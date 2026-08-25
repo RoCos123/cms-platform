@@ -87,16 +87,28 @@ Nimic de schimbat aici. Rămâne pe lista „ce rămâne pe tine" din plan: crea
 | 16 | `contact` | Contact | **Contact** | — |
 | 17 | `footer` | Footer | **Subsol** | posibil de mutat conceptual sub Setări în Faza 5 |
 
-### 6.1 Consecințe ale repurposării — de rezolvat în Faza 2
+### 6.1 Consecințe ale repurposării — confirmate 25 aug. 2026
 
-Două secțiuni și-au schimbat *scopul*, nu doar numele. Asta afectează schema JSON per secțiune și componentele, deci trebuie clarificat înainte de a le construi:
+**`logos` → „Bandă servicii":** bandă subțire, doar numele serviciilor, pentru scanare rapidă („Terapie individuală · Terapie de cuplu · Consiliere adolescenți"). Text scurt per element, fără imagini încărcate. Delimitarea față de `features` („Serviciile mele") e clară: banda = listă rapidă de nume; „Serviciile mele" = secțiunea detaliată, cu descrieri și imagini.
 
-- **`logos` → „Bandă servicii".** Originalul era o bandă de logo-uri (listă de imagini + alt text). Ca bandă de servicii, forma datelor probabil devine text + iconiță, nu imagini încărcate. **De clarificat:** ce conține exact un element, și cum se delimitează de `features` („Serviciile mele") — două secțiuni despre servicii pe aceeași pagină cer o distincție clară pentru client.
-- **`portfolio` → „Programe și materiale (opțional)".** Nu se mai elimină. **De clarificat:** ce e un element (workshop? PDF descărcabil? curs?), fiindcă asta decide dacă are nevoie de fișiere, prețuri, sau pagini proprii.
+*Consecință:* forma datelor se simplifică față de original (era listă de imagini + alt text) → devine listă de șiruri de text. Componenta e mult mai ieftină decât un RepeaterList cu ImageField.
 
-Modulul **separat** `/dashboard/portfolio` („Case studies") din original rămâne eliminat — e distinct de secțiunea `portfolio` de mai sus, nefolosit pe site-ul sursă (audit-dashboard.md §9, inconsistența #3).
+**`pricing` → blocul de pachete se PĂSTREAZĂ**, contrar propunerii de eliminare. Motivul dat: pachete reale de tip „5 ședințe la preț redus".
 
-**Rămâne neconfirmat:** blocul „Tiers (legacy)" din Tarife (abonamente tip SaaS, rămășiță de template — audit-dashboard.md §9 #2). Propunerea de eliminare stă în picioare până spui altceva.
+*Observație importantă:* asta **nu** înseamnă resuscitarea codului „Tiers (legacy)" din original — acela era un bloc de abonamente SaaS (Basic/Pro/Enterprise), rămășiță de template, afișat clientului fără sens (audit-dashboard.md §9 #2). Se construiește un bloc **nou**, în limbajul clientului: „Pachete" — titlu, număr de ședințe, preț, valabilitate. Cheia veche `tiers` din JSON nu se refolosește, ca să nu moștenim forma greșită.
+
+**`portfolio` → „Programe și materiale":** păstrat, cu **trei tipuri de element** confirmate — workshop/grup cu dată, material descărcabil, program pe termen lung.
+
+*Consecință majoră de arhitectură:* asta depășește ce încape într-o secțiune de pagină principală (un rând JSON în `site_content`). Cele trei tipuri cer, respectiv: dată + locuri + înscriere (leagă de modulul Programări, Faza 6); fișier non-imagine în Storage (azi se încarcă doar imagini); descriere lungă + preț + pagină proprie cu SEO.
+
+Recomandarea de structură — **modul propriu, nu secțiune**, în oglindă cu `services`:
+- tabel nou `programs` (analog cu `services`: slug, titlu, descriere, preț, tip, status, seo)
+- pagini publice proprii `/programe/[slug]`, ca să fie indexabile individual
+- secțiunea `portfolio` de pe prima pagină rămâne, dar devine un **teaser** care afișează câteva programe din tabel — sursă unică de adevăr, exact ca la servicii
+
+*Efort suplimentar față de plan:* nu era bugetat. Realist +3–5 zile, distribuite între Faza 2 (componente), Faza 4 (pagini publice + SEO) și Faza 6 (înscriere la workshop-uri). **De decis:** se face integral, sau se începe cu un singur tip (ex. „program pe termen lung", cel mai simplu) și se adaugă restul odată cu Programările din Faza 6.
+
+**Rămâne eliminat:** modulul separat `/dashboard/portfolio` („Case studies") din original — distinct de secțiunea de mai sus, nefolosit pe site-ul sursă (audit-dashboard.md §9, inconsistența #3).
 
 ---
 
