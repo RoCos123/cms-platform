@@ -44,6 +44,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const nextIdRef = useRef(0);
   const timersRef = useRef(new Map<number, ReturnType<typeof setTimeout>>());
+  const viewportRef = useRef<HTMLDivElement | null>(null);
 
   const clearTimer = useCallback((id: number) => {
     const timer = timersRef.current.get(id);
@@ -96,6 +97,29 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  /**
+   * Re-afișează popoverul la fiecare schimbare a listei: „top layer" e o stivă,
+   * iar un `<dialog>` deschis după el s-ar așeza deasupra. Re-afișarea îl readuce
+   * în vârf. `try/catch` fiindcă `showPopover()` aruncă dacă elementul e deja
+   * afișat sau dacă browserul nu cunoaște API-ul — în ambele cazuri, notificarea
+   * rămâne perfect audibilă prin regiunile live, doar poziționarea suferă.
+   */
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || typeof viewport.showPopover !== "function") return;
+
+    try {
+      if (toasts.length === 0) {
+        viewport.hidePopover();
+        return;
+      }
+      viewport.hidePopover();
+      viewport.showPopover();
+    } catch {
+      // Vezi mai sus: degradare tăcută, nu pierdem funcționalitatea esențială.
+    }
+  }, [toasts]);
+
   const value = useMemo(() => ({ show }), [show]);
 
   const renderToast = (toast: Toast) => (
@@ -140,36 +164,57 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={value}>
       {children}
 
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-end gap-2 p-4">
-        {/*
-          Ambele regiuni trebuie să existe în pagină înainte să apară primul mesaj
-          — un aria-live montat odată cu conținutul nu e anunțat de cititoarele de
-          ecran. De aceea stau aici goale, niciodată `display: none` (asta le-ar
-          scoate din arborele de accesibilitate și le-ar readuce în aceeași
-          situație), și de aceea nu se randează condiționat.
+      {/*
+        Anunțul și partea vizuală sunt separate deliberat.
 
-          Sunt două, nu una: „polite" așteaptă la coadă după orice altceva citește
-          cititorul de ecran în acel moment. Pentru o confirmare e exact ce trebuie
-          — nu întrerupem pe nimeni pentru „Salvat". Pentru o eroare, așteptarea
-          înseamnă că mesajul poate fi ratat cu totul, așa că erorile intră într-o
-          regiune „assertive", care întrerupe.
-        */}
-        <div
-          role="status"
-          aria-live="polite"
-          aria-atomic="false"
-          className="flex w-full flex-col items-end gap-2"
-        >
-          {toasts.filter((toast) => toast.tone !== "danger").map(renderToast)}
+        Regiunile live de mai jos rămân permanent în pagină, ascunse vizual: un
+        `aria-live` montat odată cu conținutul nu e anunțat de cititoarele de
+        ecran, iar `display: none` l-ar scoate din arborele de accesibilitate.
+        Ele poartă doar textul.
+
+        Sunt două, nu una: „polite" așteaptă la coadă după ce citește cititorul de
+        ecran în acel moment — exact ce vrem pentru „Salvat", nu întrerupem pe
+        nimeni. Pentru o eroare, așteptarea înseamnă că mesajul poate fi ratat cu
+        totul, deci erorile intră într-o regiune „assertive", care întrerupe.
+      */}
+      <div className="sr-only">
+        <div role="status" aria-live="polite" aria-atomic="false">
+          {toasts
+            .filter((toast) => toast.tone !== "danger")
+            .map((toast) => (
+              <p key={toast.id}>{toast.message}</p>
+            ))}
         </div>
-        <div
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="false"
-          className="flex w-full flex-col items-end gap-2"
-        >
-          {toasts.filter((toast) => toast.tone === "danger").map(renderToast)}
+        <div role="alert" aria-live="assertive" aria-atomic="false">
+          {toasts
+            .filter((toast) => toast.tone === "danger")
+            .map((toast) => (
+              <p key={toast.id}>{toast.message}</p>
+            ))}
         </div>
+      </div>
+
+      {/*
+        Partea vizuală e un popover, nu un simplu `fixed z-50`. Toate modalele
+        aplicației folosesc `<dialog>.showModal()`, care le urcă în „top layer" —
+        deasupra oricărui z-index. O notificare ridicată cât e deschisă biblioteca
+        media ar fi apărut sub voal, invizibilă. Un popover intră în același strat,
+        iar `viewportRef` îl re-afișează la fiecare mesaj nou ca să ajungă peste
+        dialogul deschis între timp.
+
+        `aria-hidden`: textul e deja anunțat de regiunile de mai sus; fără el,
+        fiecare mesaj s-ar citi de două ori.
+      */}
+      <div
+        ref={viewportRef}
+        popover="manual"
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none inset-[unset] bottom-0 left-0 right-0 m-0 w-full max-w-full",
+          "flex flex-col items-end gap-2 border-0 bg-transparent p-4",
+        )}
+      >
+        {toasts.map(renderToast)}
       </div>
     </ToastContext.Provider>
   );

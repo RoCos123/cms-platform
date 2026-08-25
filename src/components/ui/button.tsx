@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes, Ref } from "react";
 import { cn } from "@/lib/cn";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
@@ -20,6 +20,13 @@ const SIZES: Record<Size, string> = {
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant;
   size?: Size;
+  /**
+   * În React 19 `ref` e un prop obișnuit, dar trebuie declarat explicit ca
+   * `<Button ref={…}>` să treacă de verificarea de tipuri. Fără el, gestionarea
+   * focusului (dialoguri, liste reordonabile) ar trebui să ocolească prin
+   * atribute `data-*` și `querySelector`.
+   */
+  ref?: Ref<HTMLButtonElement>;
 };
 
 export function Button({
@@ -27,10 +34,12 @@ export function Button({
   variant = "primary",
   size = "md",
   type = "button",
+  ref,
   ...props
 }: ButtonProps) {
   return (
     <button
+      ref={ref}
       type={type}
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-base font-medium transition-colors",

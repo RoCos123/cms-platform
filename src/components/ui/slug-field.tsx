@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
 import { Button } from "./button";
 import { TextField } from "./field";
@@ -78,8 +78,10 @@ const STATUS_TEXT: Record<
   checking: { text: "Se verifică…", tone: "muted" },
   free: { text: "Disponibil", tone: "success" },
   taken: { text: "Există deja un element cu acest link", tone: "danger" },
+  // Fără promisiunea unei reîncercări care nu vine de la sine: verificarea repornește
+  // doar când se schimbă adresa, așa că mesajul spune exact atât.
   failed: {
-    text: "Nu am putut verifica adresa acum. Încearcă din nou peste câteva momente.",
+    text: "Nu am putut verifica dacă adresa e liberă. Încercăm din nou dacă o modifici.",
     tone: "muted",
   },
 };
@@ -122,6 +124,7 @@ export function SlugField({
    * între timp, iar starea „se verifică" se deduce, nu se mai setează separat.
    */
   const [answer, setAnswer] = useState<{ slug: string; outcome: Availability } | null>(null);
+  const statusId = useId();
 
   /*
    * Funcția de verificare vine de obicei ca funcție anonimă, deci se schimbă la
@@ -193,6 +196,9 @@ export function SlugField({
         autoCorrect="off"
         spellCheck={false}
         aria-invalid={Boolean(error) || taken || undefined}
+        // `aria-invalid` singur spune doar „e greșit", nu și de ce: cine revine cu
+        // Tab pe câmp după ce anunțul live a trecut ar auzi „câmp nevalid" și atât.
+        aria-describedby={status ? statusId : undefined}
         error={error}
         className={cn("font-mono", taken && !error && "border-danger")}
         hint="Adresa la care se va vedea pagina. Doar litere mici, cifre și cratime."
@@ -215,6 +221,7 @@ export function SlugField({
            * verificare, cititoarele de ecran n-ar avea ce anunța.
            */}
           <p
+            id={statusId}
             aria-live="polite"
             className={cn(
               "text-xs",

@@ -15,7 +15,7 @@ export default async function SiteUnavailablePage({ searchParams }: Props) {
       </h1>
       <p className="max-w-md text-sm text-zinc-500">
         {host
-          ? `Domeniul „${host}" nu e asociat niciunui tenant încă.`
+          ? `Domeniul „${host}” nu e asociat niciunui tenant încă.`
           : "Acesta e un preview de platformă, fără tenant asociat."}
       </p>
     </div>

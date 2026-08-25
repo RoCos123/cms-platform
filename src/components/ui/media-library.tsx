@@ -351,7 +351,7 @@ export function MediaLibrary({
     }
 
     setSelectedId(null);
-    setStatus(`„${pendingDelete.filename}" a fost ștearsă din bibliotecă.`);
+    setStatus(`„${pendingDelete.filename}” a fost ștearsă din bibliotecă.`);
     refocusAfterDelete.current = true;
   }
 
@@ -431,7 +431,7 @@ export function MediaLibrary({
                 {hasUploads && filtered.length === 0 && (
                   <EmptyState
                     title="Nicio imagine cu numele acesta"
-                    description={`Niciun fișier din bibliotecă nu conține „${query.trim()}". Încearcă doar o parte din nume.`}
+                    description={`Niciun fișier din bibliotecă nu conține „${query.trim()}”. Încearcă doar o parte din nume.`}
                     action={
                       <Button variant="secondary" onClick={showAllImages}>
                         Arată toate imaginile
@@ -619,7 +619,7 @@ export function MediaLibrary({
         title="Ștergi imaginea?"
         description={
           pendingDelete
-            ? `„${pendingDelete.filename}" dispare din bibliotecă și nu mai poate fi recuperată.`
+            ? `„${pendingDelete.filename}” dispare din bibliotecă și nu mai poate fi recuperată.`
             : ""
         }
         warning={

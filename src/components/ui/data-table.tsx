@@ -1,6 +1,6 @@
 "use client";
 
-import { isValidElement, useMemo, useState, type ReactNode } from "react";
+import { isValidElement, useMemo, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Button } from "./button";
 import { Card } from "./card";
@@ -184,6 +184,7 @@ export function DataTable<T>({
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortState>(null);
   const [requestedPage, setRequestedPage] = useState(0);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   const perPage = Math.max(1, Math.floor(pageSize));
 
@@ -248,6 +249,14 @@ export function DataTable<T>({
     setRequestedPage(0);
   }
 
+  function clearSearch() {
+    handleQueryChange("");
+    // Butonul tocmai apăsat dispare odată cu starea „niciun rezultat"; fără mutarea
+    // asta focusul ar cădea pe <body>, adică cine navighează de la tastatură ar fi
+    // aruncat înapoi la începutul paginii, departe de lista pe care o citea.
+    searchRef.current?.querySelector<HTMLElement>("[data-table-search]")?.focus();
+  }
+
   const total = prepared.length;
   const shown = sorted.length;
   const rangeText =
@@ -262,14 +271,16 @@ export function DataTable<T>({
   return (
     <Card className={cn("overflow-hidden", className)}>
       {searchable && (
-        <div className="border-b border-border px-4 py-3">
+        <div ref={searchRef} className="border-b border-border px-4 py-3">
           <div className="max-w-xs">
             <TextField
               label="Caută în listă"
               type="search"
               value={query}
               placeholder={searchPlaceholder}
+              autoComplete="off"
               onChange={(event) => handleQueryChange(event.target.value)}
+              data-table-search=""
             />
           </div>
         </div>
@@ -284,10 +295,10 @@ export function DataTable<T>({
         )
       ) : hasNoMatches ? (
         <EmptyState
-          title={`Nimic găsit pentru „${query.trim()}"`}
+          title={`Nimic găsit pentru „${query.trim()}”`}
           description="Încearcă alt cuvânt sau șterge căutarea ca să vezi din nou toată lista."
           action={
-            <Button variant="secondary" size="sm" onClick={() => handleQueryChange("")}>
+            <Button variant="secondary" size="sm" onClick={clearSearch}>
               Șterge căutarea
             </Button>
           }
@@ -385,11 +396,18 @@ export function DataTable<T>({
 
                       // Prima coloană e antetul rândului: cititoarele de ecran
                       // anunță „Titlu articol" înaintea fiecărei celule din rând.
+                      // `th` e centrat implicit de browser, deci alinierea la stânga
+                      // se scrie explicit — dar numai când coloana n-a cerut dreapta,
+                      // altfel ar anula tăcut `align: "right"` pe prima coloană.
                       return columnIndex === 0 ? (
                         <th
                           key={column.key}
                           scope="row"
-                          className={cn(cellClass, "text-left font-normal")}
+                          className={cn(
+                            cellClass,
+                            "font-normal",
+                            column.align !== "right" && "text-left",
+                          )}
                         >
                           {content}
                         </th>

@@ -9,34 +9,55 @@ const CONTROL_CLASS = cn(
   "disabled:opacity-50",
 );
 
+/** Ce primește controlul ca să fie legat corect de etichetă, ajutor și eroare. */
+type ControlBinding = {
+  id: string;
+  /** Se pune PE CONTROL, nu pe un înveliș: aria-describedby nu se moștenește. */
+  "aria-describedby": string | undefined;
+  "aria-invalid": boolean | undefined;
+};
+
 type FieldShellProps = {
   label: string;
   /** Text de ajutor sub câmp — în limbajul clientului, nu jargon. */
   hint?: ReactNode;
   error?: string;
   required?: boolean;
-  children: (controlId: string) => ReactNode;
+  children: (binding: ControlBinding) => ReactNode;
 };
 
 /**
- * Învelișul comun al oricărui câmp: etichetă legată corect de control, ajutor și
- * eroare. Componentele de mai jos îl folosesc, ca eticheta să nu fie niciodată
- * uitată — accesibilitatea nu depinde de disciplina celui care scrie formularul.
+ * Învelișul comun al oricărui câmp: etichetă legată de control, ajutor și eroare.
+ * Componentele de mai jos îl folosesc, ca legăturile de accesibilitate să nu
+ * poată fi uitate — nu depind de disciplina celui care scrie formularul.
  */
 function FieldShell({ label, hint, error, required, children }: FieldShellProps) {
   const controlId = useId();
-  const describedBy = [hint ? `${controlId}-hint` : null, error ? `${controlId}-error` : null]
-    .filter(Boolean)
-    .join(" ");
+  const describedBy =
+    [hint ? `${controlId}-hint` : null, error ? `${controlId}-error` : null]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   return (
     <div className="space-y-1.5">
       <label htmlFor={controlId} className="block text-sm font-medium text-foreground">
         {label}
-        {required && <span className="ml-1 text-danger">*</span>}
+        {required && (
+          <>
+            {/* Asteriscul singur nu spune nimic la citire; textul ascuns îl explică. */}
+            <span aria-hidden="true" className="ml-1 text-danger">
+              *
+            </span>
+            <span className="sr-only"> (obligatoriu)</span>
+          </>
+        )}
       </label>
 
-      <div aria-describedby={describedBy || undefined}>{children(controlId)}</div>
+      {children({
+        id: controlId,
+        "aria-describedby": describedBy,
+        "aria-invalid": error ? true : undefined,
+      })}
 
       {hint && (
         <p id={`${controlId}-hint`} className="text-xs text-muted-foreground">
@@ -61,9 +82,9 @@ export type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id"> &
 export function TextField({ label, hint, error, className, ...props }: TextFieldProps) {
   return (
     <FieldShell label={label} hint={hint} error={error} required={props.required}>
-      {(id) => (
+      {(binding) => (
         <input
-          id={id}
+          {...binding}
           className={cn(CONTROL_CLASS, error && "border-danger", className)}
           {...props}
         />
@@ -88,9 +109,9 @@ export function TextAreaField({
 }: TextAreaFieldProps) {
   return (
     <FieldShell label={label} hint={hint} error={error} required={props.required}>
-      {(id) => (
+      {(binding) => (
         <textarea
-          id={id}
+          {...binding}
           rows={rows}
           className={cn(CONTROL_CLASS, "resize-y", error && "border-danger", className)}
           {...props}
