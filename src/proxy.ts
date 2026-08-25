@@ -70,9 +70,23 @@ export async function proxy(request: NextRequest) {
 
   // Rolul `anon` nu mai are acces la `sites` (migrarea de întărire RLS), deci
   // rezolvarea tenantului se face cu cheia secretă, server-side.
+  const secretKey = process.env.SUPABASE_SECRET_KEY;
+
+  if (!secretKey) {
+    // Fără ea nu se poate rezolva niciun tenant, deci fiecare cerere ar eșua.
+    // Mesaj explicit în loguri: în Vercel, variabilele au bife separate per
+    // mediu, iar una setată doar pe Production lasă Preview-ul complet rupt.
+    console.error(
+      "[proxy] Lipsește SUPABASE_SECRET_KEY. În Vercel, verifică Project Settings → " +
+        "Environment Variables că e bifată pentru mediul curent (Production ȘI Preview). " +
+        "Local: .env.local",
+    );
+    return NextResponse.rewrite(new URL("/site-unavailable", request.url));
+  }
+
   const supabaseService = createSupabaseClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SECRET_KEY!,
+    secretKey,
     { auth: { persistSession: false, autoRefreshToken: false } },
   );
 
