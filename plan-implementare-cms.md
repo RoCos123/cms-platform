@@ -16,16 +16,16 @@
 
 ---
 
-## Faza 0 — Decizii înainte de cod (0,5 săpt.)
+## Faza 0 — Decizii înainte de cod (0,5 săpt.) ✅ completă (25 aug. 2026)
 
-Nu e cod, dar blochează tot ce urmează.
+Nu e cod, dar blochează tot ce urmează. Decizii detaliate în [`decizii-faza-0.md`](./decizii-faza-0.md).
 
-- [ ] **Strategie de domenii.** Cum primește fiecare tenant domeniul lui: subdomeniu platformă (`client.platforma.ro`) la început + domeniu propriu (`cabinet.ro`) mai târziu prin Vercel Domains API. Auditul arată că domeniul greșit = zero indexare Google; aici se rezolvă din arhitectură.
-- [ ] **Auth:** Supabase Auth (email + magic link / parolă). Un user aparține unui `site_id`.
-- [ ] **Storage:** Supabase Storage pentru imagini, bucket per tenant sau prefix `site_id/`.
-- [ ] **Confirmă lista de secțiuni și denumirile în limba clientului** (Hero → „Prima secțiune" etc.).
+- [x] **Strategie de domenii.** Decis: **domeniu propriu din prima fază** pentru fiecare tenant (nu subdomeniu platformă întâi) — diferit față de varianta inițială schițată mai jos. Vezi `decizii-faza-0.md` §2 pentru implicațiile asupra middleware-ului de rezolvare tenant și pentru ce rămâne totuși în Faza 7 (automatizarea conectării, nu conectarea în sine). Numele platformei: `sitepsihologi.ro`.
+- [x] **Auth:** Supabase Auth — **doar email + parolă** (fără magic link). Un user aparține unui `site_id`.
+- [x] **Storage:** Supabase Storage — **un singur bucket, prefix `site_id/`** (nu bucket per tenant), pentru scalare la mii de tenanți.
+- [x] **Lista de secțiuni și denumirile în limba clientului** — propunere completă (17 secțiuni) în `decizii-faza-0.md` §6, inclusiv 2 candidați la eliminare ca cod mort. De confirmat definitiv până la Faza 2.
 
-**Risc:** dacă strategia de domenii nu e clară acum, guardrail-urile SEO din Faza 4 trebuie refăcute.
+**Risc (istoric, acum rezolvat):** dacă strategia de domenii nu e clară acum, guardrail-urile SEO din Faza 4 trebuie refăcute. Strategia „domeniu propriu din prima fază" schimbă riscul: fără subdomeniu-fallback, un tenant nou e „offline" până propagă DNS-ul lui — de comunicat la onboarding manual (Fazele 1–6), vezi `decizii-faza-0.md` §2.
 
 ---
 

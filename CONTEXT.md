@@ -17,6 +17,7 @@ Reperul de efort: originalul (single-tenant, un client, cu bug-uri de configurar
 - [`audit-dashboard.md`](./audit-dashboard.md) — analiză completă a panoului de administrare original (rute, componente, model de date, fluxuri).
 - [`audit-site-public.md`](./audit-site-public.md) — audit SEO/QA al site-ului public original. **Nu e documentație de arhitectură vizuală** — nu descrie pixel-cu-pixel cum arată variantele Hero A/B/C. Acelea se extrag direct de pe site-ul live la momentul construirii.
 - [`plan-implementare-cms.md`](./plan-implementare-cms.md) — planul pe faze (Faza 0–8), cu estimări, dependențe și riscuri per fază.
+- [`decizii-faza-0.md`](./decizii-faza-0.md) — deciziile confirmate ale Fazei 0 (domeniu, auth, storage, denumiri secțiuni) și implicațiile lor tehnice pentru Faza 1.
 
 ---
 
@@ -66,4 +67,6 @@ Important: e timp de lucru concentrat, nu calendaristic. Bottleneck-ul real nu e
 
 ## Următorul pas planificat
 
-**Faza 0** din plan: confirmare strategie de domenii (subdomeniu platformă la început vs. domeniu propriu per client) + denumiri de secțiuni în română + Resend/Turnstile confirmate. Apoi Faza 1 (fundația multi-tenant: schema + RLS + auth + app shell).
+**Faza 0 e completă** (vezi [`decizii-faza-0.md`](./decizii-faza-0.md)): platforma se numește `sitepsihologi.ro`; fiecare tenant vine cu domeniul lui propriu din prima fază (nu subdomeniu platformă); auth doar email+parolă; Storage într-un singur bucket cu prefix `site_id/`; Resend/Turnstile reconfirmate; propunere de denumiri RO pentru cele 17 secțiuni (de confirmat definitiv până la Faza 2).
+
+**Următor: Faza 1** — fundația multi-tenant: schema + RLS de la prima migrare, `sites.domain` ca rezolvare de tenant (inclusiv fallback pentru dev local și preview-uri Vercel, vezi `decizii-faza-0.md` §2), auth cu parolă, app shell.
