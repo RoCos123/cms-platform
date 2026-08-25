@@ -65,29 +65,38 @@ Nimic de schimbat aici. Rămâne pe lista „ce rămâne pe tine" din plan: crea
 
 ## 6. Secțiunile paginii principale — denumiri în română
 
-**Propunere**, nu decizie confirmată explicit — de revizuit și ajustat. Pornește de la cele 4 denumiri deja stabilite în `audit-dashboard.md` (Hero, Features, Showcase, CTA) și le extinde consecvent pe restul de 13, plus semnalează 2 candidați la eliminare completă (cod mort, deja documentat în audit).
+**Confirmat 25 aug. 2026.** Cheile din DB rămân cele originale (camelCase, ca în auditul dashboard-ului) — se schimbă doar eticheta afișată clientului. Vocabularul e al clientului, nu al developerului: „Hero" devine „Prima secțiune", „CTA" devine „Invitație la programare".
 
-| Cheie (DB) | Etichetă originală | Propunere RO | Notă |
-|---|---|---|---|
-| `hero` | Hero | **Prima secțiune** | confirmat în audit |
-| `logos` | Logos | **Recunoaștere** | candidat la eliminare — un cabinet solo, fără parteneri/presă, poate n-are ce pune aici; de confirmat cu conținut real |
-| `stats` | Stats | **Cifre cheie** | — |
-| `aboutTeaser` | About teaser | **Despre mine (rezumat)** | — |
-| `problem` | Problem | **Provocarea** | — |
-| `solution` | Solution | **Cum te pot ajuta** | — |
-| `features` | Features | **Servicii** | confirmat în audit |
-| `showcase` | Showcase | **Cabinetul** | confirmat în audit |
-| `howItWorks` | How it works | **Cum decurge o programare** | — |
-| `useCases` | Use cases | **Pentru cine e potrivit** | — |
-| `portfolio` | „Templates" (etichetă greșită, rutează spre `portfolio`) | — | **propun eliminare** — cod mort confirmat în audit (§9), plus modulul separat `/dashboard/portfolio` „Case studies", niciunul folosit pe site-ul sursă |
-| `testimonials` | Testimonials | **Testimoniale** | rămâne cu bifa „acord scris obținut" (guardrail deontologic, Faza 6) |
-| `pricing` | Pricing | **Tarife** | blocul intern „Tiers (legacy)" — **propun eliminare** |
-| `faq` | FAQ | **Întrebări frecvente** | — |
-| `cta` | CTA | **Invitație la programare** | confirmat în audit |
-| `contact` | Contact | **Contact** | deja clar, fără schimbare |
-| `footer` | Footer | **Subsol** | posibil de mutat conceptual sub Setări în Faza 5, nu o decizie de Faza 0 |
+| # | Cheie (DB) | Etichetă originală | **Etichetă în panou** | Notă |
+|---|---|---|---|---|
+| 1 | `hero` | Hero | **Prima secțiune** | — |
+| 2 | `logos` | Logos | **Bandă servicii** | ⚠️ **repurposat** — nu mai e bandă de logo-uri (parteneri/presă), ci bandă de servicii. Schimbă forma datelor, vezi §6.1 |
+| 3 | `stats` | Stats | **Experiență** | — |
+| 4 | `aboutTeaser` | About teaser | **Despre mine (pe prima pagină)** | denumirea spune explicit *unde* apare — evită confuzia cu pagina „Despre mine" |
+| 5 | `problem` | Problem | **Situații frecvente** | — |
+| 6 | `solution` | Solution | **Cum lucrez** | — |
+| 7 | `features` | Features | **Serviciile mele** | — |
+| 8 | `showcase` | Showcase | **Cabinetul** | — |
+| 9 | `howItWorks` | How it works | **Cum decurge colaborarea** | mai larg decât „o programare" — acoperă tot parcursul, nu doar prima ședință |
+| 10 | `useCases` | Use cases | **Cui mă adresez** | — |
+| 11 | `portfolio` | „Templates" | **Programe și materiale (opțional)** | ⚠️ **păstrat și repurposat** — nu se elimină, cum se propusese. Vezi §6.1 |
+| 12 | `testimonials` | Testimonials | **Păreri** | rămâne cu bifa „acord scris obținut" (guardrail deontologic, Faza 6) |
+| 13 | `pricing` | Pricing | **Tarife** | — |
+| 14 | `faq` | FAQ | **Întrebări frecvente** | — |
+| 15 | `cta` | CTA | **Invitație la programare** | — |
+| 16 | `contact` | Contact | **Contact** | — |
+| 17 | `footer` | Footer | **Subsol** | posibil de mutat conceptual sub Setări în Faza 5 |
 
-**De confirmat înainte sau în timpul Fazei 2** (nu blochează Faza 1): denumirile exacte de mai sus, și dacă `logos`/`portfolio` chiar se elimină sau rămân opționale.
+### 6.1 Consecințe ale repurposării — de rezolvat în Faza 2
+
+Două secțiuni și-au schimbat *scopul*, nu doar numele. Asta afectează schema JSON per secțiune și componentele, deci trebuie clarificat înainte de a le construi:
+
+- **`logos` → „Bandă servicii".** Originalul era o bandă de logo-uri (listă de imagini + alt text). Ca bandă de servicii, forma datelor probabil devine text + iconiță, nu imagini încărcate. **De clarificat:** ce conține exact un element, și cum se delimitează de `features` („Serviciile mele") — două secțiuni despre servicii pe aceeași pagină cer o distincție clară pentru client.
+- **`portfolio` → „Programe și materiale (opțional)".** Nu se mai elimină. **De clarificat:** ce e un element (workshop? PDF descărcabil? curs?), fiindcă asta decide dacă are nevoie de fișiere, prețuri, sau pagini proprii.
+
+Modulul **separat** `/dashboard/portfolio` („Case studies") din original rămâne eliminat — e distinct de secțiunea `portfolio` de mai sus, nefolosit pe site-ul sursă (audit-dashboard.md §9, inconsistența #3).
+
+**Rămâne neconfirmat:** blocul „Tiers (legacy)" din Tarife (abonamente tip SaaS, rămășiță de template — audit-dashboard.md §9 #2). Propunerea de eliminare stă în picioare până spui altceva.
 
 ---
 
