@@ -118,6 +118,24 @@ Tabelul `programs` se proiectează de la început cu o coloană `type`, ca adău
 
 ---
 
+## 7. Direcția vizuală a site-ului public (confirmat 25 aug. 2026)
+
+Răspunde la riscul lăsat deschis în `plan-implementare-cms.md` §Faza 4 („fidelitatea vizuală a variantelor față de original — se decide: replicăm exact site-ul Rodi, sau redesenăm mai curat").
+
+**Decizie: redesenăm curat, NU replicăm site-ul original.** Variantele A/B/C ale originalului nu mai sunt o referință de urmat pixel cu pixel; auditul rămâne specificație pentru *ce conține* fiecare secțiune, nu pentru cum arată.
+
+**Ton: cald și liniștitor.** Publicul-țintă e cineva anxios, care ezită să sune. Designul trebuie să reducă bariera, nu să impresioneze: culori blânde, spațiu liber generos, colțuri rotunjite, contrast moderat. Nu clinic, nu corporatist.
+
+**Fotografii: calitate mixtă — și profesionale, și slabe.** E cea mai constrângătoare decizie de aici, fiindcă exclude cele două soluții simple:
+- Un layout construit în jurul unor imagini mari (tipar obișnuit la site-uri de prezentare) arată jalnic la un client cu poze făcute cu telefonul.
+- Un layout care ignoră imaginile irosește pozele clientului care a plătit un fotograf.
+
+Deci: **imaginile sunt un plus, niciodată o cerință structurală.** Fiecare secțiune trebuie să arate complet și intenționat și fără nicio imagine — ierarhia se ține pe tipografie, spațiere și culoare. Când există o imagine bună, secțiunea o folosește vizibil, dar fără ca absența ei să lase o gaură. De verificat la fiecare variantă construită în Faza 4: *arată bine cu zero poze?*
+
+**Culori: propuse de mine**, verificate pentru contrast (WCAG) și funcționale pe ambele teme. Sunt doar punctul de plecare — „branding ca date" din Faza 7 le face schimbabile per client din panou, fără fork de cod. Tokenurile semantice din `src/app/globals.css` sunt deja construite pentru asta.
+
+---
+
 ## Următorul pas
 
 Faza 1 — Fundația multi-tenant: schema Postgres cu `site_id` + RLS din prima migrare, `sites.domain` ca rezolvare de tenant (vezi §2 mai sus pentru implicații), Auth cu parolă, App shell.
