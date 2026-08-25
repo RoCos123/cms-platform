@@ -69,4 +69,8 @@ Important: e timp de lucru concentrat, nu calendaristic. Bottleneck-ul real nu e
 
 **Faza 0 e completă** (vezi [`decizii-faza-0.md`](./decizii-faza-0.md)): platforma se numește `sitepsihologi.ro`; fiecare tenant vine cu domeniul lui propriu din prima fază (nu subdomeniu platformă); auth doar email+parolă; Storage într-un singur bucket cu prefix `site_id/`; Resend/Turnstile reconfirmate; propunere de denumiri RO pentru cele 17 secțiuni (de confirmat definitiv până la Faza 2).
 
-**Următor: Faza 1** — fundația multi-tenant: schema + RLS de la prima migrare, `sites.domain` ca rezolvare de tenant (inclusiv fallback pentru dev local și preview-uri Vercel, vezi `decizii-faza-0.md` §2), auth cu parolă, app shell.
+**Faza 1 e completă** (25 aug. 2026) — fundația multi-tenant e în picioare și verificată pe un preview Vercel: schema + RLS din prima migrare, rezolvarea tenantului pe domeniu (`src/proxy.ts`), auth cu parolă, app shell. Detalii, livrabil verificat și capcanele întâlnite: `plan-implementare-cms.md` §Faza 1.
+
+**Stare infrastructură:** proiect Supabase creat (schema rulată, 2 tenanți de test seedați — `supabase/seed-test-tenants.sql`); proiect Vercel conectat, deploy pe branch ca Preview.
+
+**Următor: Faza 2** — design system: ImageField + MediaLibrary + RepeaterList + VariantPicker cu miniaturi, DataTable, SaveBar cu gardă de modificări nesalvate. Plus două restanțe din Faza 1: helper-ul de `audit_log` (odată ce apar primele mutații) și rularea testului automat `e2e/tenant-rls.spec.ts`.

@@ -29,20 +29,26 @@ Nu e cod, dar blochează tot ce urmează. Decizii detaliate în [`decizii-faza-0
 
 ---
 
-## Faza 1 — Fundația multi-tenant (Săpt. 1–2)
+## Faza 1 — Fundația multi-tenant (Săpt. 1–2) ✅ completă (25 aug. 2026)
 
 Partea fără surprize, dar cea pe care se sprijină totul.
 
-- Proiect Supabase; schema completă cu `site_id` pe **fiecare** tabel; **RLS din prima migrare** (nu retrofit).
-- Tabelele: `sites`, `users`, `site_content`, `site_settings`, `pages`, `services`, `blog_categories`, `blog_articles`, `uploads`, `contact_messages`, `appointments`, `audit_log`.
-- Auth + mapare user → `site_id`.
-- **Rezolvarea tenantului**: middleware care mapează domeniul cererii → `site_id` (tabelul `sites`).
-- App shell: sidebar cu grupuri pliabile, topbar, layout, temă light/dark.
-- Infrastructura de audit: un helper prin care trec toate mutațiile și scriu automat în `audit_log`.
+- [x] Proiect Supabase; schema completă cu `site_id` pe **fiecare** tabel; **RLS din prima migrare** (nu retrofit). → `supabase/migrations/20260825120000_init_schema.sql`
+- [x] Tabelele: `sites`, `users`, `site_content`, `site_settings`, `pages`, `services`, `blog_categories`, `blog_articles`, `uploads`, `contact_messages`, `appointments`, `audit_log`.
+- [x] Auth + mapare user → `site_id`. Doar email+parolă (decizii-faza-0.md §3).
+- [x] **Rezolvarea tenantului**: `src/proxy.ts` (Next.js 16 a redenumit middleware → proxy) + `src/lib/tenant.ts`, pe domeniul propriu al clientului. Include canonicalizare www/apex și fallback `DEV_TENANT_DOMAIN` pentru dev local + preview-uri Vercel.
+- [x] App shell: sidebar cu grupuri pliabile, topbar, layout, temă light/dark.
+- [ ] Infrastructura de audit: **amânată în Faza 2** — nu există încă nicio mutație prin care să treacă (primele apar odată cu editoarele de conținut). Tabelul `audit_log` + RLS-ul lui există deja.
 
-**Livrabil:** te loghezi, vezi dashboard-ul gol al unui tenant; un al doilea tenant de test **nu** poate vedea datele primului (RLS verificat cu test automat).
+**Livrabil — verificat:** login pe un preview Vercel cu userul tenantului A → dashboard-ul lui, cu datele lui. Izolarea RLS confirmată prin impersonare în SQL (`set_config('request.jwt.claims', …)` + `set role authenticated`): fiecare tenant vede exact un `site_id`, al lui, la un `select` fără niciun filtru.
 **Dependențe:** Faza 0.
-**Risc:** RLS greșit = scurgere de date între clienți. Se testează cu Playwright de la început, nu la final.
+**Risc (rămas parțial deschis):** testul automat Playwright (`e2e/tenant-rls.spec.ts`) e scris, dar **încă nerulat** — mediul remote blochează egress-ul către Supabase, iar local nu era Node instalat. De rulat la prima ocazie; până atunci acoperirea vine din verificarea SQL manuală de mai sus.
+
+### Capcane întâlnite (de evitat data viitoare)
+
+- **Vercel importat pe un `master` gol** (doar documentație, fără `package.json`) → auto-detecția a setat Framework Preset = „Other", iar deploy-urile ieșeau „Ready" dar dădeau **404 pe orice rută**, cu build-ul Next rulând corect în loguri. Reparat cu `vercel.json` (`"framework": "nextjs"`) + preset schimbat manual. Simptom util: fișierele din `public/` se serveau, paginile nu.
+- **Preview-urile Vercel au Deployment Protection activ implicit** — 404-uri de la edge, înainte de codul aplicației.
+- **Variabilele de mediu Vercel se aplică doar la deploy-uri noi**, niciodată retroactiv.
 
 ---
 
