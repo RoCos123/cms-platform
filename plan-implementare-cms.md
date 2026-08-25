@@ -49,6 +49,8 @@ Verificarea inițială n-a prins-o fiindcă **testa doar rolul `authenticated`**
 
 Reparat în `supabase/migrations/20260825140000_harden_rls.sql`: acces retras complet pentru `anon`; citirea publică se face server-side cu cheia secretă, prin `src/lib/supabase/admin.ts`, care impune filtrul pe tenant prin construcție. Testul `e2e/tenant-rls.spec.ts` acoperă acum ambele roluri.
 
+**Verificat în producție (25 aug.):** migrarea rulată, login + dashboard funcționale pe `cms-platform-delta.vercel.app` cu politicile întărite — deci restrângerea accesului `anon` n-a rupt nimic din fluxul aplicației.
+
 **Restanță:** testul automat e scris dar **încă nerulat** — mediul remote blochează egress-ul către Supabase, iar local nu e Node instalat. Până la rulare, acoperirea vine din verificarea SQL manuală.
 
 ### Capcane întâlnite (de evitat data viitoare)
