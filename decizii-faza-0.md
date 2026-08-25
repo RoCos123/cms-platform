@@ -106,7 +106,13 @@ Recomandarea de structură — **modul propriu, nu secțiune**, în oglindă cu 
 - pagini publice proprii `/programe/[slug]`, ca să fie indexabile individual
 - secțiunea `portfolio` de pe prima pagină rămâne, dar devine un **teaser** care afișează câteva programe din tabel — sursă unică de adevăr, exact ca la servicii
 
-*Efort suplimentar față de plan:* nu era bugetat. Realist +3–5 zile, distribuite între Faza 2 (componente), Faza 4 (pagini publice + SEO) și Faza 6 (înscriere la workshop-uri). **De decis:** se face integral, sau se începe cu un singur tip (ex. „program pe termen lung", cel mai simplu) și se adaugă restul odată cu Programările din Faza 6.
+*Efort suplimentar față de plan:* nu era bugetat. Realist +3–5 zile, distribuite între Faza 2 (componente), Faza 4 (pagini publice + SEO) și Faza 6 (înscriere la workshop-uri).
+
+**Decis (25 aug. 2026): incremental.** Se construiește întâi **doar „program pe termen lung"** — titlu, descriere, preț, pagină proprie cu SEO; zero dependențe noi, intră în tiparul deja existent al `services`. Celelalte două tipuri se adaugă când costul lor devine marginal:
+- **workshop cu dată** → în Faza 6, odată cu modulul Programări (are oricum nevoie de calendar + înscriere + email)
+- **material descărcabil** → când se decide politica de fișiere non-imagine în Storage (tipuri acceptate, limită de mărime, acces public vs. protejat)
+
+Tabelul `programs` se proiectează de la început cu o coloană `type`, ca adăugarea celorlalte două tipuri să fie o migrare aditivă, nu o restructurare.
 
 **Rămâne eliminat:** modulul separat `/dashboard/portfolio` („Case studies") din original — distinct de secțiunea de mai sus, nefolosit pe site-ul sursă (audit-dashboard.md §9, inconsistența #3).
 
