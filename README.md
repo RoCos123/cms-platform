@@ -20,6 +20,14 @@ Ai nevoie de un proiect Supabase (vezi `.env.local.example` pentru variabilele e
 
 Fără un domeniu real la îndemână pentru dev local, setează `DEV_TENANT_DOMAIN` în `.env.local` cu domeniul unui site seedat manual în tabelul `sites` — vezi `decizii-faza-0.md` §2 pentru raționament.
 
+## Deploy pe Vercel
+
+Producția (`master`) e goală până la primul merge — tot ce există acum e pe branch-uri de feature, deployate ca Preview. Variabile de mediu necesare în Project Settings → Environment Variables (Preview, măcar):
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `DEV_TENANT_DOMAIN` — obligatoriu ca să poți ajunge la `/login` pe un URL `*.vercel.app`, altfel proxy.ts nu are niciun domeniu propriu de rezolvat (vezi `src/proxy.ts`).
+
 ## Structură
 
 - `src/proxy.ts` — rezolvarea tenantului (domeniu → `site_id`) + verificări optimistice de autentificare. Rulează pe fiecare cerere.
