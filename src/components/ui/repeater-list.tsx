@@ -31,6 +31,20 @@ export type RepeaterListProps<T> = {
   className?: string;
 };
 
+/**
+ * Ce anume trebuie să primească focusul după ce lista s-a schimbat. Ținem cererea
+ * într-un ref, nu în state: nu trebuie să declanșeze o re-randare, doar să fie
+ * citită o dată, după ce DOM-ul nou e pe ecran.
+ */
+type FocusRequest =
+  | { kind: "move"; index: number; direction: "up" | "down" }
+  | { kind: "delete"; index: number }
+  | { kind: "add"; index: number };
+
+/** Primul lucru de completat dintr-un rând nou — restul e decorul din jurul lui. */
+const CONTENT_CONTROLS =
+  "input:not([type='hidden']):not([disabled]), textarea:not([disabled]), select:not([disabled]), [contenteditable='true']";
+
 function moveItem<T>(list: T[], from: number, to: number): T[] {
   const next = [...list];
   const [moved] = next.splice(from, 1);
@@ -59,20 +73,53 @@ export function RepeaterList<T>({
   const [pendingDelete, setPendingDelete] = useState<{ index: number; key: string } | null>(null);
   const [status, setStatus] = useState("");
 
+  const rootRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
-  const focusAfterMove = useRef<{ index: number; direction: "up" | "down" } | null>(null);
+  const focusRequest = useRef<FocusRequest | null>(null);
+  /**
+   * Aceeași valoare ca `grabbedIndex`, dar citibilă imediat. `dragstart` ajunge
+   * la noi înaintea oricărei re-randări, iar decizia „tragerea a pornit de la
+   * mâner?" nu are voie să depindă de momentul în care React a apucat să comite.
+   */
+  const grabbedRef = useRef<number | null>(null);
 
   /**
    * După o mutare cu tastatura, rândul se re-randează cu altă cheie și focusul
    * s-ar pierde pe <body> — utilizatorul ar trebui să navigheze de la capăt ca
-   * să mai apese o dată „Mută mai sus". Îl punem înapoi pe același buton.
+   * să mai apese o dată „Mută mai sus”. Îl punem înapoi pe același buton.
+   *
+   * La ștergere e și mai rău: ConfirmDialog readuce focusul pe butonul care l-a
+   * deschis, dar acel buton tocmai a dispărut din DOM odată cu rândul, deci
+   * nimeni nu-l mai poate primi. Îl mutăm noi pe vecinul rămas.
    */
   useEffect(() => {
-    const target = focusAfterMove.current;
-    if (!target || !listRef.current) return;
-    focusAfterMove.current = null;
+    const target = focusRequest.current;
+    if (!target) return;
+    focusRequest.current = null;
 
-    const rows = listRef.current.querySelectorAll<HTMLElement>("[data-repeater-row]");
+    const rows = listRef.current
+      ? Array.from(listRef.current.querySelectorAll<HTMLElement>("[data-repeater-row]"))
+      : [];
+
+    const addButtonEl = rootRef.current?.querySelector<HTMLButtonElement>("[data-repeater-add]");
+
+    if (target.kind === "delete") {
+      // Rândul de pe aceeași poziție (sau ultimul, dacă am șters de la coadă);
+      // dacă lista s-a golit, singurul lucru rămas de făcut e adăugarea.
+      const row = rows[Math.min(target.index, rows.length - 1)];
+      (row?.querySelector<HTMLButtonElement>("[data-repeater-delete]") ?? addButtonEl)?.focus();
+      return;
+    }
+
+    if (target.kind === "add") {
+      // La primul element, butonul de adăugare se mută din starea goală în rândul
+      // de sub listă: elementul apăsat dispare din DOM și focusul ar cădea pe
+      // <body>. Îl ducem în câmpul nou-apărut — oricum acolo urmează să scrie.
+      const content = rows[target.index]?.querySelector<HTMLElement>("[data-repeater-content]");
+      (content?.querySelector<HTMLElement>(CONTENT_CONTROLS) ?? addButtonEl)?.focus();
+      return;
+    }
+
     const row = rows[target.index];
     if (!row) return;
 
@@ -85,17 +132,21 @@ export function RepeaterList<T>({
   /**
    * Plasă de siguranță: dacă mânerul a fost apăsat dar tragerea nu a mai pornit,
    * `draggable` ar rămâne activ pe rând și ar bloca selectarea textului din câmpuri.
+   *
+   * Ascultăm doar `pointerup`, nu și `pointercancel`: browserul trimite
+   * `pointercancel` exact în clipa în care pornește o tragere nativă, deci l-am
+   * folosi ca să anulăm chiar tragerea pe care utilizatorul tocmai a cerut-o.
+   * Sfârșitul unei trageri reale îl aflăm din `dragend`.
    */
   useEffect(() => {
     if (grabbedIndex === null) return;
 
-    const release = () => setGrabbedIndex(null);
-    window.addEventListener("pointerup", release);
-    window.addEventListener("pointercancel", release);
-    return () => {
-      window.removeEventListener("pointerup", release);
-      window.removeEventListener("pointercancel", release);
+    const release = () => {
+      grabbedRef.current = null;
+      setGrabbedIndex(null);
     };
+    window.addEventListener("pointerup", release);
+    return () => window.removeEventListener("pointerup", release);
   }, [grabbedIndex]);
 
   const atLimit = typeof max === "number" && items.length >= max;
@@ -108,19 +159,29 @@ export function RepeaterList<T>({
     const to = direction === "up" ? from - 1 : from + 1;
     if (to < 0 || to >= items.length) return;
 
-    focusAfterMove.current = { index: to, direction };
+    focusRequest.current = { kind: "move", index: to, direction };
     onChange(moveItem(items, from, to));
     announceMove(to + 1, items.length);
+  }
+
+  function grabHandle(index: number) {
+    grabbedRef.current = index;
+    setGrabbedIndex(index);
+  }
+
+  function releaseHandle() {
+    grabbedRef.current = null;
+    setGrabbedIndex(null);
   }
 
   function resetDrag() {
     setDragIndex(null);
     setDropIndex(null);
-    setGrabbedIndex(null);
+    releaseHandle();
   }
 
   function handleDragStart(event: DragEvent<HTMLLIElement>, index: number) {
-    if (grabbedIndex !== index) {
+    if (grabbedRef.current !== index) {
       // Tragere pornită din altă parte decât mânerul (ex. text selectat).
       event.preventDefault();
       return;
@@ -166,19 +227,24 @@ export function RepeaterList<T>({
 
   function handleAdd() {
     if (atLimit) return;
+    focusRequest.current = { kind: "add", index: items.length };
     onChange([...items, onAdd()]);
     setStatus(`Element nou adăugat pe poziția ${items.length + 1}.`);
   }
 
   function confirmDelete() {
     if (!pendingDelete) return;
-    const { index, key } = pendingDelete;
+    const { key } = pendingDelete;
 
     // Lista se putea schimba cât timp dialogul era deschis (altă filă, salvare
-    // automată). Ștergem doar dacă pe poziția aceea e tot elementul confirmat.
-    if (index < items.length && getKey(items[index], index) === key) {
+    // automată, o reordonare). Ștergem după cheie, nu după poziția memorată:
+    // dacă elementul confirmat s-a mutat între timp, tot pe el îl vrem șters, nu
+    // pe vecinul care i-a luat locul — și nici nu vrem un „Șterge” fără efect.
+    const index = items.findIndex((item, i) => getKey(item, i) === key);
+    if (index !== -1) {
       onChange(items.filter((_, i) => i !== index));
       setStatus(`Element șters de pe poziția ${index + 1}.`);
+      focusRequest.current = { kind: "delete", index };
     }
     setPendingDelete(null);
   }
@@ -190,18 +256,18 @@ export function RepeaterList<T>({
   }
 
   const addButton = (
-    <Button variant="secondary" onClick={handleAdd} disabled={atLimit}>
+    <Button variant="secondary" onClick={handleAdd} disabled={atLimit} data-repeater-add="">
       {addLabel}
     </Button>
   );
 
   return (
-    <div className={cn("space-y-3", className)}>
+    <div ref={rootRef} className={cn("space-y-3", className)}>
       {items.length === 0 ? (
         <Card className="border-dashed">
           <EmptyState
             title="Nu ai adăugat încă nimic aici"
-            description={`Apasă „${addLabel}" ca să începi. După aceea poți schimba ordinea oricând, trăgând elementele de mâner sau cu butoanele săgeată.`}
+            description={`Apasă „${addLabel}” ca să începi. După aceea poți schimba ordinea oricând, trăgând elementele de mâner sau cu butoanele săgeată.`}
             action={addButton}
           />
         </Card>
@@ -209,6 +275,8 @@ export function RepeaterList<T>({
         <>
           <ul
             ref={listRef}
+            /* Preflight scoate bulinele, iar VoiceOver pierde odată cu ele și semantica de listă. */
+            role="list"
             className="flex flex-col gap-2"
             onDragOver={(event) => {
               // Fără preventDefault pe container, browserul refuză drop-ul în spațiile dintre rânduri.
@@ -249,7 +317,7 @@ export function RepeaterList<T>({
                          * tastatură, iar calea reală sunt butoanele „Mută mai sus/jos".
                          */
                         tabIndex={-1}
-                        onPointerDown={() => setGrabbedIndex(index)}
+                        onPointerDown={() => grabHandle(index)}
                         className="cursor-grab rounded-base p-1 text-muted-foreground hover:bg-surface-hover hover:text-foreground active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                       >
                         <GripIcon />
@@ -262,13 +330,20 @@ export function RepeaterList<T>({
                       </span>
                     </div>
 
-                    <div className="min-w-0 flex-1">{renderItem(item, index)}</div>
+                    <div data-repeater-content className="min-w-0 flex-1">
+                      {renderItem(item, index)}
+                    </div>
 
                     <div className="flex shrink-0 items-center gap-1">
+                      {/*
+                       * Poziția intră în fiecare etichetă: altfel toate rândurile ar avea
+                       * exact același nume accesibil („Mută mai sus"), iar la parcurgerea
+                       * cu cititorul de ecran nimic n-ar spune pe care element ești.
+                       */}
                       <Button
                         variant="ghost"
                         size="sm"
-                        aria-label="Mută mai sus"
+                        aria-label={`Mută ${itemLabel} de pe poziția ${index + 1} mai sus`}
                         data-move="up"
                         disabled={index === 0}
                         onClick={() => handleMove(index, "up")}
@@ -279,7 +354,7 @@ export function RepeaterList<T>({
                       <Button
                         variant="ghost"
                         size="sm"
-                        aria-label="Mută mai jos"
+                        aria-label={`Mută ${itemLabel} de pe poziția ${index + 1} mai jos`}
                         data-move="down"
                         disabled={isLast}
                         onClick={() => handleMove(index, "down")}
@@ -290,7 +365,8 @@ export function RepeaterList<T>({
                       <Button
                         variant="ghost"
                         size="sm"
-                        aria-label={`Șterge ${itemLabel}`}
+                        aria-label={`Șterge ${itemLabel} de pe poziția ${index + 1}`}
+                        data-repeater-delete=""
                         onClick={() => setPendingDelete({ index, key: getKey(item, index) })}
                         className="size-8 px-0 hover:bg-danger-surface hover:text-danger"
                       >
@@ -321,6 +397,9 @@ export function RepeaterList<T>({
 
       <ConfirmDialog
         open={pendingDelete !== null}
+        // Fără tonul de pericol, „Șterge definitiv" ar fi butonul principal albastru
+        // — aceeași culoare cu „Salvează" din restul aplicației.
+        tone="danger"
         title={`Ștergi ${itemLabel}?`}
         description={
           pendingDelete

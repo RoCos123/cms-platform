@@ -50,6 +50,8 @@ export type ConfirmDialogProps = ConfirmDialogBaseProps & ConfirmDialogCloseProp
  * pe „Renunță": la o ștergere, un Enter din reflex nu trebuie să distrugă nimic.
  */
 const INITIAL_FOCUS_ATTR = "data-confirm-initial-focus";
+/** Butonul de reîncercare după o acțiune eșuată — vezi efectul care păstrează focusul. */
+const CONFIRM_ACTION_ATTR = "data-confirm-action";
 
 export function ConfirmDialog({
   open,
@@ -67,11 +69,25 @@ export function ConfirmDialog({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const pointerDownOnBackdrop = useRef(false);
+  /** A pornit o confirmare din acest dialog? Decide unde se întoarce focusul după. */
+  const actionRan = useRef(false);
   const [running, setRunning] = useState(false);
 
   const titleId = useId();
   const descriptionId = useId();
+  const warningId = useId();
   const busy = pending || running;
+
+  /*
+   * Avertismentul e exact partea pe care utilizatorul nu o poate deduce din ecran
+   * („imaginea e folosită în 3 locuri"). Dacă nu intră în descrierea dialogului,
+   * cititorul de ecran anunță la deschidere doar titlul, iar consecința — motivul
+   * pentru care dialogul există — rămâne nespusă.
+   */
+  const describedBy =
+    [description ? descriptionId : null, warning ? warningId : null]
+      .filter(Boolean)
+      .join(" ") || undefined;
 
   const restoreFocus = useCallback(() => {
     const trigger = triggerRef.current;
@@ -95,10 +111,40 @@ export function ConfirmDialog({
       // Reținem declanșatorul cât încă are focusul, înainte ca modalul să-l fure.
       triggerRef.current =
         document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      actionRan.current = false;
       dialog.showModal();
     }
     dialog.querySelector<HTMLElement>(`[${INITIAL_FOCUS_ATTR}]`)?.focus();
   }, [open]);
+
+  /*
+   * Cât timp acțiunea rulează, ambele butoane sunt dezactivate — inclusiv cel pe
+   * care stătea focusul când utilizatorul a apăsat Enter. Browserul mută focusul
+   * de pe un element dezactivat pe <body>, adică în afara dialogului: cititorul
+   * de ecran pierde contextul, iar la un eșec (dialogul rămâne deschis) omul
+   * rămâne fără niciun punct de plecare. Îl ținem pe dialog cât se lucrează și îl
+   * punem înapoi pe butonul de confirmare când s-a terminat fără să se închidă.
+   */
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog?.open) return;
+    const active = document.activeElement;
+
+    if (busy) {
+      // `contains` include și dialogul însuși, deci mutarea e idempotentă.
+      if (!dialog.contains(active)) dialog.focus();
+      return;
+    }
+
+    // Focusul a rămas pe un control adevărat din dialog — nu i-l luăm de sub mână.
+    if (active !== dialog && dialog.contains(active)) return;
+
+    // După o confirmare eșuată omul deja a decis: îl punem pe butonul pe care
+    // tocmai l-a apăsat, ca reîncercarea să fie la o apăsare distanță. Altfel
+    // rămâne regula de la deschidere — „Renunță", nu acțiunea distructivă.
+    const attr = actionRan.current ? CONFIRM_ACTION_ATTR : INITIAL_FOCUS_ATTR;
+    dialog.querySelector<HTMLElement>(`[${attr}]`)?.focus();
+  }, [busy, open]);
 
   useEffect(() => () => restoreFocus(), [restoreFocus]);
 
@@ -120,25 +166,57 @@ export function ConfirmDialog({
     if (open) requestClose();
   }
 
+  /*
+   * Click-ul pe fundal e raportat pe <dialog>, dar la fel e și cel pe bara de
+   * derulare a dialogului (avem `overflow-y-auto`, deci un avertisment lung o
+   * scoate) — după țintă singură, tragerea de scrollbar ar închide dialogul.
+   * Singura diferență sigură e poziția: fundal înseamnă în afara dreptunghiului.
+   */
+  function isOnBackdrop(event: { target: EventTarget | null; clientX: number; clientY: number }) {
+    const dialog = dialogRef.current;
+    if (!dialog || event.target !== dialog) return false;
+    const rect = dialog.getBoundingClientRect();
+    return (
+      event.clientX < rect.left ||
+      event.clientX > rect.right ||
+      event.clientY < rect.top ||
+      event.clientY > rect.bottom
+    );
+  }
+
   function handlePointerDown(event: PointerEvent<HTMLDialogElement>) {
-    // Click-ul pe fundal e raportat pe <dialog>; tot conținutul stă într-un copil.
-    pointerDownOnBackdrop.current = event.target === dialogRef.current;
+    pointerDownOnBackdrop.current = isOnBackdrop(event);
   }
 
   function handleClick(event: MouseEvent<HTMLDialogElement>) {
-    // O selecție de text începută în dialog și terminată pe fundal nu e o intenție de închidere.
-    if (!pointerDownOnBackdrop.current || event.target !== dialogRef.current) return;
+    /*
+     * Cerem fundalul la ambele capete ale gestului. `click` se declanșează pe
+     * strămoșul comun al apăsării și al ridicării, adică tot pe <dialog> și când
+     * o selecție de text începe în conținut și se termină pe fundal — sau invers,
+     * când tragerea pornește de pe fundal și se termină peste dialog. Niciuna
+     * dintre ele nu e o intenție de închidere.
+     */
+    const onBackdrop = pointerDownOnBackdrop.current && isOnBackdrop(event);
     pointerDownOnBackdrop.current = false;
-    requestClose();
+    if (onBackdrop) requestClose();
   }
 
   async function handleConfirm() {
+    actionRan.current = true;
     setRunning(true);
     try {
       await onConfirm();
       onOpenChange?.(false);
+    } catch (error) {
+      /*
+       * La eșec dialogul rămâne deschis, ca utilizatorul să vadă eroarea (pe care
+       * o afișează părintele, prin `description`/`warning`) și să reîncerce.
+       * Eroarea nu are voie să iasă din handler ca promisiune respinsă: `onClick`
+       * nu o mai prinde nimeni, iar în dev ar arunca peste tot ecranul overlay-ul
+       * Next, exact peste dialogul pe care omul trebuia să-l citească.
+       */
+      console.error(error);
     } finally {
-      // La eșec dialogul rămâne deschis, ca utilizatorul să vadă eroarea și să reîncerce.
       setRunning(false);
     }
   }
@@ -148,8 +226,12 @@ export function ConfirmDialog({
   return (
     <dialog
       ref={dialogRef}
+      // Nefocusabil cu Tab, dar destinație validă cât timp acțiunea rulează și
+      // butoanele dezactivate nu mai pot ține focusul.
+      tabIndex={-1}
       aria-labelledby={titleId}
-      aria-describedby={description ? descriptionId : undefined}
+      aria-describedby={describedBy}
+      aria-busy={busy}
       onCancel={handleNativeCancel}
       onClose={handleNativeClose}
       onPointerDown={handlePointerDown}
@@ -177,7 +259,10 @@ export function ConfirmDialog({
         </div>
 
         {warning && (
-          <div className="flex items-start gap-2 rounded-base bg-warning-surface px-3 py-2 text-xs text-warning">
+          <div
+            id={warningId}
+            className="flex items-start gap-2 rounded-base bg-warning-surface px-3 py-2 text-xs text-warning"
+          >
             <svg
               viewBox="0 0 20 20"
               fill="none"
@@ -210,6 +295,7 @@ export function ConfirmDialog({
             variant={tone === "danger" ? "danger" : "primary"}
             onClick={handleConfirm}
             disabled={busy}
+            data-confirm-action=""
           >
             {busy ? "Un moment…" : resolvedConfirmLabel}
           </Button>
