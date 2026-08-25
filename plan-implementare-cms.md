@@ -40,9 +40,16 @@ Partea fără surprize, dar cea pe care se sprijină totul.
 - [x] App shell: sidebar cu grupuri pliabile, topbar, layout, temă light/dark.
 - [ ] Infrastructura de audit: **amânată în Faza 2** — nu există încă nicio mutație prin care să treacă (primele apar odată cu editoarele de conținut). Tabelul `audit_log` + RLS-ul lui există deja.
 
-**Livrabil — verificat:** login pe un preview Vercel cu userul tenantului A → dashboard-ul lui, cu datele lui. Izolarea RLS confirmată prin impersonare în SQL (`set_config('request.jwt.claims', …)` + `set role authenticated`): fiecare tenant vede exact un `site_id`, al lui, la un `select` fără niciun filtru.
+**Livrabil — verificat:** login pe un preview Vercel cu userul tenantului A → dashboard-ul lui, cu datele lui. Izolarea RLS pentru rolul `authenticated` confirmată prin impersonare în SQL (`set_config('request.jwt.claims', …)` + `set role authenticated`): fiecare tenant vede exact un `site_id`, al lui, la un `select` fără niciun filtru.
 **Dependențe:** Faza 0.
-**Risc (rămas parțial deschis):** testul automat Playwright (`e2e/tenant-rls.spec.ts`) e scris, dar **încă nerulat** — mediul remote blochează egress-ul către Supabase, iar local nu era Node instalat. De rulat la prima ocazie; până atunci acoperirea vine din verificarea SQL manuală de mai sus.
+
+**Risc — s-a materializat o dată, reparat:** un review adversarial al schemei (25 aug.) a găsit că **politicile pentru rolul `anon` nu aveau predicat pe `site_id`**. Cheia publishable fiind publică prin construcție, oricine o extrăgea din bundle-ul JS al unui site putea citi datele tuturor clienților: catalogul `uploads` (inclusiv căile fișierelor nepublicate), lista de clienți din `sites`, `site_settings`, tot conținutul publicat. Inserarea anonimă în `contact_messages`/`appointments` era `with check (true)` — spam țintit în inboxul oricărui client.
+
+Verificarea inițială n-a prins-o fiindcă **testa doar rolul `authenticated`**. Lecția: izolarea multi-tenant are două suprafețe (autentificat și anonim), iar cea anonimă e cea expusă publicului.
+
+Reparat în `supabase/migrations/20260825140000_harden_rls.sql`: acces retras complet pentru `anon`; citirea publică se face server-side cu cheia secretă, prin `src/lib/supabase/admin.ts`, care impune filtrul pe tenant prin construcție. Testul `e2e/tenant-rls.spec.ts` acoperă acum ambele roluri.
+
+**Restanță:** testul automat e scris dar **încă nerulat** — mediul remote blochează egress-ul către Supabase, iar local nu e Node instalat. Până la rulare, acoperirea vine din verificarea SQL manuală.
 
 ### Capcane întâlnite (de evitat data viitoare)
 
