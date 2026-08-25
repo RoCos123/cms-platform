@@ -44,3 +44,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# canvas de design generat (2+ MB, conține editorul împachetat) — regenerabil din
+# fișierele .dc.html + canvas.json prin skill-ul `design`
+/design/**/pagina-principala-psiholog.html

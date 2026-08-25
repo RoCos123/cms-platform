@@ -1,0 +1,26 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1200, "h": 1720, "title": "Direcția A — Editorial cald" },
+    { "file": "DirectiaB.dc.html", "x": 1320, "y": 0, "w": 1200, "h": 1720, "title": "Direcția B — Structurat și limpede" },
+    { "file": "DirectiaC.dc.html", "x": 2640, "y": 0, "w": 1200, "h": 1720, "title": "Direcția C — Spațiu și liniște" },
+    { "file": "CuPoza.dc.html", "x": 0, "y": 2000, "w": 1200, "h": 760, "title": "Cu fotografie profesională" },
+    { "file": "FaraPoza.dc.html", "x": 1320, "y": 2000, "w": 1200, "h": 760, "title": "Fără nicio fotografie" }
+  ],
+  "annotations": [
+    {
+      "id": "brief-directii",
+      "x": 0,
+      "y": -230,
+      "w": 620,
+      "text": "TREI DIRECȚII DE ALES\n\nAceleași texte în toate trei, ca să compari doar felul în care arată.\nAlege una — pe aia o construiesc în cod.\n\nA — Editorial cald: serif, mult aer, text-led. Cald fără să fie dulceag.\nB — Structurat și limpede: carduri rotunjite, totul ordonat. Liniștește prin claritate.\nC — Spațiu și liniște: aproape gol, tipografie mare. Calm radical, dar poate părea rece."
+    },
+    {
+      "id": "test-fotografii",
+      "x": 0,
+      "y": 1820,
+      "w": 620,
+      "text": "TESTUL FOTOGRAFIILOR\n\nAi spus că unii clienți vor avea poze profesionale, alții poze slabe.\nDeci layoutul nu se poate sprijini pe imagini — dar nici să le irosească.\n\nAceeași secțiune, în stânga cu poză, în dreapta fără niciuna.\nÎntrebarea de verificat: varianta din dreapta arată intenționată,\nsau arată a pagină căreia îi lipsește ceva?"
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

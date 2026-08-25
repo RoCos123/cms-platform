@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400&family=Karla:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: oklch(0.55 0.08 45); }
+    a:hover { color: oklch(0.45 0.09 45); }
+  </style>
+</helmet>
+
+<div style="font-family: Karla, 'Segoe UI', system-ui, sans-serif; background: oklch(0.985 0.006 80); color: oklch(0.25 0.015 60); min-height: 100%;">
+
+  <div style="padding: 20px 72px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.62 0.012 60); border-bottom: 1px solid oklch(0.93 0.008 70);">
+    Clientul are fotografii profesionale
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 32px; padding: 72px 72px 64px;">
+    <div style="grid-column: span 7;">
+      <p style="margin: 0 0 26px; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.08 45);">
+        Psiholog clinician · [ORAȘ]
+      </p>
+      <h1 style="margin: 0; font-family: Newsreader, Georgia, serif; font-weight: 300; font-size: 62px; line-height: 1.08; letter-spacing: -0.02em; text-wrap: pretty;">
+        Un loc unde poți<br>vorbi liber.
+      </h1>
+      <p style="margin: 28px 0 0; max-width: 28em; font-size: 18px; line-height: 1.7; color: oklch(0.42 0.014 60); text-wrap: pretty;">
+        Ședințe de psihoterapie pentru adulți, la cabinet sau online.
+        Primul pas e doar o conversație.
+      </p>
+      <div style="display: flex; gap: 16px; margin-top: 40px; align-items: center;">
+        <span style="display: inline-flex; align-items: center; height: 52px; padding: 0 30px; border-radius: 999px; background: oklch(0.55 0.08 45); color: oklch(0.99 0.004 80); font-size: 16px; font-weight: 500;">
+          Programează o discuție
+        </span>
+        <span style="display: inline-flex; align-items: center; height: 52px; padding: 0 26px; border-radius: 999px; border: 1px solid oklch(0.88 0.01 70); font-size: 16px; color: oklch(0.35 0.014 60);">
+          Cum decurge o ședință
+        </span>
+      </div>
+    </div>
+
+    <div style="grid-column: span 5; display: flex; align-items: stretch;">
+      <div style="width: 100%; border-radius: 4px 96px 4px 4px; overflow: hidden; background: oklch(0.94 0.018 75);">
+        <svg viewBox="0 0 400 480" preserveAspectRatio="xMidYMid slice" style="display: block; width: 100%; height: 100%;" role="img" aria-label="Portret profesional (desen provizoriu în locul fotografiei reale)">
+          <defs>
+            <linearGradient id="photoWarm" x1="0" y1="0" x2="0.6" y2="1">
+              <stop offset="0%" stop-color="oklch(0.95 0.022 78)"/>
+              <stop offset="100%" stop-color="oklch(0.86 0.038 58)"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="480" fill="url(#photoWarm)"/>
+          <circle cx="300" cy="110" r="105" fill="oklch(0.93 0.03 90)" opacity="0.7"/>
+          <path d="M0 340 Q120 285 220 330 T400 310 L400 480 L0 480 Z" fill="oklch(0.83 0.042 55)" opacity="0.5"/>
+          <circle cx="196" cy="205" r="54" fill="oklch(0.72 0.048 50)" opacity="0.85"/>
+          <path d="M118 480 Q118 335 196 335 Q274 335 274 480 Z" fill="oklch(0.72 0.048 50)" opacity="0.85"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 0 72px 40px;">
+    <p style="margin: 0; font-size: 14px; color: oklch(0.58 0.012 60);">
+      Fotografia poartă o parte din căldura paginii — portretul face cabinetul să pară
+      un loc real, cu un om în el.
+    </p>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400&family=Karla:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; }
+    a { color: oklch(0.55 0.08 45); }
+    a:hover { color: oklch(0.45 0.09 45); }
+  </style>
+</helmet>
+
+<div style="font-family: Karla, 'Segoe UI', system-ui, sans-serif; background: oklch(0.985 0.006 80); color: oklch(0.25 0.015 60); min-height: 100%;">
+
+  <div style="padding: 20px 72px; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.62 0.012 60); border-bottom: 1px solid oklch(0.93 0.008 70);">
+    Clientul nu are nicio fotografie
+  </div>
+
+  <!--
+    Aceeași secțiune, fără imagine. Coloana din dreapta NU rămâne goală: titlul se
+    lățește, iar spațiul e preluat de informația care altfel s-ar pierde mai jos în
+    pagină — durata, formatul și costul primei discuții. Exact grijile omului care
+    ezită să sune, urcate la vedere.
+  -->
+  <div style="padding: 72px 72px 56px;">
+    <p style="margin: 0 0 26px; font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.55 0.08 45);">
+      Psiholog clinician · [ORAȘ]
+    </p>
+    <h1 style="margin: 0; max-width: 16em; font-family: Newsreader, Georgia, serif; font-weight: 300; font-size: 62px; line-height: 1.08; letter-spacing: -0.02em; text-wrap: pretty;">
+      Un loc unde poți vorbi liber.
+    </h1>
+    <p style="margin: 28px 0 0; max-width: 34em; font-size: 18px; line-height: 1.7; color: oklch(0.42 0.014 60); text-wrap: pretty;">
+      Ședințe de psihoterapie pentru adulți, la cabinet sau online.
+      Primul pas e doar o conversație.
+    </p>
+    <div style="display: flex; gap: 16px; margin-top: 40px; align-items: center;">
+      <span style="display: inline-flex; align-items: center; height: 52px; padding: 0 30px; border-radius: 999px; background: oklch(0.55 0.08 45); color: oklch(0.99 0.004 80); font-size: 16px; font-weight: 500;">
+        Programează o discuție
+      </span>
+      <span style="display: inline-flex; align-items: center; height: 52px; padding: 0 26px; border-radius: 999px; border: 1px solid oklch(0.88 0.01 70); font-size: 16px; color: oklch(0.35 0.014 60);">
+        Cum decurge o ședință
+      </span>
+    </div>
+  </div>
+
+  <div style="padding: 0 72px 44px;">
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid oklch(0.92 0.008 70);">
+      <div style="padding: 28px 32px 28px 0; border-right: 1px solid oklch(0.92 0.008 70);">
+        <p style="margin: 0; font-family: Newsreader, Georgia, serif; font-size: 30px; font-weight: 300;">20 de minute</p>
+        <p style="margin: 8px 0 0; font-size: 15px; color: oklch(0.52 0.012 60);">Prima discuție, ca să vedem dacă ne potrivim</p>
+      </div>
+      <div style="padding: 28px 32px; border-right: 1px solid oklch(0.92 0.008 70);">
+        <p style="margin: 0; font-family: Newsreader, Georgia, serif; font-size: 30px; font-weight: 300;">Fără cost</p>
+        <p style="margin: 8px 0 0; font-size: 15px; color: oklch(0.52 0.012 60);">Nu plătești nimic pentru primul contact</p>
+      </div>
+      <div style="padding: 28px 0 28px 32px;">
+        <p style="margin: 0; font-family: Newsreader, Georgia, serif; font-size: 30px; font-weight: 300;">Cabinet sau online</p>
+        <p style="margin: 8px 0 0; font-size: 15px; color: oklch(0.52 0.012 60);">Alegi tu ce te face să te simți mai în largul tău</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 0 72px 40px;">
+    <p style="margin: 0; font-size: 14px; color: oklch(0.58 0.012 60);">
+      Fără poză, căldura vine din tipografie, spațiu și din ce scrie — nu rămâne
+      nicio gaură unde ar fi trebuit să fie o imagine.
+    </p>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
