@@ -22,6 +22,8 @@ Acest document înlocuiește checklist-ul `- [ ]` din planul de implementare cu 
 
 Fiecare tenant vine cu domeniul lui propriu (ex. `rodicacotenescu.ro`) încă din Faza 1. Nu există etapă intermediară de subdomeniu `client.sitepsihologi.ro`.
 
+**Precizare importantă (clarificat 25 aug. 2026):** „domeniu propriu" descrie doar unde locuiește site-ul, nu cine face munca. Clientul nu vine cu nimic — nici site, nici conținut. Site-ul e construit 100% de operator (tu), în CMS. Domeniul e o chestiune separată de proprietate/înregistrare: clientul poate avea deja unul, sau operatorul îl cumpără/înregistrează în numele lui ca parte din serviciu — oricum ar fi, conectarea lui la platformă (Vercel + rândul din `sites`) rămâne un pas manual făcut de operator în Fazele 1–6 (vezi „SSL/DNS" mai jos), nu ceva ce clientul configurează singur.
+
 **Implicații tehnice pentru Faza 1 (middleware + schema):**
 - `sites.domain` (unique, not null) devine cheia principală de rezolvare a tenantului — `host` din request se caută direct în acest câmp, fără parsare de subdomeniu/wildcard.
 - **Canonicalizare www vs. apex:** originalul avea exact acest bug (canonical pe `www.rodicacotenescu.ro`, servit de pe alt domeniu). Faza 1 trebuie să decidă per-site dacă `www` redirecționează spre apex sau invers, nu implicit.
