@@ -8,7 +8,7 @@ export type ResolvedTenant =
   | { kind: "redirect"; canonicalHost: string }
   | { kind: "unresolved"; isPlatformHost: boolean };
 
-function isPlatformHost(host: string): boolean {
+export function isPlatformHost(host: string): boolean {
   const bareHost = host.split(":")[0];
   return PLATFORM_HOST_SUFFIXES.some(
     (suffix) => bareHost === suffix || bareHost.endsWith(suffix),

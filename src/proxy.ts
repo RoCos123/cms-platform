@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { resolveTenant } from "@/lib/tenant";
+import { resolveTenant, isPlatformHost } from "@/lib/tenant";
 
-// Fallback pentru dev local: fără subdomeniu platformă, localhost n-are niciun
-// tenant "gratuit" de testat — vezi decizii-faza-0.md §2. Setează în .env.local
-// domeniul unui site real seedat, ex. DEV_TENANT_DOMAIN=rodicacotenescu.ro
+// Fallback pentru dev local ȘI pentru preview-uri Vercel: fără subdomeniu
+// platformă, niciunul din cele două n-are un tenant "gratuit" de testat —
+// vezi decizii-faza-0.md §2. Setează domeniul unui site real seedat, ex.
+// DEV_TENANT_DOMAIN=rodicacotenescu.ro (local: .env.local; Vercel: env vars
+// din Project Settings, sigur de lăsat inclusiv pe Production — un vizitator
+// real vine mereu pe domeniul lui propriu, niciodată pe *.vercel.app).
 const DEV_TENANT_DOMAIN = process.env.DEV_TENANT_DOMAIN;
-
-function isLocalHost(host: string): boolean {
-  return host.startsWith("localhost") || host.startsWith("127.0.0.1");
-}
 
 /**
  * Notă: Next.js 16 a redenumit Middleware în Proxy (funcționalitate identică) —
@@ -52,7 +51,7 @@ export async function proxy(request: NextRequest) {
 
   const requestHost = request.headers.get("host") ?? "";
   const lookupHost =
-    DEV_TENANT_DOMAIN && isLocalHost(requestHost) ? DEV_TENANT_DOMAIN : requestHost;
+    DEV_TENANT_DOMAIN && isPlatformHost(requestHost) ? DEV_TENANT_DOMAIN : requestHost;
 
   const tenant = await resolveTenant(supabase, lookupHost);
 
