@@ -17,7 +17,8 @@ export type LogosData = {
     tip?: string;
     data?: string;
     href?: string;
-    imagine?: { url: string; alt: string };
+    /** Aceeași formă ca la încărcare (`ImageValue`): `altText`, nu `alt`. */
+    imagine?: { url: string; altText?: string };
   }[];
 };
 
@@ -65,7 +66,7 @@ export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
                 {aparitie.imagine && (
                   <SectionImage
                     src={aparitie.imagine.url}
-                    alt={aparitie.imagine.alt}
+                    alt={aparitie.imagine.altText ?? ""}
                     aspectRatio="16 / 9"
                     sizes="(max-width: 720px) 100vw, 560px"
                   />

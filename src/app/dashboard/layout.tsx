@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
+import { imaginileBibliotecii } from "@/lib/imagini-panou";
+import { BibliotecaImagini } from "@/components/dashboard/biblioteca-imagini";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ToastProvider } from "@/components/ui/toast";
@@ -14,7 +16,7 @@ export const metadata: Metadata = {
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await verifySession();
   const supabase = await createClient();
-  const [{ data: site }, { count: mesajeNecitite }] = await Promise.all([
+  const [{ data: site }, { count: mesajeNecitite }, imagini] = await Promise.all([
     supabase.from("sites").select("name, domain").eq("id", session.siteId).single(),
     // Numărul de lângă „Mesaje" din meniu. Fără el, un mesaj primit ar fi
     // invizibil până când clientul s-ar gândi singur să intre acolo — iar
@@ -25,6 +27,11 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       .eq("site_id", session.siteId)
       .is("deleted_at", null)
       .is("read_at", null),
+    // Fereastra „Alege din bibliotecă" trebuie să fie la îndemână din orice
+    // formular cu imagini, deci lista se citește o dată aici, nu de fiecare
+    // ecran în parte. `imaginileBibliotecii` e memorată pe cerere: ecranul
+    // Imagini o cere și el, fără o a doua interogare.
+    imaginileBibliotecii(session.siteId),
   ]);
 
   return (
@@ -56,7 +63,9 @@ export default async function DashboardLayout({ children }: { children: ReactNod
               </form>
             </div>
           </header>
-          <main className="flex-1 p-6">{children}</main>
+          <main className="flex-1 p-6">
+            <BibliotecaImagini imagini={imagini}>{children}</BibliotecaImagini>
+          </main>
         </div>
       </div>
     </ToastProvider>

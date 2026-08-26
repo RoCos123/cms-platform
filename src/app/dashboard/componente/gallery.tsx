@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -109,6 +109,11 @@ export function ComponentGallery() {
   const [slug, setSlug] = useState("psihoterapie-pentru-adulti");
   const [varianta, setVarianta] = useState("clasic");
   const [imagine, setImagine] = useState<ImageValue | null>(null);
+  /**
+   * Ce așteaptă imaginea aleasă: câmpul (care își mută singur focusul după) sau
+   * nimeni, când biblioteca a fost deschisă din butonul de alături.
+   */
+  const alegeDinBiblioteca = useRef<((image: ImageValue) => void) | null>(null);
   const [bibliotecaDeschisa, setBibliotecaDeschisa] = useState(false);
   const [dialogDeschis, setDialogDeschis] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -191,7 +196,10 @@ export function ComponentGallery() {
           label="Imaginea secțiunii"
           value={imagine}
           onChange={setImagine}
-          onPickFromLibrary={() => setBibliotecaDeschisa(true)}
+          onPickFromLibrary={(alege) => {
+            alegeDinBiblioteca.current = alege;
+            setBibliotecaDeschisa(true);
+          }}
           hint="Formatele obișnuite de poză, până în 5 MB."
         />
         <Button variant="secondary" onClick={() => setBibliotecaDeschisa(true)}>
@@ -199,10 +207,16 @@ export function ComponentGallery() {
         </Button>
         <MediaLibrary
           open={bibliotecaDeschisa}
-          onClose={() => setBibliotecaDeschisa(false)}
+          onClose={() => {
+            setBibliotecaDeschisa(false);
+            alegeDinBiblioteca.current = null;
+          }}
           uploads={IMAGINI_DEMO}
           onSelect={(upload) => {
-            setImagine({ uploadId: upload.id, url: upload.url, altText: upload.altText });
+            const aleasa = { uploadId: upload.id, url: upload.url, altText: upload.altText };
+            // Deschisă din buton, fără câmp în spate: punem imaginea direct.
+            if (alegeDinBiblioteca.current) alegeDinBiblioteca.current(aleasa);
+            else setImagine(aleasa);
             setBibliotecaDeschisa(false);
             toast.show("Imagine aleasă din bibliotecă.", "success");
           }}

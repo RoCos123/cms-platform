@@ -1,5 +1,6 @@
 "use client";
 
+import { useBibliotecaImagini } from "@/components/dashboard/biblioteca-imagini";
 import { TextAreaField, TextField } from "@/components/ui/field";
 import { ImageField, type ImageValue } from "@/components/ui/image-field";
 import { RepeaterList } from "@/components/ui/repeater-list";
@@ -33,6 +34,10 @@ export function CampuriSectiune({
   /** Drumul până aici, pentru căutarea erorilor. Gol la nivelul de sus. */
   prefix?: string;
 }) {
+  // `null` în afara panoului (galeria de componente): atunci `ImageField` nu mai
+  // arată butonul „Alege din bibliotecă", iar restul câmpului merge la fel.
+  const biblioteca = useBibliotecaImagini();
+
   function seteaza(cheie: string, nou: unknown) {
     onChange({ ...valoare, [cheie]: nou });
   }
@@ -129,6 +134,11 @@ export function CampuriSectiune({
                 error={eroare}
                 value={imagine}
                 onChange={(noua) => seteaza(camp.cheie, noua)}
+                // Aceeași poză a cabinetului se pune în mai multe secțiuni. Fără
+                // butonul ăsta ar fi trebuit încărcată din nou de fiecare dată,
+                // iar biblioteca s-ar fi umplut de copii ale aceluiași fișier —
+                // fiecare cu descrierea ei, fiecare de întreținut separat.
+                onPickFromLibrary={biblioteca ? biblioteca.deschide : undefined}
               />
             );
           }

@@ -16,7 +16,8 @@ export type PortfolioData = {
     /** „14–16 martie", „Brașov", „12 locuri" — se afișează pe un rând, separate. */
     detalii?: string[];
     buton?: { text: string; href: string };
-    imagine?: { url: string; alt: string };
+    /** Aceeași formă ca la încărcare (`ImageValue`): `altText`, nu `alt`. */
+    imagine?: { url: string; altText?: string };
   }[];
 };
 
@@ -66,7 +67,7 @@ export function Portfolio({ data, tone }: { data: PortfolioData; tone?: SectionT
             {element.imagine && (
               <SectionImage
                 src={element.imagine.url}
-                alt={element.imagine.alt}
+                alt={element.imagine.altText ?? ""}
                 aspectRatio="3 / 2"
                 sizes="(max-width: 720px) 100vw, 560px"
               />

@@ -20,6 +20,7 @@ import {
   IMAGE_INPUT_ACCEPT,
   MAX_IMAGE_SIZE_LABEL,
   describeImageProblem,
+  measureImage,
   type ImageValue,
 } from "@/lib/uploads";
 
@@ -32,21 +33,22 @@ export type ImageFieldProps = {
   hint?: ReactNode;
   required?: boolean;
   /**
-   * Deschide biblioteca media. E primit ca prop, nu importat: așa ImageField
-   * rămâne folosibil (și testabil) fără MediaLibrary, iar cele două componente
-   * nu se leagă una de alta.
+   * Deschide biblioteca media, dându-i ce să facă cu imaginea aleasă.
+   *
+   * Primește un callback în loc să întoarcă rezultatul prin `onChange`-ul
+   * părintelui: alegerea din bibliotecă golește zona de drop, iar butonul apăsat
+   * („Alege din bibliotecă") dispare odată cu ea. Doar de aici se vede că
+   * focusul trebuie mutat — părintele nu știe nimic despre DOM-ul câmpului.
+   *
+   * E prop, nu import: așa ImageField rămâne folosibil (și testabil) fără
+   * MediaLibrary, iar cele două componente nu se leagă una de alta.
    */
-  onPickFromLibrary?: () => void;
+  onPickFromLibrary?: (alege: (image: ImageValue) => void) => void;
   /** Eroare venită din validarea formularului părinte, ex. la salvare. */
   error?: string;
   className?: string;
 };
 
-/**
- * Dimensiunile reale ale imaginii se citesc în browser și se trimit ca metadata.
- * Server-ul nu poate deschide antetul fișierului fără o librărie în plus, iar
- * fără lățime/înălțime biblioteca media nu poate arăta „1200 × 630" nicăieri.
- */
 /**
  * Acțiunea de pe server întoarce erorile așteptate ca `{ ok: false }`, dar
  * apelul în sine poate și să arunce: internet căzut, sesiune expirată, corp
@@ -56,19 +58,29 @@ export type ImageFieldProps = {
 const NETWORK_UPLOAD_ERROR =
   "Nu am putut trimite imaginea. Verifică legătura la internet și mai încearcă o dată.";
 
-async function measureImage(file: File): Promise<{ width: number; height: number } | null> {
-  if (typeof createImageBitmap !== "function") return null;
+/**
+ * Focus care nu se lasă din prima încercare.
+ *
+ * Când imaginea vine din bibliotecă, în momentul ăsta e încă deschis un
+ * `<dialog>` modal deasupra: cât timp e deschis, restul paginii e inert și un
+ * `focus()` din afara lui nu face pur și simplu nimic. Imediat după, browserul
+ * închide dialogul și mută el focusul pe elementul de dinainte — butonul „Alege
+ * din bibliotecă", care tocmai a dispărut odată cu zona de drop — deci îl lasă
+ * pe `<body>`.
+ *
+ * Nu putem aștepta un moment anume (ordinea dintre efectele React, închiderea
+ * dialogului și restaurarea focusului nu e garantată de nicio specificație), așa
+ * că încercăm câteva cadre la rând și ne oprim în clipa în care a prins. Bucla e
+ * mărginită, ca o țintă care refuză focusul să nu ne pună să încercăm la
+ * nesfârșit, și nu se anulează la re-randare: pe un element scos din pagină,
+ * `focus()` nu face nimic, deci nu are ce strica.
+ */
+function insistaCuFocusul(node: HTMLElement, cadreRamase = 6) {
+  node.focus();
 
-  try {
-    const bitmap = await createImageBitmap(file);
-    const size = { width: bitmap.width, height: bitmap.height };
-    bitmap.close();
-    return size;
-  } catch {
-    // SVG-urile fără dimensiuni intrinseci pică aici. Lipsa metadatelor nu e
-    // motiv să oprim încărcarea — imaginea în sine e perfect bună.
-    return null;
-  }
+  if (document.activeElement === node || cadreRamase <= 1) return;
+
+  requestAnimationFrame(() => insistaCuFocusul(node, cadreRamase - 1));
 }
 
 export function ImageField({
@@ -131,7 +143,7 @@ export function ImageField({
     if (!node) return;
 
     focusAfterChange.current = null;
-    node.focus();
+    insistaCuFocusul(node);
   });
 
   /**
@@ -233,6 +245,18 @@ export function ImageField({
     inputRef.current?.click();
   }
 
+  function pickFromLibrary() {
+    onPickFromLibrary?.((image) => {
+      // Aceeași grijă ca după încărcare: când câmpul era gol, controlul apăsat
+      // dispare odată cu zona de drop, iar focusul ar cădea pe <body>. Când
+      // câmpul avea deja o imagine, butonul „Bibliotecă" rămâne pe ecran și
+      // biblioteca îi dă focusul înapoi singură.
+      if (value === null) focusAfterChange.current = "altText";
+      setUploadError(null);
+      onChange(image);
+    });
+  }
+
   function handleRemove() {
     // Scoatem doar legătura din acest câmp. Fișierul rămâne în bibliotecă,
     // pentru că poate fi folosit și în alte locuri; ștergerea definitivă se
@@ -279,7 +303,7 @@ export function ImageField({
     <Button
       variant="secondary"
       size="sm"
-      onClick={onPickFromLibrary}
+      onClick={pickFromLibrary}
       disabled={isUploading}
       // `relative` îl ridică peste butonul care acoperă toată zona de drop;
       // altfel apăsarea pe el ar deschide alegerea fișierului, nu biblioteca.

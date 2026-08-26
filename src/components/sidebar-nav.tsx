@@ -33,7 +33,7 @@ const NAV: (NavItem | NavGroup)[] = [
   { label: "Blog", items: [{ label: "Articole" }, { label: "Categorii" }] },
   { label: "Programări" },
   { label: "Mesaje", href: "/dashboard/mesaje" },
-  { label: "Imagini" },
+  { label: "Imagini", href: "/dashboard/imagini" },
   { label: "Setări", href: "/dashboard/setari" },
   { label: "Activitate" },
 ];

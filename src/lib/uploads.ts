@@ -8,6 +8,14 @@
  * deci constantele și tipurile nu pot locui în `src/app/actions/upload.ts`.
  */
 
+/**
+ * Un singur bucket pentru toate site-urile, cu prefix `site_id/` (decizii-faza-0
+ * §4). Numele stă aici, nu în acțiunea de încărcare: îl citesc și încărcarea, și
+ * ștergerea, și construirea adreselor publice pentru bibliotecă — trei locuri
+ * din care doar unul ar fi fost actualizat la o redenumire.
+ */
+export const BUCKET_MEDIA = "media";
+
 export const ACCEPTED_IMAGE_TYPES = [
   "image/png",
   "image/jpeg",
@@ -36,8 +44,6 @@ export type ImageValue = {
 export type UploadImageResult =
   | { ok: true; image: ImageValue }
   | { ok: false; error: string };
-
-export type DeleteUploadResult = { ok: true } | { ok: false; error: string };
 
 /** Doar cât ne trebuie ca să validăm — așa putem testa fără un `File` real. */
 export type ImageCandidate = {
@@ -119,6 +125,31 @@ export function buildStorageFileName(originalName: string): string {
       .replace(/-+$/, "") || "imagine";
 
   return extension ? `${base}.${extension}` : base;
+}
+
+/**
+ * Dimensiunile reale ale imaginii se citesc în browser și se trimit ca metadata:
+ * server-ul nu poate deschide antetul fișierului fără o librărie în plus, iar
+ * fără lățime/înălțime biblioteca nu poate arăta niciodată „1200 × 630".
+ *
+ * Stă aici, lângă restul regulilor, fiindcă o cer amândouă locurile din care se
+ * încarcă imagini: câmpul dintr-un formular și ecranul Imagini.
+ */
+export async function measureImage(
+  file: Blob,
+): Promise<{ width: number; height: number } | null> {
+  if (typeof createImageBitmap !== "function") return null;
+
+  try {
+    const bitmap = await createImageBitmap(file);
+    const size = { width: bitmap.width, height: bitmap.height };
+    bitmap.close();
+    return size;
+  } catch {
+    // SVG-urile fără dimensiuni intrinseci pică aici. Lipsa metadatelor nu e
+    // motiv să oprim încărcarea — imaginea în sine e perfect bună.
+    return null;
+  }
 }
 
 /**
