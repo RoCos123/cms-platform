@@ -27,6 +27,7 @@ Reperul de efort: originalul (single-tenant, un client, cu bug-uri de configurar
 - **Multi-tenant din prima migrare:** `site_id` pe fiecare tabel + RLS de la început, nu retrofit ulterior (retrofitarea e dureroasă și riscantă pe date reale).
 - **Rezolvare tenant:** domeniul cererii → `site_id`, printr-un tabel `sites` + middleware.
 - **API-uri externe obligatorii pentru MVP:** Supabase; email tranzacțional (Resend recomandat) pentru notificări contact + confirmări programări; anti-spam (Cloudflare Turnstile — GDPR-friendly, spre deosebire de reCAPTCHA) pe formularele publice.
+- **Emailul tranzacțional se face ULTIMUL** (confirmat 26 aug. 2026, la cererea proprietarului: „nu am ce email să fac acum"). Contul de trimitere nu există încă. Până atunci, mesajele din formular se văd doar în panou, cu numărul de necitite lângă „Mesaje" — vezi `TODO` din `src/app/actions/formulare.ts`. **Nu propune Resend ca următorul pas**; e ultimul de pe listă, indiferent cât de mult ar ajuta.
 - **Pentru scalare (fazele ulterioare):** Vercel Domains API (conectare automată domeniu propriu per client), Stripe (billing).
 - **Opționale:** Google Analytics — DOUĂ integrări distincte (tag `gtag` care colectează pe site-ul public vs. GA4 Data API cu service account care citește datele înapoi în dashboard — originalul confundă asta, de evitat); Google Calendar API / Cal.com pentru sincronizare programări; Search Console API.
 
@@ -67,10 +68,36 @@ Important: e timp de lucru concentrat, nu calendaristic. Bottleneck-ul real nu e
 
 ## Următorul pas planificat
 
-**Faza 0 e completă** (vezi [`decizii-faza-0.md`](./decizii-faza-0.md)): platforma se numește `sitepsihologi.ro`; fiecare tenant vine cu domeniul lui propriu din prima fază (nu subdomeniu platformă); auth doar email+parolă; Storage într-un singur bucket cu prefix `site_id/`; Resend/Turnstile reconfirmate; propunere de denumiri RO pentru cele 17 secțiuni (de confirmat definitiv până la Faza 2).
+**Stare la 26 aug. 2026.** Panoul e complet pe partea de conținut: Pagina
+principală (secțiuni cu previzualizare vie), Servicii, Blog, Pagini, Mesaje,
+Imagini, Setări. Site-ul public are prima pagină, `/servicii`, `/blog`,
+`/blog/<articol>` și paginile proprii ale clientului la `/<adresă>`.
 
-**Faza 1 e completă** (25 aug. 2026) — fundația multi-tenant e în picioare și verificată pe un preview Vercel: schema + RLS din prima migrare, rezolvarea tenantului pe domeniu (`src/proxy.ts`), auth cu parolă, app shell. Detalii, livrabil verificat și capcanele întâlnite: `plan-implementare-cms.md` §Faza 1.
+Ordinea de mai jos e cea confirmată de proprietar, nu o preferință tehnică.
 
-**Stare infrastructură:** proiect Supabase creat (schema rulată, 2 tenanți de test seedați — `supabase/seed-test-tenants.sql`); proiect Vercel conectat, deploy pe branch ca Preview.
+**1. Două verificări înainte de primul client real.** Amândouă cer acces la
+Vercel și Supabase, deci le face proprietarul, nu sesiunea de dezvoltare:
 
-**Următor: Faza 2** — design system: ImageField + MediaLibrary + RepeaterList + VariantPicker cu miniaturi, DataTable, SaveBar cu gardă de modificări nesalvate. Plus două restanțe din Faza 1: helper-ul de `audit_log` (odată ce apar primele mutații) și rularea testului automat `e2e/tenant-rls.spec.ts`.
+- `DEV_TENANT_DOMAIN` NU trebuie să existe în variabilele de Production. E o
+  scurtătură de dezvoltare: setată acolo, orice cerere către gazda platformei
+  (`*.vercel.app`) se rezolvă la un singur client — vezi `src/proxy.ts`.
+- Izolarea între clienți trebuie dovedită, nu presupusă. `e2e/tenant-rls.spec.ts`
+  n-a rulat niciodată (mediul de dezvoltare nu ajunge la Supabase). Aceeași
+  verificare există acum și ca SQL de lipit în SQL Editor:
+  `supabase/verificare-izolare.sql`.
+
+**2. Programări** — ultimul modul mare din meniu. De construit DOAR dacă se
+confirmă că psihologii vor programare online; multe cabinete mici preferă
+telefonul, fiindcă vor să audă omul înainte de prima ședință.
+
+**3. Activitate** — jurnalul cine-ce-a-schimbat. Se scrie deja în `audit_log` la
+fiecare modificare, deci nu se pierde nimic dacă ecranul apare mai târziu. Pe un
+site cu un singur utilizator, îi arată clientului doar ce a făcut el însuși.
+
+**4. Restanțe mici**, în ordinea valorii: fonturile mutate de la Google pe
+serverul nostru (scoate Google din politica de confidențialitate și grăbește
+prima afișare); imagine per serviciu; categorii de blog (de făcut abia când un
+cabinet chiar are atâtea articole încât să nu le mai găsească).
+
+**5. Emailul cu Resend** — ultimul, prin decizie explicită. Vezi „Decizii
+confirmate".

@@ -126,8 +126,13 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
     return { status: "eroare", mesaj: EROARE_TEHNICA, valori };
   }
 
-  // TODO (Faza 6): notificare pe email către cabinet, prin Resend. Până atunci
-  // mesajele se citesc din panou — de spus clientului la predarea site-ului.
+  // Notificarea pe email către cabinet (prin Resend) se face ULTIMA, prin
+  // decizie explicită a proprietarului — vezi CONTEXT.md, „Decizii confirmate".
+  // Nu contul de email lipsește din greșeală; încă nu există.
+  //
+  // Până atunci, mesajul se vede doar în panou, cu numărul de necitite lângă
+  // „Mesaje" în meniu. De spus clientului la predarea site-ului: dacă nu intră
+  // în panou, nu află că i-a scris cineva.
   return { status: "succes", mesaj: SUCCES_CONTACT };
 }
 
