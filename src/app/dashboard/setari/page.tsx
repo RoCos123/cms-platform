@@ -2,6 +2,7 @@ import { getTenant, verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { CAMPURI_CABINET, CAMPURI_SEO, type Brand, type Seo } from "@/lib/setari";
 import { catreEditor } from "@/lib/sectiuni-editare";
+import { getTemplate } from "@/lib/templates";
 import { FormularSetari } from "./formular";
 
 export const metadata = { title: "Setări" };
@@ -12,7 +13,7 @@ export default async function SetariPage() {
   const supabase = await createClient();
 
   const [{ data: site }, { data: setari }] = await Promise.all([
-    supabase.from("sites").select("name").eq("id", session.siteId).single(),
+    supabase.from("sites").select("name, template").eq("id", session.siteId).single(),
     supabase.from("site_settings").select("brand, seo").eq("site_id", session.siteId).maybeSingle(),
   ]);
 
@@ -37,6 +38,7 @@ export default async function SetariPage() {
         cabinetInitial={catreEditor({ ...brand, nume: site?.name ?? "" }, CAMPURI_CABINET)}
         seoInitial={catreEditor(seo, CAMPURI_SEO)}
         domeniu={domain}
+        template={getTemplate(site?.template as string | null)}
       />
     </div>
   );
