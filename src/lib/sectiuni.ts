@@ -384,18 +384,17 @@ const LISTA: MetaSectiune[] = [
     descriere: "Ultimele articole de pe blog. Textele vin din Blog, nu de aici.",
     repetabila: false,
     continutDinAltaParte:
-      "Articolele se scriu la Blog. Aici alegi doar cum arată secțiunea și câte se afișează. Dacă n-ai niciun articol publicat, secțiunea nu apare deloc pe site.",
+      "Articolele se scriu la Blog, în meniu. Aici alegi doar cum arată secțiunea și câte se văd pe prima pagină. Dacă n-ai niciun articol publicat, secțiunea nu apare deloc pe site.",
     campuri: [
       ...campuriAntet(),
       {
         tip: "numar",
         cheie: "numar",
-        eticheta: "Câte articole se afișează",
+        eticheta: "Câte articole se văd pe prima pagină",
         min: 1,
         maxim: 6,
-        hint: "Restul se văd pe pagina de blog.",
+        hint: "Lasă gol ca să le arăți pe toate. Cu pagina de blog oprită, se arată oricum toate — altfel restul n-ar mai apărea nicăieri.",
       },
-      { tip: "link", cheie: "linkToateArticolele", eticheta: "Link către toate articolele" },
     ],
   },
   {

@@ -339,7 +339,7 @@ export function Galerie({ imagini }: { imagini: ImagineBiblioteca[] }) {
                         ) : imagine.folosiri.length === 0 ? (
                           "Nefolosită"
                         ) : (
-                          imagine.folosiri[0].numeSectiune
+                          imagine.folosiri[0].nume
                         )}
                       </p>
                     </button>

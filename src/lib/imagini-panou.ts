@@ -6,6 +6,7 @@ import { BUCKET_MEDIA } from "@/lib/uploads";
 import {
   folosirileImaginilor,
   type ImagineBiblioteca,
+  type RandArticolCoperta,
   type RandSectiune,
 } from "@/lib/imagini";
 
@@ -25,16 +26,22 @@ export const imaginileBibliotecii = cache(
   async (siteId: string): Promise<ImagineBiblioteca[]> => {
     const supabase = await createClient();
 
-    const [{ data: incarcari, error }, { data: sectiuni }] = await Promise.all([
+    const [{ data: incarcari, error }, { data: sectiuni }, { data: articole }] = await Promise.all([
       supabase
         .from("uploads")
         .select("id, storage_path, filename, size_bytes, width, height, alt_text, created_at")
         .eq("site_id", siteId)
         .order("created_at", { ascending: false }),
-      // Conținutul secțiunilor e singurul loc din care se referă imagini azi.
-      // Când vor exista articole de blog cu copertă, aici se adaugă a doua sursă
-      // — restul lanțului (numărare, ștergere, avertismente) nu se schimbă.
+      // Cele două locuri din care se referă imagini: conținutul secțiunilor și
+      // coperțile articolelor.
       supabase.from("site_content").select("id, key, data").eq("site_id", siteId),
+      supabase
+        .from("blog_articles")
+        .select("id, title, cover_upload_id")
+        .eq("site_id", siteId)
+        // Un articol nepublicat tot ține imaginea ocupată: ștearsă acum, ar
+        // lipsi din articol în ziua în care clientul îl publică.
+        .not("cover_upload_id", "is", null),
     ]);
 
     if (error) {
@@ -44,7 +51,10 @@ export const imaginileBibliotecii = cache(
       return [];
     }
 
-    const folosiri = folosirileImaginilor((sectiuni ?? []) as RandSectiune[]);
+    const folosiri = folosirileImaginilor({
+      sectiuni: (sectiuni ?? []) as RandSectiune[],
+      articole: (articole ?? []) as RandArticolCoperta[],
+    });
 
     return (incarcari ?? []).map((rand) => {
       const {

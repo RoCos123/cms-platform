@@ -2,7 +2,7 @@ import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { paginaServiciiEsteActiva, type Pagini } from "@/lib/setari";
+import { paginaEsteActiva, type Pagini } from "@/lib/setari";
 import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { ComutatorPaginaServicii } from "./comutator-pagina";
 import { ListaServicii, type RandServiciuLista } from "./lista-servicii";
@@ -25,7 +25,7 @@ export default async function ServiciiPage() {
 
   if (error) console.error("Citirea serviciilor a eșuat:", error);
 
-  const paginaActiva = paginaServiciiEsteActiva((setari?.pagini ?? {}) as Pagini);
+  const paginaActiva = paginaEsteActiva((setari?.pagini ?? {}) as Pagini, "servicii");
 
   const randuri: RandServiciuLista[] = (data ?? []).map((rand) => ({
     id: rand.id as string,

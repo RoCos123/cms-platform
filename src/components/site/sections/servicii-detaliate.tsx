@@ -2,6 +2,7 @@ import type { SectionTone } from "@/lib/templates";
 import type { Serviciu } from "@/lib/servicii";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
+import { CorpText } from "@/components/site/corp-text";
 
 /**
  * Serviciile, pe larg — conținutul paginii `/servicii`.
@@ -123,34 +124,14 @@ export function BlocServiciu({ serviciu, primul = true }: { serviciu: Serviciu; 
         </div>
 
         <div>
-          {paragrafe(serviciu.descriereCompleta || serviciu.descriereScurta).map((paragraf, i) => (
-            <p
-              key={i}
-              style={{
-                margin: i === 0 ? 0 : "18px 0 0",
-                fontSize: "17px",
-                lineHeight: 1.75,
-                color: "var(--s-text-secundar)",
-                textWrap: "pretty",
-              }}
-            >
-              {paragraf}
-            </p>
-          ))}
+          {/* `h3`, nu `h2`: numele serviciului de alături e deja `h2`, iar un
+              subtitlu dinăuntrul lui nu poate fi pe același nivel. */}
+          <CorpText
+            text={serviciu.descriereCompleta || serviciu.descriereScurta}
+            nivelSubtitlu="h3"
+          />
         </div>
       </div>
     </article>
   );
-}
-
-/**
- * Textul lung se scrie într-o casetă obișnuită, cu Enter între idei. Un rând
- * gol înseamnă paragraf nou; rândurile simple rămân împreună, ca la scris de
- * mână. Fără asta, tot textul ar apărea ca un bloc compact.
- */
-function paragrafe(text: string): string[] {
-  return text
-    .split(/\n\s*\n/)
-    .map((bucata) => bucata.trim())
-    .filter(Boolean);
 }

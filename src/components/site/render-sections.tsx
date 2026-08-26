@@ -33,6 +33,12 @@ export type SectionRow = {
  * nu din propriul rând.
  */
 export type SectionContext = {
+  /**
+   * Articolele publicate. Goală când blogul e oprit din panou: acolo comutatorul
+   * stinge tot blogul — pagina, articolele și secțiunea de aici. Spre deosebire
+   * de un serviciu, care se citește întreg pe cartonaș, un cartonaș de articol
+   * fără pagina lui n-ar avea unde duce.
+   */
   articole: Articol[];
   /** Serviciile publicate. „Serviciile mele" le citește de aici, nu din rândul ei. */
   servicii: Serviciu[];

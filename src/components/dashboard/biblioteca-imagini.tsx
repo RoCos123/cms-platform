@@ -70,7 +70,7 @@ export function BibliotecaImagini({
         width: imagine.latime ?? 0,
         height: imagine.inaltime ?? 0,
         createdAt: imagine.incarcataLa,
-        usageCount: new Set(imagine.folosiri.map((folosire) => folosire.sectiuneId)).size,
+        usageCount: new Set(imagine.folosiri.map((folosire) => folosire.href)).size,
       })),
     [imagini],
   );

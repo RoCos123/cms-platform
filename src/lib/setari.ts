@@ -97,16 +97,24 @@ export type Seo = {
 };
 
 /**
- * Ce pagini opționale sunt pornite.
+ * Paginile care pot fi pornite sau oprite din panou.
  *
+ * Nu orice pagină e opțională: prima pagină există mereu. Astea două au sens
+ * doar dacă clientul chiar le folosește — un cabinet care nu scrie articole n-are
+ * de ce să aibă un blog gol la /blog.
+ */
+export type PaginaOptionala = "servicii" | "blog";
+
+/**
  * Lipsa unei valori înseamnă PORNIT: cine n-a atins comutatorul are site-ul așa
  * cum i l-am construit. O valoare implicită „oprit" ar fi făcut ca o pagină
  * scrisă de client să dispară în tăcere la prima citire a setărilor.
  */
-export type Pagini = {
-  servicii?: boolean;
-};
+export type Pagini = Partial<Record<PaginaOptionala, boolean>>;
 
-export function paginaServiciiEsteActiva(pagini: Pagini | null | undefined): boolean {
-  return pagini?.servicii !== false;
+export function paginaEsteActiva(
+  pagini: Pagini | null | undefined,
+  care: PaginaOptionala,
+): boolean {
+  return pagini?.[care] !== false;
 }

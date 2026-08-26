@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import { getSesiuneOptionala, getTenant } from "@/lib/dal";
+import { getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
-import { paginaServiciiEsteActiva } from "@/lib/setari";
+import { paginaEsteActiva } from "@/lib/setari";
 import { serviciiPublicate } from "@/lib/servicii-publice";
+import { articolePublicate } from "@/lib/blog-public";
 import { tenantTable } from "@/lib/supabase/admin";
-import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
-import type { Articol } from "@/components/site/sections/latest-posts";
-import { SiteHeader } from "@/components/site/header";
-import { SiteFooter } from "@/components/site/footer";
-import { AdminBar } from "@/components/site/admin-bar";
+import { CadruSite } from "@/components/site/cadru-site";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteId, domain } = await getTenant();
@@ -43,107 +40,53 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PublicHomePage() {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, brand, pagini }, { data: rows }, { data: articole }, servicii, sesiune] =
-    await Promise.all([
-      identitateaSiteului(siteId),
-      (await tenantTable("site_content"))
-        .select("id, key, variant, tone, data, visible, position")
-        .eq("visible", true)
-        .order("position", { ascending: true }),
-      // Articolele se citesc o dată aici, nu în componentă: secțiunea „Articole
-      // recente" e singura care are nevoie de ele, dar o componentă care își face
-      // singură interogarea ar face imposibilă previzualizarea live din Faza 3.
-      (await tenantTable("blog_articles"))
-        .select("slug, title, excerpt, published_at, status")
-        .eq("status", "published")
-        .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(3),
-      // Serviciile se citesc o dată aici, ca articolele: secțiunea „Serviciile
-      // mele" nu-și face singură interogarea, altfel previzualizarea din panou
-      // n-ar putea să i le dea.
-      serviciiPublicate(siteId),
-      // Pentru un vizitator obișnuit se rezolvă instantaneu cu `null`, fără nicio
-      // cerere: fără cookie de sesiune n-are ce verifica.
-      getSesiuneOptionala(),
-    ]);
-
-  const template = getTemplate(site?.template);
-  const nume = site?.name ?? domain;
+  const [{ site, pagini }, { data: rows }, articole, servicii] = await Promise.all([
+    identitateaSiteului(siteId),
+    (await tenantTable("site_content"))
+      .select("id, key, variant, tone, data, visible, position")
+      .eq("visible", true)
+      .order("position", { ascending: true }),
+    // Articolele și serviciile se citesc o dată aici, nu în componente:
+    // „Articole recente" și „Serviciile mele" își iau conținutul din altă parte,
+    // dar o componentă care își face singură interogarea n-ar putea fi
+    // previzualizată în panou.
+    //
+    // Toate articolele, nu primele trei: secțiunea are un câmp „câte se văd",
+    // iar o limită fixă aici l-ar fi făcut să nu însemne nimic peste 3. Forma
+    // listată nu poartă textul articolelor, deci nu costă.
+    articolePublicate(siteId),
+    serviciiPublicate(siteId),
+  ]);
 
   // Dublul cast e necesar cât timp nu generăm tipurile bazei de date: `tenantTable`
   // primește numele tabelului ca `string`, deci supabase-js nu poate deduce forma
   // rândului și cade pe un tip de eroare. De înlocuit cu tipuri generate
   // (`supabase gen types`) când schema se stabilizează.
   const sections = (rows ?? []) as unknown as SectionRow[];
-  const articoleRaw = (articole ?? []) as unknown as {
-    slug: string;
-    title: string;
-    excerpt: string;
-    published_at: string | null;
-  }[];
-
-  const articoleRecente: Articol[] = articoleRaw.map((a) => ({
-    slug: a.slug,
-    titlu: a.title,
-    extras: a.excerpt,
-    publishedAt: a.published_at,
-  }));
 
   return (
-    <>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-      <link rel="stylesheet" href={templateFontsHref(template)} />
-
-      <div
-        style={{
-          ...templateStyle(template),
-          background: "var(--t-fundal)",
-          color: "var(--t-text)",
-          fontFamily: "var(--t-font-principal)",
-          minHeight: "100%",
-        }}
-      >
-        <SiteHeader
-          data={{
-            nume,
-            subtitlu: brand.subtitlu,
-            telefon: brand.telefon,
-            paginaServicii: paginaServiciiEsteActiva(pagini),
+    <CadruSite linkEditare="/dashboard/sectiuni">
+      {sections.length > 0 ? (
+        <RenderSections
+          rows={sections}
+          context={{
+            // Blogul oprit înseamnă blog inexistent: și pagina, și articolele, și
+            // secțiunea de aici. De asta lista se golește, nu se marchează cumva —
+            // secțiunea se stinge apoi singură, fără să știe de comutator.
+            articole: paginaEsteActiva(pagini, "blog") ? articole : [],
+            servicii,
+            paginaServiciiActiva: paginaEsteActiva(pagini, "servicii"),
           }}
         />
-
-        <main>
-          {sections.length > 0 ? (
-            <RenderSections rows={sections} context={{
-                articole: articoleRecente,
-                servicii,
-                paginaServiciiActiva: paginaServiciiEsteActiva(pagini),
-              }} />
-          ) : (
-            // Un site fără nicio secțiune nu trebuie să fie o pagină albă:
-            // clientul tocmai a fost provizionat și încă nu a scris nimic.
-            <div style={{ padding: "120px 24px", textAlign: "center" }}>
-              <p style={{ margin: 0, fontSize: "18px", color: "var(--t-text-secundar)" }}>
-                {nume} — site în pregătire.
-              </p>
-            </div>
-          )}
-        </main>
-
-        <SiteFooter
-          data={{
-            nume,
-            descriere: brand.descriereSubsol,
-            telefon: brand.telefon,
-            email: brand.email,
-            adresa: brand.adresa,
-            acreditare: brand.acreditare,
-          }}
-        />
-
-        {sesiune && <AdminBar email={sesiune.email} linkEditare="/dashboard/sectiuni" />}
-      </div>
-    </>
+      ) : (
+        // Un site fără nicio secțiune nu trebuie să fie o pagină albă: clientul
+        // tocmai a fost provizionat și încă nu a scris nimic.
+        <div style={{ padding: "120px 24px", textAlign: "center" }}>
+          <p style={{ margin: 0, fontSize: "18px", color: "var(--t-text-secundar)" }}>
+            {site?.name ?? domain} — site în pregătire.
+          </p>
+        </div>
+      )}
+    </CadruSite>
   );
 }

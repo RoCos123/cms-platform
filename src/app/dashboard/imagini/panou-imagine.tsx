@@ -68,9 +68,9 @@ function Detalii({
 
   const modificat = descriere.trim() !== imagine.descriere.trim();
   const incarcataLa = formateazaData(imagine.incarcataLa);
-  // Aceeași imagine pusă de două ori în aceeași secțiune e tot un singur loc de
-  // unde trebuie scoasă: clientul întreabă „unde e", nu „de câte ori".
-  const locuri = [...new Map(imagine.folosiri.map((f) => [f.sectiuneId, f])).values()];
+  // Aceeași imagine pusă de două ori în același loc e tot un singur loc de unde
+  // trebuie scoasă: clientul întreabă „unde e", nu „de câte ori".
+  const locuri = [...new Map(imagine.folosiri.map((f) => [f.href, f])).values()];
 
   function salveaza() {
     setEroare(null);
@@ -185,12 +185,9 @@ function Detalii({
         {locuri.length > 0 ? (
           <ul className="space-y-1 text-xs">
             {locuri.map((loc) => (
-              <li key={loc.sectiuneId}>
-                <Link
-                  href={`/dashboard/sectiuni/${loc.sectiuneId}`}
-                  className="text-muted-foreground underline hover:text-foreground"
-                >
-                  Deschide {loc.numeSectiune}
+              <li key={loc.href}>
+                <Link href={loc.href} className="text-muted-foreground underline hover:text-foreground">
+                  Deschide {loc.nume}
                 </Link>
               </li>
             ))}

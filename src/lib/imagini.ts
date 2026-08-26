@@ -12,6 +12,7 @@
  */
 
 import { metaSectiune } from "@/lib/sectiuni";
+import { cereDe } from "@/lib/numerale";
 
 /**
  * Cât poate fi de lungă descrierea unei imagini.
@@ -22,12 +23,12 @@ import { metaSectiune } from "@/lib/sectiuni";
  */
 export const MAXIM_DESCRIERE_IMAGINE = 300;
 
-/** Un loc din site în care apare imaginea. */
+/** Un loc din panou în care e pusă imaginea. */
 export type FolosireImagine = {
-  /** Rândul din `site_content` — devine adresa ecranului de editare. */
-  sectiuneId: string;
-  /** Numele pe care îl citește clientul în meniu („Despre mine"), nu cheia. */
-  numeSectiune: string;
+  /** Ecranul care o folosește — devine linkul „Deschide …". */
+  href: string;
+  /** Cum îi spune clientul locului („Despre mine", titlul unui articol). */
+  nume: string;
 };
 
 /** O imagine așa cum o vede panoul. */
@@ -82,27 +83,49 @@ export function idurileImaginilor(valoare: unknown, gasite = new Set<string>()):
 
 export type RandSectiune = { id: string; key: string; data: unknown };
 
+/** Un articol de blog, cât ne trebuie ca să știm dacă folosește o imagine. */
+export type RandArticolCoperta = { id: string; title: string; cover_upload_id: string | null };
+
 /**
- * Pentru fiecare imagine, în ce secțiuni apare.
+ * Pentru fiecare imagine, în ce locuri din panou e pusă.
  *
- * O secțiune care folosește aceeași imagine de două ori (în două rânduri ale
- * unei liste) apare o singură dată: clientul întreabă „unde e pusă", nu „de
- * câte ori".
+ * Două surse, fiindcă imaginile ajung pe site pe două căi: în conținutul unei
+ * secțiuni (ca obiect în JSON) și ca „copertă" a unui articol (ca cheie externă
+ * într-o coloană). Ecranul Imagini nu trebuie să știe de diferența asta —
+ * întrebarea clientului e aceeași, „unde e pusă poza".
+ *
+ * Un loc care folosește aceeași imagine de două ori (în două rânduri ale unei
+ * liste) apare o singură dată: întrebarea e „unde", nu „de câte ori".
  */
-export function folosirileImaginilor(randuri: RandSectiune[]): Map<string, FolosireImagine[]> {
+export function folosirileImaginilor(surse: {
+  sectiuni: RandSectiune[];
+  articole: RandArticolCoperta[];
+}): Map<string, FolosireImagine[]> {
   const folosiri = new Map<string, FolosireImagine[]>();
 
-  for (const rand of randuri) {
+  function adauga(uploadId: string, folosire: FolosireImagine) {
+    const lista = folosiri.get(uploadId) ?? [];
+    lista.push(folosire);
+    folosiri.set(uploadId, lista);
+  }
+
+  for (const rand of surse.sectiuni) {
     // O cheie necunoscută (secțiune scoasă din cod, rând rămas dintr-o versiune
     // veche) tot trebuie numită cumva: fără nume, imaginea ar părea nefolosită
     // și clientul ar șterge-o liniștit.
     const nume = metaSectiune(rand.key)?.nume ?? rand.key;
 
     for (const id of idurileImaginilor(rand.data)) {
-      const lista = folosiri.get(id) ?? [];
-      lista.push({ sectiuneId: rand.id, numeSectiune: nume });
-      folosiri.set(id, lista);
+      adauga(id, { href: `/dashboard/sectiuni/${rand.id}`, nume });
     }
+  }
+
+  for (const articol of surse.articole) {
+    if (!articol.cover_upload_id) continue;
+    adauga(articol.cover_upload_id, {
+      href: `/dashboard/blog/${articol.id}`,
+      nume: articol.title || "Articol fără titlu",
+    });
   }
 
   return folosiri;
@@ -205,18 +228,14 @@ export function normalizeazaPentruCautare(valoare: string): string {
     .toLowerCase();
 }
 
-/**
- * În română, numeralele de la 20 în sus cer „de" înaintea substantivului
- * („21 de locuri"), iar 1 schimbă și prepoziția („într-un loc").
- */
+/** „21 de locuri". Pentru 1 se scrie altfel („într-un loc"), la apelant. */
 export function formateazaLocuri(numar: number): string {
-  const cereDe = numar % 100 === 0 || numar % 100 > 19;
-  return `${numar}${cereDe ? " de" : ""} locuri`;
+  return `${numar}${cereDe(numar) ? " de" : ""} locuri`;
 }
 
 /** „Folosită în Despre mine și Contact" — locurile pe nume, nu un număr. */
 export function descrieFolosirile(folosiri: FolosireImagine[]): string {
-  const nume = [...new Set(folosiri.map((f) => f.numeSectiune))];
+  const nume = [...new Set(folosiri.map((folosire) => folosire.nume))];
 
   if (nume.length === 0) return "Nu e folosită nicăieri pe site.";
   if (nume.length === 1) return `Folosită în ${nume[0]}.`;

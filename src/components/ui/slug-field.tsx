@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { Button } from "./button";
 import { TextField } from "./field";
@@ -87,6 +87,12 @@ const STATUS_TEXT: Record<
 };
 
 export type SlugFieldProps = {
+  /**
+   * Ce scrie sub câmp. Implicit, regula de scriere; când e dat, îl înlocuiește —
+   * unele adrese au ceva mai important de spus decât caracterele permise (a unui
+   * articol publicat, de pildă, nu se mai schimbă fără să rupă linkurile primite).
+   */
+  hint?: ReactNode;
   value: string;
   onChange: (value: string) => void;
   /** Titlul din care se generează adresa la apăsarea butonului. */
@@ -107,6 +113,7 @@ export type SlugFieldProps = {
 };
 
 export function SlugField({
+  hint,
   value,
   onChange,
   sourceValue,
@@ -201,7 +208,7 @@ export function SlugField({
         aria-describedby={status ? statusId : undefined}
         error={error}
         className={cn("font-mono", taken && !error && "border-danger")}
-        hint="Adresa la care se va vedea pagina. Doar litere mici, cifre și cratime."
+        hint={hint ?? "Adresa la care se va vedea pagina. Doar litere mici, cifre și cratime."}
       />
 
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">

@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/toast";
 import { CampuriSectiune } from "@/components/dashboard/campuri-sectiune";
 import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
-import type { Articol } from "@/components/site/sections/latest-posts";
+import type { ArticolListat } from "@/lib/blog";
 import type { Serviciu } from "@/lib/servicii";
 import type { SectionTone, Template } from "@/lib/templates";
 import type { MetaSectiune } from "@/lib/sectiuni";
@@ -29,7 +29,7 @@ export function EditorSectiune({
   tone: SectionTone;
   valoareInitiala: ValoareEditor;
   template: Template;
-  articole: Articol[];
+  articole: ArticolListat[];
   servicii: Serviciu[];
   paginaServiciiActiva: boolean;
 }) {

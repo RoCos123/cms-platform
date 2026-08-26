@@ -6,9 +6,9 @@ import { metaSectiune } from "@/lib/sectiuni";
 import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate, type SectionTone } from "@/lib/templates";
 import { serviciiPublicate } from "@/lib/servicii-publice";
-import { paginaServiciiEsteActiva, type Pagini } from "@/lib/setari";
+import { articolePublicate } from "@/lib/blog-public";
+import { paginaEsteActiva, type Pagini } from "@/lib/setari";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
-import type { Articol } from "@/components/site/sections/latest-posts";
 import { EditorSectiune } from "./editor";
 
 export default async function EditorSectiunePage({
@@ -54,30 +54,17 @@ export default async function EditorSectiunePage({
     );
   }
 
-  const [{ data: site }, { data: articole }, servicii, { data: setari }] = await Promise.all([
+  const [{ data: site }, articole, servicii, { data: setari }] = await Promise.all([
     supabase.from("sites").select("template").eq("id", session.siteId).single(),
     // Previzualizarea „Articolelor recente" arată articole adevărate, nu
     // exemple: altfel clientul n-ar avea cum să vadă că secțiunea dispare
     // singură când nu există niciun articol publicat.
-    supabase
-      .from("blog_articles")
-      .select("slug, title, excerpt, published_at")
-      .eq("site_id", session.siteId)
-      .eq("status", "published")
-      .order("published_at", { ascending: false, nullsFirst: false })
-      .limit(3),
+    articolePublicate(session.siteId),
     // Doar cele publicate, ca previzualizarea să arate exact ce vede un
     // vizitator — inclusiv atunci când asta înseamnă „nimic încă".
     serviciiPublicate(session.siteId),
     supabase.from("site_settings").select("pagini").eq("site_id", session.siteId).maybeSingle(),
   ]);
-
-  const articolePreviz: Articol[] = (articole ?? []).map((a) => ({
-    slug: a.slug as string,
-    titlu: a.title as string,
-    extras: a.excerpt as string,
-    publishedAt: a.published_at as string | null,
-  }));
 
   return (
     <EditorSectiune
@@ -86,9 +73,11 @@ export default async function EditorSectiunePage({
       tone={(rand.tone as SectionTone) ?? "deschis"}
       valoareInitiala={catreEditor(rand.data, meta.campuri)}
       template={getTemplate(site?.template as string | null)}
-      articole={articolePreviz}
+      // Goale când blogul e oprit — exact ca pe site, ca previzualizarea să nu
+      // arate o secțiune care în realitate nu apare.
+      articole={paginaEsteActiva((setari?.pagini ?? {}) as Pagini, "blog") ? articole : []}
       servicii={servicii}
-      paginaServiciiActiva={paginaServiciiEsteActiva((setari?.pagini ?? {}) as Pagini)}
+      paginaServiciiActiva={paginaEsteActiva((setari?.pagini ?? {}) as Pagini, "servicii")}
     />
   );
 }

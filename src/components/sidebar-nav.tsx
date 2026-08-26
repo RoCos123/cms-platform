@@ -30,7 +30,11 @@ const NAV: (NavItem | NavGroup)[] = [
   { label: "Pagina principală", href: "/dashboard/sectiuni" },
   { label: "Servicii", href: "/dashboard/servicii" },
   { label: "Pagini" },
-  { label: "Blog", items: [{ label: "Articole" }, { label: "Categorii" }] },
+  // Fără subgrup: „Articole" era singurul lucru dinăuntru care există, iar un
+  // grup cu un singur element cerea două clicuri și punea aceleași cuvinte în
+  // două locuri. Categoriile se adaugă când un cabinet chiar are atâtea articole
+  // încât să nu le mai găsească.
+  { label: "Blog", href: "/dashboard/blog" },
   { label: "Programări" },
   { label: "Mesaje", href: "/dashboard/mesaje" },
   { label: "Imagini", href: "/dashboard/imagini" },

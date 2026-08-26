@@ -11,6 +11,13 @@ export type SiteHeaderData = {
   telefon?: string;
   /** E pornită pagina cu serviciile pe larg? Atunci „Servicii" duce acolo. */
   paginaServicii?: boolean;
+  /**
+   * Unde duce „Blog": la pagina `/blog`, la secțiunea de pe prima pagină, sau
+   * nicăieri — caz în care linkul nu apare deloc. Fără articole publicate,
+   * secțiunea „Articole recente" nu se randează, deci „/#articole" ar fi o
+   * ancoră către un loc care nu există.
+   */
+  blog?: "pagina" | "sectiune" | null;
 };
 
 /**
@@ -21,11 +28,16 @@ export type SiteHeaderData = {
  * rămâne blocat, cu impresia că site-ul e stricat. „/#despre" spune „du-te la
  * prima pagină, la secțiunea despre", și merge de oriunde.
  */
-function linkuriImplicite(paginaServicii: boolean): LinkAntet[] {
+function linkuriImplicite(
+  paginaServicii: boolean,
+  blog: "pagina" | "sectiune" | null,
+): LinkAntet[] {
   return [
     { text: "Despre", href: "/#despre" },
     { text: "Servicii", href: paginaServicii ? "/servicii" : "/#servicii" },
-    { text: "Blog", href: "/#articole" },
+    // Un meniu cu patru intrări din care una nu face nimic e mai rău decât unul
+    // cu trei: prima dă impresia unui site stricat, a doua e doar un site fără blog.
+    ...(blog ? [{ text: "Blog", href: blog === "pagina" ? "/blog" : "/#articole" }] : []),
     { text: "Contact", href: "/#contact" },
   ];
 }
@@ -42,7 +54,7 @@ function linkuriImplicite(paginaServicii: boolean): LinkAntet[] {
 export function SiteHeader({ data }: { data: SiteHeaderData }) {
   const linkuri = data.linkuri?.length
     ? data.linkuri
-    : linkuriImplicite(data.paginaServicii ?? false);
+    : linkuriImplicite(data.paginaServicii ?? false, data.blog ?? null);
   const initiala = data.initiala ?? data.nume.trim().charAt(0).toUpperCase();
 
   return (

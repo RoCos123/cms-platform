@@ -148,6 +148,7 @@ export function CampuriSectiune({
               <SlugField
                 key={camp.cheie}
                 label={camp.eticheta}
+                hint={camp.hint}
                 value={String(valoare[camp.cheie] ?? "")}
                 onChange={(nou) => seteaza(camp.cheie, nou)}
                 // Sursa e alt câmp al aceluiași formular, numit în descriere.
