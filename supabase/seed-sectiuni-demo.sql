@@ -21,7 +21,7 @@ cross join (values
     'hero', 'deschis', 10,
     jsonb_build_object(
       'eyebrow', 'Cabinet · București · online & fizic',
-      'titlu', 'Sunt Renata,',
+      'titlu', 'Sunt Rodica,',
       'titluAccent', 'psiholog clinician.',
       'subtitlu', 'Lucrez cu adulți care traversează perioade grele — anxietate, epuizare, despărțiri. Prima discuție e scurtă și fără cost, ca să vedem dacă ne potrivim.',
       'butonPrincipal', jsonb_build_object('text', 'Programează o discuție', 'href', '#contact'),

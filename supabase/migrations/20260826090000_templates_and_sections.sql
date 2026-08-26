@@ -15,8 +15,8 @@
 -- rândul deja citit în acel moment.
 -- ----------------------------------------------------------------------------
 alter table public.sites
-  add column template text not null default 'renata'
-  check (template in ('renata', 'dragos', 'gina', 'ana'));
+  add column template text not null default 'rodica'
+  check (template in ('rodica', 'dragos', 'gina', 'ana'));
 
 comment on column public.sites.template is
   'Șablonul vizual al site-ului public. Valorile corespund fișierelor din src/lib/templates/.';
@@ -24,7 +24,7 @@ comment on column public.sites.template is
 -- ----------------------------------------------------------------------------
 -- 2. Tonul de fundal al fiecărei secțiuni.
 --
--- La Renata alternanța fundalurilor e deliberată: deschis → nuanțat → deschis →
+-- În șablonul-sursă alternanța fundalurilor e deliberată: deschis → nuanțat →
 -- închis → nuanțat. Dacă fiecare secțiune și-ar hardcoda culoarea, un șablon nou
 -- ar însemna rescrierea tuturor secțiunilor. Așa, secțiunea declară doar un TON,
 -- iar șablonul decide ce culoare înseamnă tonul acela.
@@ -54,7 +54,7 @@ comment on column public.site_content.is_demo is
 -- ----------------------------------------------------------------------------
 -- 4. Abonații la newsletter.
 --
--- Secțiunea „Scrisori din cabinet" a lui Renata colectează adrese. Tabel separat,
+-- Secțiunea de newsletter din șabloane colectează adrese. Tabel separat,
 -- nu o coloană în `contact_messages`: sunt lucruri diferite (un abonat nu e un
 -- mesaj) și au cicluri de viață diferite — dezabonarea trebuie să lase urmă.
 -- ----------------------------------------------------------------------------

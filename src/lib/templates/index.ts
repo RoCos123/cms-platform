@@ -1,24 +1,24 @@
 import type { CSSProperties } from "react";
 import type { Template, TemplateId } from "./types";
-import { renata } from "./renata";
+import { rodica } from "./rodica";
 
 export * from "./types";
 
 /**
  * Deocamdată există un singur șablon construit. Celelalte trei se adaugă aici,
- * ca fișiere de valori, după ce Renata e validată integral — vezi
+ * ca fișiere de valori, după ce primul e validat integral — vezi
  * design/sabloane/README.md, „Ordinea de lucru".
  */
 const TEMPLATES: Record<string, Template> = {
-  renata,
+  rodica,
 };
 
 /**
- * Șablonul unui site. Necunoscut sau lipsă → Renata: un site public trebuie să
+ * Șablonul unui site. Necunoscut sau lipsă → cel implicit: un site public trebuie să
  * se randeze mereu, chiar dacă rândul din baza de date a rămas în urma codului.
  */
 export function getTemplate(id: string | null | undefined): Template {
-  return TEMPLATES[id ?? ""] ?? renata;
+  return TEMPLATES[id ?? ""] ?? rodica;
 }
 
 export function listTemplates(): Template[] {

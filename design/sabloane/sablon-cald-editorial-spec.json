@@ -47,13 +47,10 @@
       "inaltime": 1293,
       "fundal": "rgba(0, 0, 0, 0)",
       "padding": "120 0 80 0",
-      "titlu": "Sunt Renata,psihologclinician.",
       "titluMarime": "158/700",
       "titluFont": "Manrope",
-      "text": [
-        "Te însoțesc în călătoria către o minte mai liniștită — cu blândețe, claritate și fără grabă. Fiecare ședință e un loc un"
-      ],
-      "elemenreRepetate": 0
+      "elemenreRepetate": 0,
+      "rol": "hero"
     },
     {
       "tag": "SECTION",
@@ -62,14 +59,10 @@
       "inaltime": 1106,
       "fundal": "rgb(252, 248, 245)",
       "padding": "130 0 130 0",
-      "titlu": "Câtevacuvintedespre drumulpe care ți-l propun.",
       "titluMarime": "84/700",
       "titluFont": "Manrope",
-      "text": [
-        "Lucrez ca psiholog clinician de peste un deceniu, cu adulți, cupluri și familii care trec prin momente grele, întrebări ",
-        "Cred că terapia este un loc — nu o tehnică. Un loc unde poți respira, unde te poți auzi pe tine, unde nimic din ce simți"
-      ],
-      "elemenreRepetate": 0
+      "elemenreRepetate": 0,
+      "rol": "despre"
     },
     {
       "tag": "SECTION",
@@ -78,13 +71,10 @@
       "inaltime": 321,
       "fundal": "rgb(248, 241, 234)",
       "padding": "80 0 80 0",
-      "titlu": null,
       "titluMarime": null,
       "titluFont": null,
-      "text": [
-        "Acasă nu e un loc, e o stare. Te ajut să ți-o construiești înăuntru — bucățică cu bucățică."
-      ],
-      "elemenreRepetate": 0
+      "elemenreRepetate": 0,
+      "rol": "citat"
     },
     {
       "tag": "SECTION",
@@ -93,14 +83,10 @@
       "inaltime": 1790,
       "fundal": "rgba(0, 0, 0, 0)",
       "padding": "130 0 130 0",
-      "titlu": "Cum te potînsoți.",
       "titluMarime": "92/700",
       "titluFont": "Manrope",
-      "text": [
-        "Șase servicii, un singur principiu: respect pentru ritmul tău și pentru povestea ta.",
-        "Un spațiu sigur pentru anxietate, depresie, traume, momente de tranziție. Lucrăm împreună la ritmul tău."
-      ],
-      "elemenreRepetate": 6
+      "elemenreRepetate": 6,
+      "rol": "servicii"
     },
     {
       "tag": "SECTION",
@@ -109,14 +95,10 @@
       "inaltime": 895,
       "fundal": "rgb(42, 31, 26)",
       "padding": "130 0 130 0",
-      "titlu": "Cum decurgecolaborareanoastră.",
       "titluMarime": "92/700",
       "titluFont": "Manrope",
-      "text": [
-        "Patru pași clari, fără mister. Așa arată drumul de la primul telefon la o viață care îți aparține.",
-        "Un apel scurt, fără angajament. Aflăm dacă ne potrivim și fixăm prima ședință."
-      ],
-      "elemenreRepetate": 0
+      "elemenreRepetate": 0,
+      "rol": "proces"
     },
     {
       "tag": "SECTION",
@@ -125,13 +107,10 @@
       "inaltime": 321,
       "fundal": "rgb(42, 31, 26)",
       "padding": "80 0 80 0",
-      "titlu": null,
       "titluMarime": null,
       "titluFont": null,
-      "text": [
-        "Nu trebuie să fii „distrus(ă)\" ca să meriți să fii ascultat(ă)."
-      ],
-      "elemenreRepetate": 0
+      "elemenreRepetate": 0,
+      "rol": "citat (a doua oară)"
     },
     {
       "tag": "SECTION",
@@ -140,13 +119,10 @@
       "inaltime": 950,
       "fundal": "rgb(252, 248, 245)",
       "padding": "130 0 130 0",
-      "titlu": "Apariții TV& podcast.",
       "titluMarime": "81/700",
       "titluFont": "Manrope",
-      "text": [
-        "Conversații din emisiunea „Părinți Prezenți\" și alte apariții — despre divorț, parenting, memorie umană și psihologia fa"
-      ],
-      "elemenreRepetate": 2
+      "elemenreRepetate": 2,
+      "rol": "apariții TV & podcast"
     },
     {
       "tag": "SECTION",
@@ -155,13 +131,10 @@
       "inaltime": 829,
       "fundal": "rgb(223, 216, 209)",
       "padding": "130 0 130 0",
-      "titlu": "Povești ale celorcare au început.",
       "titluMarime": "72/700",
       "titluFont": "Manrope",
-      "text": [
-        "„Am venit la Renata într-un moment în care nu mai recunoșteam. După șase luni, am început din nou să dorm. Apoi să râd. "
-      ],
-      "elemenreRepetate": 0
+      "elemenreRepetate": 0,
+      "rol": "testimoniale"
     },
     {
       "tag": "SECTION",
@@ -170,14 +143,10 @@
       "inaltime": 1200,
       "fundal": "rgb(252, 248, 245)",
       "padding": "130 0 130 0",
-      "titlu": "Experiențede grup.",
       "titluMarime": "81/700",
       "titluFont": "Manrope",
-      "text": [
-        "Patru zile de respirație, jurnalare ghidată, ședințe de grup și plimbări lungi. Pentru când ai nevoie să te oprești.",
-        "O zi întreagă în care tu și partenerul învățați practic cum să vorbiți fără să vă răniți."
-      ],
-      "elemenreRepetate": 2
+      "elemenreRepetate": 2,
+      "rol": "programe și materiale"
     },
     {
       "tag": "SECTION",
@@ -186,14 +155,10 @@
       "inaltime": 1073,
       "fundal": "rgba(0, 0, 0, 0)",
       "padding": "130 0 130 0",
-      "titlu": "Articolerecente.",
       "titluMarime": "81/700",
       "titluFont": "Manrope",
-      "text": [
-        "Memoria umană NU este perfectă, există erori și i se poate întâmpla oricui. O explicație psihologică.",
-        "Cum explicăm micuțului ceea ce s-a întâmplat și de ce adulții merg pe drumuri separate."
-      ],
-      "elemenreRepetate": 3
+      "elemenreRepetate": 3,
+      "rol": "articole recente"
     },
     {
       "tag": "SECTION",
@@ -202,14 +167,10 @@
       "inaltime": 876,
       "fundal": "rgba(0, 0, 0, 0)",
       "padding": "130 0 130 0",
-      "titlu": "Întrebărifrecvente.",
       "titluMarime": "76/700",
       "titluFont": "Manrope",
-      "text": [
-        "Tot ce ai vrea să știi înainte de prima ședință. Nu găsești răspunsul aici? Întreabă-mă direct.",
-        "O ședință standard durează 50 de minute. Pentru cupluri sau ședințe inițiale alocăm uneori 75 de minute, în funcție de n"
-      ],
-      "elemenreRepetate": 0
+      "elemenreRepetate": 0,
+      "rol": "întrebări frecvente"
     },
     {
       "tag": "SECTION",
@@ -218,13 +179,10 @@
       "inaltime": 584,
       "fundal": "rgb(42, 31, 26)",
       "padding": "130 0 130 0",
-      "titlu": "Scrisoridin cabinet.",
       "titluMarime": "76/700",
       "titluFont": "Manrope",
-      "text": [
-        "O dată pe lună, un email scurt despre ce vorbim în terapie săptămâna asta — fără spam, fără tehnici de marketing."
-      ],
-      "elemenreRepetate": 0
+      "elemenreRepetate": 0,
+      "rol": "newsletter"
     },
     {
       "tag": "SECTION",
@@ -233,13 +191,10 @@
       "inaltime": 1450,
       "fundal": "rgb(223, 216, 209)",
       "padding": "130 0 130 0",
-      "titlu": "Hai să vorbim,fără presiune.",
       "titluMarime": "86/700",
       "titluFont": "Manrope",
-      "text": [
-        "Sună, scrie pe WhatsApp sau completează formularul. Stabilim împreună o conversație de 10 minute, fără cost, ca să decid"
-      ],
-      "elemenreRepetate": 1
+      "elemenreRepetate": 1,
+      "rol": "contact"
     },
     {
       "tag": "FOOTER",
@@ -248,13 +203,11 @@
       "inaltime": 383,
       "fundal": "rgb(42, 31, 26)",
       "padding": "80 0 32 0",
-      "titlu": null,
       "titluMarime": null,
       "titluFont": null,
-      "text": [
-        "„Happy mind, happy life.\""
-      ],
-      "elemenreRepetate": 0
+      "elemenreRepetate": 0,
+      "rol": "subsol"
     }
-  ]
+  ],
+  "nota": "Date structurale extrase prin randare din șablonul-sursă. Textele au fost eliminate intenționat: sunt conținutul autorului, iar pentru construcție ne trebuie doar structura, culorile și spațierile."
 }

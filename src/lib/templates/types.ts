@@ -11,7 +11,7 @@
 /** Rolul de fundal al unei secțiuni în ritmul paginii, nu o culoare anume. */
 export type SectionTone = "deschis" | "nuantat" | "inchis";
 
-export type TemplateId = "renata" | "dragos" | "gina" | "ana";
+export type TemplateId = "rodica" | "dragos" | "gina" | "ana";
 
 export type TemplatePalette = {
   /** Fundalul paginii și al secțiunilor „deschis". */

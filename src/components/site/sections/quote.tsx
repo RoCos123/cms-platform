@@ -7,9 +7,9 @@ export type QuoteData = {
 
 /**
  * Secțiune găsită în șabloane, absentă din cele 17 definite în Faza 0: o bandă
- * cu un singur citat, folosită ca respiro între blocuri grele. La Renata și la
- * Dragoș apare de câte două ori, o dată pe fundal deschis și o dată pe închis —
- * de aceea tonul e prop, nu valoare fixă.
+ * cu un singur citat, folosită ca respiro între blocuri grele. În două dintre
+ * șabloane apare de câte două ori în aceeași pagină, o dată pe fundal deschis și
+ * o dată pe închis — de aceea tonul e prop, nu valoare fixă.
  */
 export function Quote({ data, tone }: { data: QuoteData; tone?: "deschis" | "nuantat" | "inchis" }) {
   return (

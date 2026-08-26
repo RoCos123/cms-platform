@@ -9,9 +9,9 @@ export type FeaturesData = {
 };
 
 /**
- * „Serviciile mele" — la Renata șase, la Dragoș patru, la Gina șase. Grila se
- * adaptează singură la câte există, ca numărul de servicii să fie o alegere a
- * clientului, nu o constrângere de layout.
+ * „Serviciile mele" — în șabloanele analizate numărul variază între patru și
+ * șase. Grila se adaptează singură la câte există, ca numărul de servicii să fie
+ * o alegere a clientului, nu o constrângere de layout.
  */
 export function Features({
   data,

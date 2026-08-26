@@ -1,11 +1,11 @@
 import type { Template } from "./types";
 
 /**
- * Valorile sunt măsurate din randarea reală a șablonului, nu alese de mine —
- * vezi design/sabloane/renata-spec.json pentru extragerea brută.
+ * Valorile sunt măsurate din randarea reală a șablonului-sursă, nu alese de mine
+ * — vezi design/sabloane/sablon-cald-editorial-spec.json pentru datele brute.
  */
-export const renata: Template = {
-  id: "renata",
+export const rodica: Template = {
+  id: "rodica",
   nume: "Cald și editorial",
   descriere: "Crem cald, accent terracotta, titluri mari cu accente în serif italic.",
 
