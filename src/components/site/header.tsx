@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeaderNav, type LinkAntet } from "./header-nav";
 
 export type SiteHeaderData = {
   nume: string;
@@ -6,7 +7,7 @@ export type SiteHeaderData = {
   subtitlu?: string;
   /** Inițiala din medalion, când nu există logo încărcat. */
   initiala?: string;
-  linkuri?: { text: string; href: string }[];
+  linkuri?: LinkAntet[];
   telefon?: string;
 };
 
@@ -45,20 +46,26 @@ export function SiteHeader({ data }: { data: SiteHeaderData }) {
         style={{
           maxWidth: "1180px",
           margin: "0 auto",
-          paddingInline: "clamp(20px, 5vw, 64px)",
+          paddingInline: "clamp(16px, 5vw, 64px)",
           height: "76px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: "24px",
+          gap: "16px",
+          // Panoul de meniu se poziționează față de rândul ăsta.
+          position: "relative",
         }}
       >
         <Link
           href="/"
-          style={{ display: "flex", alignItems: "center", gap: "12px", textDecoration: "none", color: "inherit" }}
+          // `minWidth: 0` ca numele să se poată prescurta: fără el, un nume de
+          // patruzeci de caractere împinge butoanele afară din ecran în loc să
+          // se taie el.
+          style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: 0, textDecoration: "none", color: "inherit" }}
         >
           <span
             aria-hidden
+            className="antet-medalion"
             style={{
               width: "38px",
               height: "38px",
@@ -74,47 +81,27 @@ export function SiteHeader({ data }: { data: SiteHeaderData }) {
           >
             {initiala}
           </span>
-          <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.15 }}>
-            <span style={{ fontSize: "17px", fontWeight: 600 }}>{data.nume}</span>
-            {data.subtitlu && (
-              <span
-                style={{
-                  fontSize: "10px",
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  color: "var(--t-text-secundar)",
-                }}
-              >
-                {data.subtitlu}
-              </span>
-            )}
+          <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.15, minWidth: 0 }}>
+            <span className="antet-nume">{data.nume}</span>
+            {data.subtitlu && <span className="antet-subtitlu">{data.subtitlu}</span>}
           </span>
         </Link>
 
-        <nav
-          aria-label="Navigare principală"
-          style={{ display: "flex", gap: "28px", fontSize: "15px" }}
-        >
-          {linkuri.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              style={{ color: "var(--t-text)", textDecoration: "none", whiteSpace: "nowrap" }}
-            >
-              {link.text}
-            </a>
-          ))}
-        </nav>
+        <HeaderNav linkuri={linkuri} />
 
         {data.telefon && (
           <a
             href={`tel:${data.telefon.replace(/\s/g, "")}`}
+            // Eticheta stă pe link, nu într-un text ascuns lângă număr: pe ecran
+            // lat numărul e vizibil, iar un text ascuns în plus l-ar face pe
+            // cititorul de ecran să-l citească de două ori.
+            aria-label={`Sună la ${data.telefon}`}
             style={{
               display: "inline-flex",
               alignItems: "center",
               gap: "9px",
               height: "44px",
-              paddingInline: "20px",
+              paddingInline: "clamp(14px, 3vw, 20px)",
               borderRadius: "var(--t-raza-buton)",
               background: "var(--t-fundal-inchis)",
               color: "var(--t-text-pe-inchis)",
@@ -127,7 +114,10 @@ export function SiteHeader({ data }: { data: SiteHeaderData }) {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 1.9.6 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.8.6a2 2 0 0 1 1.7 2z" />
             </svg>
-            {data.telefon}
+            {/* Pe ecran mic rămâne doar icoana: numărul scris ia locul numelui. */}
+            <span className="antet-telefon-text" aria-hidden>
+              {data.telefon}
+            </span>
           </a>
         )}
       </div>

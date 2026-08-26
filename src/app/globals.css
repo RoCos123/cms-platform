@@ -159,3 +159,132 @@ body {
     display: none !important;
   }
 }
+
+/* ==========================================================================
+ * Antetul site-ului public.
+ *
+ * Restul site-ului public se stilizează inline, din variabilele șablonului.
+ * Aici nu se poate: ce se vede pe ecran lat și ce se vede pe telefon e o
+ * întrebare de media query, iar un atribut `style` nu poate conține una.
+ *
+ * Alternativa — decis în JavaScript, după lățimea ferestrei — ar fi însemnat
+ * că meniul apare abia după ce se încarcă scriptul, deci clipește la fiecare
+ * încărcare de pagină.
+ * ========================================================================== */
+
+.antet-nume {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.antet-subtitlu {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--t-text-secundar);
+}
+
+.antet-nav {
+  display: flex;
+  gap: 28px;
+  font-size: 15px;
+}
+
+.antet-link {
+  color: var(--t-text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.antet-meniu-buton {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: 1px solid color-mix(in oklab, var(--t-chenar) 80%, transparent);
+  border-radius: var(--t-raza-buton);
+  background: transparent;
+  color: var(--t-text);
+  cursor: pointer;
+}
+
+.antet-panou {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 8px clamp(16px, 5vw, 64px) 16px;
+  background: var(--t-fundal);
+  border-bottom: 1px solid color-mix(in oklab, var(--t-chenar) 60%, transparent);
+}
+
+.antet-panou-link {
+  padding: 14px 0;
+  color: var(--t-text);
+  font-size: 17px;
+  text-decoration: none;
+}
+
+.antet-panou-link + .antet-panou-link {
+  border-top: 1px solid color-mix(in oklab, var(--t-chenar) 50%, transparent);
+}
+
+/*
+ * 900px: sub această lățime, un nume real („Cabinet de psihoterapie Anghel
+ * Alexandru"), patru linkuri și butonul de telefon nu mai încap pe un rând.
+ * Măsurat cu numele acela: la 390px pagina ieșea din ecran cu 300 de pixeli.
+ */
+@media (max-width: 900px) {
+  .antet-nav {
+    display: none;
+  }
+
+  .antet-meniu-buton {
+    display: inline-flex;
+  }
+
+  .antet-nume {
+    font-size: 15px;
+    /*
+     * Două rânduri, nu prescurtare pe unul singur. Numele cabinetului E marca
+     * omului: „Cabinet de psihoter…" nu spune nimic despre cine e, în timp ce
+     * pe două rânduri numele întreg încape. Antetul are 76px înălțime — două
+     * rânduri la 15px plus subtitlul stau lejer înăuntru.
+     */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .antet-subtitlu {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Sub 560px numărul scris nu mai încape lângă nume; rămâne icoana. */
+@media (max-width: 560px) {
+  .antet-telefon-text {
+    display: none;
+  }
+}
+
+/*
+ * Pe ecranele cele mai mici dispare și medalionul cu inițiala.
+ *
+ * E un ornament: nu spune nimic ce nu spune și numele de lângă el. Cei 50 de
+ * pixeli pe care îi ocupă sunt însă diferența dintre „Cabinet de psihoterapie
+ * Anghel Alexandru" citit întreg și „Cabinet de psihoterapie Anghe…" — iar pe
+ * un site de cabinet, numele E marca.
+ */
+@media (max-width: 480px) {
+  .antet-medalion {
+    display: none !important;
+  }
+}

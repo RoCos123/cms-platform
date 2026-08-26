@@ -31,7 +31,7 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(240px, 100%), 1fr))",
             gap: "40px",
           }}
         >
@@ -53,7 +53,23 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
             )}
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "16px" }}>
+          {/*
+            `overflowWrap: "anywhere"` și `minWidth: 0`: o adresă de forma
+            contact@cabinetdepsihoterapieanghelalexandru.ro n-are niciun spațiu
+            la care browserul să o rupă, așa că iese din coloană și împinge toată
+            pagina afară din ecran. Măsurat pe un telefon de 390px: documentul
+            ieșea lat de 431.
+          */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+              minWidth: 0,
+              fontSize: "16px",
+              overflowWrap: "anywhere",
+            }}
+          >
             {data.telefon && (
               <a href={`tel:${data.telefon.replace(/\s/g, "")}`} style={{ color: "inherit", textDecoration: "none" }}>
                 {data.telefon}
@@ -72,7 +88,14 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
           {data.linkuri && data.linkuri.length > 0 && (
             <nav
               aria-label="Legături din subsol"
-              style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "16px" }}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                minWidth: 0,
+                fontSize: "16px",
+                overflowWrap: "anywhere",
+              }}
             >
               {data.linkuri.map((link) => (
                 <a key={link.href} href={link.href} style={{ color: "inherit", textDecoration: "none" }}>
