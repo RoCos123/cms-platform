@@ -135,7 +135,9 @@ export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: 
           siteKey={siteKey}
           temaCaptcha={tone === "inchis" ? "dark" : "light"}
           textAcord={data.textAcord ?? ACORD_IMPLICIT}
-          linkConfidentialitate={data.linkConfidentialitate ?? "/confidentialitate"}
+          // Fără valoare implicită: `/confidentialitate` nu există încă, iar un
+          // link către o pagină inexistentă e mai rău decât lipsa lui.
+          linkConfidentialitate={data.linkConfidentialitate}
           mesajSucces={data.mesajSucces}
           textButon={data.textButon ?? "Trimite mesajul"}
         />

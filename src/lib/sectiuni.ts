@@ -209,8 +209,12 @@ const LISTA: MetaSectiune[] = [
           {
             tip: "adresa",
             cheie: "href",
-            eticheta: "Adresa paginii serviciului",
-            hint: "Opțional. Ex.: /servicii/terapie-individuala",
+            eticheta: "Pagina cu detalii despre serviciu",
+            // Cinstit, nu invitație la un link care nu duce nicăieri: paginile
+            // de servicii nu se pot crea încă din panou (vezi „Pagini" în
+            // meniu), deci orice adresă scrisă aici ar trimite vizitatorul
+            // într-un perete. Se rescrie când ecranul de Pagini există.
+            hint: "Adaugă pe card un link „Află mai multe”. Deocamdată nu poți crea pagini de servicii din panou — lasă gol, cardul arată bine și fără.",
             max: 200,
           },
         ],
@@ -504,6 +508,7 @@ const LISTA: MetaSectiune[] = [
         tip: "adresa",
         cheie: "linkConfidentialitate",
         eticheta: "Adresa politicii de confidențialitate",
+        hint: "Cât timp e gol, textul apare fără link. Se completează când pagina există.",
         max: 200,
       },
       {

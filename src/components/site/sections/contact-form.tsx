@@ -17,7 +17,8 @@ export function ContactForm({
   siteKey: string | null;
   temaCaptcha: "light" | "dark";
   textAcord: string;
-  linkConfidentialitate: string;
+  /** Lipsă = pagina nu există încă, deci textul rămâne fără link. */
+  linkConfidentialitate?: string;
   mesajSucces?: string;
   textButon: string;
 }) {
@@ -99,7 +100,7 @@ function Acord({
 }: {
   eroare?: string;
   text: string;
-  linkConfidentialitate: string;
+  linkConfidentialitate?: string;
 }) {
   const idEroare = "contact-acord-eroare";
 
@@ -118,20 +119,31 @@ function Acord({
         />
         <label htmlFor="contact-acord" style={{ fontSize: "14px", lineHeight: 1.6 }}>
           {text}{" "}
-          <a
-            href={linkConfidentialitate}
-            // Subliniat, nu doar colorat: un link în mijlocul unui text distins
-            // numai prin culoare pică WCAG 1.4.1 (și dispare pentru cine nu
-            // deosebește nuanțele).
-            style={{
-              color: "var(--s-accent)",
-              textDecoration: "underline",
-              textDecorationThickness: "1px",
-              textUnderlineOffset: "2px",
-            }}
-          >
-            Politica de confidențialitate
-          </a>
+          {/*
+            Link doar dacă există unde să ducă. Un „Politica de
+            confidențialitate" care deschide o pagină inexistentă e mai rău
+            decât unul care nu se poate apăsa: omul apasă tocmai fiindcă vrea să
+            se lămurească, iar peretele pe care îl primește îl lasă cu impresia
+            că nu are cine să-i răspundă nici mai încolo.
+          */}
+          {linkConfidentialitate ? (
+            <a
+              href={linkConfidentialitate}
+              // Subliniat, nu doar colorat: un link în mijlocul unui text distins
+              // numai prin culoare pică WCAG 1.4.1 (și dispare pentru cine nu
+              // deosebește nuanțele).
+              style={{
+                color: "var(--s-accent)",
+                textDecoration: "underline",
+                textDecorationThickness: "1px",
+                textUnderlineOffset: "2px",
+              }}
+            >
+              Politica de confidențialitate
+            </a>
+          ) : (
+            "Politica de confidențialitate"
+          )}
           .
         </label>
       </div>
