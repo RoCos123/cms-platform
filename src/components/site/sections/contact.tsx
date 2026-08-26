@@ -31,8 +31,12 @@ export type ContactData = {
  * restul rămâne text simplu. Programul („Luni – vineri, 10:00 – 19:00") conține
  * litere și, de obicei, mai multe rânduri — deci nu e confundat cu un număr.
  */
-function adresaDedusa(valoare: string): string | null {
-  const curat = valoare.trim();
+function adresaDedusa(valoare: string | undefined): string | null {
+  // `undefined`, nu doar șir gol: în previzualizarea din panou, un rând
+  // proaspăt adăugat n-are încă nicio valoare, iar câmpurile goale nu ajung
+  // deloc în datele secțiunii. Tipul spune „string" fiindcă asta e forma
+  // salvată — dar tipurile nu se aplică datelor venite din JSON.
+  const curat = (valoare ?? "").trim();
 
   // Mai multe rânduri înseamnă program sau adresă, niciodată telefon sau email.
   if (curat.includes("\n")) return null;

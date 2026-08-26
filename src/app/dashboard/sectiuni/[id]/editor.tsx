@@ -7,6 +7,7 @@ import { SaveBar } from "@/components/ui/save-bar";
 import { useToast } from "@/components/ui/toast";
 import { CampuriSectiune } from "@/components/dashboard/campuri-sectiune";
 import { CadruPrevizualizare } from "@/components/dashboard/cadru-previzualizare";
+import { LimitaEroare } from "@/components/dashboard/limita-eroare";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
 import type { Articol } from "@/components/site/sections/latest-posts";
 import { templateFontsHref, templateStyle, type SectionTone, type Template } from "@/lib/templates";
@@ -47,12 +48,14 @@ export function EditorSectiune({
   // Previzualizarea folosește exact componenta de pe site, cu datele din
   // formular trecute prin aceeași conversie ca la salvare. Dacă ar folosi
   // direct forma din editor, ar arăta altceva decât se salvează.
+  const datePreviz = catreStocare(valoare, meta.campuri);
+
   const randPreviz: SectionRow = {
     id,
     key: meta.cheie,
     variant: null,
     tone,
-    data: catreStocare(valoare, meta.campuri),
+    data: datePreviz,
   };
 
   async function salveaza() {
@@ -141,18 +144,28 @@ export function EditorSectiune({
           </div>
 
           <div className="max-h-[52vh] overflow-hidden rounded-base lg:max-h-none lg:overflow-visible">
-            <CadruPrevizualizare latime={latime} fonturi={templateFontsHref(template)}>
-              <div
-                style={{
-                  ...templateStyle(template),
-                  background: "var(--t-fundal)",
-                  color: "var(--t-text)",
-                  fontFamily: "var(--t-font-principal)",
-                }}
-              >
-                <RenderSections rows={[randPreviz]} context={{ articole }} />
-              </div>
-            </CadruPrevizualizare>
+            <LimitaEroare
+              cheie={JSON.stringify(datePreviz)}
+              fallback={
+                <div className="rounded-base border border-border bg-surface p-6 text-sm text-muted-foreground">
+                  Previzualizarea nu s-a putut afișa pentru ce e scris acum în formular.
+                  Continuă să scrii — se reia singură. Ce ai completat nu s-a pierdut.
+                </div>
+              }
+            >
+              <CadruPrevizualizare latime={latime} fonturi={templateFontsHref(template)}>
+                <div
+                  style={{
+                    ...templateStyle(template),
+                    background: "var(--t-fundal)",
+                    color: "var(--t-text)",
+                    fontFamily: "var(--t-font-principal)",
+                  }}
+                >
+                  <RenderSections rows={[randPreviz]} context={{ articole }} />
+                </div>
+              </CadruPrevizualizare>
+            </LimitaEroare>
           </div>
 
           <p className="mt-2 text-xs text-muted-foreground">
