@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SaveBar } from "@/components/ui/save-bar";
 import { useToast } from "@/components/ui/toast";
@@ -133,6 +134,15 @@ export function ListaSectiuni({ initiale }: { initiale: RandSectiune[] }) {
                     "Secțiune pe care panoul nu o cunoaște încă. Pe site nu se afișează."}
                 </p>
               </div>
+
+              {meta && (
+                <Link
+                  href={`/dashboard/sectiuni/${rand.id}`}
+                  className="shrink-0 rounded-base px-3 py-1.5 text-sm font-medium text-foreground underline hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  Editează
+                </Link>
+              )}
 
               <label className="flex shrink-0 cursor-pointer items-center gap-2 text-sm text-muted-foreground">
                 <input

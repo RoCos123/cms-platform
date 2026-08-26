@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
+import { metaSectiune } from "@/lib/sectiuni";
+import { catreEditor, catreStocare, valideaza } from "@/lib/sectiuni-editare";
 
 export type RandStructura = {
   id: string;
@@ -99,6 +101,83 @@ export async function salveazaStructuraPaginii(
   revalidatePath("/dashboard/sectiuni");
   // Site-ul public citește exact rândurile astea; fără linia asta, clientul
   // salvează în panou și nu vede nicio schimbare pe site.
+  revalidatePath("/");
+
+  return { ok: true };
+}
+
+/** Peste atât, conținutul unei singure secțiuni e o greșeală, nu un text lung. */
+const MAXIM_OCTETI_SECTIUNE = 100_000;
+
+/**
+ * Salvează conținutul unei secțiuni.
+ *
+ * Datele primite NU se scriu așa cum vin. Trec printr-un dus-întors prin
+ * descrierea secțiunii (`catreEditor` → `catreStocare`), care păstrează exact
+ * câmpurile declarate și le aruncă pe toate celelalte. Așa, o cheie în plus
+ * trimisă din browser nu poate ajunge în conținutul site-ului, iar validarea
+ * rulează pe server pe aceleași reguli ca în formular — nu pe o copie a lor,
+ * care ar rămâne în urmă.
+ */
+export async function salveazaSectiune(
+  id: string,
+  date: Record<string, unknown>,
+): Promise<RezultatSalvare> {
+  const session = await verifySession();
+  const supabase = await createClient();
+
+  if (JSON.stringify(date).length > MAXIM_OCTETI_SECTIUNE) {
+    return { ok: false, mesaj: "Conținutul secțiunii e prea mare. Scurtează textele." };
+  }
+
+  const { data: rand } = await supabase
+    .from("site_content")
+    .select("id, key, data")
+    .eq("id", id)
+    .eq("site_id", session.siteId)
+    .maybeSingle();
+
+  if (!rand) {
+    return { ok: false, mesaj: "Secțiunea nu mai există. Reîncarcă pagina." };
+  }
+
+  const meta = metaSectiune(rand.key as string);
+  if (!meta) {
+    return { ok: false, mesaj: "Secțiunea aceasta nu poate fi editată din panou." };
+  }
+
+  const curatat = catreStocare(catreEditor(date, meta.campuri), meta.campuri);
+  const erori = valideaza(catreEditor(curatat, meta.campuri), meta.campuri);
+
+  if (Object.keys(erori).length > 0) {
+    return { ok: false, mesaj: "Mai lipsește ceva. Verifică marcajele din formular." };
+  }
+
+  const { error } = await supabase
+    .from("site_content")
+    // `is_demo` cade la prima editare: din clipa în care clientul a scris ceva
+    // aici, secțiunea nu mai e textul demonstrativ pus de noi la provizionare,
+    // iar ecranul „Pregătit de lansare" nu mai are de ce s-o semnaleze.
+    .update({ data: curatat, is_demo: false })
+    .eq("id", id)
+    .eq("site_id", session.siteId);
+
+  if (error) {
+    console.error("Salvarea secțiunii a eșuat:", error);
+    return { ok: false, mesaj: "Nu am putut salva. Încearcă din nou peste câteva momente." };
+  }
+
+  await scrieInJurnal({
+    siteId: session.siteId,
+    actorId: session.userId,
+    actiune: "update",
+    entitate: "SiteContent",
+    entitateId: id,
+    diff: { sectiune: rand.key, rezumat: `Conținutul secțiunii „${meta.nume}” a fost modificat.` },
+  });
+
+  revalidatePath("/dashboard/sectiuni");
+  revalidatePath(`/dashboard/sectiuni/${id}`);
   revalidatePath("/");
 
   return { ok: true };
