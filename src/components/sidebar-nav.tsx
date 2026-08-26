@@ -5,7 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
 
-type NavItem = { label: string; href?: string };
+type NavItem = {
+  label: string;
+  href?: string;
+  /** Numărul afișat lângă etichetă (ex. mesaje necitite). Zero nu se arată. */
+  numar?: number;
+};
 type NavGroup = { label: string; items: NavItem[] };
 
 // Structura recomandată din audit-dashboard.md §10 („Arhitectura informației
@@ -26,7 +31,7 @@ const NAV: (NavItem | NavGroup)[] = [
   { label: "Pagini" },
   { label: "Blog", items: [{ label: "Articole" }, { label: "Categorii" }] },
   { label: "Programări" },
-  { label: "Mesaje" },
+  { label: "Mesaje", href: "/dashboard/mesaje" },
   { label: "Imagini" },
   { label: "Setări" },
   { label: "Activitate" },
@@ -36,7 +41,7 @@ function isGroup(item: NavItem | NavGroup): item is NavGroup {
   return "items" in item;
 }
 
-export function SidebarNav() {
+export function SidebarNav({ mesajeNecitite = 0 }: { mesajeNecitite?: number }) {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const pathname = usePathname();
 
@@ -65,7 +70,11 @@ export function SidebarNav() {
             )}
           </div>
         ) : (
-          <NavLink key={item.label} item={item} pathname={pathname} />
+          <NavLink
+            key={item.label}
+            item={item.label === "Mesaje" ? { ...item, numar: mesajeNecitite } : item}
+            pathname={pathname}
+          />
         ),
       )}
     </nav>
@@ -95,7 +104,19 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
           : "text-foreground hover:bg-surface-hover",
       )}
     >
-      {item.label}
+      <span className="flex items-center justify-between gap-2">
+        {item.label}
+        {Boolean(item.numar) && (
+          <span
+            className={cn(
+              "rounded-base px-1.5 text-xs font-medium",
+              isActive ? "bg-primary-foreground/20" : "bg-primary text-primary-foreground",
+            )}
+          >
+            {item.numar}
+          </span>
+        )}
+      </span>
     </Link>
   );
 }

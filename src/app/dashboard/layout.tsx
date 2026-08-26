@@ -9,11 +9,18 @@ import { signOut } from "./actions";
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await verifySession();
   const supabase = await createClient();
-  const { data: site } = await supabase
-    .from("sites")
-    .select("name, domain")
-    .eq("id", session.siteId)
-    .single();
+  const [{ data: site }, { count: mesajeNecitite }] = await Promise.all([
+    supabase.from("sites").select("name, domain").eq("id", session.siteId).single(),
+    // Numărul de lângă „Mesaje" din meniu. Fără el, un mesaj primit ar fi
+    // invizibil până când clientul s-ar gândi singur să intre acolo — iar
+    // notificarea pe email încă nu există.
+    supabase
+      .from("contact_messages")
+      .select("id", { head: true, count: "exact" })
+      .eq("site_id", session.siteId)
+      .is("deleted_at", null)
+      .is("read_at", null),
+  ]);
 
   return (
     // Provider-ul înfășoară doar zona autentificată: notificările apar ca urmare
@@ -25,7 +32,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             <p className="font-semibold text-foreground">{site?.name ?? "Panou"}</p>
             <p className="text-xs text-muted-foreground">{site?.domain}</p>
           </div>
-          <SidebarNav />
+          <SidebarNav mesajeNecitite={mesajeNecitite ?? 0} />
         </aside>
 
         <div className="flex flex-1 flex-col">
