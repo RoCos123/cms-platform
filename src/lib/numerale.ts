@@ -13,8 +13,20 @@ export function cereDe(numar: number): boolean {
   return ultimeleDoua === 0 || ultimeleDoua > 19;
 }
 
-/** „1 minut", „19 minute", „20 de minute". */
+const NUMERE = new Intl.NumberFormat("ro-RO");
+
+/**
+ * Numărul scris ca în română: „3.000", nu „3000" și cu atât mai puțin „3,000".
+ * Contează abia de la mii în sus, dar de-acolo încolo contează peste tot —
+ * inclusiv în mesajul de eroare de lângă contorul care arată deja „3.000".
+ */
+export function formateazaNumar(numar: number): string {
+  return NUMERE.format(numar);
+}
+
+/** „1 minut", „19 minute", „20 de minute", „3.000 de cuvinte". */
 export function numara(numar: number, singular: string, plural: string): string {
-  if (Math.abs(numar) === 1) return `${numar} ${singular}`;
-  return `${numar}${cereDe(numar) ? " de" : ""} ${plural}`;
+  const scris = formateazaNumar(numar);
+  if (Math.abs(numar) === 1) return `${scris} ${singular}`;
+  return `${scris}${cereDe(numar) ? " de" : ""} ${plural}`;
 }

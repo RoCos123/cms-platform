@@ -54,14 +54,27 @@ export function blocuriText(text: string): BlocText[] {
 }
 
 /**
- * Cât durează cititul, în minute. 200 de cuvinte pe minut e media pentru un text
- * obișnuit în limba maternă.
+ * Câte cuvinte are textul.
+ *
+ * Orice grup de caractere despărțit de spații — inclusiv „14-16" sau „ex.:".
+ * Nu încercăm să fim mai deștepți de-atât: numărul e o măsură a lungimii pentru
+ * om, nu o statistică lingvistică, iar orice regulă mai fină ar da un rezultat
+ * pe care nimeni nu l-ar putea verifica numărând pe ecran.
+ */
+export function numaraCuvinte(text: string): number {
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+/** 200 de cuvinte pe minut — media pentru un text obișnuit în limba maternă. */
+export const CUVINTE_PE_MINUT = 200;
+
+/**
+ * Cât durează cititul, în minute.
  *
  * Nu e o precizie de care depinde ceva; e felul în care cineva decide dacă
  * citește acum sau lasă pe seară. De asta rotunjim în sus și nu arătăm niciodată
  * „0 minute".
  */
 export function minuteDeCitit(text: string): number {
-  const cuvinte = text.trim().split(/\s+/).filter(Boolean).length;
-  return Math.max(1, Math.round(cuvinte / 200));
+  return Math.max(1, Math.round(numaraCuvinte(text) / CUVINTE_PE_MINUT));
 }

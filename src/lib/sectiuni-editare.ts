@@ -1,4 +1,6 @@
 import type { CampSchema } from "@/lib/sectiuni";
+import { numaraCuvinte } from "@/lib/blocuri-text";
+import { numara } from "@/lib/numerale";
 import { esteEmailValid } from "@/lib/formulare";
 
 /**
@@ -223,6 +225,17 @@ export function valideaza(
 
     if (camp.obligatoriu && text === "") {
       erori[drum] = "Câmpul acesta nu poate rămâne gol.";
+    } else if (
+      camp.tip === "textLung" &&
+      camp.maxCuvinte &&
+      numaraCuvinte(text) > camp.maxCuvinte
+    ) {
+      // Înaintea limitei în caractere: acolo unde există amândouă, cea în
+      // cuvinte e cea despre care i s-a spus omului, iar cealaltă e doar o plasă
+      // pusă mult mai sus.
+      erori[drum] =
+        `Cel mult ${numara(camp.maxCuvinte, "cuvânt", "cuvinte")}. ` +
+        `Acum sunt ${numara(numaraCuvinte(text), "cuvânt", "cuvinte")}.`;
     } else if (camp.max && text.length > camp.max) {
       erori[drum] = `Maximum ${camp.max} de caractere. Acum sunt ${text.length}.`;
     } else if (camp.tip === "slug" && text !== "" && !esteSlugValid(text)) {

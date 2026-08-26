@@ -6,6 +6,9 @@ import { ImageField, type ImageValue } from "@/components/ui/image-field";
 import { RepeaterList } from "@/components/ui/repeater-list";
 import { SlugField } from "@/components/ui/slug-field";
 import type { CampSchema } from "@/lib/sectiuni";
+import { cn } from "@/lib/cn";
+import { numaraCuvinte } from "@/lib/blocuri-text";
+import { formateazaNumar, numara } from "@/lib/numerale";
 import { catreEditor, type ElementListaEditor, type ValoareEditor } from "@/lib/sectiuni-editare";
 
 /**
@@ -49,20 +52,35 @@ export function CampuriSectiune({
         const eroare = erori[drum];
 
         switch (camp.tip) {
-          case "textLung":
+          case "textLung": {
+            const scris = String(valoare[camp.cheie] ?? "");
+
             return (
               <TextAreaField
                 key={camp.cheie}
                 label={camp.eticheta}
-                hint={camp.hint}
+                hint={
+                  // Contorul dispare când câmpul are o eroare: eroarea spune
+                  // deja și limita, și cât ai scris. Amândouă odată ar fi fost
+                  // aceeași propoziție de două ori, una sub alta.
+                  camp.maxCuvinte && !eroare ? (
+                    <>
+                      {camp.hint}
+                      <ContorCuvinte text={scris} limita={camp.maxCuvinte} />
+                    </>
+                  ) : (
+                    camp.hint
+                  )
+                }
                 error={eroare}
                 required={camp.obligatoriu}
                 rows={camp.randuri ?? 3}
                 maxLength={camp.max}
-                value={String(valoare[camp.cheie] ?? "")}
+                value={scris}
                 onChange={(event) => seteaza(camp.cheie, event.target.value)}
               />
             );
+          }
 
           case "numar":
             return (
@@ -236,6 +254,32 @@ export function CampuriSectiune({
         }
       })}
     </div>
+  );
+}
+
+/**
+ * Cât ai scris, sub casetă.
+ *
+ * Un număr, nu o bară: pentru un articol, „câte cuvinte am" e o întrebare la
+ * care omul vrea răspunsul exact, ca să-l compare cu ce a mai scris. O bară
+ * care se umple ar sugera în plus că ținta e s-o umpli.
+ *
+ * Se colorează abia pe ultima zecime — până acolo, un contor roșu ar grăbi pe
+ * cineva care are încă loc berechet.
+ */
+function ContorCuvinte({ text, limita }: { text: string; limita: number }) {
+  const scrise = numaraCuvinte(text);
+  const peste = scrise - limita;
+
+  const ton =
+    peste > 0 ? "text-danger" : scrise >= limita * 0.9 ? "text-warning" : "text-muted-foreground";
+
+  return (
+    <span className={cn("mt-1 block tabular-nums", ton)}>
+      {peste > 0
+        ? `${numara(scrise, "cuvânt", "cuvinte")} — cu ${numara(peste, "cuvânt", "cuvinte")} peste limită.`
+        : `${numara(scrise, "cuvânt", "cuvinte")} din ${formateazaNumar(limita)}.`}
+    </span>
   );
 }
 

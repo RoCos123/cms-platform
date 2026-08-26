@@ -42,7 +42,26 @@ export type CampSchema =
    * lui nu mai trebuie să se schimbe singură când i se corectează titlul.
    */
   | (CampComun & { tip: "slug"; dinCheia: string; prefix?: string; max?: number })
-  | (CampComun & { tip: "textLung"; max?: number; randuri?: number })
+  | (CampComun & {
+      tip: "textLung";
+      /** Limita în caractere. Oprește scrisul în casetă (`maxLength`). */
+      max?: number;
+      /**
+       * Limita în cuvinte, pentru textele lungi.
+       *
+       * Caracterele sunt măsura potrivită pentru un titlu sau un extras, unde
+       * contează dacă intră într-un rând. Pentru un articol, nimeni nu-și
+       * numără caracterele — și nici nu poate ghici dacă 20.000 înseamnă mult
+       * sau puțin. Cuvintele se pot compara cu ce a mai scris.
+       *
+       * Când e pusă, câmpul arată și cât ai scris până acum. Spre deosebire de
+       * limita în caractere, asta NU oprește scrisul: o oprire bruscă la
+       * jumătatea unui cuvânt, după o oră de scris, ar fi mai supărătoare decât
+       * un mesaj la salvare.
+       */
+      maxCuvinte?: number;
+      randuri?: number;
+    })
   | (CampComun & { tip: "numar"; min?: number; maxim?: number })
   /** Pereche text + adresă. În JSON: `{ text, href }`. */
   | (CampComun & { tip: "link" })

@@ -49,7 +49,19 @@ export const CAMPURI_ARTICOL: CampSchema[] = [
     hint: "Apasă Enter pentru un paragraf nou. Dacă vrei un subtitlu, începe rândul cu ## și un spațiu — ex.: „## Ce poți face acum”.",
     obligatoriu: true,
     randuri: 18,
-    max: 20000,
+    /**
+     * 3.000 de cuvinte ≈ un sfert de oră de citit. E mult peste ce are nevoie
+     * un articol de cabinet (majoritatea stau bine în 800–1.500) — de aceea e o
+     * limită, nu o țintă: cine o atinge are de obicei două articole, nu unul.
+     */
+    maxCuvinte: 3000,
+    /**
+     * Plasa de dedesubt, în caractere, ca `maxLength` să oprească o lipire
+     * uriașă înainte să ajungă în browser. Douăzeci de caractere pe cuvânt e
+     * mult peste media limbii române (~7), deci nu poate tăia niciodată un
+     * articol care respectă limita de mai sus.
+     */
+    max: 60000,
   },
 ];
 
