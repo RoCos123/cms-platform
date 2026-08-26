@@ -43,11 +43,22 @@ export async function tenantTable(table: string) {
   const supabase = createServiceClient();
 
   return {
-    select(columns = "*") {
-      return supabase.from(table).select(columns).eq("site_id", siteId);
+    select(
+      columns = "*",
+      options?: { head?: boolean; count?: "exact" | "planned" | "estimated" },
+    ) {
+      return supabase.from(table).select(columns, options).eq("site_id", siteId);
     },
     insert(values: Record<string, unknown>) {
       return supabase.from(table).insert({ ...values, site_id: siteId });
+    },
+    /**
+     * Filtrul pe `site_id` e deja aplicat, dar apelantul TREBUIE să adauge și
+     * restul condițiilor (`.eq("id", …)`): altfel un update atinge tot tabelul
+     * tenantului. Aici putem garanta doar că nu iese din tenant.
+     */
+    update(values: Record<string, unknown>) {
+      return supabase.from(table).update(values).eq("site_id", siteId);
     },
   };
 }

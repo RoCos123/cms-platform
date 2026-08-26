@@ -22,7 +22,7 @@ export function Quote({ data, tone }: { data: QuoteData; tone?: SectionTone }) {
             fontFamily: "var(--t-font-secundar)",
             fontSize: "clamp(56px, 7vw, 96px)",
             lineHeight: 0.8,
-            color: "var(--t-accent)",
+            color: "var(--s-accent)",
             flexShrink: 0,
           }}
         >

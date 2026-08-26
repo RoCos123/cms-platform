@@ -122,3 +122,19 @@ body {
   /* Scaffold-ul punea Arial aici, anulând fontul încărcat în layout.tsx. */
   font-family: var(--font-sans), system-ui, sans-serif;
 }
+
+/*
+ * Câmpurile formularelor de pe site-ul public.
+ *
+ * Restul site-ului public se stilizează inline, din variabilele șablonului —
+ * dar `::placeholder` e un pseudo-element și nu poate fi atins dintr-un `style`.
+ * Fără regula asta, textul-sugestie rămâne gri-ul implicit al browserului: pe
+ * banda maro-închis a newsletterului e aproape invizibil.
+ *
+ * 0,7 din culoarea textului dă 4,81:1 pe cel mai greu fundal deschis și 7,65:1
+ * pe cel închis — peste pragul WCAG AA în ambele cazuri.
+ */
+.camp-public::placeholder {
+  color: currentColor;
+  opacity: 0.7;
+}

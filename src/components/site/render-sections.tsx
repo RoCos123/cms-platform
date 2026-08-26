@@ -8,6 +8,10 @@ import { HowItWorks, type HowItWorksData } from "./sections/how-it-works";
 import { Testimonials, type TestimonialsData } from "./sections/testimonials";
 import { Faq, type FaqData } from "./sections/faq";
 import { LatestPosts, type LatestPostsData, type Articol } from "./sections/latest-posts";
+import { Logos, type LogosData } from "./sections/logos";
+import { Portfolio, type PortfolioData } from "./sections/portfolio";
+import { Contact, type ContactData } from "./sections/contact";
+import { Newsletter, type NewsletterData } from "./sections/newsletter";
 
 /** Un rând din `site_content`, așa cum vine din baza de date. */
 export type SectionRow = {
@@ -51,6 +55,10 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
   latestPosts: (row, ctx) => (
     <LatestPosts data={row.data as LatestPostsData} articole={ctx.articole} tone={row.tone} />
   ),
+  logos: (row) => <Logos data={row.data as LogosData} tone={row.tone} />,
+  portfolio: (row) => <Portfolio data={row.data as PortfolioData} tone={row.tone} />,
+  contact: (row) => <Contact data={row.data as ContactData} tone={row.tone} />,
+  newsletter: (row) => <Newsletter data={row.data as NewsletterData} tone={row.tone} />,
 };
 
 export function sectiuneCunoscuta(key: string): boolean {

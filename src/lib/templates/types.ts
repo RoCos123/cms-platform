@@ -31,6 +31,15 @@ export type TemplatePalette = {
 
   accent: string;
   accentText: string;
+  /**
+   * Accentul pe fundal închis. Nu e un lux: un accent ales să fie lizibil pe
+   * crem e aproape sigur prea închis pe maro-închis. Fără rolul ăsta, cifrele
+   * pașilor și ghilimelele mari de pe benzile închise ies sub pragul WCAG.
+   */
+  accentPeInchis: string;
+  /** Culoarea erorilor de formular, pe fundal deschis și pe fundal închis. */
+  eroare: string;
+  eroarePeInchis: string;
   chenar: string;
 };
 
@@ -75,6 +84,8 @@ export function tonuri(template: Template, tone: SectionTone) {
         fundal: p.fundalInchis,
         text: p.textPeInchis,
         textSecundar: p.textSecundarPeInchis,
+        accent: p.accentPeInchis,
+        eroare: p.eroarePeInchis,
         chenar: "color-mix(in oklab, currentColor 18%, transparent)",
       };
     case "relief":
@@ -82,6 +93,8 @@ export function tonuri(template: Template, tone: SectionTone) {
         fundal: p.fundalRelief,
         text: p.text,
         textSecundar: p.textSecundar,
+        accent: p.accent,
+        eroare: p.eroare,
         chenar: p.chenar,
       };
     case "nuantat":
@@ -89,6 +102,8 @@ export function tonuri(template: Template, tone: SectionTone) {
         fundal: p.fundalNuantat,
         text: p.text,
         textSecundar: p.textSecundar,
+        accent: p.accent,
+        eroare: p.eroare,
         chenar: p.chenar,
       };
     default:
@@ -96,6 +111,8 @@ export function tonuri(template: Template, tone: SectionTone) {
         fundal: p.fundal,
         text: p.text,
         textSecundar: p.textSecundar,
+        accent: p.accent,
+        eroare: p.eroare,
         chenar: p.chenar,
       };
   }

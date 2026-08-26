@@ -27,6 +27,14 @@ export const caldura: Template = {
 
     accent: "#904D39",
     accentText: "#FFFFFF",
+    // #904D39 pe fundalul închis dă 2,51:1 — sub orice prag, inclusiv cel de
+    // 3:1 pentru text mare. Se vedea la cifrele pașilor și la ghilimelele mari
+    // de pe benzile închise. Aceeași nuanță, deschisă până la 5,96:1.
+    accentPeInchis: "#D98A6E",
+
+    eroare: "#B3261E",
+    eroarePeInchis: "#E8877A",
+
     chenar: "#DFD8D1",
   },
 

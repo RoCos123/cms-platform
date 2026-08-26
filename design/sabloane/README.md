@@ -39,20 +39,24 @@ Extrasă din randarea reală, nu din citirea codului
 
 | # | Secțiune | Fundal | Elemente repetate | Cheia noastră |
 |---|---|---|---|---|
-| 1 | Hero | transparent | — | `hero` |
-| 2 | Despre mine | `#FCF8F5` | — | `aboutTeaser` |
-| 3 | **Bandă cu citat** | `#F8F1EA` | — | ⚠️ **lipsește** |
-| 4 | Servicii | transparent | 6 | `features` |
-| 5 | Cum decurge colaborarea | `#2A1F1A` închis | 4 pași | `howItWorks` |
-| 6 | **Bandă cu citat** (a doua oară) | `#2A1F1A` închis | — | ⚠️ **lipsește** |
-| 7 | Apariții TV & podcast | `#FCF8F5` | 2 | ⚠️ vezi `logos` mai jos |
-| 8 | Testimoniale | `#DFD8D1` | — | `testimonials` |
-| 9 | Experiențe de grup (retreat, workshop) | `#FCF8F5` | 2 | `portfolio` |
-| 10 | **Articole recente** | transparent | 3 | ⚠️ **lipsește** |
-| 11 | Întrebări frecvente | transparent | — | `faq` |
-| 12 | **Newsletter** | `#2A1F1A` închis | — | ⚠️ **lipsește** |
-| 13 | Contact | `#DFD8D1` | — | `contact` |
-| 14 | Subsol | `#2A1F1A` închis | — | `footer` |
+| 1 | Hero | transparent | — | `hero` ✅ |
+| 2 | Despre mine | `#FCF8F5` | — | `aboutTeaser` ✅ |
+| 3 | **Bandă cu citat** | `#F8F1EA` | — | `quote` ✅ |
+| 4 | Servicii | transparent | 6 | `features` ✅ |
+| 5 | Cum decurge colaborarea | `#2A1F1A` închis | 4 pași | `howItWorks` ✅ |
+| 6 | **Bandă cu citat** (a doua oară) | `#2A1F1A` închis | — | `quote` ✅ |
+| 7 | Apariții TV & podcast | `#FCF8F5` | 2 | `logos` ✅ |
+| 8 | Testimoniale | `#DFD8D1` | — | `testimonials` ✅ |
+| 9 | Experiențe de grup (retreat, workshop) | `#FCF8F5` | 2 | `portfolio` ✅ |
+| 10 | **Articole recente** | transparent | 3 | `latestPosts` ✅ |
+| 11 | Întrebări frecvente | transparent | — | `faq` ✅ |
+| 12 | **Newsletter** | `#2A1F1A` închis | — | `newsletter` ✅ |
+| 13 | Contact | `#DFD8D1` | — | `contact` ✅ |
+| 14 | Subsol | `#2A1F1A` închis | — | `footer` ✅ |
+
+**Stare: toate cele 13 secțiuni de conținut ale șablonului „Căldură" sunt
+construite** (bifele din tabel). Rândul 14 e cadrul paginii, nu o secțiune.
+Ce urmează e editarea lor din panou, nu randarea.
 
 ## Ce lipsește din cele 17 secțiuni definite în `decizii-faza-0.md` §6
 
@@ -100,6 +104,25 @@ Fazele 3–4 se construiesc presupunând un singur stil, adăugarea celorlalte t
 
 Fundația de tokenuri semantice din Faza 2 (`src/app/globals.css`) e exact
 mecanismul care face asta ieftin.
+
+### Corecție găsită la construirea benzilor închise
+
+Un singur accent per șablon nu ajunge. Terracotta `#904D39`, ales să fie lizibil
+pe crem, dă **2,53:1** pe fundalul închis `#2A1F1A` — sub orice prag WCAG,
+inclusiv cel de 3:1 pentru text mare. Se vedea la cifrele pașilor din „Cum
+decurge colaborarea" și la ghilimelele mari de pe a doua bandă cu citat, ambele
+pe fundal închis.
+
+Paleta are de acum `accentPeInchis` (5,97:1), plus `eroare` / `eroarePeInchis`
+pentru formulare. Tonul secțiunii alege varianta, prin variabile `--s-*` pe care
+`Section` le publică. Regula pentru cine scrie o secțiune nouă:
+
+- ce stă **direct pe fundalul secțiunii** → `--s-accent`, `--s-eroare`,
+  `--s-buton-fundal`, `--s-text-secundar`;
+- ce stă **într-un card cu fundal propriu** (mereu deschis) → `--t-accent` etc.
+
+Un buton plin primește același tratament: pe fundal închis se inversează în
+crem, fiindcă terracotta pe maro-închis e o pată care abia se distinge.
 
 ## Ordinea de lucru
 

@@ -76,7 +76,7 @@ export function Faq({ data, tone }: { data: FaqData; tone?: SectionTone }) {
                   transform: "translateY(-50%)",
                   fontSize: "24px",
                   lineHeight: 1,
-                  color: "var(--t-accent)",
+                  color: "var(--s-accent)",
                 }}
               >
                 +

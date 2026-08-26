@@ -85,6 +85,31 @@ cross join (values
     'citat', 'Vindecarea nu este o destinație — este un drum pe care nu trebuie să mergi singur.'
   )),
 
+  -- Poziții intercalate (65, 75, 95, 100): ordinea urmează structura reală a
+  -- șablonului din design/sabloane/README.md, fără să renumerotăm restul.
+  --
+  -- Aparițiile și programele nu au `imagine`: n-avem fișiere încărcate pentru
+  -- tenanții de test, iar secțiunile sunt scrise să arate bine și fără. Așa se
+  -- verifică și cazul acesta, care va fi cel al oricărui client în prima zi.
+  ('logos', 'nuantat', 65, jsonb_build_object(
+    'eyebrow', 'În public',
+    'titlu', 'Apariții și',
+    'titluAccent', 'acreditări.',
+    'intro', 'Conversații despre sănătate mintală, dincolo de cabinet.',
+    'aparitii', jsonb_build_array(
+      jsonb_build_object(
+        'tip', 'Podcast', 'sursa', 'Vorbim deschis', 'data', 'martie 2026',
+        'titlu', 'Cum recunoști epuizarea înainte să te doboare',
+        'descriere', 'O oră despre semnele pe care le trecem cel mai des cu vederea.'
+      ),
+      jsonb_build_object(
+        'tip', 'Emisiune TV', 'sursa', 'Exemplu TV', 'data', 'ianuarie 2026',
+        'titlu', 'Anxietatea la tineri: ce s-a schimbat în zece ani',
+        'descriere', 'Invitată într-o discuție despre presiunea din școli și din online.'
+      )
+    )
+  )),
+
   ('testimonials', 'relief', 70, jsonb_build_object(
     'eyebrow', 'Păreri',
     'titlu', 'Povești ale celor',
@@ -93,6 +118,27 @@ cross join (values
       jsonb_build_object('text', 'Am venit crezând că trebuie reparat ceva la mine. Am plecat înțelegând că doar nu mă ascultasem niciodată.', 'autor', 'A.M.', 'context', 'consiliere individuală'),
       jsonb_build_object('text', 'După șapte ani în care ne certam pe aceleași lucruri, am învățat în sfârșit să ne auzim.', 'autor', 'C. și R.', 'context', 'consiliere de cuplu'),
       jsonb_build_object('text', 'Cel mai mult a contat că nu m-a grăbit nimeni. Am mers în ritmul meu.', 'autor', 'D.P.', 'context', 'anxietate')
+    )
+  )),
+
+  ('portfolio', 'nuantat', 75, jsonb_build_object(
+    'eyebrow', 'Împreună',
+    'titlu', 'Experiențe',
+    'titluAccent', 'de grup.',
+    'intro', 'Câteva zile în care lucrezi cu tine, dar nu singur.',
+    'elemente', jsonb_build_array(
+      jsonb_build_object(
+        'eticheta', 'Retreat',
+        'titlu', 'Trei zile de liniște',
+        'descriere', 'Un weekend departe de oraș, cu ateliere de dimineață și mult timp nestructurat. Fără telefoane, fără program încărcat.',
+        'detalii', jsonb_build_array('14–16 martie', 'Brașov', '12 locuri')
+      ),
+      jsonb_build_object(
+        'eticheta', 'Atelier',
+        'titlu', 'Granițe sănătoase',
+        'descriere', 'Patru ore despre cum spui nu fără să te simți vinovat. Exerciții practice, în grup mic.',
+        'detalii', jsonb_build_array('sâmbătă, 4 aprilie', 'online', '20 de locuri')
+      )
     )
   )),
 
@@ -115,6 +161,28 @@ cross join (values
       jsonb_build_object('intrebare', 'Ședințele online sunt la fel de eficiente?', 'raspuns', 'Pentru majoritatea situațiilor, da. Sunt și oameni care preferă cabinetul, și e la fel de bine. Alegi ce te face să te simți mai în largul tău.'),
       jsonb_build_object('intrebare', 'Ce discutăm rămâne confidențial?', 'raspuns', 'Da. Confidențialitatea e o obligație profesională, cu excepțiile prevăzute de lege, pe care ți le explic de la prima întâlnire.')
     )
+  )),
+
+  ('newsletter', 'inchis', 95, jsonb_build_object(
+    'eyebrow', 'Newsletter',
+    'titlu', 'Un email pe lună,',
+    'titluAccent', 'fără zgomot.',
+    'intro', 'Scriu despre ce văd cel mai des în cabinet și despre ce ajută, cu adevărat, între ședințe.',
+    'textButon', 'Abonează-mă'
+  )),
+
+  ('contact', 'relief', 100, jsonb_build_object(
+    'eyebrow', 'Contact',
+    'titlu', 'Hai să',
+    'titluAccent', 'vorbim.',
+    'intro', 'Scrie-mi câteva rânduri despre ce te aduce aici. Nu trebuie să știi de unde să începi — e suficient să începi.',
+    'detalii', jsonb_build_array(
+      jsonb_build_object('eticheta', 'Telefon', 'valoare', '0700 000 000', 'href', 'tel:0700000000'),
+      jsonb_build_object('eticheta', 'Email', 'valoare', 'contact@example.com', 'href', 'mailto:contact@example.com'),
+      jsonb_build_object('eticheta', 'Cabinet', 'valoare', 'Str. Exemplu nr. 1, București'),
+      jsonb_build_object('eticheta', 'Program', 'valoare', 'Luni – vineri, 10:00 – 19:00')
+    ),
+    'textButon', 'Trimite mesajul'
   ))
 
 ) as v(key, tone, position, data)

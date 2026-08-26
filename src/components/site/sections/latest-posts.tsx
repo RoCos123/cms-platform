@@ -82,7 +82,7 @@ export function LatestPosts({
             style={{
               fontSize: "15px",
               fontWeight: 600,
-              color: "var(--t-accent)",
+              color: "var(--s-accent)",
               textDecoration: "none",
               whiteSpace: "nowrap",
             }}

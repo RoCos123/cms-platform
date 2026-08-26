@@ -75,7 +75,7 @@ export function HowItWorks({ data, tone }: { data: HowItWorksData; tone?: Sectio
                 fontFamily: "var(--t-font-secundar)",
                 fontSize: "44px",
                 lineHeight: 1,
-                color: "var(--t-accent)",
+                color: "var(--s-accent)",
               }}
             >
               {String(index + 1).padStart(2, "0")}
