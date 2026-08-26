@@ -82,8 +82,8 @@ export function FormularSetari({
 
       <Card>
         <CardHeader
-          title="Cum apare în Google"
-          description="Textul pe care îl citește cineva care te caută, înainte să intre pe site."
+          title="Cum apari în căutările Google"
+          description="Când cineva caută un psiholog, Google arată o listă. Aici scrii ce apare în dreptul site-ului tău."
         />
         <CardBody>
           <CampuriSectiune campuri={CAMPURI_SEO} valoare={seo} onChange={setSeo} erori={erori} />
@@ -189,16 +189,28 @@ function PreviewGoogle({
   domeniu: string;
 }) {
   return (
-    <div className="mt-6 rounded-base border border-border bg-surface p-4">
-      <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        Aproximativ așa
+    <div className="mt-6">
+      <p className="mb-2 text-sm font-medium text-foreground">
+        Așa va arăta în lista de rezultate
       </p>
-      <p className="text-xs text-muted-foreground">{domeniu}</p>
-      <p className="mt-0.5 text-lg leading-snug text-primary">
-        {titlu || "Numele tău"}
-      </p>
-      <p className="mt-1 text-sm leading-snug text-muted-foreground">
-        {descriere || "Scrie o descriere ca să vezi cum arată aici."}
+
+      <div className="rounded-base border border-border bg-surface p-4">
+        <p className="text-xs text-muted-foreground">{domeniu}</p>
+        <p className="mt-0.5 text-lg leading-snug text-primary">{titlu || "Numele tău"}</p>
+        <p className="mt-1 text-sm leading-snug text-muted-foreground">
+          {descriere || "Scrie o descriere ca să vezi cum arată aici."}
+        </p>
+      </div>
+
+      {/*
+        Spus explicit, ca să nu pară un defect al panoului mai târziu: Google
+        chiar rescrie uneori titlul și descrierea, dacă găsește în pagină ceva ce
+        i se pare mai potrivit pentru ce a căutat omul. Nu putem promite că ce
+        scrie aici apare cuvânt cu cuvânt.
+      */}
+      <p className="mt-2 text-xs text-muted-foreground">
+        Google alege uneori singur alt text, dacă găsește în pagină ceva mai potrivit
+        pentru ce a căutat omul. De cele mai multe ori îl folosește pe al tău.
       </p>
     </div>
   );

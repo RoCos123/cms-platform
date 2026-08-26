@@ -55,23 +55,27 @@ export const CAMPURI_CABINET: CampSchema[] = [
 ];
 
 /**
- * Limitele de mai jos nu sunt inventate: Google taie titlul pe la 60 de
- * caractere și descrierea pe la 160. Un text mai lung nu e o eroare, dar se
- * termină cu „…" în rezultate — deci merită spus dinainte, nu descoperit după.
+ * Etichetele descriu ce SE VEDE, nu cum se numesc lucrurile în meseria noastră.
+ * „Titlul din rezultatele Google" presupune că omul știe deja din ce e făcut un
+ * rezultat Google; „titlul albastru" e ceva ce a văzut de mii de ori.
+ *
+ * Limitele nu sunt inventate: Google taie titlul pe la 60 de caractere și
+ * descrierea pe la 160. Un text mai lung nu e o eroare, dar se termină cu „…"
+ * în rezultate — deci merită spus dinainte, nu descoperit după.
  */
 export const CAMPURI_SEO: CampSchema[] = [
   {
     tip: "text",
     cheie: "titlu",
-    eticheta: "Titlul din rezultatele Google",
-    hint: "Dacă îl lași gol, se folosește numele tău. Cel mult 60 de caractere.",
+    eticheta: "Titlul albastru, pe care se apasă",
+    hint: "Dacă îl lași gol, se folosește numele tău. Peste 60 de caractere, Google îl taie.",
     max: 60,
   },
   {
     tip: "textLung",
     cheie: "descriere",
-    eticheta: "Descrierea din rezultatele Google",
-    hint: "Rândurile de sub titlu. Scrie-le pentru omul care caută ajutor, nu pentru motorul de căutare. Cel mult 160 de caractere.",
+    eticheta: "Cele două rânduri gri de sub titlu",
+    hint: "Singurul text pe care îl citește cineva înainte să decidă dacă intră pe site. Scrie-l pentru omul care caută ajutor, nu pentru Google. Peste 160 de caractere, se taie.",
     randuri: 3,
     max: 160,
   },
