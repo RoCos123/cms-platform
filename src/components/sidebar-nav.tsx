@@ -28,6 +28,7 @@ const NAV: (NavItem | NavGroup)[] = [
   // cuvinte în două locuri („Pagina principală" în meniu, „Secțiuni" înăuntru și
   // ca titlu de pagină). Celelalte pagini ale site-ului stau la „Pagini".
   { label: "Pagina principală", href: "/dashboard/sectiuni" },
+  { label: "Servicii", href: "/dashboard/servicii" },
   { label: "Pagini" },
   { label: "Blog", items: [{ label: "Articole" }, { label: "Categorii" }] },
   { label: "Programări" },

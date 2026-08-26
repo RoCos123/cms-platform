@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { SectionTone } from "@/lib/templates";
+import type { Serviciu } from "@/lib/servicii";
 import { Hero, type HeroData } from "./sections/hero";
 import { Quote, type QuoteData } from "./sections/quote";
 import { Features, type FeaturesData } from "./sections/features";
@@ -33,6 +34,8 @@ export type SectionRow = {
  */
 export type SectionContext = {
   articole: Articol[];
+  /** Serviciile publicate. „Serviciile mele" le citește de aici, nu din rândul ei. */
+  servicii: Serviciu[];
 };
 
 /**
@@ -47,7 +50,9 @@ export type SectionContext = {
 const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNode> = {
   hero: (row) => <Hero data={row.data as HeroData} tone={row.tone} />,
   quote: (row) => <Quote data={row.data as QuoteData} tone={row.tone} />,
-  features: (row) => <Features data={row.data as FeaturesData} tone={row.tone} />,
+  features: (row, ctx) => (
+    <Features data={row.data as FeaturesData} servicii={ctx.servicii} tone={row.tone} />
+  ),
   aboutTeaser: (row) => <AboutTeaser data={row.data as AboutTeaserData} tone={row.tone} />,
   howItWorks: (row) => <HowItWorks data={row.data as HowItWorksData} tone={row.tone} />,
   testimonials: (row) => <Testimonials data={row.data as TestimonialsData} tone={row.tone} />,

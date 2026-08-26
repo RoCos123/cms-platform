@@ -3,6 +3,7 @@
 import { TextAreaField, TextField } from "@/components/ui/field";
 import { ImageField, type ImageValue } from "@/components/ui/image-field";
 import { RepeaterList } from "@/components/ui/repeater-list";
+import { SlugField } from "@/components/ui/slug-field";
 import type { CampSchema } from "@/lib/sectiuni";
 import { catreEditor, type ElementListaEditor, type ValoareEditor } from "@/lib/sectiuni-editare";
 
@@ -131,6 +132,21 @@ export function CampuriSectiune({
               />
             );
           }
+
+          case "slug":
+            return (
+              <SlugField
+                key={camp.cheie}
+                label={camp.eticheta}
+                value={String(valoare[camp.cheie] ?? "")}
+                onChange={(nou) => seteaza(camp.cheie, nou)}
+                // Sursa e alt câmp al aceluiași formular, numit în descriere.
+                sourceValue={String(valoare[camp.dinCheia] ?? "")}
+                prefix={camp.prefix}
+                required={camp.obligatoriu}
+                error={eroare}
+              />
+            );
 
           case "listaText": {
             // O singură casetă, câte un element pe rând — nu o listă cu mâner,

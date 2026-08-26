@@ -38,6 +38,16 @@ const MESAJ_ADRESA =
  * omul apasă și nu se întâmplă nimic. E genul de defect pe care nici cel care
  * l-a scris nu-l observă.
  */
+/**
+ * Forma unei adrese scurte: doar litere mici fără diacritice, cifre și cratime.
+ * Orice altceva ajunge codificat procentual în bara de adrese — „consiliere
+ * parentală" devine „consiliere%20parental%C4%83", imposibil de dictat la
+ * telefon și de recunoscut într-un link.
+ */
+export function esteSlugValid(slug: string): boolean {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug.trim());
+}
+
 export function esteAdresaValida(adresa: string): boolean {
   const curat = adresa.trim();
   if (curat === "") return true;
@@ -215,6 +225,9 @@ export function valideaza(
       erori[drum] = "Câmpul acesta nu poate rămâne gol.";
     } else if (camp.max && text.length > camp.max) {
       erori[drum] = `Maximum ${camp.max} de caractere. Acum sunt ${text.length}.`;
+    } else if (camp.tip === "slug" && text !== "" && !esteSlugValid(text)) {
+      erori[drum] =
+        "Doar litere mici fără diacritice, cifre și cratime. Apasă butonul de lângă câmp ca să se completeze singură din nume.";
     } else if (camp.tip === "adresa" && !esteAdresaValida(text)) {
       erori[drum] = MESAJ_ADRESA;
     } else if (camp.tip === "email" && text !== "" && !esteEmailValid(text)) {

@@ -8,6 +8,7 @@ import { CampuriSectiune } from "@/components/dashboard/campuri-sectiune";
 import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
 import type { Articol } from "@/components/site/sections/latest-posts";
+import type { Serviciu } from "@/lib/servicii";
 import type { SectionTone, Template } from "@/lib/templates";
 import type { MetaSectiune } from "@/lib/sectiuni";
 import { catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
@@ -20,6 +21,7 @@ export function EditorSectiune({
   valoareInitiala,
   template,
   articole,
+  servicii,
 }: {
   id: string;
   meta: MetaSectiune;
@@ -27,6 +29,7 @@ export function EditorSectiune({
   valoareInitiala: ValoareEditor;
   template: Template;
   articole: Articol[];
+  servicii: Serviciu[];
 }) {
   const [valoare, setValoare] = useState(valoareInitiala);
   const [referinta, setReferinta] = useState(valoareInitiala);
@@ -111,7 +114,7 @@ export function EditorSectiune({
           cheie={JSON.stringify(datePreviz)}
           nota="Se actualizează pe măsură ce scrii. Modificările ajung pe site abia după ce apeși Salvează."
         >
-          <RenderSections rows={[randPreviz]} context={{ articole }} />
+          <RenderSections rows={[randPreviz]} context={{ articole, servicii }} />
         </PanouPrevizualizare>
       </div>
 

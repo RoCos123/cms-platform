@@ -53,19 +53,13 @@ cross join (values
     'citat', 'Acasă nu e un loc, e o stare. Te ajut să ți-o construiești.'
   )),
 
+  -- Fără listă de servicii: din migrarea 20260826180000 ele stau în tabelul
+  -- `services`, ca să nu fie scrise de două ori. Secțiunea rămâne vitrină.
   ('features', 'deschis', 40, jsonb_build_object(
-    'eyebrow', 'Servicii',
-    'titlu', 'Cum te pot',
-    'titluAccent', 'însoți.',
-    'intro', 'Fiecare drum e diferit. Alegem împreună ce ți se potrivește, fără grabă.',
-    'servicii', jsonb_build_array(
-      jsonb_build_object('titlu', 'Consiliere individuală', 'descriere', 'Un spațiu în care poți vorbi liber, fără să fii judecat sau grăbit.'),
-      jsonb_build_object('titlu', 'Consiliere de cuplu', 'descriere', 'Când aceleași certuri se repetă și nu mai găsiți drumul unul spre celălalt.'),
-      jsonb_build_object('titlu', 'Consiliere parentală', 'descriere', 'Sprijin pentru părinți care simt că au rămas fără resurse.'),
-      jsonb_build_object('titlu', 'Anxietate și atacuri de panică', 'descriere', 'Când neliniștea nu se mai oprește singură și îți îngustează viața.'),
-      jsonb_build_object('titlu', 'Epuizare și lipsă de sens', 'descriere', 'Când nimic nu mai are gust, deși din afară pare că funcționezi.'),
-      jsonb_build_object('titlu', 'Avize psihologice', 'descriere', 'Evaluări și avize pentru situațiile în care ai nevoie de un act.')
-    )
+    'eyebrow', 'Ce ofer',
+    'titlu', 'Serviciile',
+    'titluAccent', 'mele.',
+    'intro', 'Lucrez cu adulți, individual și în cuplu, la cabinet sau online.'
   )),
 
   ('howItWorks', 'inchis', 50, jsonb_build_object(
@@ -189,6 +183,34 @@ cross join (values
   ))
 
 ) as v(key, tone, position, data)
+where s.domain in ('test-tenant-a.example.com', 'test-tenant-b.example.com');
+
+-- ----------------------------------------------------------------------------
+-- 1b. Serviciile demonstrative — în tabelul lor, nu în secțiune
+-- ----------------------------------------------------------------------------
+delete from public.services
+where site_id in (
+  select id from public.sites
+  where domain in ('test-tenant-a.example.com', 'test-tenant-b.example.com')
+);
+
+insert into public.services (site_id, slug, title, excerpt, content, price_label, duration_label, position, status)
+select s.id, v.slug, v.titlu, v.scurt, v.lung, v.pret, v.durata, v.pozitie, 'published'
+from public.sites s
+cross join (values
+  ('terapie-individuala', 'Terapie individuală',
+   'Un spațiu numai al tău, în care nu trebuie să te explici sau să te justifici.',
+   E'Lucrăm împreună la ce te apasă acum și la tiparele care se repetă de mai multă vreme.\n\nPrimele ședințe sunt de cunoaștere: îmi spui ce te aduce aici, iar eu îți spun cum lucrez și ce ne putem propune realist. Nu trebuie să vii cu lucrurile puse în ordine — de asta e ședința.\n\nRitmul îl stabilim împreună. De obicei săptămânal la început, mai rar pe măsură ce lucrurile se așază.',
+   '250 lei / ședință', '50 de minute', 10),
+  ('consiliere-de-cuplu', 'Consiliere de cuplu',
+   'Când aceleași certuri se reiau, cu alte cuvinte, de ani de zile.',
+   E'Ședințele de cuplu nu sunt un tribunal în care se stabilește cine are dreptate.\n\nCăutăm împreună tiparul din care nu reușiți să ieșiți: ce spune unul, ce aude celălalt, unde se rupe conversația de fiecare dată. De cele mai multe ori, cearta despre vase nu e despre vase.\n\nVeniți amândoi. Dacă unul dintre voi are nevoie și de ședințe individuale, vă îndrum către un coleg — nu pot fi terapeutul cuplului și al unuia dintre voi în același timp.',
+   '350 lei / ședință', '80 de minute', 20),
+  ('anxietate-si-atacuri-de-panica', 'Anxietate și atacuri de panică',
+   'Când neliniștea nu se mai oprește singură și îți îngustează viața.',
+   E'Anxietatea nu se vindecă prin a-ți spune că nu e nimic. Corpul tău a învățat să reacționeze la o alarmă care nu se mai oprește, și tot corpul trebuie să reînvețe.\n\nLucrăm în două direcții: ce faci în momentul în care te prinde, și ce întreține alarma între timp. Prima parte aduce ușurare destul de repede, a doua durează mai mult și ține mai mult.\n\nDacă ai avut atacuri de panică, îți explic de la prima ședință ce se întâmplă în corp atunci. De multe ori, doar să înțelegi mecanismul le face mai puțin înspăimântătoare.',
+   '250 lei / ședință', '50 de minute', 30)
+) as v(slug, titlu, scurt, lung, pret, durata, pozitie)
 where s.domain in ('test-tenant-a.example.com', 'test-tenant-b.example.com');
 
 -- ----------------------------------------------------------------------------

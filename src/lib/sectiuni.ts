@@ -36,6 +36,12 @@ export type CampSchema =
    * să-și dea seama — pe pagină arată exact ca unul bun.
    */
   | (CampComun & { tip: "adresa"; max?: number })
+  /**
+   * Partea din adresă care identifică elementul („consiliere-parentala").
+   * Se generează din alt câmp, dar rămâne editabilă: odată publicat ceva, adresa
+   * lui nu mai trebuie să se schimbe singură când i se corectează titlul.
+   */
+  | (CampComun & { tip: "slug"; dinCheia: string; prefix?: string; max?: number })
   | (CampComun & { tip: "textLung"; max?: number; randuri?: number })
   | (CampComun & { tip: "numar"; min?: number; maxim?: number })
   /** Pereche text + adresă. În JSON: `{ text, href }`. */
@@ -184,40 +190,20 @@ const LISTA: MetaSectiune[] = [
   {
     cheie: "features",
     nume: "Serviciile mele",
-    descriere: "Ce oferi, fiecare cu o descriere scurtă.",
+    descriere: "Ce oferi. Textele vin din Servicii, nu de aici.",
     repetabila: false,
+    continutDinAltaParte:
+      "Serviciile se scriu la Servicii, în meniu — o singură dată, cu tot cu descrierea lungă. Aici alegi doar cum arată secțiunea de pe prima pagină și câte servicii se văd. Restul se citesc pe pagina de servicii.",
     campuri: [
       ...campuriAntet(),
       INTRO,
       {
-        tip: "lista",
-        cheie: "servicii",
-        eticheta: "Servicii",
-        etichetaElement: "serviciu",
-        rezumatDin: "titlu",
-        max: 8,
-        campuri: [
-          { tip: "text", cheie: "titlu", eticheta: "Numele serviciului", obligatoriu: true, max: 80 },
-          {
-            tip: "textLung",
-            cheie: "descriere",
-            eticheta: "Descriere",
-            obligatoriu: true,
-            randuri: 3,
-            max: 400,
-          },
-          {
-            tip: "adresa",
-            cheie: "href",
-            eticheta: "Pagina cu detalii despre serviciu",
-            // Cinstit, nu invitație la un link care nu duce nicăieri: paginile
-            // de servicii nu se pot crea încă din panou (vezi „Pagini" în
-            // meniu), deci orice adresă scrisă aici ar trimite vizitatorul
-            // într-un perete. Se rescrie când ecranul de Pagini există.
-            hint: "Adaugă pe card un link „Află mai multe”. Deocamdată nu poți crea pagini de servicii din panou — lasă gol, cardul arată bine și fără.",
-            max: 200,
-          },
-        ],
+        tip: "numar",
+        cheie: "numar",
+        eticheta: "Câte servicii se văd pe prima pagină",
+        min: 1,
+        maxim: 12,
+        hint: "Lasă gol ca să le arăți pe toate.",
       },
     ],
   },

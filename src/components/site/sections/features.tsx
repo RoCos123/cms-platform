@@ -1,72 +1,66 @@
 import type { SectionTone } from "@/lib/templates";
-import { Section, SectionEyebrow } from "@/components/site/section";
+import type { Serviciu } from "@/lib/servicii";
+import { Section } from "@/components/site/section";
+import { SectionHeading } from "@/components/site/section-heading";
 
 export type FeaturesData = {
   eyebrow?: string;
   titlu: string;
   titluAccent?: string;
   intro?: string;
-  servicii: { titlu: string; descriere: string; href?: string }[];
+  /** Câte se arată pe prima pagină. Lipsă = toate. */
+  numar?: number;
 };
 
 /**
- * „Serviciile mele" — în șabloanele analizate numărul variază între patru și
- * șase. Grila se adaptează singură la câte există, ca numărul de servicii să fie
- * o alegere a clientului, nu o constrângere de layout.
+ * „Serviciile mele" — vitrina de pe prima pagină.
+ *
+ * Nu-și ține conținutul: îl citește din Servicii, la fel cum „Articole recente"
+ * îl citește din Blog. Secțiunea reține doar CUM se afișează (titlu, câte), nu
+ * CE — altfel fiecare serviciu ar fi scris de două ori, o dată aici și o dată pe
+ * pagina de servicii, iar cele două ar ajunge să se contrazică.
  */
 export function Features({
   data,
+  servicii,
   tone,
 }: {
   data: FeaturesData;
+  servicii: Serviciu[];
   tone?: SectionTone;
 }) {
+  // Fără niciun serviciu publicat, secțiunea nu se randează deloc: un titlu
+  // „Serviciile mele" urmat de nimic arată a site stricat, nu a site nou.
+  if (servicii.length === 0) return null;
+
+  const afisate = data.numar ? servicii.slice(0, data.numar) : servicii;
+  const maiSunt = servicii.length > afisate.length;
+
   return (
     <Section tone={tone} id="servicii">
-      {data.eyebrow && <SectionEyebrow>{data.eyebrow}</SectionEyebrow>}
-
-      <h2
-        style={{
-          margin: 0,
-          maxWidth: "14em",
-          fontSize: "clamp(34px, 5vw, 62px)",
-          lineHeight: 1.05,
-          letterSpacing: "-0.025em",
-          fontWeight: 700,
-          textWrap: "balance",
-        }}
-      >
-        {data.titlu}
-        {data.titluAccent && (
-          <>
-            {" "}
-            <span
+      <SectionHeading
+        eyebrow={data.eyebrow}
+        titlu={data.titlu}
+        titluAccent={data.titluAccent}
+        intro={data.intro}
+        maxWidthTitlu="14em"
+        actiune={
+          maiSunt ? (
+            <a
+              href="/servicii"
               style={{
-                fontFamily: "var(--t-font-secundar)",
-                fontStyle: "italic",
-                fontWeight: 300,
+                fontSize: "15px",
+                fontWeight: 600,
+                color: "var(--s-accent)",
+                textDecoration: "none",
+                whiteSpace: "nowrap",
               }}
             >
-              {data.titluAccent}
-            </span>
-          </>
-        )}
-      </h2>
-
-      {data.intro && (
-        <p
-          style={{
-            margin: "24px 0 0",
-            maxWidth: "36em",
-            fontSize: "17px",
-            lineHeight: 1.7,
-            color: "var(--s-text-secundar)",
-            textWrap: "pretty",
-          }}
-        >
-          {data.intro}
-        </p>
-      )}
+              Toate serviciile →
+            </a>
+          ) : undefined
+        }
+      />
 
       <ul
         style={{
@@ -74,52 +68,66 @@ export function Features({
           margin: "56px 0 0",
           padding: 0,
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(288px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(288px, 100%), 1fr))",
           gap: "20px",
         }}
       >
-        {data.servicii.map((serviciu) => (
-          <li
-            key={serviciu.titlu}
-            style={{
-              background: "var(--t-fundal-nuantat)",
-              border: "1px solid var(--t-chenar)",
-              borderRadius: "var(--t-raza)",
-              padding: "32px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "12px",
-            }}
-          >
-            <h3 style={{ margin: 0, fontSize: "21px", fontWeight: 600, color: "var(--t-text)" }}>
-              {serviciu.titlu}
-            </h3>
-            <p
+        {afisate.map((serviciu) => (
+          <li key={serviciu.id}>
+            {/*
+              Cardul întreg e link, nu doar rândul de jos: pe telefon, o țintă de
+              opt pixeli înălțime e greu de nimerit, iar oricine vede un card cu
+              „Află mai multe" încearcă oricum să apese oriunde pe el.
+            */}
+            <a
+              href={`/servicii#${serviciu.slug}`}
               style={{
-                margin: 0,
-                fontSize: "16px",
-                lineHeight: 1.7,
-                color: "var(--t-text-secundar)",
-                textWrap: "pretty",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+                height: "100%",
+                background: "var(--t-fundal-nuantat)",
+                border: "1px solid var(--t-chenar)",
+                borderRadius: "var(--t-raza)",
+                padding: "32px",
+                color: "var(--t-text)",
+                textDecoration: "none",
               }}
             >
-              {serviciu.descriere}
-            </p>
-            {serviciu.href && (
-              <a
-                href={serviciu.href}
+              <h3 style={{ margin: 0, fontSize: "21px", fontWeight: 600, textWrap: "pretty" }}>
+                {serviciu.titlu}
+              </h3>
+
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "16px",
+                  lineHeight: 1.7,
+                  color: "var(--t-text-secundar)",
+                  textWrap: "pretty",
+                }}
+              >
+                {serviciu.descriereScurta}
+              </p>
+
+              {(serviciu.durata || serviciu.pret) && (
+                <p style={{ margin: 0, fontSize: "14px", color: "var(--t-text-secundar)" }}>
+                  {[serviciu.durata, serviciu.pret].filter(Boolean).join(" · ")}
+                </p>
+              )}
+
+              <span
                 style={{
                   marginTop: "auto",
                   paddingTop: "12px",
                   fontSize: "15px",
                   fontWeight: 600,
                   color: "var(--t-accent)",
-                  textDecoration: "none",
                 }}
               >
                 Află mai multe →
-              </a>
-            )}
+              </span>
+            </a>
           </li>
         ))}
       </ul>

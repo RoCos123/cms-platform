@@ -1,38 +1,14 @@
-import { cache } from "react";
 import type { Metadata } from "next";
 import { getSesiuneOptionala, getTenant } from "@/lib/dal";
-import type { Brand, Seo } from "@/lib/setari";
-import { createServiceClient, tenantTable } from "@/lib/supabase/admin";
+import { identitateaSiteului } from "@/lib/site-public";
+import { serviciiPublicate } from "@/lib/servicii-publice";
+import { tenantTable } from "@/lib/supabase/admin";
 import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
 import type { Articol } from "@/components/site/sections/latest-posts";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { AdminBar } from "@/components/site/admin-bar";
-
-/**
- * Identitatea site-ului: numele, șablonul și setările.
- *
- * `cache()` fiindcă e nevoie de ea de două ori într-o singură cerere — o dată
- * pentru titlul și descrierea din Google, o dată pentru pagina însăși. Fără el,
- * ar însemna două interogări identice la fiecare vizită.
- */
-const identitateaSiteului = cache(async (siteId: string) => {
-  // Rolul `anon` nu mai are acces la date (vezi migrarea de întărire RLS), deci
-  // tot ce se citește pentru site-ul public trece prin cheia secretă, server-side.
-  const service = createServiceClient();
-
-  const [{ data: site }, { data: settings }] = await Promise.all([
-    service.from("sites").select("name, template").eq("id", siteId).single(),
-    service.from("site_settings").select("brand, seo").eq("site_id", siteId).maybeSingle(),
-  ]);
-
-  return {
-    site,
-    brand: (settings?.brand ?? {}) as Brand,
-    seo: (settings?.seo ?? {}) as Seo,
-  };
-});
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteId, domain } = await getTenant();
@@ -66,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PublicHomePage() {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, brand }, { data: rows }, { data: articole }, sesiune] =
+  const [{ site, brand }, { data: rows }, { data: articole }, servicii, sesiune] =
     await Promise.all([
       identitateaSiteului(siteId),
       (await tenantTable("site_content"))
@@ -81,6 +57,10 @@ export default async function PublicHomePage() {
         .eq("status", "published")
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(3),
+      // Serviciile se citesc o dată aici, ca articolele: secțiunea „Serviciile
+      // mele" nu-și face singură interogarea, altfel previzualizarea din panou
+      // n-ar putea să i le dea.
+      serviciiPublicate(siteId),
       // Pentru un vizitator obișnuit se rezolvă instantaneu cu `null`, fără nicio
       // cerere: fără cookie de sesiune n-are ce verifica.
       getSesiuneOptionala(),
@@ -129,7 +109,7 @@ export default async function PublicHomePage() {
 
         <main>
           {sections.length > 0 ? (
-            <RenderSections rows={sections} context={{ articole: articoleRecente }} />
+            <RenderSections rows={sections} context={{ articole: articoleRecente, servicii }} />
           ) : (
             // Un site fără nicio secțiune nu trebuie să fie o pagină albă:
             // clientul tocmai a fost provizionat și încă nu a scris nimic.

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { metaSectiune } from "@/lib/sectiuni";
 import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate, type SectionTone } from "@/lib/templates";
+import { serviciiPublicate } from "@/lib/servicii-publice";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import type { Articol } from "@/components/site/sections/latest-posts";
 import { EditorSectiune } from "./editor";
@@ -52,7 +53,7 @@ export default async function EditorSectiunePage({
     );
   }
 
-  const [{ data: site }, { data: articole }] = await Promise.all([
+  const [{ data: site }, { data: articole }, servicii] = await Promise.all([
     supabase.from("sites").select("template").eq("id", session.siteId).single(),
     // Previzualizarea „Articolelor recente" arată articole adevărate, nu
     // exemple: altfel clientul n-ar avea cum să vadă că secțiunea dispare
@@ -64,6 +65,9 @@ export default async function EditorSectiunePage({
       .eq("status", "published")
       .order("published_at", { ascending: false, nullsFirst: false })
       .limit(3),
+    // Doar cele publicate, ca previzualizarea să arate exact ce vede un
+    // vizitator — inclusiv atunci când asta înseamnă „nimic încă".
+    serviciiPublicate(session.siteId),
   ]);
 
   const articolePreviz: Articol[] = (articole ?? []).map((a) => ({
@@ -81,6 +85,7 @@ export default async function EditorSectiunePage({
       valoareInitiala={catreEditor(rand.data, meta.campuri)}
       template={getTemplate(site?.template as string | null)}
       articole={articolePreviz}
+      servicii={servicii}
     />
   );
 }
