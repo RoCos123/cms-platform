@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import type { Template, TemplateId } from "./types";
-import { rodica } from "./rodica";
+import { caldura } from "./caldura";
 
 export * from "./types";
 
@@ -10,7 +10,7 @@ export * from "./types";
  * design/sabloane/README.md, „Ordinea de lucru".
  */
 const TEMPLATES: Record<string, Template> = {
-  rodica,
+  caldura,
 };
 
 /**
@@ -18,7 +18,7 @@ const TEMPLATES: Record<string, Template> = {
  * se randeze mereu, chiar dacă rândul din baza de date a rămas în urma codului.
  */
 export function getTemplate(id: string | null | undefined): Template {
-  return TEMPLATES[id ?? ""] ?? rodica;
+  return TEMPLATES[id ?? ""] ?? caldura;
 }
 
 export function listTemplates(): Template[] {

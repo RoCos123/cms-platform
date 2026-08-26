@@ -15,8 +15,8 @@
 -- rândul deja citit în acel moment.
 -- ----------------------------------------------------------------------------
 alter table public.sites
-  add column template text not null default 'rodica'
-  check (template in ('rodica', 'dragos', 'gina', 'ana'));
+  add column template text not null default 'caldura'
+  check (template in ('caldura', 'liniste', 'lumina', 'apropiere'));
 
 comment on column public.sites.template is
   'Șablonul vizual al site-ului public. Valorile corespund fișierelor din src/lib/templates/.';

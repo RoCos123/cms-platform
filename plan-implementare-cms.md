@@ -92,7 +92,7 @@ Diferențiatorul central: editezi cu site-ul vizibil lângă tine.
 **Livrabil:** editezi Hero-ul cu preview live, alegi varianta din miniaturi, salvezi.
 **Dependențe:** Faza 2.
 
-**Specificație (actualizat 26 aug. 2026):** nu se mai extrage de pe `rodi-cotenescu.vercel.app` (inaccesibil din mediul de lucru, iar auditele nu-l descriu vizual). Clientul a furnizat **patru șabloane** reale, analizate în `design/sabloane/`. Se construiește **întâi „Cald editorial"** (cod `rodica`), integral — e superset-ul verificat al celorlalte trei; abia apoi restul, ca seturi de valori peste aceeași structură.
+**Specificație (actualizat 26 aug. 2026):** nu se mai extrage de pe `rodi-cotenescu.vercel.app` (inaccesibil din mediul de lucru, iar auditele nu-l descriu vizual). Clientul a furnizat **patru șabloane** reale, analizate în `design/sabloane/`. Se construiește **întâi „Căldură"** (cod `caldura`), integral — e superset-ul verificat al celorlalte trei; abia apoi restul, ca seturi de valori peste aceeași structură.
 
 **Risc:** preview-ul live cere ca site-ul public (Faza 4) să existe măcar parțial ca set de componente. În practică, Faza 3 și Faza 4 se întrepătrund — componentele de secțiune sunt aceleași.
 

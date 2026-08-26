@@ -2,12 +2,12 @@ import type { Template } from "./types";
 
 /**
  * Valorile sunt măsurate din randarea reală a șablonului-sursă, nu alese de mine
- * — vezi design/sabloane/sablon-cald-editorial-spec.json pentru datele brute.
+ * — vezi design/sabloane/sablon-caldura-spec.json pentru datele brute.
  */
-export const rodica: Template = {
-  id: "rodica",
-  nume: "Cald și editorial",
-  descriere: "Crem cald, accent terracotta, titluri mari cu accente în serif italic.",
+export const caldura: Template = {
+  id: "caldura",
+  nume: "Căldură",
+  descriere: "Crem și terracotta, titluri mari cu accente în serif. Cel mai complet dintre cele patru.",
 
   paleta: {
     fundal: "#F8F1EA",

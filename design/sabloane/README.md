@@ -5,21 +5,26 @@ direcțiile propuse anterior în `decizii-faza-0.md` §7: nu mai proiectăm de l
 zero, ci pornim de la acestea patru.
 
 **Notă de atribuire:** șabloanele-sursă sunt site-uri ale unor practicieni reali.
-Aici sunt referite prin denumiri descriptive, nu prin numele lor; codul folosit ca
-identificator (`rodica`) e al clientului nostru, nu al autorilor șabloanelor. Din
-șabloane s-au reținut doar structura, culorile și spațierile — datele măsurabile.
-Textele lor nu au fost păstrate nicăieri în proiect.
+Aici sunt referite prin denumirile pe care le va vedea clientul la alegerea
+stilului, nu prin numele autorilor. Din ele s-au reținut doar structura, culorile
+și spațierile — datele măsurabile; textele lor nu au fost păstrate nicăieri în
+proiect.
+
+Denumirile sunt **stări pe care un cabinet le poate transmite**, nu descrieri
+tehnice: numele apare în panou lângă miniatură, deci trebuie să fie ceva ce un
+client e mulțumit să spună că a ales — iar niciunul nu trebuie să pară varianta
+mai slabă.
 
 ## Cele patru
 
 | Șablon | Cod | Font principal | Font secundar | Fundal | Accent | Înălțime | Secțiuni |
 |---|---|---|---|---|---|---|---|
-| **Cald editorial** | `rodica` | Manrope | Cormorant Garamond | `#F8F1EA` | `#B8654D` terracotta | 13070 px | 14 |
-| Sobru natural | `dragos` | DM Sans | serif italic | `#F3EDE2` | `#1F2A24` verde închis | 8693 px | 9 |
-| Luminos modern | `gina` | Inter | — | `#F1F5FD` lavandă | `#5E2976` mov | 7594 px | 8 |
-| Prietenos rotunjit | `ana` | Nunito | — | `#F4EDE2` | verde discret | 7157 px | 8 |
+| **Căldură** | `caldura` | Manrope | Cormorant Garamond | `#F8F1EA` | `#B8654D` terracotta | 13070 px | 14 |
+| Liniște | `liniste` | DM Sans | serif italic | `#F3EDE2` | `#1F2A24` verde închis | 8693 px | 9 |
+| Lumină | `lumina` | Inter | — | `#F1F5FD` lavandă | `#5E2976` mov | 7594 px | 8 |
+| Apropiere | `apropiere` | Nunito | — | `#F4EDE2` | verde discret | 7157 px | 8 |
 
-**„Cald editorial" e superset-ul** — verificat, nu presupus: fiecare secțiune din
+**„Căldură" e superset-ul** — verificat, nu presupus: fiecare secțiune din
 celelalte trei există și la el. De aceea se construiește primul, integral, iar
 celelalte trei se adaugă după (vezi „Ordinea de lucru" mai jos).
 
@@ -27,10 +32,10 @@ Toate patru împart aceeași familie: fundal crem/cald deschis, text brun-închi
 negru), un singur accent saturat, colțuri rotunjite, mult spațiu. Confirmă tonul
 „cald și liniștitor" decis anterior.
 
-## Structura șablonului „Cald editorial", secțiune cu secțiune
+## Structura șablonului „Căldură", secțiune cu secțiune
 
 Extrasă din randarea reală, nu din citirea codului
-(`sablon-cald-editorial-spec.json` are datele brute).
+(`sablon-caldura-spec.json` are datele brute).
 
 | # | Secțiune | Fundal | Elemente repetate | Cheia noastră |
 |---|---|---|---|---|
@@ -51,18 +56,18 @@ Extrasă din randarea reală, nu din citirea codului
 
 ## Ce lipsește din cele 17 secțiuni definite în `decizii-faza-0.md` §6
 
-1. **Bandă cu citat** — în „Cald editorial" apare de două ori, în „Sobru natural"
+1. **Bandă cu citat** — în „Căldură" apare de două ori, în „Liniște"
    tot de două ori. E un element vizual recurent, nu un accident. Cheie propusă:
    `quote`.
 2. **Articole recente** — apare în **toate patru** șabloanele. Avem tabelul
    `blog_articles`, dar nicio secțiune de pagină principală care să afișeze
    ultimele N articole. Cea mai clară scăpare. Cheie propusă: `latestPosts`.
-3. **Newsletter / abonare** — prezent în „Cald editorial". Cheie propusă:
+3. **Newsletter / abonare** — prezent în „Căldură". Cheie propusă:
    `newsletter`. Necesită și stocarea adreselor, deci un tabel nou.
 
 **Corecție la o decizie anterioară:** `logos` a fost repurposat în „Bandă servicii"
-(decizii-faza-0.md §6.1) pe baza benzii derulante din „Luminos modern". Dar „Cald
-editorial" are „Apariții TV & podcast" — exact scopul original al lui `logos`
+(decizii-faza-0.md §6.1) pe baza benzii derulante din „Lumină". Dar „Căldură"
+are „Apariții TV & podcast" — exact scopul original al lui `logos`
 (recunoaștere, presă). Sunt două lucruri diferite și amândouă apar în șabloane,
 deci trebuie două chei:
 - `logos` → **„Apariții și acreditări"** (imagini/logo-uri, scopul original)
@@ -88,7 +93,7 @@ Fazele 3–4 se construiesc presupunând un singur stil, adăugarea celorlalte t
 înseamnă refacere, nu adăugare.
 
 **Ritmul de fundal** merită tratat ca parte din șablon, nu hardcodat per secțiune.
-În „Cald editorial" alternanța e deliberată: transparent → `#FCF8F5` → transparent
+În „Căldură" alternanța e deliberată: transparent → `#FCF8F5` → transparent
 → închis → `#FCF8F5` → `#DFD8D1`. Fiecare secțiune primește un *ton* (`deschis`,
 `nuantat`, `inchis`), iar șablonul decide ce culoare înseamnă fiecare ton. Așa, un
 șablon nou = un set de valori, nu rescrierea secțiunilor.
@@ -98,7 +103,7 @@ mecanismul care face asta ieftin.
 
 ## Ordinea de lucru
 
-1. **„Cald editorial", integral** — de la editarea în panou până la site-ul public
+1. **„Căldură", integral** — de la editarea în panou până la site-ul public
    randat. Superset-ul: dacă merge el, structura e validată pentru toate.
 2. Abia apoi celelalte trei, care devin seturi de valori peste aceeași structură.
 
