@@ -21,6 +21,47 @@ export const getTenant = cache(async () => {
 });
 
 /**
+ * Sesiunea, dacă există — fără redirect.
+ *
+ * Perechea lui `verifySession()`: aceleași verificări (autentificat ȘI aparține
+ * tenantului acestui domeniu), dar întoarce `null` în loc să trimită la /login.
+ * E ce-i trebuie site-ului public, unde absența unei sesiuni e cazul normal, nu
+ * o eroare.
+ *
+ * Pentru un vizitator obișnuit nu costă nimic: fără cookie de sesiune,
+ * `getUser()` întoarce `null` fără să iasă în rețea, iar interogarea următoare
+ * nici nu se mai face.
+ *
+ * ATENȚIE la memorare: citirea cookie-urilor scoate ruta din randarea statică,
+ * deci pagina publică rămâne dinamică. Dacă cineva adaugă vreodată `revalidate`
+ * sau cache public pe pagina principală, bara de administrare ar putea ajunge
+ * în răspunsul servit vizitatorilor. Nu adăuga cache fără să muți întâi bara.
+ */
+export const getSesiuneOptionala = cache(async () => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const tenant = await getTenant();
+
+  const { data: profile } = await supabase
+    .from("users")
+    .select("site_id")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  // Un cont valid pe alt domeniu nu e proprietarul acestui site. Fără
+  // verificarea asta, pe un domeniu de preview unde cookie-urile sunt comune,
+  // clientul A ar vedea bara de administrare pe site-ul clientului B.
+  if (!profile || profile.site_id !== tenant.siteId) return null;
+
+  return { userId: user.id, email: user.email ?? "", siteId: tenant.siteId };
+});
+
+/**
  * Data Access Layer pentru rutele din /dashboard — verifică sesiunea Supabase
  * ȘI că userul autentificat chiar aparține tenantului rezolvat pentru acest
  * domeniu (nu doar că e autentificat undeva). Fără asta, un user logat pe

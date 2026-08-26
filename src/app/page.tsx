@@ -1,10 +1,11 @@
-import { getTenant } from "@/lib/dal";
+import { getSesiuneOptionala, getTenant } from "@/lib/dal";
 import { createServiceClient, tenantTable } from "@/lib/supabase/admin";
 import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
 import type { Articol } from "@/components/site/sections/latest-posts";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
+import { AdminBar } from "@/components/site/admin-bar";
 
 /** Ce ține `site_settings.brand` din perspectiva site-ului public. */
 type Brand = {
@@ -23,7 +24,7 @@ export default async function PublicHomePage() {
   // tot ce se citește pentru site-ul public trece prin cheia secretă, server-side.
   const service = createServiceClient();
 
-  const [{ data: site }, { data: settings }, { data: rows }, { data: articole }] =
+  const [{ data: site }, { data: settings }, { data: rows }, { data: articole }, sesiune] =
     await Promise.all([
       service.from("sites").select("name, template").eq("id", siteId).single(),
       service.from("site_settings").select("brand").eq("site_id", siteId).maybeSingle(),
@@ -39,6 +40,9 @@ export default async function PublicHomePage() {
         .eq("status", "published")
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(3),
+      // Pentru un vizitator obișnuit se rezolvă instantaneu cu `null`, fără nicio
+      // cerere: fără cookie de sesiune n-are ce verifica.
+      getSesiuneOptionala(),
     ]);
 
   const template = getTemplate(site?.template);
@@ -107,6 +111,8 @@ export default async function PublicHomePage() {
             acreditare: brand.acreditare,
           }}
         />
+
+        {sesiune && <AdminBar email={sesiune.email} linkEditare="/dashboard/sectiuni" />}
       </div>
     </>
   );

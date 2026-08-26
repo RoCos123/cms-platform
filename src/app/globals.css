@@ -138,3 +138,24 @@ body {
   color: currentColor;
   opacity: 0.7;
 }
+
+/*
+ * Bara de administrare nu apare la tipărire: proprietarul care listează o pagină
+ * a site-ului nu vrea unealta noastră pe hârtie.
+ */
+@media print {
+  .admin-bar {
+    display: none !important;
+  }
+}
+
+/*
+ * Pe telefon adresa de email nu încape lângă cele două butoane — bara ar ieși
+ * din ecran. Emailul e o comoditate (contează doar dacă cineva are două
+ * conturi), butoanele sunt scopul barei, deci el pleacă primul.
+ */
+@media (max-width: 560px) {
+  .admin-bar-email {
+    display: none !important;
+  }
+}
