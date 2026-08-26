@@ -95,7 +95,15 @@ export function EditorSectiune({
         )}
       </div>
 
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)]">
+      {/*
+        `minmax(0, 1fr)` și pe o singură coloană, nu doar pe două.
+        Fără el, coloana se lățea până la lățimea reală a ferestrei simulate
+        (1180px), fiindcă asta e mărimea conținutului ei. Previzualizarea își
+        calculează micșorarea din lățimea coloanei — deci coloana rămânea largă,
+        micșorarea ieșea 1, iar previzualizarea ieșea din ecran. `minmax(0, …)`
+        îi spune coloanei că are voie să fie mai îngustă decât ce conține.
+      */}
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)] lg:gap-8">
         <CampuriSectiune
           campuri={meta.campuri}
           valoare={valoare}
@@ -103,7 +111,18 @@ export function EditorSectiune({
           erori={erori}
         />
 
-        <div className="lg:sticky lg:top-6">
+        {/*
+          Pe ecran lat, previzualizarea stă în dreapta formularului și rămâne
+          lipită sus cât derulezi.
+
+          Pe ecran îngust (tabletă, laptop mic) cele două coloane se așază una
+          sub alta — iar previzualizarea trebuie să treacă DEASUPRA. Sub formular
+          ar fi ajuns după zeci de câmpuri: ai fi scris fără s-o vezi, adică
+          exact dus-întorsul pe care previzualizarea trebuia să-l elimine.
+          Înălțimea ei se limitează atunci la jumătate de ecran, ca să rămână loc
+          și de scris.
+        */}
+        <div className="sticky top-0 z-10 order-first bg-background pb-4 lg:order-none lg:top-6 lg:pb-0">
           <div className="mb-3 flex items-center justify-between gap-4">
             <p className="text-sm font-medium text-foreground">Cum arată pe site</p>
             <div className="flex gap-1" role="group" aria-label="Lățimea previzualizării">
@@ -121,18 +140,20 @@ export function EditorSectiune({
             </div>
           </div>
 
-          <CadruPrevizualizare latime={latime} fonturi={templateFontsHref(template)}>
-            <div
-              style={{
-                ...templateStyle(template),
-                background: "var(--t-fundal)",
-                color: "var(--t-text)",
-                fontFamily: "var(--t-font-principal)",
-              }}
-            >
-              <RenderSections rows={[randPreviz]} context={{ articole }} />
-            </div>
-          </CadruPrevizualizare>
+          <div className="max-h-[52vh] overflow-hidden rounded-base lg:max-h-none lg:overflow-visible">
+            <CadruPrevizualizare latime={latime} fonturi={templateFontsHref(template)}>
+              <div
+                style={{
+                  ...templateStyle(template),
+                  background: "var(--t-fundal)",
+                  color: "var(--t-text)",
+                  fontFamily: "var(--t-font-principal)",
+                }}
+              >
+                <RenderSections rows={[randPreviz]} context={{ articole }} />
+              </div>
+            </CadruPrevizualizare>
+          </div>
 
           <p className="mt-2 text-xs text-muted-foreground">
             Se actualizează pe măsură ce scrii. Modificările ajung pe site abia după ce
