@@ -9,10 +9,10 @@
 --   Supabase → SQL Editor → New query → lipești TOT fișierul → Run.
 --   Rezultatul e un tabel cu o linie per verificare și verdictul ei.
 --
---   „Goale, deci nedovedite" nu e o eroare: înseamnă că acel tabel n-are încă
---   rânduri la clientul de test, deci verificarea n-a avut ce compara acolo.
---   Ca acoperirea să fie completă, fiecare client de test ar trebui să aibă
---   măcar un rând în fiecare tabel.
+--   „Fără date la alt client" nu e o eroare și nici o slăbiciune a bazei: e un
+--   tabel în care NIMENI altcineva n-are rânduri, deci nu există ce să scape.
+--   Ca acoperirea să fie completă, măcar unul dintre clienții de test ar trebui
+--   să aibă un rând în fiecare tabel.
 --
 -- NU MODIFICĂ NIMIC. Singura scriere pe care o încearcă e una care TREBUIE să
 -- fie respinsă; dacă totuși trece, rândul se șterge imediat și verificarea e
@@ -31,10 +31,11 @@ declare
   user_b uuid; site_b uuid;
   al_lui uuid; site_lui uuid;
   randuri bigint; straine bigint;
-  verificate int; goale int; refuzate int;
+  dovedite int; fara_ce int; refuzate int;
+  ale_altora bigint;
   tabel text; coloana text;
   scurgeri text := '';
-  goluri text := '';
+  netestate text := '';
   refuzuri text := '';
 begin
   -- --------------------------------------------------------------------------
@@ -69,19 +70,12 @@ begin
   for i in 1..2 loop
     al_lui   := case when i = 1 then user_a else user_b end;
     site_lui := case when i = 1 then site_a else site_b end;
-    verificate := 0;
-    goale := 0;
+    dovedite := 0;
+    fara_ce := 0;
     refuzate := 0;
     scurgeri := '';
-    goluri := '';
+    netestate := '';
     refuzuri := '';
-
-    perform set_config('role', 'authenticated', true);
-    perform set_config(
-      'request.jwt.claims',
-      json_build_object('sub', al_lui, 'role', 'authenticated')::text,
-      true
-    );
 
     foreach tabel in array array[
       'sites', 'users', 'site_content', 'site_settings', 'pages', 'services',
@@ -91,19 +85,37 @@ begin
       -- În `sites`, clientul E rândul; în rest, îl arată coloana `site_id`.
       coloana := case when tabel = 'sites' then 'id' else 'site_id' end;
 
+      -- Câte rânduri ale ALTOR clienți există în tabel, văzute cu ochii bazei
+      -- (rolul curent e încă cel privilegiat la momentul apelului de mai jos).
+      --
+      -- Ăsta e numărul care hotărăște dacă verificarea dovedește ceva. Un tabel
+      -- gol la clientul nostru NU e „nedovedit", dacă altcineva are rânduri
+      -- acolo: tocmai faptul că nu le vede e dovada. Nedovedit e doar tabelul în
+      -- care nimeni altcineva n-are nimic — acolo n-are ce să scape.
+      execute format(
+        'select count(*) from public.%I where %I is distinct from $1', tabel, coloana
+      ) into ale_altora using site_lui;
+
       begin
+        perform set_config('role', 'authenticated', true);
+        perform set_config(
+          'request.jwt.claims',
+          json_build_object('sub', al_lui, 'role', 'authenticated')::text, true);
+
         execute format(
           'select count(*), count(*) filter (where %I is distinct from $1) from public.%I',
           coloana, tabel
         ) into randuri, straine using site_lui;
 
-        if randuri = 0 then
-          goale := goale + 1;
-          goluri := goluri || tabel || ', ';
-        elsif straine > 0 then
+        perform set_config('role', 'postgres', true);
+
+        if straine > 0 then
           scurgeri := scurgeri || format('%s (%s rânduri străine), ', tabel, straine);
+        elsif ale_altora > 0 then
+          dovedite := dovedite + 1;
         else
-          verificate := verificate + 1;
+          fara_ce := fara_ce + 1;
+          netestate := netestate || tabel || ', ';
         end if;
       exception when others then
         -- ATENȚIE: aici refuzul NU e un răspuns bun.
@@ -112,12 +124,12 @@ begin
         -- întrebe" — și așa a trecut o politică stricată dinadins, fără să o
         -- prindă. Un client care nu-și poate citi PROPRIILE date n-are izolare
         -- bună; are panoul rupt. Se raportează separat.
+        perform set_config('role', 'postgres', true);
         refuzate := refuzate + 1;
         refuzuri := refuzuri || tabel || ', ';
       end;
     end loop;
 
-    perform set_config('role', 'postgres', true);
     perform set_config('request.jwt.claims', '', true);
 
     return query select
@@ -132,9 +144,9 @@ begin
         when refuzate > 0 then format(
           'nu-și poate citi propriile date din: %s — panoul ar da eroare acolo',
           rtrim(refuzuri, ', '))
-        when goale = 0 then format('%s tabele verificate, toate cu date de-ale lui', verificate)
-        else format('%s tabele verificate; %s goale, deci nedovedite: %s',
-                    verificate, goale, rtrim(goluri, ', '))
+        when fara_ce = 0 then format('%s tabele dovedite — n-a văzut niciun rând străin', dovedite)
+        else format('%s tabele dovedite; %s fără date la alt client, deci nimic de scurs: %s',
+                    dovedite, fara_ce, rtrim(netestate, ', '))
       end::text;
   end loop;
 
