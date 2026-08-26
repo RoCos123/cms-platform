@@ -9,6 +9,11 @@
 --   Supabase → SQL Editor → New query → lipești TOT fișierul → Run.
 --   Rezultatul e un tabel cu o linie per verificare și verdictul ei.
 --
+--   „Goale, deci nedovedite" nu e o eroare: înseamnă că acel tabel n-are încă
+--   rânduri la clientul de test, deci verificarea n-a avut ce compara acolo.
+--   Ca acoperirea să fie completă, fiecare client de test ar trebui să aibă
+--   măcar un rând în fiecare tabel.
+--
 -- NU MODIFICĂ NIMIC. Singura scriere pe care o încearcă e una care TREBUIE să
 -- fie respinsă; dacă totuși trece, rândul se șterge imediat și verificarea e
 -- marcată PICAT.
@@ -24,11 +29,13 @@ as $$
 declare
   user_a uuid; site_a uuid;
   user_b uuid; site_b uuid;
-  vazute int;
-  al_lui uuid;
-  randuri bigint;
-  tabel text;
+  al_lui uuid; site_lui uuid;
+  randuri bigint; straine bigint;
+  verificate int; goale int; refuzate int;
+  tabel text; coloana text;
   scurgeri text := '';
+  goluri text := '';
+  refuzuri text := '';
 begin
   -- --------------------------------------------------------------------------
   -- Doi useri din site-uri diferite. Fără ei, restul n-ar dovedi nimic.
@@ -51,12 +58,24 @@ begin
     format('%s și %s', site_a, site_b);
 
   -- --------------------------------------------------------------------------
-  -- Fiecare client, logat, vede DOAR conținutul lui.
+  -- Fiecare client, logat, vede DOAR datele lui — în TOATE tabelele.
   --
-  -- Interogare fără niciun filtru pe site_id: dacă politicile ar fi greșite,
-  -- ar întoarce rândurile amândurora.
+  -- Interogări fără niciun filtru: dacă o politică ar fi greșită, rândurile
+  -- celuilalt client ar ieși la iveală.
+  --
+  -- Un tabel gol pentru clientul de test nu e o eroare, dar nici nu dovedește
+  -- nimic — de asta îl numărăm separat, în loc să-l trecem drept „OK".
   -- --------------------------------------------------------------------------
-  foreach al_lui in array array[user_a, user_b] loop
+  for i in 1..2 loop
+    al_lui   := case when i = 1 then user_a else user_b end;
+    site_lui := case when i = 1 then site_a else site_b end;
+    verificate := 0;
+    goale := 0;
+    refuzate := 0;
+    scurgeri := '';
+    goluri := '';
+    refuzuri := '';
+
     perform set_config('role', 'authenticated', true);
     perform set_config(
       'request.jwt.claims',
@@ -64,18 +83,58 @@ begin
       true
     );
 
-    select count(distinct c.site_id) into vazute from public.site_content c;
+    foreach tabel in array array[
+      'sites', 'users', 'site_content', 'site_settings', 'pages', 'services',
+      'blog_categories', 'blog_articles', 'uploads', 'contact_messages',
+      'appointments', 'audit_log'
+    ] loop
+      -- În `sites`, clientul E rândul; în rest, îl arată coloana `site_id`.
+      coloana := case when tabel = 'sites' then 'id' else 'site_id' end;
+
+      begin
+        execute format(
+          'select count(*), count(*) filter (where %I is distinct from $1) from public.%I',
+          coloana, tabel
+        ) into randuri, straine using site_lui;
+
+        if randuri = 0 then
+          goale := goale + 1;
+          goluri := goluri || tabel || ', ';
+        elsif straine > 0 then
+          scurgeri := scurgeri || format('%s (%s rânduri străine), ', tabel, straine);
+        else
+          verificate := verificate + 1;
+        end if;
+      exception when others then
+        -- ATENȚIE: aici refuzul NU e un răspuns bun.
+        --
+        -- Prima variantă a verificării îl număra ca reușită, „n-are voie nici să
+        -- întrebe" — și așa a trecut o politică stricată dinadins, fără să o
+        -- prindă. Un client care nu-și poate citi PROPRIILE date n-are izolare
+        -- bună; are panoul rupt. Se raportează separat.
+        refuzate := refuzate + 1;
+        refuzuri := refuzuri || tabel || ', ';
+      end;
+    end loop;
 
     perform set_config('role', 'postgres', true);
     perform set_config('request.jwt.claims', '', true);
 
     return query select
-      format('Clientul %s vede doar conținutul lui', left(al_lui::text, 8))::text,
-      case when vazute = 1 then 'OK' else 'PICAT' end::text,
+      format('Clientul %s vede doar datele lui', left(al_lui::text, 8))::text,
       case
-        when vazute = 1 then 'un singur site, al lui'
-        when vazute = 0 then 'nu vede nimic — are secțiuni seedate?'
-        else format('vede %s site-uri — SCURGERE ÎNTRE CLIENȚI', vazute)
+        when scurgeri <> '' then 'PICAT'
+        when refuzate > 0 then 'ATENȚIE'
+        else 'OK'
+      end::text,
+      case
+        when scurgeri <> '' then 'VEDE DATELE ALTUI CLIENT în: ' || rtrim(scurgeri, ', ')
+        when refuzate > 0 then format(
+          'nu-și poate citi propriile date din: %s — panoul ar da eroare acolo',
+          rtrim(refuzuri, ', '))
+        when goale = 0 then format('%s tabele verificate, toate cu date de-ale lui', verificate)
+        else format('%s tabele verificate; %s goale, deci nedovedite: %s',
+                    verificate, goale, rtrim(goluri, ', '))
       end::text;
   end loop;
 

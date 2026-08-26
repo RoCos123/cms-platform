@@ -84,7 +84,13 @@ Vercel și Supabase, deci le face proprietarul, nu sesiunea de dezvoltare:
 - Izolarea între clienți trebuie dovedită, nu presupusă. `e2e/tenant-rls.spec.ts`
   n-a rulat niciodată (mediul de dezvoltare nu ajunge la Supabase). Aceeași
   verificare există acum și ca SQL de lipit în SQL Editor:
-  `supabase/verificare-izolare.sql`.
+  `supabase/verificare-izolare.sql`. Rulat pe baza reală la 26 aug. 2026 — trecut.
+  Verifică toate cele 12 tabele per client, nu doar `site_content`.
+
+**Bancul de probă local.** `supabase/proba-locala.sh` pornește un Postgres gol,
+rulează migrările în ordine, seedează doi clienți și rulează verificarea. Există
+fiindcă mediul de dezvoltare nu ajunge la Supabase, iar fără el au plecat de
+două ori scripturi SQL netestate. Orice migrare nouă trece pe aici întâi.
 
 **2. Programări** — ultimul modul mare din meniu. De construit DOAR dacă se
 confirmă că psihologii vor programare online; multe cabinete mici preferă
