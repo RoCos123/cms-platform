@@ -12,9 +12,17 @@ type NavGroup = { label: string; items: NavItem[] };
 // propusă"), nu meniul original — fără Templates/Portfolio ca intrări separate
 // (cod mort, vezi decizii-faza-0.md §6). Rutele reale se adaugă în Fazele 3-6;
 // până atunci itemele fără `href` apar ca „curând".
+//
+// „Componente" nu e aici intenționat: galeria de la /dashboard/componente e
+// bancul de lucru al dezvoltării (un câmp de text, un tabel, o bară de salvare),
+// nu o unealtă de client. Ruta există în continuare pentru cine o caută, dar
+// n-are ce face într-un meniu pe care îl vede un psiholog.
 const NAV: (NavItem | NavGroup)[] = [
   { label: "Acasă", href: "/dashboard" },
-  { label: "Pagina principală", items: [{ label: "Secțiuni", href: "/dashboard/sectiuni" }] },
+  // Un grup cu un singur element înăuntru cerea două clicuri și punea aceleași
+  // cuvinte în două locuri („Pagina principală" în meniu, „Secțiuni" înăuntru și
+  // ca titlu de pagină). Celelalte pagini ale site-ului stau la „Pagini".
+  { label: "Pagina principală", href: "/dashboard/sectiuni" },
   { label: "Pagini" },
   { label: "Blog", items: [{ label: "Articole" }, { label: "Categorii" }] },
   { label: "Programări" },
@@ -22,7 +30,6 @@ const NAV: (NavItem | NavGroup)[] = [
   { label: "Imagini" },
   { label: "Setări" },
   { label: "Activitate" },
-  { label: "Componente", href: "/dashboard/componente" },
 ];
 
 function isGroup(item: NavItem | NavGroup): item is NavGroup {
