@@ -118,7 +118,18 @@ Tabelul `programs` se proiectează de la început cu o coloană `type`, ca adău
 
 ---
 
-## 7. Direcția vizuală a site-ului public (confirmat 25 aug. 2026)
+## 7. Direcția vizuală a site-ului public
+
+> **DEPĂȘIT PARȚIAL (26 aug. 2026).** Clientul a furnizat patru șabloane concrete,
+> care înlocuiesc direcțiile propuse aici. Tonul confirmat mai jos („cald și
+> liniștitor") se verifică în toate patru, deci rămâne valabil; ce se schimbă e că
+> **nu mai proiectăm de la zero**. Specificația reală: [`design/sabloane/README.md`](./design/sabloane/README.md).
+>
+> Consecințe: cele 17 secțiuni din §6 devin **21** (lipsesc bandă cu citat,
+> articole recente, newsletter; plus `logos` se desparte în două), iar stratul de
+> „șablon" se mută din Faza 7 în Faza 3.
+
+### Ce rămâne valabil din decizia inițială (25 aug. 2026)
 
 Răspunde la riscul lăsat deschis în `plan-implementare-cms.md` §Faza 4 („fidelitatea vizuală a variantelor față de original — se decide: replicăm exact site-ul Rodi, sau redesenăm mai curat").
 

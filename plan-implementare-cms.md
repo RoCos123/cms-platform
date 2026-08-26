@@ -81,15 +81,20 @@ Componentele care se folosesc în tot restul. Construite o dată, corect.
 
 Diferențiatorul central: editezi cu site-ul vizibil lângă tine.
 
+- **Stratul de șablon** (mutat aici din Faza 7): fonturi + paletă + rotunjimi + ritm de fundal, alese o dată per site. Fără el, Fazele 3–4 s-ar construi presupunând un singur stil, iar adăugarea celorlalte trei ar însemna refacere, nu adăugare. Vezi [`design/sabloane/README.md`](./design/sabloane/README.md).
 - Schema JSON per secțiune (arhetipurile A simplu-cu-variante / B listă / C tabelar).
 - **Split-screen:** formular stânga, preview real dreapta, actualizat pe măsură ce scrii.
 - Ecran **„Pagina principală"**: reordonezi secțiunile prin drag, le ascunzi/afișezi vizual.
 - Server Actions: `saveSection`, `toggleSectionVisibility`, `reorderSections`.
 - **Guardrail:** conținut seed marcat `is_demo`; blochează publicarea (vezi Faza 6).
+- **Cele 4 secțiuni noi** găsite în șabloane: `quote` (bandă cu citat), `latestPosts` (articole recente — apare în toate patru), `newsletter`, plus `logos` despărțit în „Apariții și acreditări" / „Bandă servicii". Total 17 → 21.
 
 **Livrabil:** editezi Hero-ul cu preview live, alegi varianta din miniaturi, salvezi.
 **Dependențe:** Faza 2.
-**Risc:** preview-ul live cere ca site-ul public (Faza 4) să existe măcar parțial ca set de componente. În practică, Faza 3 și Faza 4 se întrepătrund — componentele de secțiune sunt aceleași. **Variantele vizuale se extrag de pe site-ul live** `rodi-cotenescu.vercel.app`.
+
+**Specificație (actualizat 26 aug. 2026):** nu se mai extrage de pe `rodi-cotenescu.vercel.app` (inaccesibil din mediul de lucru, iar auditele nu-l descriu vizual). Clientul a furnizat **patru șabloane** reale, analizate în `design/sabloane/`. Se construiește **întâi Renata**, integral — e superset-ul verificat al celorlalte trei; abia apoi restul, ca seturi de valori peste aceeași structură.
+
+**Risc:** preview-ul live cere ca site-ul public (Faza 4) să existe măcar parțial ca set de componente. În practică, Faza 3 și Faza 4 se întrepătrund — componentele de secțiune sunt aceleași.
 
 ---
 
