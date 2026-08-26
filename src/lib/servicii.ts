@@ -42,8 +42,9 @@ export const CAMPURI_SERVICIU: CampSchema[] = [
     tip: "textLung",
     cheie: "content",
     eticheta: "Descrierea completă",
-    hint: "Ce se citește pe pagina de servicii: cui se adresează, cum decurge, la ce să se aștepte. Enter face paragraf nou, iar un rând care începe cu ## și un spațiu devine subtitlu. Lasă gol dacă n-ai pornit pagina de servicii — atunci nu are unde să apară.",
+    hint: "Ce se citește pe pagina de servicii: cui se adresează, cum decurge, la ce să se aștepte. Lasă gol dacă n-ai pornit pagina de servicii — atunci nu are unde să apară.",
     randuri: 10,
+    cuSubtitluri: true,
     /**
      * 600 de cuvinte — vreo trei minute de citit. Mai puțin decât la un articol,
      * și dinadins: pagina de servicii le arată pe TOATE una sub alta, iar șase

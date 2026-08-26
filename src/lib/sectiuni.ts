@@ -61,6 +61,15 @@ export type CampSchema =
        */
       maxCuvinte?: number;
       randuri?: number;
+      /**
+       * Textul e randat cu `CorpText`: fiecare rând e un paragraf, iar un rând
+       * care începe cu `## ` e subtitlu.
+       *
+       * Când e pus, câmpul arată și regulile astea, cu un exemplu alături.
+       * Nu se pot ghici — iar un client care nu le știe scrie tot articolul ca
+       * pe un bloc compact, apoi se întreabă de ce arată prost pe site.
+       */
+      cuSubtitluri?: boolean;
     })
   | (CampComun & { tip: "numar"; min?: number; maxim?: number })
   /** Pereche text + adresă. În JSON: `{ text, href }`. */

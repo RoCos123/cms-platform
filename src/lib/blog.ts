@@ -46,8 +46,8 @@ export const CAMPURI_ARTICOL: CampSchema[] = [
     tip: "textLung",
     cheie: "content",
     eticheta: "Articolul",
-    hint: "Apasă Enter pentru un paragraf nou. Dacă vrei un subtitlu, începe rândul cu ## și un spațiu — ex.: „## Ce poți face acum”.",
     obligatoriu: true,
+    cuSubtitluri: true,
     randuri: 18,
     /**
      * 3.000 de cuvinte ≈ un sfert de oră de citit. E mult peste ce are nevoie

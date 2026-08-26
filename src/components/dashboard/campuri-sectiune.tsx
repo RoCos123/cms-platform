@@ -7,7 +7,7 @@ import { RepeaterList } from "@/components/ui/repeater-list";
 import { SlugField } from "@/components/ui/slug-field";
 import type { CampSchema } from "@/lib/sectiuni";
 import { cn } from "@/lib/cn";
-import { numaraCuvinte, opresteLaLimita } from "@/lib/blocuri-text";
+import { blocuriText, numaraCuvinte, opresteLaLimita } from "@/lib/blocuri-text";
 import { formateazaNumar, numara } from "@/lib/numerale";
 import { catreEditor, type ElementListaEditor, type ValoareEditor } from "@/lib/sectiuni-editare";
 
@@ -55,22 +55,22 @@ export function CampuriSectiune({
           case "textLung": {
             const scris = String(valoare[camp.cheie] ?? "");
 
-            return (
+            const casetă = (
               <TextAreaField
-                key={camp.cheie}
                 label={camp.eticheta}
                 hint={
-                  // Contorul dispare când câmpul are o eroare: eroarea spune
-                  // deja și limita, și cât ai scris. Amândouă odată ar fi fost
-                  // aceeași propoziție de două ori, una sub alta.
-                  camp.maxCuvinte && !eroare ? (
-                    <>
-                      {camp.hint}
+                  <>
+                    {camp.hint}
+                    {camp.cuSubtitluri && <ReguliScriere />}
+                    {/*
+                      Contorul dispare când câmpul are o eroare: eroarea spune
+                      deja și limita, și cât ai scris. Amândouă odată ar fi fost
+                      aceeași propoziție de două ori, una sub alta.
+                    */}
+                    {camp.maxCuvinte && !eroare && (
                       <ContorCuvinte text={scris} limita={camp.maxCuvinte} />
-                    </>
-                  ) : (
-                    camp.hint
-                  )
+                    )}
+                  </>
                 }
                 error={eroare}
                 required={camp.obligatoriu}
@@ -88,6 +88,18 @@ export function CampuriSectiune({
                   )
                 }
               />
+            );
+
+            // Regulile de scriere stau în `hint` (deci sunt citite la intrarea
+            // în câmp), iar exemplul dedesubt, în afara lui: e prea lung pentru
+            // ceva anunțat la fiecare focus, și oricum se citește cu ochii.
+            if (!camp.cuSubtitluri) return <div key={camp.cheie}>{casetă}</div>;
+
+            return (
+              <div key={camp.cheie}>
+                {casetă}
+                <ExempluScriere />
+              </div>
             );
           }
 
@@ -263,6 +275,92 @@ export function CampuriSectiune({
         }
       })}
     </div>
+  );
+}
+
+/**
+ * Regulile de scriere ale unui text lung, în două propoziții.
+ *
+ * Stau în `hint`, adică legate de câmp prin `aria-describedby`: cine folosește
+ * un cititor de ecran le aude la intrarea în casetă, nu după ce a scris tot
+ * articolul ca pe un bloc compact.
+ *
+ * Doar elemente de tip text înăuntru: `hint` se randează într-un `<p>`, iar un
+ * `<div>` sau un `<pre>` acolo ar închide paragraful mai devreme și ar rupe
+ * randarea. Exemplul, care are nevoie de amândouă, stă separat mai jos.
+ */
+function ReguliScriere() {
+  return (
+    <span className="mt-1.5 block">
+      <strong className="font-medium text-foreground">Enter</strong> face un paragraf nou.{" "}
+      {/* Fără spațiul de după: regula îl acceptă și fără, iar în chip s-ar fi
+          văzut doar ca o pată de fundal mai lată, fără să spună nimic. */}
+      <code className="rounded bg-surface-muted px-1 py-0.5 font-mono text-foreground">##</code>{" "}
+      la începutul unui rând îl face subtitlu.
+    </span>
+  );
+}
+
+/** Textul din exemplu. Scurt, dar cu toate cele trei situații înăuntru. */
+const EXEMPLU_SCRIERE = [
+  "Prima ședință e doar cu voi, fără copil.",
+  "De la a doua, lucrăm pe situații concrete.",
+  "## Cum decurge",
+  "Ne vedem o dată pe săptămână, câte 50 de minute.",
+].join("\n");
+
+/**
+ * Aceleași rânduri, o dată așa cum se scriu și o dată așa cum ies.
+ *
+ * O regulă scrisă în cuvinte („un rând care începe cu ## devine subtitlu") cere
+ * un efort de imaginație pe care nu-l face nimeni în mijlocul scrisului. Două
+ * casete alăturate se înțeleg dintr-o privire.
+ *
+ * Partea din dreapta trece prin exact funcția care randează site-ul, deci
+ * exemplul nu poate ajunge vreodată să arate altceva decât produce regula.
+ */
+function ExempluScriere() {
+  const blocuri = blocuriText(EXEMPLU_SCRIERE);
+
+  return (
+    <details className="mt-2 rounded-base border border-border bg-surface-muted">
+      <summary className="cursor-pointer select-none px-3 py-2 text-xs font-medium text-foreground">
+        Vezi un exemplu
+      </summary>
+
+      <div className="space-y-3 border-t border-border p-3">
+        <div>
+          <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            Ce scrii
+          </p>
+          <pre className="overflow-x-auto whitespace-pre-wrap rounded-base bg-surface p-2.5 font-mono text-xs text-foreground">
+            {EXEMPLU_SCRIERE}
+          </pre>
+        </div>
+
+        <div>
+          <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            Cum apare pe site
+          </p>
+          <div className="rounded-base bg-surface p-2.5">
+            {blocuri.map((bloc, i) =>
+              bloc.tip === "subtitlu" ? (
+                <p
+                  key={i}
+                  className={cn("text-sm font-semibold text-foreground", i > 0 && "mt-3")}
+                >
+                  {bloc.text}
+                </p>
+              ) : (
+                <p key={i} className={cn("text-xs text-muted-foreground", i > 0 && "mt-1.5")}>
+                  {bloc.text}
+                </p>
+              ),
+            )}
+          </div>
+        </div>
+      </div>
+    </details>
   );
 }
 
