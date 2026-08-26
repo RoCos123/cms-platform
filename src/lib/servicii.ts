@@ -42,9 +42,21 @@ export const CAMPURI_SERVICIU: CampSchema[] = [
     tip: "textLung",
     cheie: "content",
     eticheta: "Descrierea completă",
-    hint: "Ce se citește pe pagina de servicii: cui se adresează, cum decurge, la ce să se aștepte. Lasă gol dacă n-ai pornit pagina de servicii — atunci nu are unde să apară.",
+    hint: "Ce se citește pe pagina de servicii: cui se adresează, cum decurge, la ce să se aștepte. Enter face paragraf nou, iar un rând care începe cu ## și un spațiu devine subtitlu. Lasă gol dacă n-ai pornit pagina de servicii — atunci nu are unde să apară.",
     randuri: 10,
-    max: 4000,
+    /**
+     * 600 de cuvinte — vreo trei minute de citit. Mai puțin decât la un articol,
+     * și dinadins: pagina de servicii le arată pe TOATE una sub alta, iar șase
+     * servicii scrise fiecare cât un articol fac o pagină pe care n-o mai
+     * citește nimeni până la capăt. Cele mai bune descrieri stau în 150–400.
+     */
+    maxCuvinte: 600,
+    /**
+     * Plasa de dedesubt, în caractere (vezi `CAMPURI_ARTICOL`): douăzeci de
+     * caractere pe cuvânt, mult peste media limbii române, deci nu poate tăia
+     * niciodată o descriere care respectă limita în cuvinte.
+     */
+    max: 12000,
   },
   {
     tip: "text",
