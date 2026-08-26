@@ -2,7 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 import { createServiceClient } from "@/lib/supabase/admin";
-import type { Brand, Seo } from "@/lib/setari";
+import type { Brand, Pagini, Seo } from "@/lib/setari";
 
 /**
  * Identitatea site-ului: numele, șablonul și setările.
@@ -21,12 +21,13 @@ export const identitateaSiteului = cache(async (siteId: string) => {
 
   const [{ data: site }, { data: settings }] = await Promise.all([
     service.from("sites").select("name, template").eq("id", siteId).single(),
-    service.from("site_settings").select("brand, seo").eq("site_id", siteId).maybeSingle(),
+    service.from("site_settings").select("brand, seo, pagini").eq("site_id", siteId).maybeSingle(),
   ]);
 
   return {
     site,
     brand: (settings?.brand ?? {}) as Brand,
     seo: (settings?.seo ?? {}) as Seo,
+    pagini: (settings?.pagini ?? {}) as Pagini,
   };
 });

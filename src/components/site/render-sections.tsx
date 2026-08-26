@@ -36,6 +36,8 @@ export type SectionContext = {
   articole: Articol[];
   /** Serviciile publicate. „Serviciile mele" le citește de aici, nu din rândul ei. */
   servicii: Serviciu[];
+  /** E pornită pagina cu serviciile descrise pe larg? Decide dacă mai sunt linkuri. */
+  paginaServiciiActiva: boolean;
 };
 
 /**
@@ -51,7 +53,12 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
   hero: (row) => <Hero data={row.data as HeroData} tone={row.tone} />,
   quote: (row) => <Quote data={row.data as QuoteData} tone={row.tone} />,
   features: (row, ctx) => (
-    <Features data={row.data as FeaturesData} servicii={ctx.servicii} tone={row.tone} />
+    <Features
+      data={row.data as FeaturesData}
+      servicii={ctx.servicii}
+      paginaDetaliata={ctx.paginaServiciiActiva}
+      tone={row.tone}
+    />
   ),
   aboutTeaser: (row) => <AboutTeaser data={row.data as AboutTeaserData} tone={row.tone} />,
   howItWorks: (row) => <HowItWorks data={row.data as HowItWorksData} tone={row.tone} />,

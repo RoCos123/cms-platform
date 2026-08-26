@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { getSesiuneOptionala, getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
+import { paginaServiciiEsteActiva } from "@/lib/setari";
 import { serviciiPublicate } from "@/lib/servicii-publice";
 import { tenantTable } from "@/lib/supabase/admin";
 import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
@@ -47,12 +49,17 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PaginaServicii() {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, brand }, antet, servicii, sesiune] = await Promise.all([
+  const [{ site, brand, pagini }, antet, servicii, sesiune] = await Promise.all([
     identitateaSiteului(siteId),
     antetulPaginii(),
     serviciiPublicate(siteId),
     getSesiuneOptionala(),
   ]);
+
+  // Oprită din panou, pagina nu există — nu e goală, nu e „în curând". Un
+  // vizitator care nimerește adresa primește același răspuns ca la orice adresă
+  // inexistentă, iar motoarele de căutare n-o mai indexează.
+  if (!paginaServiciiEsteActiva(pagini)) notFound();
 
   const template = getTemplate(site?.template);
   const nume = site?.name ?? domain;

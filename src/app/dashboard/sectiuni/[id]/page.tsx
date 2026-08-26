@@ -6,6 +6,7 @@ import { metaSectiune } from "@/lib/sectiuni";
 import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate, type SectionTone } from "@/lib/templates";
 import { serviciiPublicate } from "@/lib/servicii-publice";
+import { paginaServiciiEsteActiva, type Pagini } from "@/lib/setari";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import type { Articol } from "@/components/site/sections/latest-posts";
 import { EditorSectiune } from "./editor";
@@ -53,7 +54,7 @@ export default async function EditorSectiunePage({
     );
   }
 
-  const [{ data: site }, { data: articole }, servicii] = await Promise.all([
+  const [{ data: site }, { data: articole }, servicii, { data: setari }] = await Promise.all([
     supabase.from("sites").select("template").eq("id", session.siteId).single(),
     // Previzualizarea „Articolelor recente" arată articole adevărate, nu
     // exemple: altfel clientul n-ar avea cum să vadă că secțiunea dispare
@@ -68,6 +69,7 @@ export default async function EditorSectiunePage({
     // Doar cele publicate, ca previzualizarea să arate exact ce vede un
     // vizitator — inclusiv atunci când asta înseamnă „nimic încă".
     serviciiPublicate(session.siteId),
+    supabase.from("site_settings").select("pagini").eq("site_id", session.siteId).maybeSingle(),
   ]);
 
   const articolePreviz: Articol[] = (articole ?? []).map((a) => ({
@@ -86,6 +88,7 @@ export default async function EditorSectiunePage({
       template={getTemplate(site?.template as string | null)}
       articole={articolePreviz}
       servicii={servicii}
+      paginaServiciiActiva={paginaServiciiEsteActiva((setari?.pagini ?? {}) as Pagini)}
     />
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getSesiuneOptionala, getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
+import { paginaServiciiEsteActiva } from "@/lib/setari";
 import { serviciiPublicate } from "@/lib/servicii-publice";
 import { tenantTable } from "@/lib/supabase/admin";
 import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
@@ -42,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PublicHomePage() {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, brand }, { data: rows }, { data: articole }, servicii, sesiune] =
+  const [{ site, brand, pagini }, { data: rows }, { data: articole }, servicii, sesiune] =
     await Promise.all([
       identitateaSiteului(siteId),
       (await tenantTable("site_content"))
@@ -109,7 +110,11 @@ export default async function PublicHomePage() {
 
         <main>
           {sections.length > 0 ? (
-            <RenderSections rows={sections} context={{ articole: articoleRecente, servicii }} />
+            <RenderSections rows={sections} context={{
+                articole: articoleRecente,
+                servicii,
+                paginaServiciiActiva: paginaServiciiEsteActiva(pagini),
+              }} />
           ) : (
             // Un site fără nicio secțiune nu trebuie să fie o pagină albă:
             // clientul tocmai a fost provizionat și încă nu a scris nimic.

@@ -22,6 +22,7 @@ export function EditorSectiune({
   template,
   articole,
   servicii,
+  paginaServiciiActiva,
 }: {
   id: string;
   meta: MetaSectiune;
@@ -30,6 +31,7 @@ export function EditorSectiune({
   template: Template;
   articole: Articol[];
   servicii: Serviciu[];
+  paginaServiciiActiva: boolean;
 }) {
   const [valoare, setValoare] = useState(valoareInitiala);
   const [referinta, setReferinta] = useState(valoareInitiala);
@@ -114,7 +116,7 @@ export function EditorSectiune({
           cheie={JSON.stringify(datePreviz)}
           nota="Se actualizează pe măsură ce scrii. Modificările ajung pe site abia după ce apeși Salvează."
         >
-          <RenderSections rows={[randPreviz]} context={{ articole, servicii }} />
+          <RenderSections rows={[randPreviz]} context={{ articole, servicii, paginaServiciiActiva }} />
         </PanouPrevizualizare>
       </div>
 

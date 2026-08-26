@@ -2,6 +2,8 @@ import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { paginaServiciiEsteActiva, type Pagini } from "@/lib/setari";
+import { ComutatorPaginaServicii } from "./comutator-pagina";
 import { ListaServicii, type RandServiciuLista } from "./lista-servicii";
 import { creeazaServiciu } from "./actions";
 
@@ -11,11 +13,14 @@ export default async function ServiciiPage() {
   const session = await verifySession();
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("services")
-    .select("id, title, excerpt, status")
-    .eq("site_id", session.siteId)
-    .order("position", { ascending: true });
+  const [{ data, error }, { data: setari }] = await Promise.all([
+    supabase
+      .from("services")
+      .select("id, title, excerpt, status")
+      .eq("site_id", session.siteId)
+      .order("position", { ascending: true }),
+    supabase.from("site_settings").select("pagini").eq("site_id", session.siteId).maybeSingle(),
+  ]);
 
   if (error) console.error("Citirea serviciilor a eșuat:", error);
 
@@ -60,7 +65,12 @@ export default async function ServiciiPage() {
           </CardBody>
         </Card>
       ) : (
-        <ListaServicii initiale={randuri} />
+        <>
+          <ListaServicii initiale={randuri} />
+          <ComutatorPaginaServicii
+            activaInitial={paginaServiciiEsteActiva((setari?.pagini ?? {}) as Pagini)}
+          />
+        </>
       )}
     </div>
   );

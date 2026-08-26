@@ -132,6 +132,48 @@ export async function salveazaServiciu(
   return { ok: true };
 }
 
+/**
+ * Pornește sau oprește pagina cu serviciile descrise pe larg.
+ *
+ * Oprită, `/servicii` nu mai există (răspunde „pagina nu există", nu o pagină
+ * goală), iar cartonașele de pe prima pagină rămân cartonașe fără link. Un card
+ * care scrie „Află mai multe" și nu duce nicăieri e mai rău decât unul simplu.
+ */
+export async function comutaPaginaServicii(activa: boolean): Promise<RezultatServiciu> {
+  const session = await verifySession();
+  const supabase = await createClient();
+
+  const { data: existent } = await supabase
+    .from("site_settings")
+    .select("pagini")
+    .eq("site_id", session.siteId)
+    .maybeSingle();
+
+  const pagini = { ...((existent?.pagini ?? {}) as Record<string, unknown>), servicii: activa };
+
+  // `upsert`: rândul de setări poate lipsi, iar un `update` ar fi trecut în
+  // tăcere fără să scrie nimic.
+  const { error } = await supabase
+    .from("site_settings")
+    .upsert({ site_id: session.siteId, pagini }, { onConflict: "site_id" });
+
+  if (error) {
+    console.error("Comutarea paginii de servicii a eșuat:", error);
+    return { ok: false, mesaj: "Nu am putut salva. Încearcă din nou." };
+  }
+
+  await scrieInJurnal({
+    siteId: session.siteId,
+    actorId: session.userId,
+    actiune: activa ? "publish" : "unpublish",
+    entitate: "SiteSettings",
+    diff: { rezumat: `Pagina de servicii a fost ${activa ? "pornită" : "oprită"}.` },
+  });
+
+  reimprospateaza();
+  return { ok: true };
+}
+
 export type RandServiciu = { id: string; pozitie: number; publicat: boolean };
 
 export async function salveazaOrdineaServiciilor(

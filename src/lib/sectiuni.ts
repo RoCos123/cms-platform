@@ -203,7 +203,7 @@ const LISTA: MetaSectiune[] = [
         eticheta: "Câte servicii se văd pe prima pagină",
         min: 1,
         maxim: 12,
-        hint: "Lasă gol ca să le arăți pe toate.",
+        hint: "Lasă gol ca să le arăți pe toate. Cu pagina de servicii oprită, se arată oricum toate — altfel restul n-ar mai apărea nicăieri.",
       },
     ],
   },
