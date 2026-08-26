@@ -7,7 +7,7 @@ import { RepeaterList } from "@/components/ui/repeater-list";
 import { SlugField } from "@/components/ui/slug-field";
 import type { CampSchema } from "@/lib/sectiuni";
 import { cn } from "@/lib/cn";
-import { numaraCuvinte } from "@/lib/blocuri-text";
+import { numaraCuvinte, opresteLaLimita } from "@/lib/blocuri-text";
 import { formateazaNumar, numara } from "@/lib/numerale";
 import { catreEditor, type ElementListaEditor, type ValoareEditor } from "@/lib/sectiuni-editare";
 
@@ -77,7 +77,16 @@ export function CampuriSectiune({
                 rows={camp.randuri ?? 3}
                 maxLength={camp.max}
                 value={scris}
-                onChange={(event) => seteaza(camp.cheie, event.target.value)}
+                onChange={(event) =>
+                  seteaza(
+                    camp.cheie,
+                    // Limita în cuvinte oprește scrisul, ca cea în caractere:
+                    // altfel n-ar fi o limită, ar fi o părere.
+                    camp.maxCuvinte
+                      ? opresteLaLimita(event.target.value, scris, camp.maxCuvinte)
+                      : event.target.value,
+                  )
+                }
               />
             );
           }
@@ -264,22 +273,40 @@ export function CampuriSectiune({
  * care omul vrea răspunsul exact, ca să-l compare cu ce a mai scris. O bară
  * care se umple ar sugera în plus că ținta e s-o umpli.
  *
- * Se colorează abia pe ultima zecime — până acolo, un contor roșu ar grăbi pe
- * cineva care are încă loc berechet.
+ * Trei trepte, ca omul să vadă limita venind, nu să se lovească de ea: gri până
+ * pe ultima zecime, chihlimbariu pe ea, roșu la capăt — acolo unde caseta chiar
+ * nu mai primește cuvinte noi.
  */
 function ContorCuvinte({ text, limita }: { text: string; limita: number }) {
   const scrise = numaraCuvinte(text);
-  const peste = scrise - limita;
+  const ramase = limita - scrise;
 
   const ton =
-    peste > 0 ? "text-danger" : scrise >= limita * 0.9 ? "text-warning" : "text-muted-foreground";
+    ramase <= 0 ? "text-danger" : scrise >= limita * 0.9 ? "text-warning" : "text-muted-foreground";
+
+  const mesaj =
+    ramase < 0
+      ? // Se poate ajunge aici doar cu un text scris înainte să existe limita:
+        // de scris peste ea nu se mai poate. Spunem cât e de tăiat.
+        `${numara(scrise, "cuvânt", "cuvinte")} — cu ${numara(-ramase, "cuvânt", "cuvinte")} peste limită.`
+      : ramase === 0
+        ? `${numara(limita, "cuvânt", "cuvinte")} — ai ajuns la limită. Șterge ceva ca să poți scrie mai departe.`
+        : `${numara(scrise, "cuvânt", "cuvinte")} din ${formateazaNumar(limita)}.`;
 
   return (
-    <span className={cn("mt-1 block tabular-nums", ton)}>
-      {peste > 0
-        ? `${numara(scrise, "cuvânt", "cuvinte")} — cu ${numara(peste, "cuvânt", "cuvinte")} peste limită.`
-        : `${numara(scrise, "cuvânt", "cuvinte")} din ${formateazaNumar(limita)}.`}
-    </span>
+    <>
+      <span className={cn("mt-1 block tabular-nums", ton)}>{mesaj}</span>
+
+      {/*
+        Cine nu vede ecranul ar apăsa taste fără să se întâmple nimic: contorul
+        de mai sus stă în `aria-describedby`, care se citește la intrarea în
+        câmp, nu la fiecare tastă. Regiunea asta are text DOAR la limită, deci
+        vorbește o singură dată, când chiar s-a schimbat ceva.
+      */}
+      <span aria-live="polite" className="sr-only">
+        {ramase <= 0 ? `Ai ajuns la limita de ${numara(limita, "cuvânt", "cuvinte")}.` : ""}
+      </span>
+    </>
   );
 }
 

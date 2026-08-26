@@ -65,6 +65,51 @@ export function numaraCuvinte(text: string): number {
   return text.trim().split(/\s+/).filter(Boolean).length;
 }
 
+/**
+ * Textul tăiat după atâtea cuvinte, cu tot ce e între ele păstrat întocmai —
+ * rânduri noi, spații duble, „## " de la subtitluri.
+ *
+ * Tăiem la sfârșitul ultimului cuvânt care încape, nu la un număr de caractere:
+ * altfel o lipire s-ar termina în mijlocul unui cuvânt.
+ */
+export function taieLaCuvinte(text: string, limita: number): string {
+  if (limita <= 0) return "";
+
+  const cuvinte = [...text.matchAll(/\S+/g)];
+  if (cuvinte.length <= limita) return text;
+
+  const ultimul = cuvinte[limita - 1];
+  return text.slice(0, (ultimul.index ?? 0) + ultimul[0].length);
+}
+
+/**
+ * Ce are voie să ajungă în casetă, când există o limită de cuvinte.
+ *
+ * Trei situații, fiindcă „nu mai poate scrie" înseamnă altceva la tastat decât
+ * la lipit:
+ *
+ * 1. Sub limită — trece nemodificat.
+ * 2. Peste limită, dar scăzând (sau ținând) numărul de cuvinte — trece.
+ *    Fără regula asta, un text ajuns cumva peste limită (o valoare veche, o
+ *    salvare dinaintea limitei) n-ar mai putea fi scurtat niciodată: orice
+ *    apăsare de tastă ar fi fost respinsă, inclusiv Backspace.
+ * 3. Peste limită și crescând — păstrăm cât încape. O lipire de 500 de cuvinte
+ *    peste 2.800 intră cu primele 200, nu se pierde de tot.
+ *
+ * În cazul 3 mai e o subtilitate. Când tastezi o literă la limită, tăierea dă
+ * exact textul de dinainte, fără spațiul de la coadă — iar dacă am accepta-o,
+ * spațiul pe care tocmai l-ai pus ar dispărea și cursorul ar sări înapoi. Așa
+ * că verificăm: dacă tăierea nu aduce nimic nou, lăsăm caseta exact cum e.
+ */
+export function opresteLaLimita(propus: string, actual: string, limita: number): string {
+  const cuvintePropuse = numaraCuvinte(propus);
+  if (cuvintePropuse <= limita) return propus;
+  if (cuvintePropuse <= numaraCuvinte(actual)) return propus;
+
+  const taiat = taieLaCuvinte(propus, limita);
+  return taiat === actual.trimEnd() ? actual : taiat;
+}
+
 /** 200 de cuvinte pe minut — media pentru un text obișnuit în limba maternă. */
 export const CUVINTE_PE_MINUT = 200;
 
