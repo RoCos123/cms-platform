@@ -1,3 +1,4 @@
+import type { SectionTone } from "@/lib/templates";
 import { Section } from "@/components/site/section";
 
 export type QuoteData = {
@@ -11,7 +12,7 @@ export type QuoteData = {
  * șabloane apare de câte două ori în aceeași pagină, o dată pe fundal deschis și
  * o dată pe închis — de aceea tonul e prop, nu valoare fixă.
  */
-export function Quote({ data, tone }: { data: QuoteData; tone?: "deschis" | "nuantat" | "inchis" }) {
+export function Quote({ data, tone }: { data: QuoteData; tone?: SectionTone }) {
   return (
     <Section tone={tone}>
       <figure style={{ margin: 0, display: "flex", gap: "clamp(16px, 3vw, 40px)" }}>

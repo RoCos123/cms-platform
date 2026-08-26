@@ -1,3 +1,4 @@
+import type { SectionTone } from "@/lib/templates";
 import { Section, SectionEyebrow } from "@/components/site/section";
 
 export type FeaturesData = {
@@ -18,7 +19,7 @@ export function Features({
   tone,
 }: {
   data: FeaturesData;
-  tone?: "deschis" | "nuantat" | "inchis";
+  tone?: SectionTone;
 }) {
   return (
     <Section tone={tone} id="servicii">

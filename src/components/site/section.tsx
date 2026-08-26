@@ -4,18 +4,21 @@ import type { SectionTone } from "@/lib/templates";
 const FUNDAL: Record<SectionTone, string> = {
   deschis: "var(--t-fundal)",
   nuantat: "var(--t-fundal-nuantat)",
+  relief: "var(--t-fundal-relief)",
   inchis: "var(--t-fundal-inchis)",
 };
 
 const TEXT: Record<SectionTone, string> = {
   deschis: "var(--t-text)",
   nuantat: "var(--t-text)",
+  relief: "var(--t-text)",
   inchis: "var(--t-text-pe-inchis)",
 };
 
 const TEXT_SECUNDAR: Record<SectionTone, string> = {
   deschis: "var(--t-text-secundar)",
   nuantat: "var(--t-text-secundar)",
+  relief: "var(--t-text-secundar)",
   inchis: "var(--t-text-secundar-pe-inchis)",
 };
 

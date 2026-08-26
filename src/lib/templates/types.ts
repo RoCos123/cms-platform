@@ -9,7 +9,7 @@
  */
 
 /** Rolul de fundal al unei secțiuni în ritmul paginii, nu o culoare anume. */
-export type SectionTone = "deschis" | "nuantat" | "inchis";
+export type SectionTone = "deschis" | "nuantat" | "relief" | "inchis";
 
 export type TemplateId = "caldura" | "liniste" | "lumina" | "apropiere";
 
@@ -20,7 +20,7 @@ export type TemplatePalette = {
   fundalNuantat: string;
   /** Fundalul secțiunilor „inchis" — inversiunea, pentru accente de ritm. */
   fundalInchis: string;
-  /** Fundal intermediar, folosit de secțiunile care trebuie să iasă puțin în față. */
+  /** Fundalul tonului „relief" — o treaptă mai apăsată decât „nuantat". */
   fundalRelief: string;
 
   text: string;
@@ -76,6 +76,13 @@ export function tonuri(template: Template, tone: SectionTone) {
         text: p.textPeInchis,
         textSecundar: p.textSecundarPeInchis,
         chenar: "color-mix(in oklab, currentColor 18%, transparent)",
+      };
+    case "relief":
+      return {
+        fundal: p.fundalRelief,
+        text: p.text,
+        textSecundar: p.textSecundar,
+        chenar: p.chenar,
       };
     case "nuantat":
       return {

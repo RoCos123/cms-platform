@@ -1,3 +1,4 @@
+import type { SectionTone } from "@/lib/templates";
 import { Section, SectionEyebrow } from "@/components/site/section";
 
 export type HeroData = {
@@ -15,7 +16,7 @@ export type HeroData = {
   butonSecundar?: { text: string; href: string };
 };
 
-export function Hero({ data, tone }: { data: HeroData; tone?: "deschis" | "nuantat" | "inchis" }) {
+export function Hero({ data, tone }: { data: HeroData; tone?: SectionTone }) {
   return (
     <Section tone={tone}>
       {data.eyebrow && <SectionEyebrow>{data.eyebrow}</SectionEyebrow>}

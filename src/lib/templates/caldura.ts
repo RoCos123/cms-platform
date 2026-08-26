@@ -16,11 +16,16 @@ export const caldura: Template = {
     fundalRelief: "#DFD8D1",
 
     text: "#2A1F1A",
-    textSecundar: "#877E78",
+    // Sursa folosea #877E78 (3,55:1 pe crem) și #B8654D (3,75:1 ca text, 4,19:1
+    // sub text alb) — toate sub pragul WCAG AA de 4,5:1 pentru text normal.
+    // Întunecate cât să treacă pe cel mai greu fundal deschis (#DFD8D1),
+    // păstrând nuanța: -12,8% și -11,8% luminozitate. Un site pentru oameni
+    // anxioși e ultimul loc unde merită copiată o greșeală de lizibilitate.
+    textSecundar: "#645E59",
     textPeInchis: "#F8F1EA",
     textSecundarPeInchis: "#B5AAA2",
 
-    accent: "#B8654D",
+    accent: "#904D39",
     accentText: "#FFFFFF",
     chenar: "#DFD8D1",
   },

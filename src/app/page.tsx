@@ -2,6 +2,7 @@ import { getTenant } from "@/lib/dal";
 import { createServiceClient, tenantTable } from "@/lib/supabase/admin";
 import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
+import { SiteHeader } from "@/components/site/header";
 
 export default async function PublicHomePage() {
   const { siteId, domain } = await getTenant();
@@ -9,13 +10,15 @@ export default async function PublicHomePage() {
   // Șablonul stă pe `sites`, deci vine din rândul deja citit la rezolvarea
   // tenantului. Clientul cu cheia secretă, ca la orice citire publică — rolul
   // `anon` nu mai are acces la date (vezi migrarea de întărire RLS).
-  const { data: site } = await createServiceClient()
-    .from("sites")
-    .select("name, template")
-    .eq("id", siteId)
-    .single();
+  const service = createServiceClient();
+
+  const [{ data: site }, { data: settings }] = await Promise.all([
+    service.from("sites").select("name, template").eq("id", siteId).single(),
+    service.from("site_settings").select("brand").eq("site_id", siteId).maybeSingle(),
+  ]);
 
   const template = getTemplate(site?.template);
+  const brand = (settings?.brand ?? {}) as { subtitlu?: string; telefon?: string };
 
   const { data: rows } = await (await tenantTable("site_content"))
     .select("key, variant, tone, data, visible, position")
@@ -43,6 +46,14 @@ export default async function PublicHomePage() {
           minHeight: "100%",
         }}
       >
+        <SiteHeader
+          data={{
+            nume: site?.name ?? domain,
+            subtitlu: brand.subtitlu,
+            telefon: brand.telefon,
+          }}
+        />
+
         {sections.length > 0 ? (
           <RenderSections rows={sections} />
         ) : (
