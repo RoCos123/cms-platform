@@ -28,6 +28,8 @@ type CampComun = {
 
 export type CampSchema =
   | (CampComun & { tip: "text"; max?: number })
+  /** Ca „text", dar cu tastatură de email pe telefon și verificare a formei. */
+  | (CampComun & { tip: "email"; max?: number })
   | (CampComun & { tip: "textLung"; max?: number; randuri?: number })
   | (CampComun & { tip: "numar"; min?: number; maxim?: number })
   /** Pereche text + adresă. În JSON: `{ text, href }`. */

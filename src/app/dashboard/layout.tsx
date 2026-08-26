@@ -1,10 +1,15 @@
 import type { ReactNode } from "react";
+import type { Metadata } from "next";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ToastProvider } from "@/components/ui/toast";
 import { signOut } from "./actions";
+
+export const metadata: Metadata = {
+  title: { template: "%s · Panou", default: "Panou" },
+};
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await verifySession();

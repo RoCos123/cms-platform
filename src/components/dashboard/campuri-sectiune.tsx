@@ -195,6 +195,7 @@ export function CampuriSectiune({
             return (
               <TextField
                 key={camp.cheie}
+                type={camp.tip === "email" ? "email" : "text"}
                 label={camp.eticheta}
                 hint={camp.hint}
                 error={eroare}

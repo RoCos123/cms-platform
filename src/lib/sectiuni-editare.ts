@@ -1,4 +1,5 @@
 import type { CampSchema } from "@/lib/sectiuni";
+import { esteEmailValid } from "@/lib/formulare";
 
 /**
  * Traducerea între cum arată o secțiune în baza de date și cum îi trebuie
@@ -180,6 +181,10 @@ export function valideaza(
       erori[drum] = "Câmpul acesta nu poate rămâne gol.";
     } else if (camp.max && text.length > camp.max) {
       erori[drum] = `Maximum ${camp.max} de caractere. Acum sunt ${text.length}.`;
+    } else if (camp.tip === "email" && text !== "" && !esteEmailValid(text)) {
+      // Aceeași verificare ca la formularul public de contact, din același
+      // fișier: două reguli scrise separat ar ajunge să nu mai fie aceeași.
+      erori[drum] = "Adresa de email nu pare completă.";
     }
   }
 

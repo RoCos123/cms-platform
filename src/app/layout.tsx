@@ -13,6 +13,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+/**
+ * Doar plasa de siguranță, pentru rutele care nu-și pun titlu propriu.
+ *
+ * Fără `template`, deliberat: layoutul ăsta înfășoară și panoul, și site-urile
+ * publice ale clienților. Un tipar de forma „%s · sitepsihologi.ro" ar fi lipit
+ * numele platformei noastre la titlul din Google al fiecărui cabinet.
+ */
 export const metadata: Metadata = {
   title: "sitepsihologi.ro",
   description: "Platformă CMS multi-tenant pentru site-uri de prezentare profesională.",
