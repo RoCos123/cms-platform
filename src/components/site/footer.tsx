@@ -1,0 +1,107 @@
+export type SiteFooterData = {
+  nume: string;
+  descriere?: string;
+  telefon?: string;
+  email?: string;
+  adresa?: string;
+  /** Acreditări, cod din registrul profesional — apar în toate patru șabloanele. */
+  acreditare?: string;
+  linkuri?: { text: string; href: string }[];
+};
+
+/**
+ * Subsolul site-ului public. Ca și antetul, e cadrul paginii, nu o secțiune
+ * editabilă — datele vin din setările site-ului.
+ *
+ * Paginile legale sunt legate de aici, nu din meniul principal: sunt obligatorii,
+ * dar nu sunt ce caută vizitatorul.
+ */
+export function SiteFooter({ data }: { data: SiteFooterData }) {
+  const an = new Date().getFullYear();
+
+  return (
+    <footer
+      style={{
+        background: "var(--t-fundal-inchis)",
+        color: "var(--t-text-pe-inchis)",
+        paddingBlock: "clamp(56px, 7vw, 88px) 40px",
+      }}
+    >
+      <div style={{ maxWidth: "1180px", margin: "0 auto", paddingInline: "clamp(20px, 5vw, 64px)" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: "40px",
+          }}
+        >
+          <div>
+            <p style={{ margin: 0, fontSize: "22px", fontWeight: 700 }}>{data.nume}</p>
+            {data.descriere && (
+              <p
+                style={{
+                  margin: "14px 0 0",
+                  maxWidth: "26em",
+                  fontSize: "16px",
+                  lineHeight: 1.7,
+                  color: "var(--t-text-secundar-pe-inchis)",
+                  textWrap: "pretty",
+                }}
+              >
+                {data.descriere}
+              </p>
+            )}
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "16px" }}>
+            {data.telefon && (
+              <a href={`tel:${data.telefon.replace(/\s/g, "")}`} style={{ color: "inherit", textDecoration: "none" }}>
+                {data.telefon}
+              </a>
+            )}
+            {data.email && (
+              <a href={`mailto:${data.email}`} style={{ color: "inherit", textDecoration: "none" }}>
+                {data.email}
+              </a>
+            )}
+            {data.adresa && (
+              <span style={{ color: "var(--t-text-secundar-pe-inchis)" }}>{data.adresa}</span>
+            )}
+          </div>
+
+          {data.linkuri && data.linkuri.length > 0 && (
+            <nav
+              aria-label="Legături din subsol"
+              style={{ display: "flex", flexDirection: "column", gap: "10px", fontSize: "16px" }}
+            >
+              {data.linkuri.map((link) => (
+                <a key={link.href} href={link.href} style={{ color: "inherit", textDecoration: "none" }}>
+                  {link.text}
+                </a>
+              ))}
+            </nav>
+          )}
+        </div>
+
+        <div
+          style={{
+            marginTop: "clamp(40px, 5vw, 64px)",
+            paddingTop: "24px",
+            borderTop: "1px solid color-mix(in oklab, var(--t-text-pe-inchis) 16%, transparent)",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "12px 24px",
+            justifyContent: "space-between",
+            fontSize: "14px",
+            color: "var(--t-text-secundar-pe-inchis)",
+          }}
+        >
+          <span>
+            © {an} {data.nume}
+          </span>
+          {data.acreditare && <span>{data.acreditare}</span>}
+        </div>
+      </div>
+    </footer>
+  );
+}

@@ -1,14 +1,34 @@
+import type { ReactNode } from "react";
 import type { SectionTone } from "@/lib/templates";
 import { Hero, type HeroData } from "./sections/hero";
 import { Quote, type QuoteData } from "./sections/quote";
 import { Features, type FeaturesData } from "./sections/features";
+import { AboutTeaser, type AboutTeaserData } from "./sections/about-teaser";
+import { HowItWorks, type HowItWorksData } from "./sections/how-it-works";
+import { Testimonials, type TestimonialsData } from "./sections/testimonials";
+import { Faq, type FaqData } from "./sections/faq";
+import { LatestPosts, type LatestPostsData, type Articol } from "./sections/latest-posts";
 
 /** Un rând din `site_content`, așa cum vine din baza de date. */
 export type SectionRow = {
+  /**
+   * Identitatea rândului. Cheia secțiunii NU e unică: aceeași secțiune poate
+   * apărea de mai multe ori pe pagină (banda cu citat, în două șabloane).
+   */
+  id: string;
   key: string;
   variant: string | null;
   tone: SectionTone;
   data: unknown;
+};
+
+/**
+ * Date care nu aparțin niciunei secțiuni anume, dar de care unele au nevoie.
+ * `latestPosts` e singura de acest fel deocamdată: își ia conținutul din blog,
+ * nu din propriul rând.
+ */
+export type SectionContext = {
+  articole: Articol[];
 };
 
 /**
@@ -20,23 +40,36 @@ export type SectionRow = {
  * site-ul public — un vizitator nu trebuie să vadă niciodată o eroare fiindcă
  * panoul a mers înaintea codului.
  */
-const REGISTRU: Record<string, (row: SectionRow) => React.ReactNode> = {
+const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNode> = {
   hero: (row) => <Hero data={row.data as HeroData} tone={row.tone} />,
   quote: (row) => <Quote data={row.data as QuoteData} tone={row.tone} />,
   features: (row) => <Features data={row.data as FeaturesData} tone={row.tone} />,
+  aboutTeaser: (row) => <AboutTeaser data={row.data as AboutTeaserData} tone={row.tone} />,
+  howItWorks: (row) => <HowItWorks data={row.data as HowItWorksData} tone={row.tone} />,
+  testimonials: (row) => <Testimonials data={row.data as TestimonialsData} tone={row.tone} />,
+  faq: (row) => <Faq data={row.data as FaqData} tone={row.tone} />,
+  latestPosts: (row, ctx) => (
+    <LatestPosts data={row.data as LatestPostsData} articole={ctx.articole} tone={row.tone} />
+  ),
 };
 
 export function sectiuneCunoscuta(key: string): boolean {
   return key in REGISTRU;
 }
 
-export function RenderSections({ rows }: { rows: SectionRow[] }) {
+export function RenderSections({
+  rows,
+  context,
+}: {
+  rows: SectionRow[];
+  context: SectionContext;
+}) {
   return (
     <>
       {rows.map((row) => {
         const randeaza = REGISTRU[row.key];
         if (!randeaza) return null;
-        return <div key={row.key}>{randeaza(row)}</div>;
+        return <div key={row.id}>{randeaza(row, context)}</div>;
       })}
     </>
   );
