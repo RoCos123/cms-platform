@@ -14,7 +14,7 @@ type NavGroup = { label: string; items: NavItem[] };
 // până atunci itemele fără `href` apar ca „curând".
 const NAV: (NavItem | NavGroup)[] = [
   { label: "Acasă", href: "/dashboard" },
-  { label: "Pagina principală", items: [{ label: "Secțiuni" }] },
+  { label: "Pagina principală", items: [{ label: "Secțiuni", href: "/dashboard/sectiuni" }] },
   { label: "Pagini" },
   { label: "Blog", items: [{ label: "Articole" }, { label: "Categorii" }] },
   { label: "Programări" },
