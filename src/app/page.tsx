@@ -105,7 +105,12 @@ export default async function PublicHomePage() {
         }}
       >
         <SiteHeader
-          data={{ nume, subtitlu: brand.subtitlu, telefon: brand.telefon }}
+          data={{
+            nume,
+            subtitlu: brand.subtitlu,
+            telefon: brand.telefon,
+            paginaServicii: paginaServiciiEsteActiva(pagini),
+          }}
         />
 
         <main>

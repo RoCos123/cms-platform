@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { paginaServiciiEsteActiva, type Pagini } from "@/lib/setari";
+import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { ComutatorPaginaServicii } from "./comutator-pagina";
 import { ListaServicii, type RandServiciuLista } from "./lista-servicii";
 import { creeazaServiciu } from "./actions";
@@ -23,6 +24,8 @@ export default async function ServiciiPage() {
   ]);
 
   if (error) console.error("Citirea serviciilor a eșuat:", error);
+
+  const paginaActiva = paginaServiciiEsteActiva((setari?.pagini ?? {}) as Pagini);
 
   const randuri: RandServiciuLista[] = (data ?? []).map((rand) => ({
     id: rand.id as string,
@@ -45,10 +48,15 @@ export default async function ServiciiPage() {
           </p>
         </div>
 
-        {/* Formular, nu link: creează un rând în baza de date, deci e o acțiune. */}
-        <form action={creeazaServiciu}>
-          <Button type="submit">+ Serviciu nou</Button>
-        </form>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Linkul apare doar când pagina există — altfel ar duce în perete. */}
+          {paginaActiva && <LinkVeziPeSite href="/servicii" eticheta="Vezi pagina pe site" />}
+
+          {/* Formular, nu link: creează un rând în baza de date, deci e o acțiune. */}
+          <form action={creeazaServiciu}>
+            <Button type="submit">+ Serviciu nou</Button>
+          </form>
+        </div>
       </div>
 
       {randuri.length === 0 ? (
@@ -67,9 +75,7 @@ export default async function ServiciiPage() {
       ) : (
         <>
           <ListaServicii initiale={randuri} />
-          <ComutatorPaginaServicii
-            activaInitial={paginaServiciiEsteActiva((setari?.pagini ?? {}) as Pagini)}
-          />
+          <ComutatorPaginaServicii activaInitial={paginaActiva} />
         </>
       )}
     </div>

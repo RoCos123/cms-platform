@@ -9,14 +9,26 @@ export type SiteHeaderData = {
   initiala?: string;
   linkuri?: LinkAntet[];
   telefon?: string;
+  /** E pornită pagina cu serviciile pe larg? Atunci „Servicii" duce acolo. */
+  paginaServicii?: boolean;
 };
 
-const LINKURI_IMPLICITE = [
-  { text: "Despre", href: "#despre" },
-  { text: "Servicii", href: "#servicii" },
-  { text: "Blog", href: "#articole" },
-  { text: "Contact", href: "#contact" },
-];
+/**
+ * Adresele încep cu „/", nu cu „#".
+ *
+ * Un „#despre" e un loc din PAGINA CURENTĂ. Pe prima pagină merge; pe pagina de
+ * servicii nu există nimic cu numele acela, deci apăsarea nu face nimic — omul
+ * rămâne blocat, cu impresia că site-ul e stricat. „/#despre" spune „du-te la
+ * prima pagină, la secțiunea despre", și merge de oriunde.
+ */
+function linkuriImplicite(paginaServicii: boolean): LinkAntet[] {
+  return [
+    { text: "Despre", href: "/#despre" },
+    { text: "Servicii", href: paginaServicii ? "/servicii" : "/#servicii" },
+    { text: "Blog", href: "/#articole" },
+    { text: "Contact", href: "/#contact" },
+  ];
+}
 
 /**
  * Antetul site-ului public. Nu e o secțiune editabilă din cele 21 — e cadrul
@@ -28,7 +40,9 @@ const LINKURI_IMPLICITE = [
  * degrabă decât completează formulare.
  */
 export function SiteHeader({ data }: { data: SiteHeaderData }) {
-  const linkuri = data.linkuri?.length ? data.linkuri : LINKURI_IMPLICITE;
+  const linkuri = data.linkuri?.length
+    ? data.linkuri
+    : linkuriImplicite(data.paginaServicii ?? false);
   const initiala = data.initiala ?? data.nume.trim().charAt(0).toUpperCase();
 
   return (

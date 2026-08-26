@@ -1,6 +1,7 @@
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { ListaSectiuni, type RandSectiune } from "./lista-sectiuni";
 
 export const metadata = { title: "Secțiunile paginii principale" };
@@ -31,15 +32,19 @@ export default async function SectiuniPage() {
 
   return (
     <div className="space-y-6 pb-24">
-      <div>
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Pagina principală
-        </p>
-        <h1 className="mt-1 text-2xl font-semibold text-foreground">Secțiuni</h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          Ordinea de aici e ordinea de pe site. O secțiune ascunsă rămâne salvată cu tot
-          conținutul ei — dispare doar de pe pagina publică.
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Pagina principală
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold text-foreground">Secțiuni</h1>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            Ordinea de aici e ordinea de pe site. O secțiune ascunsă rămâne salvată cu tot
+            conținutul ei — dispare doar de pe pagina publică.
+          </p>
+        </div>
+
+        <LinkVeziPeSite href="/" eticheta="Vezi pagina pe site" />
       </div>
 
       {randuri.length === 0 ? (

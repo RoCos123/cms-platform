@@ -79,7 +79,14 @@ export default async function PaginaServicii() {
           minHeight: "100%",
         }}
       >
-        <SiteHeader data={{ nume, subtitlu: brand.subtitlu, telefon: brand.telefon }} />
+        <SiteHeader
+          data={{
+            nume,
+            subtitlu: brand.subtitlu,
+            telefon: brand.telefon,
+            paginaServicii: true,
+          }}
+        />
 
         <main>
           <ServiciiDetaliate
