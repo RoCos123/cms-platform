@@ -30,6 +30,12 @@ export type CampSchema =
   | (CampComun & { tip: "text"; max?: number })
   /** Ca „text", dar cu tastatură de email pe telefon și verificare a formei. */
   | (CampComun & { tip: "email"; max?: number })
+  /**
+   * O adresă către care duce un link. Verificată: fără asta, un text oarecare
+   * scris aici produce un link care nu duce nicăieri, iar clientul n-are cum
+   * să-și dea seama — pe pagină arată exact ca unul bun.
+   */
+  | (CampComun & { tip: "adresa"; max?: number })
   | (CampComun & { tip: "textLung"; max?: number; randuri?: number })
   | (CampComun & { tip: "numar"; min?: number; maxim?: number })
   /** Pereche text + adresă. În JSON: `{ text, href }`. */
@@ -201,7 +207,7 @@ const LISTA: MetaSectiune[] = [
             max: 400,
           },
           {
-            tip: "text",
+            tip: "adresa",
             cheie: "href",
             eticheta: "Adresa paginii serviciului",
             hint: "Opțional. Ex.: /servicii/terapie-individuala",
@@ -275,7 +281,7 @@ const LISTA: MetaSectiune[] = [
           { tip: "text", cheie: "titlu", eticheta: "Titlul discuției", obligatoriu: true, max: 140 },
           { tip: "textLung", cheie: "descriere", eticheta: "Despre ce a fost", randuri: 2, max: 300 },
           { tip: "text", cheie: "data", eticheta: "Când", hint: "Ex.: martie 2026", max: 40 },
-          { tip: "text", cheie: "href", eticheta: "Adresa materialului", max: 300 },
+          { tip: "adresa", cheie: "href", eticheta: "Adresa materialului", max: 300 },
           { tip: "imagine", cheie: "imagine", eticheta: "Imagine" },
         ],
       },
@@ -474,13 +480,14 @@ const LISTA: MetaSectiune[] = [
             hint: "Ex.: Telefon, Email, Cabinet, Program.",
             max: 40,
           },
-          { tip: "text", cheie: "valoare", eticheta: "Conținutul", obligatoriu: true, max: 160 },
           {
-            tip: "text",
-            cheie: "href",
-            eticheta: "Adresă de apăsat",
-            hint: "Pentru telefon: tel:0700000000. Pentru email: mailto:adresa@exemplu.ro. Altfel lasă gol.",
-            max: 200,
+            tip: "textLung",
+            cheie: "valoare",
+            eticheta: "Conținutul",
+            hint: "Poți scrie pe mai multe rânduri — util pentru program.",
+            obligatoriu: true,
+            randuri: 2,
+            max: 300,
           },
         ],
       },
@@ -494,7 +501,7 @@ const LISTA: MetaSectiune[] = [
         max: 300,
       },
       {
-        tip: "text",
+        tip: "adresa",
         cheie: "linkConfidentialitate",
         eticheta: "Adresa politicii de confidențialitate",
         max: 200,

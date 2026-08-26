@@ -8,14 +8,42 @@ export type ContactData = {
   titlu: string;
   titluAccent?: string;
   intro?: string;
-  /** Telefon, email, adresă, program — ce se afișează lângă formular. */
-  detalii?: { eticheta: string; valoare: string; href?: string }[];
+  /**
+   * Telefon, email, adresă, program — ce se afișează lângă formular.
+   *
+   * Nu există câmp de adresă a linkului: se deduce din conținut. Un client n-are
+   * de ce să știe că un număr de telefon apăsabil se scrie „tel:0721234567" —
+   * iar când i se cere, scrie ce nimerește și obține un link care nu duce
+   * nicăieri, dar arată ca unul bun.
+   */
+  detalii?: { eticheta: string; valoare: string }[];
   textButon?: string;
   textAcord?: string;
   linkConfidentialitate?: string;
   /** Ce citește omul după trimitere. Clientul îl poate scrie cu vocea lui. */
   mesajSucces?: string;
 };
+
+/**
+ * Ce se întâmplă când apeși pe un rând din datele cabinetului.
+ *
+ * Un număr de telefon deschide apelul, o adresă de email deschide un mesaj,
+ * restul rămâne text simplu. Programul („Luni – vineri, 10:00 – 19:00") conține
+ * litere și, de obicei, mai multe rânduri — deci nu e confundat cu un număr.
+ */
+function adresaDedusa(valoare: string): string | null {
+  const curat = valoare.trim();
+
+  // Mai multe rânduri înseamnă program sau adresă, niciodată telefon sau email.
+  if (curat.includes("\n")) return null;
+
+  if (/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(curat)) return `mailto:${curat}`;
+
+  const cifre = curat.replace(/[\s().-]/g, "");
+  if (/^\+?\d{6,15}$/.test(cifre)) return `tel:${cifre}`;
+
+  return null;
+}
 
 const ACORD_IMPLICIT =
   "Sunt de acord ca datele scrise aici să fie folosite ca să primesc un răspuns. Am citit";
@@ -54,7 +82,10 @@ export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: 
 
           {data.detalii && data.detalii.length > 0 && (
             <dl style={{ margin: "40px 0 0", display: "flex", flexDirection: "column", gap: "20px" }}>
-              {data.detalii.map((detaliu) => (
+              {data.detalii.map((detaliu) => {
+                const adresa = adresaDedusa(detaliu.valoare);
+
+                return (
                 <div key={detaliu.eticheta}>
                   <dt
                     style={{
@@ -67,10 +98,12 @@ export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: 
                   >
                     {detaliu.eticheta}
                   </dt>
-                  <dd style={{ margin: "6px 0 0", fontSize: "18px" }}>
-                    {detaliu.href ? (
+                  {/* `pre-line`: dacă omul a scris programul pe două rânduri
+                      (luni-vineri, apoi sâmbăta), așa trebuie să apară. */}
+                  <dd style={{ margin: "6px 0 0", fontSize: "18px", whiteSpace: "pre-line" }}>
+                    {adresa ? (
                       <a
-                        href={detaliu.href}
+                        href={adresa}
                         style={{
                           color: "inherit",
                           // Preflight-ul Tailwind anulează sublinierea implicită a
@@ -88,7 +121,8 @@ export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: 
                     )}
                   </dd>
                 </div>
-              ))}
+                );
+              })}
             </dl>
           )}
         </div>

@@ -176,11 +176,14 @@ cross join (values
     'titlu', 'Hai să',
     'titluAccent', 'vorbim.',
     'intro', 'Scrie-mi câteva rânduri despre ce te aduce aici. Nu trebuie să știi de unde să începi — e suficient să începi.',
+    -- Fără câmp de adresă a linkului: telefonul și emailul devin apăsabile
+    -- singure, după cum arată conținutul. Programul are două rânduri, ca să se
+    -- vadă că se poate.
     'detalii', jsonb_build_array(
-      jsonb_build_object('eticheta', 'Telefon', 'valoare', '0700 000 000', 'href', 'tel:0700000000'),
-      jsonb_build_object('eticheta', 'Email', 'valoare', 'contact@example.com', 'href', 'mailto:contact@example.com'),
+      jsonb_build_object('eticheta', 'Telefon', 'valoare', '0700 000 000'),
+      jsonb_build_object('eticheta', 'Email', 'valoare', 'contact@example.com'),
       jsonb_build_object('eticheta', 'Cabinet', 'valoare', 'Str. Exemplu nr. 1, București'),
-      jsonb_build_object('eticheta', 'Program', 'valoare', 'Luni – vineri, 10:00 – 19:00')
+      jsonb_build_object('eticheta', 'Program', 'valoare', E'Luni – vineri, 10:00 – 19:00\nSâmbătă, 09:00 – 14:00')
     ),
     'textButon', 'Trimite mesajul'
   ))

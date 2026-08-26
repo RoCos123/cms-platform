@@ -95,6 +95,7 @@ export function CampuriSectiune({
                   <TextField
                     label="Unde duce"
                     hint="Ex.: /contact sau #contact"
+                    error={erori[`${drum}.href`]}
                     value={link.href ?? ""}
                     onChange={(event) =>
                       seteaza(camp.cheie, { ...link, href: event.target.value })

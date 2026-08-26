@@ -27,6 +27,31 @@ function esteObiect(valoare: unknown): valoare is Record<string, unknown> {
   return typeof valoare === "object" && valoare !== null && !Array.isArray(valoare);
 }
 
+const MESAJ_ADRESA =
+  "Nu pare o adresă. Începe cu / pentru o pagină din site, cu # pentru un loc din pagina asta, sau cu https:// pentru un site din afară.";
+
+/**
+ * O adresă către care poate duce un link.
+ *
+ * Verificarea există fiindcă un text oarecare scris într-un asemenea câmp
+ * produce un link care nu duce nicăieri, iar pe pagină arată exact ca unul bun:
+ * omul apasă și nu se întâmplă nimic. E genul de defect pe care nici cel care
+ * l-a scris nu-l observă.
+ */
+export function esteAdresaValida(adresa: string): boolean {
+  const curat = adresa.trim();
+  if (curat === "") return true;
+
+  return (
+    curat.startsWith("/") ||
+    curat.startsWith("#") ||
+    curat.startsWith("https://") ||
+    curat.startsWith("http://") ||
+    curat.startsWith("mailto:") ||
+    curat.startsWith("tel:")
+  );
+}
+
 /** Din baza de date către formular. */
 export function catreEditor(brut: unknown, campuri: CampSchema[]): ValoareEditor {
   const sursa = esteObiect(brut) ? brut : {};
@@ -173,7 +198,16 @@ export function valideaza(
       continue;
     }
 
-    if (camp.tip === "link" || camp.tip === "imagine" || camp.tip === "numar") continue;
+    if (camp.tip === "link") {
+      const link = esteObiect(brut) ? brut : {};
+      const href = String(link.href ?? "").trim();
+      // Eroarea se pune pe subcâmp, nu pe grup: formularul are două casete
+      // acolo, iar un mesaj pe grup n-ar spune care dintre ele e de reparat.
+      if (!esteAdresaValida(href)) erori[`${drum}.href`] = MESAJ_ADRESA;
+      continue;
+    }
+
+    if (camp.tip === "imagine" || camp.tip === "numar") continue;
 
     const text = String(brut ?? "").trim();
 
@@ -181,6 +215,8 @@ export function valideaza(
       erori[drum] = "Câmpul acesta nu poate rămâne gol.";
     } else if (camp.max && text.length > camp.max) {
       erori[drum] = `Maximum ${camp.max} de caractere. Acum sunt ${text.length}.`;
+    } else if (camp.tip === "adresa" && !esteAdresaValida(text)) {
+      erori[drum] = MESAJ_ADRESA;
     } else if (camp.tip === "email" && text !== "" && !esteEmailValid(text)) {
       // Aceeași verificare ca la formularul public de contact, din același
       // fișier: două reguli scrise separat ar ajunge să nu mai fie aceeași.
