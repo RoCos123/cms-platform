@@ -128,6 +128,12 @@ const LISTA: MetaSectiune[] = [
         randuri: 3,
         max: 400,
       },
+      {
+        tip: "imagine",
+        cheie: "imagine",
+        eticheta: "Poza ta",
+        hint: "Opțională. Apare lângă text. Merge cel mai bine una pătrată sau verticală — una lată se taie pe margini.",
+      },
       { tip: "link", cheie: "butonPrincipal", eticheta: "Butonul principal" },
       {
         tip: "link",
@@ -160,6 +166,12 @@ const LISTA: MetaSectiune[] = [
         hint: "Se scrie mai mare, înclinat. O propoziție care rezumă felul tău de a lucra.",
         randuri: 2,
         max: 240,
+      },
+      {
+        tip: "imagine",
+        cheie: "imagine",
+        eticheta: "Poza ta",
+        hint: "Opțională. Apare lângă text. Merge cel mai bine una pătrată sau verticală — una lată se taie pe margini.",
       },
       { tip: "link", cheie: "buton", eticheta: "Buton" },
     ],

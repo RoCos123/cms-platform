@@ -182,7 +182,7 @@ function Detalii({
 
       <div className="space-y-2">
         <p className="text-xs font-medium text-foreground">{descrieFolosirile(locuri)}</p>
-        {locuri.length > 0 && (
+        {locuri.length > 0 ? (
           <ul className="space-y-1 text-xs">
             {locuri.map((loc) => (
               <li key={loc.sectiuneId}>
@@ -195,6 +195,17 @@ function Detalii({
               </li>
             ))}
           </ul>
+        ) : (
+          // O poză încărcată și nepusă nicăieri e exact momentul în care omul se
+          // întreabă ce mai are de făcut. Îi spunem, aici, nu într-un ghid.
+          <p className="text-xs text-muted-foreground">
+            Deschide{" "}
+            <Link href="/dashboard/sectiuni" className="underline hover:text-foreground">
+              secțiunea în care o vrei
+            </Link>{" "}
+            și apasă „Alege din bibliotecă”. Aceeași poză poate intra în mai multe
+            secțiuni.
+          </p>
         )}
       </div>
 
