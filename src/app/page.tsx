@@ -1,18 +1,60 @@
-import { headers } from "next/headers";
+import { getTenant } from "@/lib/dal";
+import { createServiceClient, tenantTable } from "@/lib/supabase/admin";
+import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
+import { RenderSections, type SectionRow } from "@/components/site/render-sections";
 
-// Placeholder pentru site-ul public al tenantului rezolvat — randarea reală a
-// secțiunilor vine în Faza 4. Deocamdată dovedește că rezolvarea tenantului
-// (proxy.ts -> x-site-id) funcționează capăt la capăt.
 export default async function PublicHomePage() {
-  const headerList = await headers();
-  const siteId = headerList.get("x-site-id");
-  const domain = headerList.get("x-site-domain");
+  const { siteId, domain } = await getTenant();
+
+  // Șablonul stă pe `sites`, deci vine din rândul deja citit la rezolvarea
+  // tenantului. Clientul cu cheia secretă, ca la orice citire publică — rolul
+  // `anon` nu mai are acces la date (vezi migrarea de întărire RLS).
+  const { data: site } = await createServiceClient()
+    .from("sites")
+    .select("name, template")
+    .eq("id", siteId)
+    .single();
+
+  const template = getTemplate(site?.template);
+
+  const { data: rows } = await (await tenantTable("site_content"))
+    .select("key, variant, tone, data, visible, position")
+    .eq("visible", true)
+    .order("position", { ascending: true });
+
+  // Dublul cast e necesar cât timp nu generăm tipurile bazei de date: `tenantTable`
+  // primește numele tabelului ca `string`, deci supabase-js nu poate deduce forma
+  // rândului și cade pe un tip de eroare. De înlocuit cu tipuri generate
+  // (`supabase gen types`) când schema se stabilizează.
+  const sections = (rows ?? []) as unknown as SectionRow[];
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
-      <p className="text-sm text-zinc-500">Site public — conținut vine în Faza 3–4</p>
-      <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">{domain}</h1>
-      <p className="text-xs text-zinc-400">site_id: {siteId}</p>
-    </div>
+    <>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+      <link rel="stylesheet" href={templateFontsHref(template)} />
+
+      <div
+        style={{
+          ...templateStyle(template),
+          background: "var(--t-fundal)",
+          color: "var(--t-text)",
+          fontFamily: "var(--t-font-principal)",
+          minHeight: "100%",
+        }}
+      >
+        {sections.length > 0 ? (
+          <RenderSections rows={sections} />
+        ) : (
+          // Un site fără nicio secțiune nu trebuie să fie o pagină albă:
+          // clientul tocmai a fost provizionat și încă nu a scris nimic.
+          <div style={{ padding: "120px 24px", textAlign: "center" }}>
+            <p style={{ margin: 0, fontSize: "18px", color: "var(--t-text-secundar)" }}>
+              {site?.name ?? domain} — site în pregătire.
+            </p>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
