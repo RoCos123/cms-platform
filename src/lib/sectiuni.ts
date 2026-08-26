@@ -41,7 +41,17 @@ export type CampSchema =
    * Se generează din alt câmp, dar rămâne editabilă: odată publicat ceva, adresa
    * lui nu mai trebuie să se schimbe singură când i se corectează titlul.
    */
-  | (CampComun & { tip: "slug"; dinCheia: string; prefix?: string; max?: number })
+  | (CampComun & {
+      tip: "slug";
+      dinCheia: string;
+      prefix?: string;
+      max?: number;
+      /**
+       * Adrese pe care câmpul nu le acceptă, fiindcă sunt deja ale altcuiva pe
+       * site. Vezi `ADRESE_REZERVATE` în `@/lib/pagini`.
+       */
+      slugInterzise?: string[];
+    })
   | (CampComun & {
       tip: "textLung";
       /** Limita în caractere. Oprește scrisul în casetă (`maxLength`). */

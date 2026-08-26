@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { getSesiuneOptionala, getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
 import { articolePublicate } from "@/lib/blog-public";
+import { linkurilePaginilor } from "@/lib/pagini-publice";
 import { paginaEsteActiva } from "@/lib/setari";
 import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
 import { SiteHeader } from "@/components/site/header";
@@ -31,9 +32,10 @@ export async function CadruSite({
 }) {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, brand, pagini }, articole, sesiune] = await Promise.all([
+  const [{ site, brand, pagini }, articole, linkuriPagini, sesiune] = await Promise.all([
     identitateaSiteului(siteId),
     articolePublicate(siteId),
+    linkurilePaginilor(siteId),
     // Pentru un vizitator obișnuit se rezolvă instantaneu cu `null`, fără nicio
     // cerere: fără cookie de sesiune n-are ce verifica.
     getSesiuneOptionala(),
@@ -46,6 +48,14 @@ export async function CadruSite({
   // articol publicat, „Blog" ar duce la o pagină pe care scrie doar că articolele
   // vin în curând — mai bine nu-l punem încă.
   const areBlog = paginaEsteActiva(pagini, "blog") && articole.length > 0;
+
+  // Aceeași listă, împărțită după unde a cerut clientul să apară fiecare pagină.
+  const catreLink = (pagina: (typeof linkuriPagini)[number]) => ({
+    text: pagina.titlu,
+    href: `/${pagina.slug}`,
+  });
+  const inAntet = linkuriPagini.filter((pagina) => pagina.loc === "header").map(catreLink);
+  const inSubsol = linkuriPagini.filter((pagina) => pagina.loc === "footer").map(catreLink);
 
   return (
     <>
@@ -69,6 +79,7 @@ export async function CadruSite({
             telefon: brand.telefon,
             paginaServicii: paginaEsteActiva(pagini, "servicii"),
             blog: areBlog ? "pagina" : null,
+            paginiProprii: inAntet,
           }}
         />
 
@@ -82,6 +93,7 @@ export async function CadruSite({
             email: brand.email,
             adresa: brand.adresa,
             acreditare: brand.acreditare,
+            linkuri: inSubsol,
           }}
         />
 

@@ -52,6 +52,14 @@ export function Features({
         maxWidthTitlu="14em"
         actiune={
           maiSunt && paginaDetaliata ? (
+            /*
+              Ancoră simplă, nu `next/link`, ca peste tot în secțiunile site-ului:
+              aceleași componente se randează și în previzualizarea din panou,
+              printr-un portal într-un iframe. Acolo contextul de rutare e al
+              PANOULUI — un `Link` ar încerca să navigheze panoul, nu site-ul, și
+              ar preîncărca pagini de care previzualizarea n-are nevoie.
+            */
+            // eslint-disable-next-line @next/next/no-html-link-for-pages
             <a
               href="/servicii"
               style={{

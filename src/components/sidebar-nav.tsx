@@ -29,7 +29,7 @@ const NAV: (NavItem | NavGroup)[] = [
   // ca titlu de pagină). Celelalte pagini ale site-ului stau la „Pagini".
   { label: "Pagina principală", href: "/dashboard/sectiuni" },
   { label: "Servicii", href: "/dashboard/servicii" },
-  { label: "Pagini" },
+  { label: "Pagini", href: "/dashboard/pagini" },
   // Fără subgrup: „Articole" era singurul lucru dinăuntru care există, iar un
   // grup cu un singur element cerea două clicuri și punea aceleași cuvinte în
   // două locuri. Categoriile se adaugă când un cabinet chiar are atâtea articole

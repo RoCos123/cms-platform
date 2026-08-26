@@ -241,6 +241,11 @@ export function valideaza(
     } else if (camp.tip === "slug" && text !== "" && !esteSlugValid(text)) {
       erori[drum] =
         "Doar litere mici fără diacritice, cifre și cratime. Apasă butonul de lângă câmp ca să se completeze singură din nume.";
+    } else if (camp.tip === "slug" && camp.slugInterzise?.includes(text)) {
+      // Adresa e a unei rute scrise în cod, care câștigă mereu. Pagina n-ar da
+      // vreo eroare — ar rămâne pur și simplu invizibilă, iar clientul ar reciti
+      // adresa de zece ori întrebându-se ce a greșit.
+      erori[drum] = `Adresa „${text}” e folosită deja de site. Alege alta.`;
     } else if (camp.tip === "adresa" && !esteAdresaValida(text)) {
       erori[drum] = MESAJ_ADRESA;
     } else if (camp.tip === "email" && text !== "" && !esteEmailValid(text)) {

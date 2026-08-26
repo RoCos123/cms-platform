@@ -18,6 +18,11 @@ export type SiteHeaderData = {
    * ancoră către un loc care nu există.
    */
   blog?: "pagina" | "sectiune" | null;
+  /**
+   * Paginile scrise de client care cer un loc în meniu. Se ADAUGĂ la cele
+   * implicite, nu le înlocuiesc (pentru asta există `linkuri`).
+   */
+  paginiProprii?: LinkAntet[];
 };
 
 /**
@@ -31,6 +36,7 @@ export type SiteHeaderData = {
 function linkuriImplicite(
   paginaServicii: boolean,
   blog: "pagina" | "sectiune" | null,
+  paginiProprii: LinkAntet[],
 ): LinkAntet[] {
   return [
     { text: "Despre", href: "/#despre" },
@@ -38,6 +44,9 @@ function linkuriImplicite(
     // Un meniu cu patru intrări din care una nu face nimic e mai rău decât unul
     // cu trei: prima dă impresia unui site stricat, a doua e doar un site fără blog.
     ...(blog ? [{ text: "Blog", href: blog === "pagina" ? "/blog" : "/#articole" }] : []),
+    // Paginile proprii intră aici, nu la coadă: „Contact" rămâne ultimul, unde
+    // îl caută toată lumea de douăzeci de ani încoace.
+    ...paginiProprii,
     { text: "Contact", href: "/#contact" },
   ];
 }
@@ -54,11 +63,15 @@ function linkuriImplicite(
 export function SiteHeader({ data }: { data: SiteHeaderData }) {
   const linkuri = data.linkuri?.length
     ? data.linkuri
-    : linkuriImplicite(data.paginaServicii ?? false, data.blog ?? null);
+    : linkuriImplicite(data.paginaServicii ?? false, data.blog ?? null, data.paginiProprii ?? []);
   const initiala = data.initiala ?? data.nume.trim().charAt(0).toUpperCase();
 
   return (
     <header
+      // Peste cinci linkuri, meniul se strânge în buton mai devreme (vezi
+      // globals.css): un nume real de cabinet plus șase linkuri nu mai încap pe
+      // un rând la 950px, oricât de bine s-ar purta fiecare în parte.
+      className={linkuri.length > 5 ? "antet antet--multe-linkuri" : "antet"}
       style={{
         position: "sticky",
         top: 0,
@@ -73,7 +86,19 @@ export function SiteHeader({ data }: { data: SiteHeaderData }) {
           maxWidth: "1180px",
           margin: "0 auto",
           paddingInline: "clamp(16px, 5vw, 64px)",
-          height: "76px",
+          /*
+            `minHeight`, nu `height`: numărul de linkuri nu mai e fix de când
+            clientul își poate pune paginile lui în meniu, deci nicio înălțime
+            fixă nu poate fi cea bună pentru toate site-urile. În cel mai rău caz
+            antetul crește — în loc să taie numele cabinetului.
+
+            Rândul NU se rupe (fără `flex-wrap`): cu el, numele s-ar duce pe un
+            rând al lui în loc să se îngusteze, iar antetul ar fi 120px chiar și
+            acolo unde totul încăpea lejer. Ce se rupe, la nevoie, sunt linkurile
+            între ele — vezi `.antet-nav` în globals.css.
+          */
+          minHeight: "76px",
+          paddingBlock: "8px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",

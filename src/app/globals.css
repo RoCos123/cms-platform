@@ -175,6 +175,16 @@ body {
 .antet-nume {
   font-size: 17px;
   font-weight: 600;
+  /*
+   * Cel mult două rânduri, la ORICE lățime. Regula stătea doar sub 900px, unde
+   * meniul e ascuns — iar peste, un nume lung se rupea pe patru rânduri și ieșea
+   * din antet. Două rânduri, nu unul prescurtat: numele cabinetului e marca
+   * omului, iar „Cabinet de psihoter…" nu spune nimic despre cine e.
+   */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .antet-subtitlu {
@@ -182,11 +192,22 @@ body {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--t-text-secundar);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .antet-nav {
   display: flex;
-  gap: 28px;
+  /*
+   * Linkurile se rup între ele, dacă chiar nu încap: clientul poate pune în
+   * meniu pagini cu titluri oricât de lungi, iar un rând de linkuri care nu
+   * încape ar împinge toată pagina afară din ecran. Așa, în cel mai rău caz
+   * antetul are două rânduri de linkuri.
+   */
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  min-width: 0;
   font-size: 15px;
 }
 
@@ -249,22 +270,24 @@ body {
 
   .antet-nume {
     font-size: 15px;
-    /*
-     * Două rânduri, nu prescurtare pe unul singur. Numele cabinetului E marca
-     * omului: „Cabinet de psihoter…" nu spune nimic despre cine e, în timp ce
-     * pe două rânduri numele întreg încape. Antetul are 76px înălțime — două
-     * rânduri la 15px plus subtitlul stau lejer înăuntru.
-     */
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+  }
+}
+
+/*
+ * Cu peste cinci linkuri în meniu — adică atunci când clientul și-a pus și
+ * paginile lui acolo — pragul urcă: la 950px, un nume real plus șase linkuri
+ * plus butonul de telefon nu mai încap pe un rând. Măsurat, nu presupus.
+ *
+ * Decis pe server, prin clasă, nu în JavaScript: un meniu care se rearanjează
+ * după ce se încarcă pagina clipește la fiecare vizită.
+ */
+@media (max-width: 1100px) {
+  .antet--multe-linkuri .antet-nav {
+    display: none;
   }
 
-  .antet-subtitlu {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .antet--multe-linkuri .antet-meniu-buton {
+    display: inline-flex;
   }
 }
 
