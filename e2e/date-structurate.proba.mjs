@@ -5,6 +5,7 @@ import {
   dateleArticolului,
   dateleCabinetului,
   dateleIntrebarilor,
+  datelePsihologului,
 } from "@/lib/date-structurate";
 
 /**
@@ -19,6 +20,7 @@ const BAZA = new URL("https://cabinet-exemplu.ro");
 
 const CABINET_COMPLET = {
   nume: "Cabinet Individual de Psihologie Maria Ionescu",
+  numePersoana: "Maria Ionescu",
   subtitlu: "Psiholog clinician",
   telefon: "0722 000 000",
   email: "contact@cabinet-exemplu.ro",
@@ -44,14 +46,60 @@ test("cabinetul complet se scrie cu tot ce s-a completat", () => {
   assert.equal(date.address, "Str. Exemplu 10, București");
   assert.equal(date.url, "https://cabinet-exemplu.ro/");
   assert.equal(date.telephone, "0722 000 000");
-  assert.deepEqual(date.memberOf, {
-    "@type": "Organization",
-    name: "Membru al Colegiului Psihologilor din România",
-  });
+  // Acreditarea NU mai stă aici: la Colegiu sunt membri oameni, nu clădiri.
+  assert.ok(!("memberOf" in date), "acreditarea ar trebui mutată pe fișa omului");
+  assert.deepEqual(date.founder, { "@id": "https://cabinet-exemplu.ro/#psiholog" });
+});
+
+test("fără numele omului, acreditarea rămâne pe firmă", () => {
+  // Mai bine agățată de cabinet decât nescrisă nicăieri.
+  const date = dateleCabinetului(BAZA, { ...CABINET_COMPLET, numePersoana: undefined });
+
+  assert.equal(date.memberOf.name, "Membru al Colegiului Psihologilor din România");
+  assert.equal(date.disambiguatingDescription, "Psiholog clinician");
+  assert.ok(!("founder" in date), "n-avem pe cine da drept fondator");
+});
+
+test("fișa omului apare doar când i se știe numele", () => {
+  assert.equal(datelePsihologului(BAZA, { ...CABINET_COMPLET, numePersoana: undefined }), null);
+  assert.equal(datelePsihologului(BAZA, { ...CABINET_COMPLET, numePersoana: "  " }), null);
+});
+
+test("psihologul poartă numele lui, nu pe al cabinetului", () => {
+  const om = datelePsihologului(BAZA, CABINET_COMPLET);
+
+  assert.equal(om["@type"], "Person");
+  assert.equal(om.name, "Maria Ionescu");
+  assert.ok(
+    !String(om.name).includes("Cabinet"),
+    "numele firmei n-are ce căuta pe o fișă de om",
+  );
+  assert.equal(om.jobTitle, "Psiholog clinician");
+  assert.equal(om.memberOf.name, "Membru al Colegiului Psihologilor din România");
+});
+
+test("cele două fișe se leagă una de alta", () => {
+  const firma = dateleCabinetului(BAZA, CABINET_COMPLET);
+  const om = datelePsihologului(BAZA, CABINET_COMPLET);
+
+  assert.equal(firma.founder["@id"], om["@id"]);
+  assert.equal(om.worksFor["@id"], firma["@id"]);
+});
+
+test("psihologul care lucrează doar online rămâne cu fișa lui", () => {
+  // Fără adresă nu există firmă, dar omul nu dispare. Înainte, un cabinet
+  // exclusiv online n-avea absolut nicio dată structurată.
+  const doarOnline = { ...CABINET_COMPLET, adresa: undefined };
+
+  assert.equal(dateleCabinetului(BAZA, doarOnline), null);
+
+  const om = datelePsihologului(BAZA, doarOnline);
+  assert.equal(om.name, "Maria Ionescu");
+  assert.ok(!("worksFor" in om), "n-are unde lucra dacă n-avem cabinet");
 });
 
 test("câmpurile goale nu se scriu deloc", () => {
-  // Un „telephone": "" nu e informație lipsă, e informație greșită: spune că
+  // Un telephone gol nu e informație lipsă, e informație greșită: spune că
   // ăsta E numărul.
   const date = dateleCabinetului(BAZA, {
     nume: "Cabinet",
@@ -97,6 +145,31 @@ test("articolul poartă data publicării, nu una inventată", () => {
   assert.equal(date.datePublished, "2026-08-25T09:00:00.000Z");
   assert.ok(!("image" in date), "coperta lipsă n-ar trebui scrisă");
   assert.ok(!("dateModified" in date), "n-avem data modificării, deci n-o inventăm");
+});
+
+test("articolul e semnat de om când îi știm numele", () => {
+  const date = dateleArticolului(CABINET_COMPLET, {
+    titlu: "Anxietatea la adulți",
+    adresa: "https://cabinet-exemplu.ro/blog/anxietatea-la-adulti",
+  });
+
+  assert.deepEqual(date.author, { "@type": "Person", name: "Maria Ionescu" });
+  // Editorul rămâne cabinetul: el ține site-ul, indiferent cine scrie.
+  assert.equal(date.publisher["@type"], "Organization");
+  assert.equal(date.publisher.name, "Cabinet Individual de Psihologie Maria Ionescu");
+});
+
+test("fără numele omului, autorul e firma — niciodată un Person fals", () => {
+  const date = dateleArticolului(
+    { ...CABINET_COMPLET, numePersoana: undefined },
+    { titlu: "Anxietatea la adulți", adresa: "https://cabinet-exemplu.ro/blog/x" },
+  );
+
+  assert.equal(date.author["@type"], "Organization");
+  assert.ok(
+    !JSON.stringify(date).includes('"@type":"Person"'),
+    "niciun Person nu are voie să apară cu numele cabinetului",
+  );
 });
 
 test("nimic de scris înseamnă niciun bloc", () => {

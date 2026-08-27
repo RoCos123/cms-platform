@@ -74,7 +74,7 @@ export default async function PaginaArticol({
   const { slug } = await params;
   const { siteId, domain } = await getTenant();
 
-  const [articol, { site }, baza] = await Promise.all([
+  const [articol, { site, brand }, baza] = await Promise.all([
     articolulPaginii(slug),
     identitateaSiteului(siteId),
     adresaSiteului(),
@@ -84,7 +84,7 @@ export default async function PaginaArticol({
 
   const dateStructurate = caJsonLd([
     dateleArticolului(
-      { nume: site?.name ?? domain },
+      { nume: site?.name ?? domain, numePersoana: brand.numeleTau },
       {
         titlu: articol.titlu,
         extras: articol.extras,

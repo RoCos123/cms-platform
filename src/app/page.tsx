@@ -10,6 +10,7 @@ import {
   caJsonLd,
   dateleCabinetului,
   dateleIntrebarilor,
+  datelePsihologului,
   type Intrebare,
 } from "@/lib/date-structurate";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
@@ -88,16 +89,27 @@ export default async function PublicHomePage() {
     .filter((rand) => rand.key === "faq")
     .flatMap((rand) => (rand.data as { intrebari?: Intrebare[] } | null)?.intrebari ?? []);
 
+  /**
+   * Aceleași date, citite o dată, pentru amândouă fișele: cabinetul e o firmă,
+   * psihologul e un om, iar ele se leagă între ele. Ce ține de om — meseria,
+   * acreditarea — ajunge pe fișa lui abia când Setările îi știu numele.
+   */
+  const cabinet = {
+    nume: site?.name ?? domain,
+    numePersoana: brand.numeleTau,
+    subtitlu: brand.subtitlu,
+    telefon: brand.telefon,
+    email: brand.email,
+    adresa: brand.adresa,
+    acreditare: brand.acreditare,
+    descriere: seo.descriere || brand.descriereSubsol,
+  };
+
+  const baza = await adresaSiteului();
+
   const dateStructurate = caJsonLd([
-    dateleCabinetului(await adresaSiteului(), {
-      nume: site?.name ?? domain,
-      subtitlu: brand.subtitlu,
-      telefon: brand.telefon,
-      email: brand.email,
-      adresa: brand.adresa,
-      acreditare: brand.acreditare,
-      descriere: seo.descriere || brand.descriereSubsol,
-    }),
+    dateleCabinetului(baza, cabinet),
+    datelePsihologului(baza, cabinet),
     dateleIntrebarilor(intrebari),
   ]);
 

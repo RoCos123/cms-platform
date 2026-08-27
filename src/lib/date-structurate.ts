@@ -12,7 +12,10 @@
 
 /** Ce știm despre cabinet, din grupurile `brand` și `seo` ale Setărilor. */
 export type Cabinet = {
+  /** Numele legal al cabinetului: „Cabinet Individual de Psihologie <nume>”. */
   nume: string;
+  /** Numele psihologului ca om. Gol la cabinetele care nu l-au completat. */
+  numePersoana?: string;
   subtitlu?: string;
   telefon?: string;
   email?: string;
@@ -37,6 +40,20 @@ export type ArticolulPaginii = {
 type Obiect = Record<string, unknown>;
 
 /**
+ * Ancorele prin care fișa cabinetului și cea a psihologului se leagă între ele.
+ *
+ * Fără ele, ar fi două fișe fără nicio legătură pe aceeași pagină, iar un motor
+ * de căutare n-ar avea de unde ști că omul ăla ține cabinetul ăla. Cu ele, e o
+ * singură poveste: o firmă, fondată de un om, care lucrează acolo.
+ */
+const ANCORA_CABINET = "#cabinet";
+const ANCORA_PSIHOLOG = "#psiholog";
+
+function ancora(baza: URL, care: string): string {
+  return new URL(care, baza).toString();
+}
+
+/**
  * Scoate câmpurile goale dintr-un obiect.
  *
  * Un `"telephone": ""` nu e o informație lipsă pentru un motor de căutare, e o
@@ -58,31 +75,73 @@ function faraGoluri(obiect: Obiect): Obiect {
  *
  * `null` fără adresă, deliberat. Google cere adresa la `LocalBusiness`, iar o
  * fișă de firmă fără ea nu e o fișă pe jumătate — e una respinsă la validare.
- * Un psiholog care lucrează doar online chiar n-are adresă de pus, iar pentru
- * el datele astea n-ar trebui inventate.
+ * Un psiholog care lucrează doar online chiar n-are adresă de pus; el primește
+ * în schimb fișa de om, din `datelePsihologului`.
  *
- * Fără `Person`, deși planul îl cerea: câmpul din Setări se cheamă „Numele tău
- * SAU al cabinetului”, deci nu se poate ști dacă „Cabinet Individual de
- * Psihologie Maria Ionescu” e o persoană sau o firmă. Un `Person` cu numele
- * unei firme e dată greșită, iar dată greșită e mai rău decât lipsă: Google o
- * ignoră pe toată. Se rezolvă cu o singură întrebare în plus în Setări.
+ * Numele de aici e cel legal al cabinetului. Nu se pune niciodată pe o fișă de
+ * `Person`: o firmă numită după om e ceva obișnuit, un om numit „Cabinet
+ * Individual de Psihologie Maria Ionescu” nu există.
  */
 export function dateleCabinetului(baza: URL, cabinet: Cabinet): Obiect | null {
   if (!cabinet.adresa?.trim()) return null;
 
+  const arePsiholog = Boolean(cabinet.numePersoana?.trim());
+
   return faraGoluri({
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
+    "@id": ancora(baza, ANCORA_CABINET),
     name: cabinet.nume,
     address: cabinet.adresa,
     url: baza.toString(),
     telephone: cabinet.telefon,
     email: cabinet.email,
     description: cabinet.descriere,
-    // „Psiholog clinician” — ce fel de cabinet e, în cuvintele clientului.
-    disambiguatingDescription: cabinet.subtitlu,
-    // „Membru al Colegiului Psihologilor din România” — apartenența declarată.
-    memberOf: cabinet.acreditare ? { "@type": "Organization", name: cabinet.acreditare } : undefined,
+    /**
+     * Când știm cine e omul, faptele care țin de el se mută pe fișa lui.
+     * „Psiholog clinician” e o meserie, iar la Colegiul Psihologilor sunt
+     * membri oameni, nu clădiri. Stau aici doar cât timp n-avem pe cine altul
+     * să le punem — mai bine agățate de firmă decât nescrise deloc.
+     */
+    disambiguatingDescription: arePsiholog ? undefined : cabinet.subtitlu,
+    memberOf:
+      !arePsiholog && cabinet.acreditare
+        ? { "@type": "Organization", name: cabinet.acreditare }
+        : undefined,
+    founder: arePsiholog ? { "@id": ancora(baza, ANCORA_PSIHOLOG) } : undefined,
+  });
+}
+
+/**
+ * Psihologul, ca `Person`.
+ *
+ * `null` până când clientul își scrie numele ca om în Setări. Nu se deduce
+ * tăind „Cabinet Individual de Psihologie ” din numele firmei: merge la cei
+ * care scriu exact forma aia și iese aiurea la „C.I.P. Maria Ionescu” sau
+ * „Cabinet psihologic dr. Maria Ionescu”. Iar un nume fals aici nu strică doar
+ * rândul lui — Google poate arunca tot blocul, cu telefon și adresă cu tot.
+ *
+ * Nu depinde de adresă: un psiholog care lucrează doar online n-are fișă de
+ * firmă, dar rămâne un om cu nume, meserie și acreditare. Înainte, el nu avea
+ * absolut nicio dată structurată.
+ */
+export function datelePsihologului(baza: URL, cabinet: Cabinet): Obiect | null {
+  const nume = cabinet.numePersoana?.trim();
+  if (!nume) return null;
+
+  return faraGoluri({
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": ancora(baza, ANCORA_PSIHOLOG),
+    name: nume,
+    url: baza.toString(),
+    jobTitle: cabinet.subtitlu,
+    telephone: cabinet.telefon,
+    email: cabinet.email,
+    memberOf: cabinet.acreditare
+      ? { "@type": "Organization", name: cabinet.acreditare }
+      : undefined,
+    worksFor: cabinet.adresa?.trim() ? { "@id": ancora(baza, ANCORA_CABINET) } : undefined,
   });
 }
 
@@ -111,6 +170,16 @@ export function dateleIntrebarilor(intrebari: Intrebare[]): Obiect | null {
 /**
  * Un articol, ca `BlogPosting`.
  *
+ * `author` e omul, când îi știm numele — un articol despre anxietate scris de un
+ * psiholog cu nume și acreditare cântărește altfel decât unul semnat de o firmă.
+ *
+ * Când nu-l știm, autorul e `Organization`, niciodată `Person` cu numele
+ * cabinetului. Asimetria e aceeași ca pe prima pagină: o firmă numită după om e
+ * ceva obișnuit, deci `Organization` rămâne adevărat oricum; un `Person` numit
+ * „Cabinet Individual de Psihologie Maria Ionescu” nu e nimeni.
+ *
+ * `publisher` rămâne mereu cabinetul: el ține site-ul, indiferent cine scrie.
+ *
  * Fără `dateModified`: citirea articolului nu aduce `updated_at`, iar o dată
  * inventată acolo i-ar spune lui Google că textul se rescrie la fiecare vizită.
  */
@@ -126,7 +195,9 @@ export function dateleArticolului(
     datePublished: articol.publicatLa ?? undefined,
     image: articol.imagine ?? undefined,
     mainEntityOfPage: articol.adresa,
-    author: { "@type": "Person", name: cabinet.nume },
+    author: cabinet.numePersoana?.trim()
+      ? { "@type": "Person", name: cabinet.numePersoana.trim() }
+      : { "@type": "Organization", name: cabinet.nume },
     publisher: { "@type": "Organization", name: cabinet.nume },
   });
 }

@@ -16,10 +16,33 @@ export const CAMPURI_CABINET: CampSchema[] = [
   {
     tip: "text",
     cheie: "nume",
-    eticheta: "Numele tău sau al cabinetului",
-    hint: "Apare sus în antet și în subsolul fiecărei pagini.",
+    /**
+     * Se chema „Numele tău sau al cabinetului”, iar acel „sau” a fost rădăcina
+     * unei probleme întregi: din câmp nu se putea ști dacă textul e numele unui
+     * om sau al unei firme, deci nu se putea spune motoarelor de căutare cine e
+     * cine. Acum omul își are câmpul lui, mai jos, iar ăsta e fără echivoc.
+     */
+    eticheta: "Numele cabinetului",
+    hint: "Cum e înregistrat, întreg. Apare sus în antet și în subsolul fiecărei pagini.",
     obligatoriu: true,
     max: 120,
+  },
+  {
+    tip: "text",
+    cheie: "numeleTau",
+    eticheta: "Numele tău",
+    /**
+     * Singurul câmp din formular care NU se vede nicăieri pe site, de aceea
+     * hint-ul o spune din prima: un client care completează ceva și nu-l
+     * regăsește pe pagină crede că s-a stricat salvarea.
+     *
+     * Există fiindcă numele cabinetului e, prin lege, „Cabinet Individual de
+     * Psihologie <nume>”. Din el nu se poate scoate numele omului fără să
+     * ghicim — iar din ghicit ies date false, pe care motoarele de căutare le
+     * pedepsesc aruncând tot, nu doar rândul greșit.
+     */
+    hint: "Nu apare pe site. Îl citesc doar motoarele de căutare, ca să știe că în spatele cabinetului e un om — și să te găsească cine te caută pe numele tău, nu pe al cabinetului.",
+    max: 80,
   },
   {
     tip: "text",
@@ -48,7 +71,7 @@ export const CAMPURI_CABINET: CampSchema[] = [
     tip: "textLung",
     cheie: "descriereSubsol",
     eticheta: "Textul din subsol",
-    hint: "Una-două propoziții despre ce faci, sub numele tău, jos pe pagină.",
+    hint: "Una-două propoziții despre ce faci, sub numele cabinetului, jos pe pagină.",
     randuri: 3,
     max: 300,
   },
@@ -83,6 +106,8 @@ export const CAMPURI_SEO: CampSchema[] = [
 
 /** Ce citește site-ul public din `site_settings.brand`. */
 export type Brand = {
+  /** Numele psihologului ca om, separat de numele legal al cabinetului. */
+  numeleTau?: string;
   subtitlu?: string;
   telefon?: string;
   email?: string;
