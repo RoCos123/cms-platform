@@ -288,6 +288,47 @@ abia când un cabinet chiar are atâtea articole încât să nu le mai găseasc�
 **6. Emailul cu Resend** — ultimul, prin decizie explicită. Vezi „Decizii
 confirmate".
 
+## Plăți cu cardul (Netopia) — de luat în calcul din timp
+
+Ridicat de proprietar pe 27 aug. 2026, ca lucru sigur, nu ca ipoteză. Nu se
+construiește nimic acum; se scrie aici ca să nu luăm între timp decizii care
+îl blochează.
+
+**Sunt DOUĂ cazuri, complet diferite, iar confundarea lor e capcana:**
+
+**A. Psihologul încasează de la pacienții lui** — plata ședinței în avans, pe
+site-ul lui. Aici **fiecare client are nevoie de contractul LUI cu Netopia**:
+firmă, cont bancar, aprobare de la ei. Nu e o bifă, e o procedură comercială de
+zile, nu de minute. Adică exact opusul promisiunii „dintr-un clic” de la
+modulul Programări — de spus asta la vânzare, nu de descoperit după.
+
+Tehnic, cazul ăsta cere ceva ce azi nu avem deloc: **secrete per client în
+bază** (cheile de comerciant ale fiecărui cabinet). Ele nu pot fi citite de
+sesiunea clientului, nu pot ajunge în pachetul de browser, și trebuie
+criptate. Azi singurele secrete sunt ale platformei și stau în variabile de
+mediu. E o clasă nouă de risc, nu o coloană în plus.
+
+**B. Noi încasăm de la clienți** — abonamentul pentru site și pentru modulele
+plătite. Aici e **un singur cont Netopia, al nostru**, cu cheile în variabile de
+mediu. Zero configurare per client. Ăsta e cazul care face afacerea să meargă
+și e mult mai simplu decât A.
+
+**Ce e comun amândurora**, și unde se greșește de obicei: plata se face prin
+redirectare către pagina lor, iar confirmarea vine înapoi ca un apel de la
+Netopia către un URL public al nostru. **Acel apel trebuie verificat prin
+semnătură.** Fără verificare, oricine îi știe adresa poate spune „s-a plătit”.
+URL-ul e unul singur, al platformei, și află din datele plății la ce site și la
+ce comandă se referă — asta se potrivește cu modelul nostru.
+
+De pregătit oricum, indiferent de caz: un tabel de plăți cu `site_id`, cu
+stările prin care trece o comandă (inițiată → plătită → eșuată → rambursată).
+Cererile de programare au deja o coloană de stare, deci „plătită” se adaugă
+acolo fără să se rescrie nimic.
+
+**Decizia de luat înainte de a scrie cod:** care caz, A sau B, sau amândouă.
+Detaliile de protocol se citesc din documentația lor la momentul construirii,
+nu din memorie.
+
 ## Module plătite: cum se pornesc, și de ce așa
 
 Un modul care se vinde nu poate fi pornit de cel care ar trebui să-l plătească.
