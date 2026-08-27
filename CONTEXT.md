@@ -228,6 +228,14 @@ Implicit OPRIT — pe dos față de `pagini`, unde lipsa valorii înseamnă porn
 platformei nu există încă (`/admin` e doar un alias pentru client), fiindcă
 n-am hotărât cum se autentifică proprietarul platformei — vezi „ce lipsește".
 
+Bifa aceea face singură și restul: un trigger pe `sites` adaugă rândul secțiunii
+„Programare online” în `site_content`, la coada paginii principale. A trebuit,
+fiindcă panoul n-are flux de „adaugă secțiune” — rândurile vin seedate la
+provizionare, așa că un tip nou de secțiune n-avea cum să ajungă pe un site care
+există deja. Clientul o găsește apoi în „Secțiuni”, de mutat unde vrea. Cât timp
+n-are nicio zi bifată în program, secțiunea nu se randează pe site: o invitație
+la programare fără nicio oră liberă e mai rea decât nimic.
+
 ## Analytics: de ce numărăm noi, și de ce nu numărăm oameni
 
 Hotărât 27 aug. 2026, la cererea proprietarului: trebuie să meargă la sute de

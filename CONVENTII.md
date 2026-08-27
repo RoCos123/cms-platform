@@ -63,6 +63,14 @@ să scrie. Garanția „domeniul e blocat prin grant” era scrisă în CONTEXT.
 săptămâni și n-a putut fi verificată nici măcar o dată. Când adaugi o apărare de
 alt fel decât RLS, întreabă-te dacă bancul o poate vedea.
 
+**Un tip nou de secțiune nu ajunge singur pe un site care există deja.**
+Panoul NU are flux de „adaugă secțiune” — rândurile din `site_content` vin
+seedate la provizionare, iar clientul le poate doar reordona, ascunde și edita.
+Componenta de programare a fost scrisă, pusă în registru și în randare, și tot
+n-a apărut nicăieri: nimic n-o putea crea. A trebuit o migrare cu trigger. Când
+adaugi un tip de secțiune, întreabă-te întâi CINE îi creează rândul, la clienții
+care există deja.
+
 **SQL netestat nu pleacă.** Există `supabase/proba-locala.sh`: pornește un
 Postgres gol, rulează toate migrările în ordine, seedează doi clienți și rulează
 verificarea de izolare. Rulează-l. Au plecat de două ori scripturi netestate

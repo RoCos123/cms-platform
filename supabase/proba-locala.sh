@@ -92,6 +92,7 @@ begin
     insert into auth.users (email) values ('owner' || i || '@exemplu.ro') returning id into u;
     insert into public.users (id, site_id, email) values (u, s, 'owner' || i || '@exemplu.ro');
     insert into public.site_content (site_id, key, position, data) values (s, 'hero', 10, jsonb_build_object('titlu', nume));
+    update public.sites set appointments_enabled = true where id = s and i = 1;
     insert into public.site_settings (site_id, brand) values (s, jsonb_build_object('telefon', '0722'));
     insert into public.pages (site_id, slug, title, content, status) values (s, 'tarife', 'Tarife', 'Text.', 'published');
     insert into public.services (site_id, slug, title, excerpt, status) values (s, 'consiliere', 'Consiliere', 'Pe scurt.', 'published');
