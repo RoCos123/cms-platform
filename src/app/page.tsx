@@ -5,8 +5,16 @@ import { paginaEsteActiva } from "@/lib/setari";
 import { serviciiPublicate } from "@/lib/servicii-publice";
 import { articolePublicate } from "@/lib/blog-public";
 import { tenantTable } from "@/lib/supabase/admin";
+import { adresaSiteului } from "@/lib/seo";
+import {
+  caJsonLd,
+  dateleCabinetului,
+  dateleIntrebarilor,
+  type Intrebare,
+} from "@/lib/date-structurate";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
 import { CadruSite } from "@/components/site/cadru-site";
+import { DateStructurate } from "@/components/site/date-structurate";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteId, domain } = await getTenant();
@@ -43,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PublicHomePage() {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, pagini }, { data: rows }, articole, servicii] = await Promise.all([
+  const [{ site, pagini, brand, seo }, { data: rows }, articole, servicii] = await Promise.all([
     identitateaSiteului(siteId),
     (await tenantTable("site_content"))
       .select("id, key, variant, tone, data, visible, position")
@@ -67,8 +75,35 @@ export default async function PublicHomePage() {
   // (`supabase gen types`) când schema se stabilizează.
   const sections = (rows ?? []) as unknown as SectionRow[];
 
+  /**
+   * Întrebările pentru `FAQPage` se iau din secțiunea de pe pagină, nu din tot
+   * ce e scris în panou: regula lui Google e că datele structurate descriu ce
+   * CHIAR se vede. Rândurile de aici sunt deja filtrate pe `visible`.
+   *
+   * `flatMap` peste toate rândurile cu cheia `faq`, nu `find`: cheia unei
+   * secțiuni nu e unică (vezi `SectionRow`), iar un al doilea bloc de întrebări
+   * ar rămâne altfel nedeclarat.
+   */
+  const intrebari = sections
+    .filter((rand) => rand.key === "faq")
+    .flatMap((rand) => (rand.data as { intrebari?: Intrebare[] } | null)?.intrebari ?? []);
+
+  const dateStructurate = caJsonLd([
+    dateleCabinetului(await adresaSiteului(), {
+      nume: site?.name ?? domain,
+      subtitlu: brand.subtitlu,
+      telefon: brand.telefon,
+      email: brand.email,
+      adresa: brand.adresa,
+      acreditare: brand.acreditare,
+      descriere: seo.descriere || brand.descriereSubsol,
+    }),
+    dateleIntrebarilor(intrebari),
+  ]);
+
   return (
     <CadruSite linkEditare="/dashboard/sectiuni">
+      <DateStructurate date={dateStructurate} />
       {sections.length > 0 ? (
         <RenderSections
           rows={sections}

@@ -4,7 +4,10 @@ import { getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
 import { articolDupaSlug } from "@/lib/blog-public";
 import { paginaEsteActiva } from "@/lib/setari";
+import { adresaAbsoluta, adresaSiteului } from "@/lib/seo";
+import { caJsonLd, dateleArticolului } from "@/lib/date-structurate";
 import { CadruSite } from "@/components/site/cadru-site";
+import { DateStructurate } from "@/components/site/date-structurate";
 import { ArticolComplet } from "@/components/site/sections/articol-complet";
 
 /**
@@ -69,12 +72,32 @@ export default async function PaginaArticol({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const articol = await articolulPaginii(slug);
+  const { siteId, domain } = await getTenant();
+
+  const [articol, { site }, baza] = await Promise.all([
+    articolulPaginii(slug),
+    identitateaSiteului(siteId),
+    adresaSiteului(),
+  ]);
 
   if (!articol) notFound();
 
+  const dateStructurate = caJsonLd([
+    dateleArticolului(
+      { nume: site?.name ?? domain },
+      {
+        titlu: articol.titlu,
+        extras: articol.extras,
+        publicatLa: articol.publicatLa,
+        imagine: articol.coperta?.url ?? null,
+        adresa: adresaAbsoluta(baza, `/blog/${articol.slug}`),
+      },
+    ),
+  ]);
+
   return (
     <CadruSite linkEditare="/dashboard/blog">
+      <DateStructurate date={dateStructurate} />
       <ArticolComplet articol={articol} />
     </CadruSite>
   );
