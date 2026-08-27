@@ -151,9 +151,14 @@ două ori scripturi SQL netestate. Orice migrare nouă trece pe aici întâi.
 confirmă că psihologii vor programare online; multe cabinete mici preferă
 telefonul, fiindcă vor să audă omul înainte de prima ședință.
 
-**3. Activitate** — jurnalul cine-ce-a-schimbat. Se scrie deja în `audit_log` la
-fiecare modificare, deci nu se pierde nimic dacă ecranul apare mai târziu. Pe un
-site cu un singur utilizator, îi arată clientului doar ce a făcut el însuși.
+**3. ~~Activitate~~** — făcut (27 aug. 2026), `/dashboard/activitate`. Rândurile
+sunt grupate pe zile („Azi”, „Ieri”, apoi data), cu ora în fusul României — nu
+timp relativ, fiindcă un „acum două ore” calculat pe server minte după ce pagina
+stă deschisă o oră. Numele celui care a făcut modificarea apare doar când NU e
+cel care se uită: pe un cabinet cu un singur cont, altfel fiecare rând ar repeta
+același email. Aproape toate acțiunile își scriu singure rezumatul; pentru cele
+care nu, propoziția se compune din acțiune și entitate, cu acordul corect
+(`descrieIntrarea` din `src/lib/activitate.ts`).
 
 **4. Restanțe mici**, în ordinea valorii: fonturile mutate de la Google pe
 serverul nostru (scoate Google din politica de confidențialitate și grăbește

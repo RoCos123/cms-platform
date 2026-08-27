@@ -39,7 +39,7 @@ const NAV: (NavItem | NavGroup)[] = [
   { label: "Mesaje", href: "/dashboard/mesaje" },
   { label: "Imagini", href: "/dashboard/imagini" },
   { label: "Setări", href: "/dashboard/setari" },
-  { label: "Activitate" },
+  { label: "Activitate", href: "/dashboard/activitate" },
 ];
 
 function isGroup(item: NavItem | NavGroup): item is NavGroup {
