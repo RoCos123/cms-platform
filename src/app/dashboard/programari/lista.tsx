@@ -10,7 +10,7 @@ export type Cerere = {
   nume: string;
   email: string;
   telefon: string | null;
-  serviciu: string | null;
+  motiv: string | null;
   note: string | null;
   cand: string;
   candScris: string;
@@ -92,7 +92,7 @@ function Rand({ cerere }: { cerere: Cerere }) {
             {cerere.telefon}
           </a>
         )}
-        {cerere.serviciu && <span>{cerere.serviciu}</span>}
+        {cerere.motiv && <span>{cerere.motiv}</span>}
       </div>
 
       {cerere.note && (

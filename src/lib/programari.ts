@@ -168,3 +168,23 @@ export function oraEsteLibera(
 
   return libere.ore.some((ora) => momentLa(zi, ora).getTime() === cerut.getTime());
 }
+
+/**
+ * Motivele dintre care alege cineva care cere o oră.
+ *
+ * Listă închisă, aceeași pentru toți clienții platformei. Înainte, câmpul se
+ * umplea din serviciile publicate ale cabinetului — un cabinet cu opt servicii
+ * dădea o listă de opt, iar omul trebuia să se hotărască ce fel de ședință
+ * vrea înainte să fi vorbit cu cineva. Hotărât de proprietar pe 27 aug. 2026.
+ *
+ * Stă aici, nu în formular, fiindcă o citește și acțiunea de server: câmpul e
+ * o listă cu două intrări, deci o valoare din afara ei nu vine de la un om
+ * care apasă, ci de la o cerere scrisă de mână — iar ce scrie acolo ar ajunge
+ * neverificat în panoul psihologului.
+ */
+export const MOTIVE = ["Evaluări psihologice", "Altceva"] as const;
+
+/** Motivul, dacă e unul dintre cele oferite. Altfel nimic — câmpul e opțional. */
+export function motivValid(brut: string): string | null {
+  return (MOTIVE as readonly string[]).includes(brut) ? brut : null;
+}

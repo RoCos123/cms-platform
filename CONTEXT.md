@@ -27,7 +27,7 @@ Reperul de efort: originalul (single-tenant, un client, cu bug-uri de configurar
 - **Multi-tenant din prima migrare:** `site_id` pe fiecare tabel + RLS de la început, nu retrofit ulterior (retrofitarea e dureroasă și riscantă pe date reale).
 - **Rezolvare tenant:** domeniul cererii → `site_id`, printr-un tabel `sites` + middleware.
 - **API-uri externe obligatorii pentru MVP:** Supabase; email tranzacțional (Resend recomandat) pentru notificări contact + confirmări programări; anti-spam (Cloudflare Turnstile — GDPR-friendly, spre deosebire de reCAPTCHA) pe formularele publice.
-- **Emailul tranzacțional se face ULTIMUL** (confirmat 26 aug. 2026, la cererea proprietarului: „nu am ce email să fac acum"). Contul de trimitere nu există încă. Până atunci, mesajele din formular se văd doar în panou, cu numărul de necitite lângă „Mesaje" — vezi `TODO` din `src/app/actions/formulare.ts`. **Nu propune Resend ca următorul pas**; e ultimul de pe listă, indiferent cât de mult ar ajuta.
+- **Emailul tranzacțional se face ULTIMUL** (confirmat 26 aug. 2026, la cererea proprietarului: „nu am ce email să fac acum”). Contul de trimitere nu există încă. Până atunci, mesajele din formular se văd doar în panou, cu numărul de necitite lângă „Mesaje” — vezi `TODO` din `src/app/actions/formulare.ts`. **Nu propune Resend ca următorul pas**; e ultimul de pe listă, indiferent cât de mult ar ajuta.
 - **Pentru scalare (fazele ulterioare):** Vercel Domains API (conectare automată domeniu propriu per client), Stripe (billing).
 - **Opționale:** Google Analytics — DOUĂ integrări distincte (tag `gtag` care colectează pe site-ul public vs. GA4 Data API cu service account care citește datele înapoi în dashboard — originalul confundă asta, de evitat); Google Calendar API / Cal.com pentru sincronizare programări; Search Console API.
 
@@ -46,7 +46,7 @@ Ce s-a hotărât pe parcurs, ca să nu fie redeschis din senin:
 - **Paginile au trei locuri**: meniul de sus, subsolul, nicăieri. Implicit
   subsolul — o pagină nouă apare undeva, chiar dacă discret. Adresele rutelor din
   cod (`blog`, `servicii`, `admin`…) sunt refuzate din formular.
-- **Fără buton de „înapoi" pe site.** Browserul are deja unul, iar al nostru n-ar
+- **Fără buton de „înapoi” pe site.** Browserul are deja unul, iar al nostru n-ar
   ști unde duce pe cineva venit din Google direct pe o pagină interioară. Ce
   lipsea de fapt era un meniu care funcționează de pe orice pagină — reparat.
 - **Limite în cuvinte, nu în caractere**, la textele lungi: 3.000 la articol, 600
@@ -73,12 +73,12 @@ Ce s-a hotărât pe parcurs, ca să nu fie redeschis din senin:
 
 ## Ce lipsește și nu era în niciun plan
 
-Găsite căutând în cod, la întrebarea „cât mai e până terminăm":
+Găsite căutând în cod, la întrebarea „cât mai e până terminăm”:
 
 - **Resetarea parolei nu există.** `/login` are doar email + parolă. Un client
   care își uită parola trebuie deblocat manual din Supabase.
 - **Provizionarea unui client e SQL scris de mână.** `/admin` e doar o
-  redirectare. Nu există script sau ecran pentru „fă-i site unui client nou".
+  redirectare. Nu există script sau ecran pentru „fă-i site unui client nou”.
 - **Domeniul clientului se conectează manual în Vercel.**
 - **Un ecran de administrare al platformei nu există.** Modulele plătite se
   pornesc bifând o coloană în editorul Supabase. Ca să fie un buton în aplicație
@@ -112,22 +112,22 @@ Important: e timp de lucru concentrat, nu calendaristic. Bottleneck-ul real nu e
 
 ## Propunerea de produs — ce facem diferit față de original
 
-**Diferențiator central:** editare cu **previzualizare live** (split-screen: formular stânga, site real dreapta, actualizat live) — nu „completezi câmpuri → Save → View live" ca în original.
+**Diferențiator central:** editare cu **previzualizare live** (split-screen: formular stânga, site real dreapta, actualizat live) — nu „completezi câmpuri → Save → View live” ca în original.
 
-**7 fixuri de usabilitate:** limbaj de client nu jargon de dev (Hero → „Prima secțiune"); selector de variantă cu **miniaturi vizuale**, nu descrieri text; gardă de modificări nesalvate; ConfirmDialog + avertisment „imagine folosită în N locuri"; cod mort scos (Tiers legacy, Portfolio nefolosit); model de publicare unificat (inclusiv About); reordonare + vizibilitate secțiuni dintr-un ecran vizual.
+**7 fixuri de usabilitate:** limbaj de client nu jargon de dev (Hero → „Prima secțiune”); selector de variantă cu **miniaturi vizuale**, nu descrieri text; gardă de modificări nesalvate; ConfirmDialog + avertisment „imagine folosită în N locuri”; cod mort scos (Tiers legacy, Portfolio nefolosit); model de publicare unificat (inclusiv About); reordonare + vizibilitate secțiuni dintr-un ecran vizual.
 
-**3 module noi:** Programări (calendar + booking public + email — numit în ambele audituri „singurul lucru care schimbă produsul"); wizard de onboarding cu template-uri per profesie; branding ca date (culori/fonturi/logo per client, fără fork de cod).
+**3 module noi:** Programări (calendar + booking public + email — numit în ambele audituri „singurul lucru care schimbă produsul”); wizard de onboarding cu template-uri per profesie; branding ca date (culori/fonturi/logo per client, fără fork de cod).
 
-**Moat față de „template clonat per client":** guardrail-urile din audit devin **imposibil de greșit prin design**, nu un checklist manual:
+**Moat față de „template clonat per client”:** guardrail-urile din audit devin **imposibil de greșit prin design**, nu un checklist manual:
 - `metadataBase`/canonical/sitemap/robots derivă automat din domeniul tenantului (originalul avea totul pe `localhost` → carduri sociale rupte + zero indexare Google).
 - Sitemap + slug-uri generate din DB, sursă unică (originalul avea 3 surse de adevăr desincronizate → 404-uri interne).
 - Conținut demo (`is_demo`) **blochează publicarea**, nu doar afișează un avertisment.
 - Date de contact placeholder detectate automat, blochează publicarea.
-- Testimoniale cer bifă „acord scris obținut" înainte de a fi vizibile (problemă deontologică reală în original: mărturii fabricate sub numele unui psiholog acreditat).
+- Testimoniale cer bifă „acord scris obținut” înainte de a fi vizibile (problemă deontologică reală în original: mărturii fabricate sub numele unui psiholog acreditat).
 - Toate imaginile prin `next/image` (originalul servea Unsplash la 1600px pe mobil).
 - Date structurate `LocalBusiness`+`Person`+`FAQPage` auto-generate.
 
-**Ecran nou: „Pregătit de lansare"** — semafor per site; butonul „Publică" e blocat până toate condițiile de mai sus sunt verzi. Ăsta e argumentul central de vânzare.
+**Ecran nou: „Pregătit de lansare”** — semafor per site; butonul „Publică” e blocat până toate condițiile de mai sus sunt verzi. Ăsta e argumentul central de vânzare.
 
 ## Următorul pas planificat
 
@@ -166,7 +166,7 @@ cereri cu confirmă/refuză, pagina publică `/programare` unde vizitatorul îș
 alege o oră liberă dintr-un **calendar pe luni** (prima variantă înșira zilele
 ca butoane cu data scrisă în fiecare — la treizeci de zile ieșea un zid de text
 din care nu se vedea nici ziua săptămânii, nici de ce lipsesc unele; zilele fără
-ore rămân acum scrise, doar stinse), și **secțiunea „Programare online"** de pus pe prima pagină,
+ore rămân acum scrise, doar stinse), și **secțiunea „Programare online”** de pus pe prima pagină,
 lângă Contact — cu primele ore libere și un buton către pagina întreagă. Fiecare
 oră de acolo duce direct la formular cu ziua și ora deja alese; o adresă scrisă
 de mână nu poate alege o oră care nu se oferă. Linkul intră în meniul site-ului doar dacă modulul e pornit
@@ -177,15 +177,31 @@ ce oferi până nu-și scrie programul.
 telefonul omului ca linkuri pe care se apasă; clientul răspunde el. Când vine
 Resend, aici se leagă confirmarea automată.
 
+Până atunci, singurul lucru care spune că a venit ceva e **numărul de lângă
+„Programări” în meniu** — aceeași mecanică folosită de „Mesaje”, cu aceleași
+două condiții ca pe ecran: cerere fără răspuns ȘI ora încă n-a trecut. Un număr
+care n-are cum să ajungă la zero ar fi învățat clientul să-l ignore. Rămâne
+totuși ceva ce se vede doar dacă psihologul deschide panoul; emailul e singurul
+care ajunge la el fără să caute.
+
+**Motivul programării** e o listă închisă cu două intrări — „Evaluări
+psihologice" și „Altceva” — și e opțional (hotărât de proprietar, 27 aug. 2026).
+Înainte se umplea din serviciile publicate ale cabinetului, dar cine cere o
+primă ședință n-are de unde ști ce fel de ședință îi trebuie. Lista e verificată
+și pe server: un `select` cu două intrări e altfel un câmp liber deghizat, iar
+ce s-ar scrie acolo ar ajunge neatins în panou. De ținut minte că e aceeași
+listă pentru toți clienții platformei: al doilea cabinet care nu face evaluări
+va cere s-o poată schimba, iar atunci locul ei e în Setări.
+
 Orele libere se calculează în `src/lib/programari.ts`, rupt de bază ca să poată
 fi probat: durata plus pauza dau pasul, ultima ședință trebuie să se TERMINE
 până la ora de închidere, preavizul taie ce e prea aproape, iar o oră ocupată
 scoate tot ce se SUPRAPUNE cu ea, nu doar ora identică. Peste schimbarea orei de
-vară, „luni la 10" rămâne 10 pe ceas — are teste pe ambele treceri din 2026.
+vară, „luni la 10” rămâne 10 pe ceas — are teste pe ambele treceri din 2026.
 
 Două cereri venite în aceeași secundă pentru aceeași oră: verificarea din
 aplicație le lasă pe amândouă să treacă, fiindcă niciuna nu e încă scrisă.
-Indexul unic `(site_id, starts_at)` pe cererile vii e singurul loc unde „ocupat"
+Indexul unic `(site_id, starts_at)` pe cererile vii e singurul loc unde „ocupat”
 chiar înseamnă ocupat.
 
 **3. ~~Activitate~~** — făcut (27 aug. 2026), `/dashboard/activitate`. Rândurile
@@ -229,7 +245,7 @@ Implicit OPRIT — pe dos față de `pagini`, unde lipsa valorii înseamnă porn
 **Cum pornești un modul:** Supabase → Table editor → `sites` → bifezi
 `appointments_enabled` pe rândul clientului. Un ecran de administrare al
 platformei nu există încă (`/admin` e doar un alias pentru client), fiindcă
-n-am hotărât cum se autentifică proprietarul platformei — vezi „ce lipsește".
+n-am hotărât cum se autentifică proprietarul platformei — vezi „ce lipsește”.
 
 Bifa aceea face singură și restul: un trigger pe `sites` adaugă rândul secțiunii
 „Programare online” în `site_content`, la coada paginii principale. A trebuit,
@@ -255,12 +271,12 @@ Un client nou are cifre din prima zi, fără ca cineva să atingă ceva.
 
 **NU numărăm vizitatori unici.** Ar cere o amprentă din IP și browser, adică fix
 urmărirea pe care șablonul de politică o exclude în numele clientului („nu pun
-niciun cookie", „nu folosesc niciun program de urmărire"). Afișările pe pagină
+niciun cookie", „nu folosesc niciun program de urmărire”). Afișările pe pagină
 răspund oricum la întrebarea pentru care se uită omul acolo: se citește ce scriu?
 Politica de confidențialitate rămâne adevărată cuvânt cu cuvânt.
 
 Vizitele proprietarului, când e conectat, nu se socotesc — altfel un psiholog
-care își verifică pagina de zece ori seara ar vedea a doua zi zece „vizite" care
+care își verifică pagina de zece ori seara ar vedea a doua zi zece „vizite” care
 sunt el.
 
 Ecranul e `/dashboard/vizite`. Migrarea `20260827100000_vizite.sql` TREBUIE

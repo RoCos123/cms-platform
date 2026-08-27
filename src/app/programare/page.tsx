@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
-import { serviciiPublicate } from "@/lib/servicii-publice";
 import { linkurilePaginilor } from "@/lib/pagini-publice";
 import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
 import { oreDeOferit } from "@/lib/programari-publice";
@@ -66,9 +65,8 @@ export default async function PaginaProgramare({
 
   if (!zile) notFound();
 
-  const [{ site }, servicii, linkuriPagini] = await Promise.all([
+  const [{ site }, linkuriPagini] = await Promise.all([
     identitateaSiteului(siteId),
-    serviciiPublicate(siteId),
     linkurilePaginilor(siteId),
   ]);
 
@@ -101,7 +99,6 @@ export default async function PaginaProgramare({
             <FormularProgramare
               zile={deAles}
               luni={luni}
-              servicii={servicii.map((s) => s.titlu)}
               siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || null}
               // Secțiunea are tonul „deschis”, deci caseta merge pe varianta deschisă.
               temaCaptcha="light"

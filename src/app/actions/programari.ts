@@ -6,7 +6,7 @@ import { tenantTable } from "@/lib/supabase/admin";
 import { capcanaDeclansata, verificaTurnstile } from "@/lib/antispam";
 import { LIMITE, citesteText, esteEmailValid, type StareFormular } from "@/lib/formulare";
 import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
-import { oraEsteLibera } from "@/lib/programari";
+import { motivValid, oraEsteLibera } from "@/lib/programari";
 import { oreleOcupate, programulSiteului } from "@/lib/programari-publice";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { momentLa, ziuaScrisa, oraLa } from "@/lib/zile";
@@ -57,11 +57,15 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
   const nume = citesteText(formData, "nume", LIMITE.nume);
   const email = citesteText(formData, "email", LIMITE.email);
   const telefon = citesteText(formData, "telefon", 40);
-  const serviciu = citesteText(formData, "serviciu", 120);
+  // Lista are două intrări; orice altceva vine dintr-o cerere scrisă de mână,
+  // nu de la cineva care apasă. Se aruncă în tăcere, nu se respinge: câmpul e
+  // opțional, iar o pagină rămasă deschisă peste o schimbare de listă n-are de
+  // ce să pice.
+  const motiv = motivValid(citesteText(formData, "motiv", 120));
   const note = citesteText(formData, "note", 1000);
   const zi = citesteText(formData, "zi", 10);
   const ora = citesteText(formData, "ora", 5);
-  const valori = { nume, email, telefon, serviciu, note, zi, ora };
+  const valori = { nume, email, telefon, motiv: motiv ?? "", note, zi, ora };
 
   const erori: Record<string, string> = {};
   if (!nume) erori.nume = "Scrie-ți numele, ca să știe cine vine.";
@@ -95,7 +99,11 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
     name: nume,
     email,
     phone: telefon || null,
-    service: serviciu || null,
+    // Coloana și-a păstrat numele din vremea când câmpul era „Pentru ce” și se
+    // umplea din serviciile cabinetului. O redenumire ar fi cerut încă o migrare
+    // rulată de mână, pentru zero câștig la client; traducerea se face aici și
+    // în ecranul din panou, în câte o linie.
+    service: motiv,
     notes: note || null,
     starts_at: cerut.toISOString(),
     status: "ceruta",

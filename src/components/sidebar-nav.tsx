@@ -43,11 +43,30 @@ const NAV: (NavItem | NavGroup)[] = [
   { label: "Activitate", href: "/dashboard/activitate" },
 ];
 
+/**
+ * Ce număr stă lângă care intrare din meniu.
+ *
+ * Aceeași judecată ca la Mesaje: fără el, o cerere de programare ar fi
+ * invizibilă până când psihologul s-ar gândi singur să intre acolo — iar
+ * notificarea pe email încă nu există. La programări doare mai tare decât la
+ * mesaje: omul care a cerut ora stă și așteaptă un răspuns.
+ */
+const NUMERE: Record<string, ((mesaje: number, programari: number) => number) | undefined> = {
+  Mesaje: (mesaje) => mesaje,
+  Programări: (_, programari) => programari,
+};
+
 function isGroup(item: NavItem | NavGroup): item is NavGroup {
   return "items" in item;
 }
 
-export function SidebarNav({ mesajeNecitite = 0 }: { mesajeNecitite?: number }) {
+export function SidebarNav({
+  mesajeNecitite = 0,
+  programariDeRaspuns = 0,
+}: {
+  mesajeNecitite?: number;
+  programariDeRaspuns?: number;
+}) {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const pathname = usePathname();
 
@@ -78,7 +97,7 @@ export function SidebarNav({ mesajeNecitite = 0 }: { mesajeNecitite?: number }) 
         ) : (
           <NavLink
             key={item.label}
-            item={item.label === "Mesaje" ? { ...item, numar: mesajeNecitite } : item}
+            item={{ ...item, numar: NUMERE[item.label]?.(mesajeNecitite, programariDeRaspuns) }}
             pathname={pathname}
           />
         ),

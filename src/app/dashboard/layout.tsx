@@ -16,7 +16,12 @@ export const metadata: Metadata = {
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await verifySession();
   const supabase = await createClient();
-  const [{ data: site }, { count: mesajeNecitite }, imagini] = await Promise.all([
+  const [
+    { data: site },
+    { count: mesajeNecitite },
+    { count: programariDeRaspuns },
+    imagini,
+  ] = await Promise.all([
     supabase.from("sites").select("name, domain").eq("id", session.siteId).single(),
     // Numărul de lângă „Mesaje" din meniu. Fără el, un mesaj primit ar fi
     // invizibil până când clientul s-ar gândi singur să intre acolo — iar
@@ -27,6 +32,16 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       .eq("site_id", session.siteId)
       .is("deleted_at", null)
       .is("read_at", null),
+    // Numărul de lângă „Programări". Aceleași două condiții ca pe ecranul
+    // Programări: cerere fără răspuns ȘI ora încă n-a trecut. O cerere pentru
+    // marțea trecută nu mai are ce aștepta, iar un număr care n-are cum să
+    // ajungă la zero ar fi învățat clientul să-l ignore.
+    supabase
+      .from("appointments")
+      .select("id", { head: true, count: "exact" })
+      .eq("site_id", session.siteId)
+      .eq("status", "ceruta")
+      .gte("starts_at", new Date().toISOString()),
     // Fereastra „Alege din bibliotecă" trebuie să fie la îndemână din orice
     // formular cu imagini, deci lista se citește o dată aici, nu de fiecare
     // ecran în parte. `imaginileBibliotecii` e memorată pe cerere: ecranul
@@ -44,7 +59,10 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             <p className="font-semibold text-foreground">{site?.name ?? "Panou"}</p>
             <p className="text-xs text-muted-foreground">{site?.domain}</p>
           </div>
-          <SidebarNav mesajeNecitite={mesajeNecitite ?? 0} />
+          <SidebarNav
+            mesajeNecitite={mesajeNecitite ?? 0}
+            programariDeRaspuns={programariDeRaspuns ?? 0}
+          />
         </aside>
 
         <div className="flex flex-1 flex-col">

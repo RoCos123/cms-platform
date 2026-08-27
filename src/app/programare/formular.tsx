@@ -7,7 +7,7 @@ import { Camp, Capcana, MesajFormular, stilButonTrimite } from "@/components/sit
 import { Turnstile } from "@/components/site/turnstile";
 import { Calendar } from "./calendar";
 import type { LunaCalendar } from "@/lib/calendar";
-import type { ZiCuOre } from "@/lib/programari";
+import { MOTIVE, type ZiCuOre } from "@/lib/programari";
 
 export type ZiDeAles = ZiCuOre & { scris: string };
 
@@ -20,7 +20,6 @@ export type ZiDeAles = ZiCuOre & { scris: string };
 export function FormularProgramare({
   zile,
   luni,
-  servicii,
   siteKey,
   temaCaptcha,
   linkConfidentialitate,
@@ -29,7 +28,6 @@ export function FormularProgramare({
   zile: ZiDeAles[];
   /** Zilele libere aranjate pe luni, socotite pe server (`src/lib/calendar.ts`). */
   luni: LunaCalendar[];
-  servicii: string[];
   siteKey: string | null;
   temaCaptcha: "light" | "dark";
   linkConfidentialitate?: string;
@@ -149,35 +147,43 @@ export function FormularProgramare({
         valoare={stare.valori?.telefon}
       />
 
-      {servicii.length > 0 && (
-        <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: 600 }}>
-          Pentru ce
-          <select
-            name="serviciu"
-            defaultValue={stare.valori?.serviciu ?? ""}
-            style={{
-              height: "44px",
-              borderRadius: "10px",
-              border: "1px solid color-mix(in oklab, currentColor 24%, transparent)",
-              // Același fundal ca la celelalte câmpuri (`stilControl` din
-              // form-parts.tsx): `--s-fundal` nu există, iar lista ieșea albă
-              // pe un șablon închis. Prins de `e2e/culori-sectiuni.proba.mjs`.
-              background: "color-mix(in oklab, currentColor 7%, transparent)",
-              color: "inherit",
-              padding: "0 12px",
-              fontSize: "16px",
-              fontWeight: 400,
-            }}
-          >
-            <option value="">Nu m-am hotărât</option>
-            {servicii.map((serviciu) => (
-              <option key={serviciu} value={serviciu}>
-                {serviciu}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
+      {/*
+        Listă închisă, nu serviciile publicate ale cabinetului: cine cere o
+        primă ședință n-are de unde ști ce fel de ședință îi trebuie. „(opțional)”
+        se scrie ca la celelalte câmpuri (`Camp` din form-parts.tsx), iar
+        alegerea implicită e „Alege” — un text de tipul „nu m-am hotărât” ar
+        pune în gura omului ceva ce n-a spus.
+      */}
+      <label style={{ display: "flex", flexDirection: "column", gap: "8px", fontSize: "14px", fontWeight: 600 }}>
+        <span>
+          Motivul programării
+          <span style={{ fontWeight: 400, color: "var(--s-text-secundar)" }}> (opțional)</span>
+        </span>
+        <select
+          name="motiv"
+          defaultValue={stare.valori?.motiv ?? ""}
+          style={{
+            height: "44px",
+            borderRadius: "10px",
+            border: "1px solid color-mix(in oklab, currentColor 24%, transparent)",
+            // Același fundal ca la celelalte câmpuri (`stilControl` din
+            // form-parts.tsx): `--s-fundal` nu există, iar lista ieșea albă
+            // pe un șablon închis. Prins de `e2e/culori-sectiuni.proba.mjs`.
+            background: "color-mix(in oklab, currentColor 7%, transparent)",
+            color: "inherit",
+            padding: "0 12px",
+            fontSize: "16px",
+            fontWeight: 400,
+          }}
+        >
+          <option value="">Alege</option>
+          {MOTIVE.map((motiv) => (
+            <option key={motiv} value={motiv}>
+              {motiv}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <Camp
         id="prog-note"

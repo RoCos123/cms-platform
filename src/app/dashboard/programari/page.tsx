@@ -48,7 +48,7 @@ export default async function ProgramariPage() {
       nume: rand.name as string,
       email: rand.email as string,
       telefon: (rand.phone as string | null) ?? null,
-      serviciu: (rand.service as string | null) ?? null,
+      motiv: (rand.service as string | null) ?? null,
       note: (rand.notes as string | null) ?? null,
       cand: rand.starts_at as string,
       candScris: `${ziuaScrisa(cand)}, ora ${oraLa(cand)}`,
@@ -115,7 +115,7 @@ function Neactivat() {
             <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
             <span className="text-foreground">
               <b className="font-medium">Programările apar aici</b>, cu nume, telefon
-              și serviciul cerut. Le confirmi sau le refuzi dintr-un buton.
+              și motivul programării. Le confirmi sau le refuzi dintr-un buton.
             </span>
           </li>
           <li className="flex gap-3">

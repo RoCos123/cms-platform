@@ -1,12 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import {
-  PROGRAM_GOL,
-  citesteProgramul,
-  oraEsteLibera,
-  oreLibere,
-  primesteProgramari,
-} from "@/lib/programari";
+import { PROGRAM_GOL, citesteProgramul, motivValid, oraEsteLibera, oreLibere, primesteProgramari } from "@/lib/programari";
 import { momentLa } from "@/lib/zile";
 
 /**
@@ -141,4 +135,25 @@ test("programul stricat din bază se citește cu valori de rezervă", () => {
 test("un program citit din nimic e cel gol", () => {
   assert.deepEqual(citesteProgramul(null).zile, {});
   assert.equal(primesteProgramari(citesteProgramul(undefined)), false);
+});
+
+/**
+ * Motivul programării: listă închisă, verificată și pe server.
+ *
+ * Câmpul e un `select` cu două intrări, deci orice altă valoare vine dintr-o
+ * cerere scrisă de mână. Fără verificarea asta, textul ar ajunge neatins în
+ * panoul psihologului — un câmp liber deghizat în listă.
+ */
+test("motivul trece doar dacă e unul dintre cele oferite", () => {
+  assert.equal(motivValid("Evaluări psihologice"), "Evaluări psihologice");
+  assert.equal(motivValid("Altceva"), "Altceva");
+});
+
+test("orice altceva se aruncă, nu se salvează", () => {
+  assert.equal(motivValid(""), null);
+  assert.equal(motivValid("Sună-mă la 07xx, ofertă"), null);
+  // Fără diacritice nu e același lucru: se scrie dintr-o listă, nu de mână.
+  assert.equal(motivValid("Evaluari psihologice"), null);
+  // Nici cu spații în plus — ar deschide ușa pentru variante aproape identice.
+  assert.equal(motivValid(" Altceva"), null);
 });
