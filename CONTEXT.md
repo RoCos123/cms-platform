@@ -325,7 +325,29 @@ stările prin care trece o comandă (inițiată → plătită → eșuată → r
 Cererile de programare au deja o coloană de stare, deci „plătită” se adaugă
 acolo fără să se rescrie nimic.
 
-**Decizia de luat înainte de a scrie cod:** care caz, A sau B, sau amândouă.
+**Hotărât (27 aug. 2026): cazul A.** Nu pentru toți, ci ca modul cerut de
+clienții care vor asta pe site-ul lor. Cazul B (noi încasând abonamentele)
+rămâne deschis, separat.
+
+Ce înseamnă asta, ca să nu fie vândut greșit:
+
+- **Banii merg direct la client, nu prin noi.** Bine așa: dacă ar trece prin
+  conturile noastre, am fi intermediar de plată, adică altă categorie legală cu
+  totul.
+- **Nu e „dintr-un clic”.** Clientul își face singur contractul cu Netopia
+  (firmă, cont bancar, aprobarea lor). Noi primim cheile lui și le punem.
+  Promisiunea corectă e „îmi trimiți cheile, ți-l pornesc”, nu „îl bifez”.
+- **Cheile lui sunt secrete care ating bani.** Azi n-avem niciun secret în bază.
+  Astea cer criptare, imposibilitate de citire din sesiunea clientului, și zero
+  prezență în pachetul de browser. Se face o dată, dar cu grijă.
+
+**Întrebările de răspuns înainte de cod, care nu sunt tehnice:** plata e
+obligatorie ca să se poată programa, sau opțională? Ce se întâmplă la anulare —
+se returnează, integral sau parțial? Cine emite documentul fiscal (clientul, dar
+trebuie să știe că trebuie)? Iar pentru un cabinet de psihologie: plata în avans
+schimbă relația cu cineva la prima ședință, deci unii o vor și alții nu — de-aia
+e modul, nu regulă.
+
 Detaliile de protocol se citesc din documentația lor la momentul construirii,
 nu din memorie.
 
