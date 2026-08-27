@@ -5,7 +5,7 @@ import { cereProgramare } from "@/app/actions/programari";
 import { LIMITE, STARE_INITIALA } from "@/lib/formulare";
 import { Camp, Capcana, MesajFormular, stilButonTrimite } from "@/components/site/form-parts";
 import { Turnstile } from "@/components/site/turnstile";
-import { Calendar } from "./calendar";
+import { Calendar } from "@/components/site/calendar";
 import type { LunaCalendar } from "@/lib/calendar";
 import { MOTIVE, type ZiCuOre } from "@/lib/programari";
 

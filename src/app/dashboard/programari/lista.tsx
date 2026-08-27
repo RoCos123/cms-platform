@@ -8,7 +8,7 @@ import { schimbaStarea } from "./actions";
 export type Cerere = {
   id: string;
   nume: string;
-  email: string;
+  email: string | null;
   telefon: string | null;
   motiv: string | null;
   note: string | null;
@@ -84,15 +84,25 @@ function Rand({ cerere }: { cerere: Cerere }) {
         mână ar fi o piedică la fiecare cerere.
       */}
       <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-        <a href={`mailto:${cerere.email}`} className="underline hover:text-foreground">
-          {cerere.email}
-        </a>
+        {cerere.email && (
+          <a href={`mailto:${cerere.email}`} className="underline hover:text-foreground">
+            {cerere.email}
+          </a>
+        )}
         {cerere.telefon && (
           <a href={`tel:${cerere.telefon.replace(/\s/g, "")}`} className="underline hover:text-foreground">
             {cerere.telefon}
           </a>
         )}
         {cerere.motiv && <span>{cerere.motiv}</span>}
+        {/*
+          Cererea venită de pe prima pagină poate să n-aibă nici email, nici
+          telefon: acolo se cere doar numele. Se scrie pe față, ca psihologul
+          să nu caute o cale de răspuns care nu există.
+        */}
+        {!cerere.email && !cerere.telefon && (
+          <span className="text-foreground">Fără date de contact</span>
+        )}
       </div>
 
       {cerere.note && (

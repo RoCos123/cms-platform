@@ -13,7 +13,11 @@ import { Logos, type LogosData } from "./sections/logos";
 import { Portfolio, type PortfolioData } from "./sections/portfolio";
 import { Contact, type ContactData } from "./sections/contact";
 import { Newsletter, type NewsletterData } from "./sections/newsletter";
-import { Programare, type ProgramareData, type ZiCuOreScrise } from "./sections/programare";
+import {
+  Programare,
+  type OreDePrimaPagina,
+  type ProgramareData,
+} from "./sections/programare";
 
 /** Un rând din `site_content`, așa cum vine din baza de date. */
 export type SectionRow = {
@@ -54,7 +58,7 @@ export type SectionContext = {
    * o componentă care își face singură interogarea n-ar putea fi previzualizată
    * în panou.
    */
-  oreProgramare: ZiCuOreScrise[];
+  oreProgramare: OreDePrimaPagina;
 };
 
 /**
@@ -88,7 +92,12 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
   portfolio: (row) => <Portfolio data={row.data as PortfolioData} tone={row.tone} />,
   contact: (row) => <Contact data={row.data as ContactData} tone={row.tone} />,
   programare: (row, ctx) => (
-    <Programare data={row.data as ProgramareData} zile={ctx.oreProgramare} tone={row.tone} />
+    <Programare
+      data={row.data as ProgramareData}
+      zile={ctx.oreProgramare.zile}
+      luni={ctx.oreProgramare.luni}
+      tone={row.tone}
+    />
   ),
   newsletter: (row) => <Newsletter data={row.data as NewsletterData} tone={row.tone} />,
 };

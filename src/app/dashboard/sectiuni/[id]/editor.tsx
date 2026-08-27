@@ -6,7 +6,7 @@ import { SaveBar } from "@/components/ui/save-bar";
 import { useToast } from "@/components/ui/toast";
 import { CampuriSectiune } from "@/components/dashboard/campuri-sectiune";
 import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare";
-import type { ZiCuOreScrise } from "@/components/site/sections/programare";
+import type { OreDePrimaPagina } from "@/components/site/sections/programare";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
 import type { ArticolListat } from "@/lib/blog";
 import type { Serviciu } from "@/lib/servicii";
@@ -34,7 +34,7 @@ export function EditorSectiune({
   articole: ArticolListat[];
   servicii: Serviciu[];
   paginaServiciiActiva: boolean;
-  oreProgramare: ZiCuOreScrise[];
+  oreProgramare: OreDePrimaPagina;
 }) {
   const [valoare, setValoare] = useState(valoareInitiala);
   const [referinta, setReferinta] = useState(valoareInitiala);

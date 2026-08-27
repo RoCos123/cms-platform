@@ -68,9 +68,22 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
   const valori = { nume, email, telefon, motiv: motiv ?? "", note, zi, ora };
 
   const erori: Record<string, string> = {};
+  /*
+   * Emailul se cere doar dacă formularul l-a oferit.
+   *
+   * Sunt două formulare pe aceeași acțiune: cel de pe `/programare`, care cere
+   * emailul și scrie asta lângă câmp, și cel scurt de pe prima pagină, care
+   * cere doar numele (hotărât de proprietar, 27 aug. 2026). O regulă unică ar
+   * fi însemnat ori un câmp cerut degeaba pe prima pagină, ori o etichetă
+   * mincinoasă pe pagina întreagă — acolo scrie „obligatoriu” și trebuie să fie.
+   *
+   * `has`, nu valoarea: câmpul gol și câmpul lipsă sunt lucruri diferite.
+   * O cerere scrisă de mână care sare peste câmp obține exact ce obține și
+   * cineva care folosește formularul scurt, deci n-are ce câștiga din asta.
+   */
   if (!nume) erori.nume = "Scrie-ți numele, ca să știe cine vine.";
-  if (!email) erori.email = "Lasă o adresă de email.";
-  else if (!esteEmailValid(email)) erori.email = "Adresa de email nu pare completă.";
+  if (formData.has("email") && !email) erori.email = "Lasă o adresă de email.";
+  else if (email && !esteEmailValid(email)) erori.email = "Adresa de email nu pare completă.";
   if (!zi || !ora) erori.ora = "Alege o oră din listă.";
 
   if (Object.keys(erori).length > 0) {
@@ -97,7 +110,9 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
 
   const { error } = await (await tenantTable("appointments")).insert({
     name: nume,
-    email,
+    // `null`, nu șir gol: formularul scurt de pe prima pagină n-are câmp de
+    // email, iar „" în panou ar fi devenit un link `mailto:` gol.
+    email: email || null,
     phone: telefon || null,
     // Coloana și-a păstrat numele din vremea când câmpul era „Pentru ce” și se
     // umplea din serviciile cabinetului. O redenumire ar fi cerut încă o migrare

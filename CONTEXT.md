@@ -166,10 +166,30 @@ cereri cu confirmă/refuză, pagina publică `/programare` unde vizitatorul îș
 alege o oră liberă dintr-un **calendar pe luni** (prima variantă înșira zilele
 ca butoane cu data scrisă în fiecare — la treizeci de zile ieșea un zid de text
 din care nu se vedea nici ziua săptămânii, nici de ce lipsesc unele; zilele fără
-ore rămân acum scrise, doar stinse), și **secțiunea „Programare online”** de pus pe prima pagină,
-lângă Contact — cu primele ore libere și un buton către pagina întreagă. Fiecare
-oră de acolo duce direct la formular cu ziua și ora deja alese; o adresă scrisă
-de mână nu poate alege o oră care nu se oferă. Linkul intră în meniul site-ului doar dacă modulul e pornit
+ore rămân acum scrise, doar stinse), și **secțiunea „Programare online”** de pus
+pe prima pagină, lângă Contact.
+
+Secțiunea nu mai e o vitrină cu link: **ora se cere de acolo, din același
+calendar.** Se deschide în trepte — calendar, orele zilei alese, iar formularul
+scurt (numele și telefonul) abia după ce s-a ales o oră. Asta e și ordinea în
+care se hotărăște omul; cerut de la început, numele ar fi făcut secțiunea să
+arate a formular de completat, nu a oră de ales. Pagina întreagă rămâne pentru
+cine intră direct pe ea din meniu sau vrea să scrie mai mult.
+
+**Pe prima pagină se cere DOAR numele**, telefonul e opțional (hotărât de
+proprietar, 27 aug. 2026, după ce i-am arătat ce înseamnă). Consecința, scrisă
+aici ca să nu surprindă pe nimeni: **pot ajunge cereri fără nicio cale de
+răspuns** — psihologul le vede în panou, cu „Fără date de contact” scris pe
+față, dar nu are cum să contacteze omul. Cine vrea o cale sigură are pagina
+întreagă, unde emailul e cerut.
+
+Emailul e cerut doar de formularul care îl oferă (`formData.has("email")` în
+acțiune), nu de o regulă unică: altfel ori pagina întreagă ar fi mințit lângă
+câmp, ori prima pagină ar fi cerut ceva ce nu arată. Coloana `appointments.email`
+a rămas fără `not null` din același motiv — un șir gol ar fi devenit în panou un
+`mailto:` care nu duce nicăieri.
+
+Linkul intră în meniul site-ului doar dacă modulul e pornit
 ȘI clientul a bifat măcar o zi — un cabinet care tocmai a cumpărat modulul n-are
 ce oferi până nu-și scrie programul.
 

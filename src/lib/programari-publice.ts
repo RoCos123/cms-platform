@@ -3,8 +3,9 @@ import "server-only";
 import { cache } from "react";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { citesteProgramul, oreLibere, primesteProgramari, type Program, type ZiCuOre } from "@/lib/programari";
-import { momentLa, ziuaScrisa } from "@/lib/zile";
-import type { ZiCuOreScrise } from "@/components/site/sections/programare";
+import { lunaScrisa, momentLa, ziuaScrisa } from "@/lib/zile";
+import { luniDeAles } from "@/lib/calendar";
+import type { OreDePrimaPagina } from "@/components/site/sections/programare";
 
 /**
  * Ce trebuie ca să se poată cere o oră pe site.
@@ -86,21 +87,27 @@ export async function oreDeOferit(siteId: string): Promise<ZiCuOre[]> {
  * telefonului care deschide pagina, iar cineva din altă țară ar vedea altă dată
  * decât cea la care chiar are loc ședința.
  */
+const NIMIC: OreDePrimaPagina = { zile: [], luni: [] };
+
 export async function oreDeAratatPePrimaPagina(
   siteId: string,
   areModulul: boolean,
-): Promise<ZiCuOreScrise[]> {
-  if (!areModulul) return [];
+): Promise<OreDePrimaPagina> {
+  if (!areModulul) return NIMIC;
 
   try {
-    const zile = await oreDeOferit(siteId);
-    return zile.map((zi) => ({
+    const zile = (await oreDeOferit(siteId)).map((zi) => ({
       ...zi,
       // Ora 12, nu miezul nopții: o zi scrisă pornind de la 00:00 UTC poate
       // cădea cu o zi mai devreme pe fusul României.
       scris: ziuaScrisa(momentLa(zi.zi, "12:00")),
     }));
+
+    // Lunile se socotesc odată cu zilele, nu în componentă: sunt derivate din
+    // ele, iar două calcule separate ar putea ajunge să nu mai fie de acord.
+    // Numele lunii cere oricum `Intl` cu fusul cabinetului.
+    return { zile, luni: luniDeAles(zile.map((z) => z.zi), lunaScrisa) };
   } catch {
-    return [];
+    return NIMIC;
   }
 }

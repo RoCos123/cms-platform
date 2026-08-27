@@ -46,7 +46,7 @@ export default async function ProgramariPage() {
     return {
       id: rand.id as string,
       nume: rand.name as string,
-      email: rand.email as string,
+      email: (rand.email as string | null) ?? null,
       telefon: (rand.phone as string | null) ?? null,
       motiv: (rand.service as string | null) ?? null,
       note: (rand.notes as string | null) ?? null,
