@@ -31,6 +31,45 @@ Reperul de efort: originalul (single-tenant, un client, cu bug-uri de configurar
 - **Pentru scalare (fazele ulterioare):** Vercel Domains API (conectare automată domeniu propriu per client), Stripe (billing).
 - **Opționale:** Google Analytics — DOUĂ integrări distincte (tag `gtag` care colectează pe site-ul public vs. GA4 Data API cu service account care citește datele înapoi în dashboard — originalul confundă asta, de evitat); Google Calendar API / Cal.com pentru sincronizare programări; Search Console API.
 
+## Decizii luate în timpul construirii (fazele 2–5)
+
+Ce s-a hotărât pe parcurs, ca să nu fie redeschis din senin:
+
+- **Serviciile au O SINGURĂ pagină detaliată** (`/servicii`), nu câte o pagină
+  fiecare. Șase servicii ar fi însemnat șase pagini de scris, multe rămase cu
+  trei rânduri — șase pagini slabe arată mai rău decât una bună. Fiecare serviciu
+  are totuși ancoră proprie (`/servicii#consiliere`).
+- **Comutatorul blogului stinge TOT blogul** — pagina, articolele și secțiunea de
+  pe prima pagină. Spre deosebire de servicii, unde cartonașul se citește întreg
+  și fără pagina lui, un cartonaș de articol fără pagina articolului n-ar avea
+  unde duce.
+- **Paginile au trei locuri**: meniul de sus, subsolul, nicăieri. Implicit
+  subsolul — o pagină nouă apare undeva, chiar dacă discret. Adresele rutelor din
+  cod (`blog`, `servicii`, `admin`…) sunt refuzate din formular.
+- **Fără buton de „înapoi" pe site.** Browserul are deja unul, iar al nostru n-ar
+  ști unde duce pe cineva venit din Google direct pe o pagină interioară. Ce
+  lipsea de fapt era un meniu care funcționează de pe orice pagină — reparat.
+- **Limite în cuvinte, nu în caractere**, la textele lungi: 3.000 la articol, 600
+  la descrierea completă a serviciului, 5.000 la o pagină. Opresc scrisul, ca
+  cele în caractere. Caracterele rămân doar ca plasă, mult deasupra.
+- **Categoriile de blog: amânate.** Un cabinet cu opt articole n-are ce sorta.
+- **Politica de confidențialitate**: șablon în `sabloane/`, potrivit pe ce face
+  chiar site-ul ăsta (formular, Turnstile, fonturi Google, zero cookie-uri la
+  vizitatori, zero urmărire). Nu e text juridic verificat.
+
+## Ce lipsește și nu era în niciun plan
+
+Găsite căutând în cod, la întrebarea „cât mai e până terminăm":
+
+- **Resetarea parolei nu există.** `/login` are doar email + parolă. Un client
+  care își uită parola trebuie deblocat manual din Supabase.
+- **Provizionarea unui client e SQL scris de mână.** `/admin` e doar o
+  redirectare. Nu există script sau ecran pentru „fă-i site unui client nou".
+- **Domeniul clientului se conectează manual în Vercel.**
+- **Din Faza 4 lipsesc garanțiile SEO**: `sitemap.xml`, `robots.txt`, date
+  structurate (`LocalBusiness`/`Person`/`FAQPage`), imaginea OG.
+- **Din Faza 5, Setările au 2 grupuri din 4** — lipsesc Social și Analytics.
+
 ## Estimare de efort (corectată)
 
 Lucrând activ cu Claude generând codul (nu un dev scriind manual):
