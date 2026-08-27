@@ -35,7 +35,7 @@ const NAV: (NavItem | NavGroup)[] = [
   // două locuri. Categoriile se adaugă când un cabinet chiar are atâtea articole
   // încât să nu le mai găsească.
   { label: "Blog", href: "/dashboard/blog" },
-  { label: "Programări" },
+  { label: "Programări", href: "/dashboard/programari" },
   { label: "Mesaje", href: "/dashboard/mesaje" },
   { label: "Imagini", href: "/dashboard/imagini" },
   { label: "Setări", href: "/dashboard/setari" },

@@ -241,6 +241,80 @@ begin
       'respins: ' || SQLERRM;
   end;
 
+  -- --------------------------------------------------------------------------
+  -- Un client nu-și poate porni singur un modul plătit.
+  --
+  -- Modulele stau în coloane pe `sites`, iar apărarea lor NU e o politică RLS
+  -- scrisă de noi, ci dreptul de scriere dat pe coloane în migrarea de
+  -- întărire: `grant update (name)`, nimic altceva. Verificarea asta există
+  -- fiindcă e o apărare ușor de pierdut din greșeală — un `grant update on
+  -- public.sites` scris cândva, ca să meargă altceva, ar deschide-o în tăcere,
+  -- iar Programările ar deveni gratuite pentru oricine se pricepe puțin.
+  -- --------------------------------------------------------------------------
+  perform set_config('role', 'authenticated', true);
+  perform set_config(
+    'request.jwt.claims',
+    json_build_object('sub', (select id from public.users where site_id = site_a limit 1))::text,
+    true
+  );
+
+  -- Domeniul: aceeași apărare, o miză mai mare. Dacă un client și-ar putea
+  -- schimba domeniul, și-ar muta site-ul pe orice adresă neocupată — iar dacă
+  -- unicitatea ar cădea vreodată, pe a altcuiva. CONTEXT.md spune de mult că
+  -- „domeniul e blocat prin grant"; până acum nu se putea dovedi, fiindcă
+  -- bancul local ștergea granturile pe coloane după migrări.
+  begin
+    update public.sites set domain = 'furat-de-client.ro' where id = site_a;
+
+    perform set_config('role', 'postgres', true);
+    update public.sites set domain = 'client-a.ro' where id = site_a;
+
+    return query select
+      'Un client nu-și poate schimba singur domeniul'::text,
+      'PICAT'::text,
+      'și-a mutat site-ul pe alt domeniu (pus la loc)'::text;
+  exception when others then
+    return query select
+      'Un client nu-și poate schimba singur domeniul'::text,
+      'OK'::text,
+      'respins: ' || SQLERRM;
+  end;
+
+  -- Numele, în schimb, TREBUIE să se poată salva: e singura coloană din `sites`
+  -- pe care clientul o editează, din Setări. O apărare care blochează și asta
+  -- ar strica ecranul, nu l-ar apăra.
+  begin
+    update public.sites set name = 'Verificare izolare' where id = site_a;
+
+    return query select
+      'Clientul își poate salva numele cabinetului'::text,
+      'OK'::text,
+      'coloana name rămâne scriibilă, cum trebuie'::text;
+  exception when others then
+    return query select
+      'Clientul își poate salva numele cabinetului'::text,
+      'PICAT'::text,
+      'apărarea a mers prea departe: ' || SQLERRM;
+  end;
+
+  begin
+    update public.sites set appointments_enabled = true where id = site_a;
+
+    perform set_config('role', 'postgres', true);
+    update public.sites set appointments_enabled = false where id = site_a;
+
+    return query select
+      'Un client nu-și poate porni singur un modul plătit'::text,
+      'PICAT'::text,
+      'și-a pornit singur Programările (pus la loc pe oprit)'::text;
+  exception when others then
+    perform set_config('role', 'postgres', true);
+    return query select
+      'Un client nu-și poate porni singur un modul plătit'::text,
+      'OK'::text,
+      'respins: ' || SQLERRM;
+  end;
+
   perform set_config('role', 'postgres', true);
   perform set_config('request.jwt.claims', '', true);
 end;

@@ -61,15 +61,24 @@ create function storage.foldername(name text) returns text[]
   language sql immutable as $$ select string_to_array(name, '/') $$;
 SQL
 
+# Drepturile de tabel se acordă la CREAREA fiecărui tabel, nu după migrări.
+#
+# Aici era o greșeală care a ținut bancul orb luni de zile: un
+# `grant all on all tables` rulat DUPĂ migrări ștergea orice `revoke` scris
+# într-o migrare. Adică exact apărarea care blochează coloanele pe care
+# clientul n-are voie să scrie — `sites.domain`, și acum modulele plătite — era
+# invizibilă aici: verificarea trecea în producție și pica local, sau invers.
+#
+# Supabase nu re-acordă nimic după migrările tale; dă drepturile prin
+# `alter default privileges`, la crearea tabelului. Asta face și linia de mai
+# jos, iar un `revoke` dintr-o migrare rămâne în picioare, ca acolo.
+ruleaza -c "alter default privileges in schema public grant all on tables to anon, authenticated, service_role;"
+
 echo "→ rulez migrările, în ordine"
 for m in "$RADACINA"/supabase/migrations/*.sql; do
   printf "   %-52s" "$(basename "$m")"
   ruleaza -f "$m" && echo "ok"
 done
-
-# DUPĂ migrări, ca la Supabase: drepturile de tabel se acordă tuturor rolurilor,
-# iar RLS e singura care hotărăște ce rânduri se văd.
-ruleaza -c "grant all on all tables in schema public to anon, authenticated, service_role;"
 
 echo "→ seedez doi clienți, cu câte un rând în fiecare tabel"
 ruleaza <<'SQL'

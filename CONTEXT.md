@@ -80,6 +80,11 @@ Găsite căutând în cod, la întrebarea „cât mai e până terminăm":
 - **Provizionarea unui client e SQL scris de mână.** `/admin` e doar o
   redirectare. Nu există script sau ecran pentru „fă-i site unui client nou".
 - **Domeniul clientului se conectează manual în Vercel.**
+- **Un ecran de administrare al platformei nu există.** Modulele plătite se
+  pornesc bifând o coloană în editorul Supabase. Ca să fie un buton în aplicație
+  trebuie întâi hotărât cum se autentifică proprietarul platformei: azi orice
+  cont aparține unui singur site, deci nu există noțiunea de „administrator peste
+  toți clienții".
 - ~~**Din Faza 4 lipsesc garanțiile SEO**~~ — făcute (27 aug. 2026):
   `sitemap.xml` și `robots.txt` generate din bază per client, `metadataBase` pe
   domeniul clientului, date structurate `LocalBusiness` + `Person` + `FAQPage` +
@@ -150,9 +155,13 @@ rulează migrările în ordine, seedează doi clienți și rulează verificarea.
 fiindcă mediul de dezvoltare nu ajunge la Supabase, iar fără el au plecat de
 două ori scripturi SQL netestate. Orice migrare nouă trece pe aici întâi.
 
-**2. Programări** — ultimul modul mare din meniu. De construit DOAR dacă se
-confirmă că psihologii vor programare online; multe cabinete mici preferă
-telefonul, fiindcă vor să audă omul înainte de prima ședință.
+**2. Programări** — ultimul modul mare din meniu. Hotărât 27 aug. 2026: se
+face, dar ca **modul opțional, contra cost**, nu ca parte din varianta de bază.
+Rezerva din audit rămâne valabilă și e chiar motivul pentru care e opțional —
+multe cabinete mici preferă telefonul, fiindcă vor să audă omul înainte de
+prima ședință. Cine nu-l cumpără nu-l vede pornit.
+
+Mecanismul e gata (vezi mai jos); ecranul propriu-zis, nu.
 
 **3. ~~Activitate~~** — făcut (27 aug. 2026), `/dashboard/activitate`. Rândurile
 sunt grupate pe zile („Azi”, „Ieri”, apoi data), cu ora în fusul României — nu
@@ -170,6 +179,32 @@ cabinet chiar are atâtea articole încât să nu le mai găsească).
 
 **5. Emailul cu Resend** — ultimul, prin decizie explicită. Vezi „Decizii
 confirmate".
+
+## Module plătite: cum se pornesc, și de ce așa
+
+Un modul care se vinde nu poate fi pornit de cel care ar trebui să-l plătească.
+Comutatoarele din `site_settings.pagini` (blog, servicii) sunt ale clientului;
+astea sunt ale noastre.
+
+Stau ca **o coloană booleană pe `sites`** (`appointments_enabled`), nu ca un
+`jsonb`, din două motive practice:
+
+1. **Se apasă.** În editorul de tabele din Supabase, un boolean e o bifă. Un
+   `jsonb` ar cere scris JSON de mână la fiecare client, adică exact ce NU e
+   „dintr-un clic”.
+2. **Se apără singură.** `sites` are deja drept de scriere pe coloane, nu pe
+   tabel — `grant update (name)` din migrarea de întărire. Orice coloană nouă
+   de acolo e, prin construcție, inaccesibilă clientului. N-avem de scris nicio
+   politică nouă, deci n-avem nici unde greși.
+
+Prețul: un modul nou e un `alter table` de un rând.
+
+Implicit OPRIT — pe dos față de `pagini`, unde lipsa valorii înseamnă pornit.
+
+**Cum pornești un modul:** Supabase → Table editor → `sites` → bifezi
+`appointments_enabled` pe rândul clientului. Un ecran de administrare al
+platformei nu există încă (`/admin` e doar un alias pentru client), fiindcă
+n-am hotărât cum se autentifică proprietarul platformei — vezi „ce lipsește".
 
 ## Analytics: de ce numărăm noi, și de ce nu numărăm oameni
 

@@ -54,6 +54,15 @@ dărâme pagina.
 
 ## Înainte să trimiți ceva clientului
 
+**Bancul local nu vede tot ce crezi.** Până pe 27 aug. 2026 rula un
+`grant all on all tables` DUPĂ migrări, „ca la Supabase” — dar Supabase nu
+re-acordă nimic după migrările tale; dă drepturile la crearea tabelului, prin
+`alter default privileges`. Diferența ștergea orice `revoke` scris într-o
+migrare, adică fix apărarea care blochează coloanele pe care clientul n-are voie
+să scrie. Garanția „domeniul e blocat prin grant” era scrisă în CONTEXT.md de
+săptămâni și n-a putut fi verificată nici măcar o dată. Când adaugi o apărare de
+alt fel decât RLS, întreabă-te dacă bancul o poate vedea.
+
 **SQL netestat nu pleacă.** Există `supabase/proba-locala.sh`: pornește un
 Postgres gol, rulează toate migrările în ordine, seedează doi clienți și rulează
 verificarea de izolare. Rulează-l. Au plecat de două ori scripturi netestate
