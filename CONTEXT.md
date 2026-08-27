@@ -75,6 +75,15 @@ Ce s-a hotărât pe parcurs, ca să nu fie redeschis din senin:
 
 Găsite căutând în cod, la întrebarea „cât mai e până terminăm”:
 
+- **Nimic nu rulează probele automat (nu există CI).** `pnpm lint`,
+  `pnpm test:logica` și `pnpm build` se rulează de mână, înainte de fiecare
+  push. Adică apărarea depinde de disciplina sesiunii de dezvoltare — o
+  promisiune, nu o garanție. **De pus** (cerut de proprietar, 27 aug. 2026, după
+  ce a întrebat ce se întâmplă dacă un deploy strică toate site-urile deodată):
+  un fișier în `.github/workflows/` care rulează cele trei la fiecare push și
+  arată roșu pe commit. Nu acoperă cum ARATĂ site-ul (rămâne verificarea
+  vizuală cu capturi) și nu apără de o migrare greșită — codul se dă înapoi
+  dintr-un clic din Vercel, datele nu.
 - **Resetarea parolei nu există.** `/login` are doar email + parolă. Un client
   care își uită parola trebuie deblocat manual din Supabase.
 - **Provizionarea unui client e SQL scris de mână.** `/admin` e doar o
@@ -93,6 +102,26 @@ Găsite căutând în cod, la întrebarea „cât mai e până terminăm”:
   2026): Facebook, Instagram, LinkedIn, YouTube, cu linkuri în subsol și
   `sameAs` în datele structurate. Analytics NU e un grup de setări, ci ecranul
   Vizite — vezi mai jos de ce.
+
+## Ordinea de lansare, hotărâtă de proprietar (27 aug. 2026)
+
+1. **Site-ul proprietarului** — primul, făcut de mână. E primul drum complet
+   cap la cap, deci scoate la iveală ce e incomod, pe un site care nu e al unui
+   client care plătește.
+2. **Site-ul firmei de web design** pe care o deschide — al doilea, pe același
+   calapod. După ăsta se știe ce se repetă, deci ce merită automatizat.
+3. **Clienții** — abia atunci.
+
+**Vor exista 3-4 șabloane** (`caldura`, `spatiu`, și încă unul-două), iar
+clientul ALEGE dintre ele. Nu e nevoie de niciun ecran de ales: omul se uită la
+demo-uri, spune care îi place, iar proprietarul scrie cheia în linia de
+provizionare. Fiecare șablon nou e un fișier de valori — culori, fonturi,
+forme — nu cod de secțiuni.
+
+Toate site-urile rulează din **același repo, același proiect Vercel, aceeași
+bază**. Fără clonare per client: asta e chiar diferența față de „template
+clonat", iar `site_id` + RLS de la prima migrare există exact ca să nu fie
+nevoie.
 
 ## Estimare de efort (corectată)
 
