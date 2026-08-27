@@ -6,7 +6,7 @@ import { tenantTable } from "@/lib/supabase/admin";
 import { capcanaDeclansata, verificaTurnstile } from "@/lib/antispam";
 import { LIMITE, citesteText, esteEmailValid, type StareFormular } from "@/lib/formulare";
 import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
-import { motivValid, oraEsteLibera } from "@/lib/programari";
+import { eroriDeContact, motivValid, oraEsteLibera } from "@/lib/programari";
 import { oreleOcupate, programulSiteului } from "@/lib/programari-publice";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { momentLa, ziuaScrisa, oraLa } from "@/lib/zile";
@@ -67,23 +67,17 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
   const ora = citesteText(formData, "ora", 5);
   const valori = { nume, email, telefon, motiv: motiv ?? "", note, zi, ora };
 
-  const erori: Record<string, string> = {};
-  /*
-   * Emailul se cere doar dacă formularul l-a oferit.
-   *
-   * Sunt două formulare pe aceeași acțiune: cel de pe `/programare`, care cere
-   * emailul și scrie asta lângă câmp, și cel scurt de pe prima pagină, care
-   * cere doar numele (hotărât de proprietar, 27 aug. 2026). O regulă unică ar
-   * fi însemnat ori un câmp cerut degeaba pe prima pagină, ori o etichetă
-   * mincinoasă pe pagina întreagă — acolo scrie „obligatoriu” și trebuie să fie.
-   *
-   * `has`, nu valoarea: câmpul gol și câmpul lipsă sunt lucruri diferite.
-   * O cerere scrisă de mână care sare peste câmp obține exact ce obține și
-   * cineva care folosește formularul scurt, deci n-are ce câștiga din asta.
-   */
+  // Regula de contact stă în `src/lib/programari.ts`, cu motivul scris acolo:
+  // fiecare cerere pleacă cu măcar o cale prin care psihologul poate răspunde,
+  // dar CARE e cerută depinde de formularul care a trimis-o.
+  const erori: Record<string, string> = eroriDeContact(
+    formData.has("email"),
+    email,
+    telefon,
+    esteEmailValid,
+  );
+
   if (!nume) erori.nume = "Scrie-ți numele, ca să știe cine vine.";
-  if (formData.has("email") && !email) erori.email = "Lasă o adresă de email.";
-  else if (email && !esteEmailValid(email)) erori.email = "Adresa de email nu pare completă.";
   if (!zi || !ora) erori.ora = "Alege o oră din listă.";
 
   if (Object.keys(erori).length > 0) {

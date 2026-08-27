@@ -122,13 +122,18 @@ export function ProgramareRapida({
             valoare={stare.valori?.nume}
           />
 
+          {/*
+            Cerut, nu opțional: aici nu există câmp de email, deci telefonul e
+            singura cale prin care psihologul poate răspunde. Fără el, cererea
+            ar bloca o oră fără să lase pe nimeni de sunat. Serverul cere același
+            lucru (`eroriDeContact`), ca eticheta să nu mintă.
+          */}
           <Camp
             id="prog-rapid-telefon"
             name="telefon"
             eticheta="Telefon"
             autoComplete="tel"
             maxLength={40}
-            obligatoriu={false}
             eroare={stare.erori?.telefon}
             valoare={stare.valori?.telefon}
           />

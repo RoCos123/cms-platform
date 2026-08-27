@@ -176,17 +176,22 @@ care se hotărăște omul; cerut de la început, numele ar fi făcut secțiunea 
 arate a formular de completat, nu a oră de ales. Pagina întreagă rămâne pentru
 cine intră direct pe ea din meniu sau vrea să scrie mai mult.
 
-**Pe prima pagină se cere DOAR numele**, telefonul e opțional (hotărât de
-proprietar, 27 aug. 2026, după ce i-am arătat ce înseamnă). Consecința, scrisă
-aici ca să nu surprindă pe nimeni: **pot ajunge cereri fără nicio cale de
-răspuns** — psihologul le vede în panou, cu „Fără date de contact” scris pe
-față, dar nu are cum să contacteze omul. Cine vrea o cale sigură are pagina
-întreagă, unde emailul e cerut.
+Pe prima pagină se cer **numele și telefonul**, amândouă. Prima variantă cerea
+doar numele; telefonul a devenit obligatoriu la a doua trecere, când s-a văzut
+ce înseamnă altfel — o cerere care blochează o oră fără să lase pe nimeni de
+sunat.
 
-Emailul e cerut doar de formularul care îl oferă (`formData.has("email")` în
-acțiune), nu de o regulă unică: altfel ori pagina întreagă ar fi mințit lângă
-câmp, ori prima pagină ar fi cerut ceva ce nu arată. Coloana `appointments.email`
-a rămas fără `not null` din același motiv — un șir gol ar fi devenit în panou un
+Regula care leagă cele două formulare e una singură: **fiecare cerere pleacă cu
+măcar o cale prin care psihologul poate răspunde.** CARE anume depinde de
+formular — pe `/programare` emailul (telefonul e în plus), pe prima pagină
+telefonul (email nu există acolo). Stă în `eroriDeContact`, rupt de acțiune ca
+să poată fi probat, fiindcă e exact ce se uită prima când se mai adaugă un
+formular. Ce cere serverul se și scrie lângă câmp: o etichetă „obligatoriu” pe
+care serverul n-o susține e o minciună care se descoperă abia la trimitere.
+
+Se uită la PREZENȚA câmpului (`formData.has("email")`), nu la valoarea lui:
+câmpul gol și câmpul lipsă sunt lucruri diferite. Coloana `appointments.email` a
+rămas fără `not null` din același motiv — un șir gol ar fi devenit în panou un
 `mailto:` care nu duce nicăieri.
 
 Linkul intră în meniul site-ului doar dacă modulul e pornit

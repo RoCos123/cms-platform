@@ -188,3 +188,48 @@ export const MOTIVE = ["Evaluări psihologice", "Altceva"] as const;
 export function motivValid(brut: string): string | null {
   return (MOTIVE as readonly string[]).includes(brut) ? brut : null;
 }
+
+/**
+ * Ce lipsește din datele de contact ale unei cereri de programare.
+ *
+ * Două formulare trimit către aceeași acțiune, cu reguli diferite:
+ *
+ * - pe `/programare` se cere emailul, iar telefonul e în plus;
+ * - în secțiunea de pe prima pagină nu există câmp de email, iar acolo
+ *   telefonul e singura cale de răspuns, deci se cere el.
+ *
+ * Regula care le leagă e una singură: **fiecare cerere pleacă cu măcar o cale
+ * prin care psihologul poate răspunde.** Ce e cerut se și scrie lângă câmp, în
+ * formularul care îl arată — o etichetă „obligatoriu” pe care serverul n-o
+ * susține, sau invers, e un fel de minciună care se descoperă abia la trimitere.
+ *
+ * `areCampEmail` vine din `formData.has("email")`, nu din valoarea lui: câmpul
+ * gol și câmpul lipsă sunt lucruri diferite. O cerere scrisă de mână care sare
+ * peste câmp obține exact ce obține și cineva care folosește formularul scurt —
+ * adică i se cere telefonul — deci n-are ce câștiga din asta.
+ *
+ * Rupt de acțiune ca să poată fi probat: acțiunea cere un tenant rezolvat și o
+ * bază, iar regula asta e ce se uită prima când se mai adaugă un formular.
+ */
+export function eroriDeContact(
+  areCampEmail: boolean,
+  email: string,
+  telefon: string,
+  emailPareValid: (email: string) => boolean,
+): Record<string, string> {
+  const erori: Record<string, string> = {};
+
+  if (areCampEmail) {
+    if (!email) erori.email = "Lasă o adresă de email.";
+    else if (!emailPareValid(email)) erori.email = "Adresa de email nu pare completă.";
+  } else if (!telefon) {
+    erori.telefon = "Lasă un număr de telefon, ca să poți fi sunat.";
+  }
+
+  // Un email scris greșit rămâne greșit și acolo unde nu era cerut.
+  if (!areCampEmail && email && !emailPareValid(email)) {
+    erori.email = "Adresa de email nu pare completă.";
+  }
+
+  return erori;
+}
