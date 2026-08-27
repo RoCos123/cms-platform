@@ -267,12 +267,25 @@ același email. Aproape toate acțiunile își scriu singure rezumatul; pentru c
 care nu, propoziția se compune din acțiune și entitate, cu acordul corect
 (`descrieIntrarea` din `src/lib/activitate.ts`).
 
-**4. Restanțe mici**, în ordinea valorii: fonturile mutate de la Google pe
-serverul nostru (scoate Google din politica de confidențialitate și grăbește
-prima afișare); imagine per serviciu; categorii de blog (de făcut abia când un
-cabinet chiar are atâtea articole încât să nu le mai găsească).
+**4. Fonturile, mutate de la Google pe serverul nostru** — de discutat cu
+proprietarul (cerut 27 aug. 2026). Azi fiecare site public cere fonturile de la
+`fonts.googleapis.com`, deci **Google apare în politica de confidențialitate a
+fiecărui client**, iar prima afișare așteaptă o cerere externă.
 
-**5. Emailul cu Resend** — ultimul, prin decizie explicită. Vezi „Decizii
+Aici suntem în urma site-ului auditat: originalul își găzduia fonturile la el,
+prin `next/font`, iar auditul public îl laudă explicit pentru asta — „fără
+cerere externă către Google Fonts — bun și pentru GDPR" (audit-site-public.md
+§6.3, §7.1). E singurul loc găsit până acum unde originalul face ceva mai bine
+decât noi.
+
+De discutat: `next/font/google` descarcă fonturile la build și le servește de pe
+domeniul clientului — deci se rezolvă fără să schimbăm șabloanele, doar felul în
+care sunt cerute (`templateFontsHref` din `src/lib/templates/index.ts`).
+
+**5. Alte restanțe mici**: imagine per serviciu; categorii de blog (de făcut
+abia când un cabinet chiar are atâtea articole încât să nu le mai găsească).
+
+**6. Emailul cu Resend** — ultimul, prin decizie explicită. Vezi „Decizii
 confirmate".
 
 ## Module plătite: cum se pornesc, și de ce așa
