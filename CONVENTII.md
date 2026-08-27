@@ -69,6 +69,12 @@ trecut senin peste o politică stricată dinadins, fiindcă număra un refuz ca
 reușită. Strică lucrul pe care testul ar trebui să-l prindă și uită-te dacă
 pică.
 
+S-a repetat la datele structurate: proba din browser se uita doar după un dialog
+`alert`, iar cu scăparea scoasă dinadins a spus tot „trecut” — codul care ieșise
+din bloc era prea rupt ca să mai ruleze. Se uită acum și după erori de pagină,
+și abia atunci pică. Când scrii proba, întreabă-te ce vezi dacă stricăciunea e
+pe jumătate reușită, nu doar dacă e completă.
+
 ---
 
 ## Verificare vizuală
@@ -89,8 +95,16 @@ de probă cu date inventate:
 cu 300px, accentul avea 2,5:1 pe fundal închis, numele cabinetului se tăia peste
 900px.
 
-Logica pură (parsere, validări, formatări) se testează cu Node direct:
-`node --experimental-strip-types`, cu un hook care rezolvă `@/`.
+Logica pură (parsere, validări, formatări) se testează cu Node direct, fără
+server și fără Supabase: **`pnpm test:logica`**. Rulează tot ce se cheamă
+`e2e/*.proba.mjs`, cu hook-ul din `e2e/alias.mjs` care rezolvă `@/`.
+
+Node rulează TypeScript direct, dar **nu și JSX**: nimic dintr-un `.tsx` nu
+poate fi probat așa. De asta măsurile cartonașului stau în `cartonas-masuri.ts`,
+separat de desenul din `cartonas-og.tsx`. Aceeași despărțire la sitemap: regula
+(`sitemap-reguli.ts`) e ruptă de interogări (`app/sitemap.ts`), altfel n-ar fi
+putut fi verificată deloc, fiindcă mediul de dezvoltare nu ajunge la Supabase.
+Când scrii ceva cu o regulă în el, pune regula unde poate fi probată.
 
 ---
 

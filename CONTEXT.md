@@ -53,6 +53,11 @@ Ce s-a hotărât pe parcurs, ca să nu fie redeschis din senin:
   la descrierea completă a serviciului, 5.000 la o pagină. Opresc scrisul, ca
   cele în caractere. Caracterele rămân doar ca plasă, mult deasupra.
 - **Categoriile de blog: amânate.** Un cabinet cu opt articole n-are ce sorta.
+- **Paginile puse pe „Nicăieri” nu se indexează.** Eticheta din panou îi promite
+  clientului „Se ajunge doar cu adresa dată de tine”. Lăsate indexabile,
+  promisiunea era falsă: cineva le-ar fi găsit din Google fără ca adresa să-i fi
+  fost dată. Lipsesc din sitemap ȘI primesc `noindex` — cele două locuri se
+  schimbă împreună.
 - **Politica de confidențialitate**: șablon în `sabloane/`, potrivit pe ce face
   chiar site-ul ăsta (formular, Turnstile, fonturi Google, zero cookie-uri la
   vizitatori, zero urmărire). Nu e text juridic verificat.
@@ -66,9 +71,18 @@ Găsite căutând în cod, la întrebarea „cât mai e până terminăm":
 - **Provizionarea unui client e SQL scris de mână.** `/admin` e doar o
   redirectare. Nu există script sau ecran pentru „fă-i site unui client nou".
 - **Domeniul clientului se conectează manual în Vercel.**
-- **Din Faza 4 lipsesc garanțiile SEO**: `sitemap.xml`, `robots.txt`, date
-  structurate (`LocalBusiness`/`Person`/`FAQPage`), imaginea OG.
+- ~~**Din Faza 4 lipsesc garanțiile SEO**~~ — făcute (27 aug. 2026):
+  `sitemap.xml` și `robots.txt` generate din bază per client, `metadataBase` pe
+  domeniul clientului, date structurate `LocalBusiness` + `FAQPage` +
+  `BlogPosting`, cartonaș social desenat din Setări. A rămas doar **`Person`**,
+  și nu din lene — vezi mai jos.
 - **Din Faza 5, Setările au 2 grupuri din 4** — lipsesc Social și Analytics.
+- **`Person` în datele structurate cere o întrebare în plus în Setări.** Câmpul
+  de acolo se cheamă „Numele tău SAU al cabinetului”, deci nu se poate ști dacă
+  „Cabinet Individual de Psihologie Maria Ionescu” e om sau firmă. Un `Person`
+  cu nume de firmă e dată greșită, iar Google nu ignoră doar rândul acela, ci
+  tot blocul. Se rezolvă cu o singură bifă („numele ăsta e al meu / al
+  cabinetului”), nu cu cod. De decis, nu de ghicit.
 
 ## Estimare de efort (corectată)
 
