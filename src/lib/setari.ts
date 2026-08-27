@@ -104,6 +104,54 @@ export const CAMPURI_SEO: CampSchema[] = [
   },
 ];
 
+/**
+ * Profilurile de pe rețele.
+ *
+ * Fac două lucruri deodată, și al doilea e cel care contează: apar ca linkuri
+ * în subsolul site-ului, dar ajung și în datele structurate, ca `sameAs` —
+ * adică îi spun lui Google că pagina de Facebook și site-ul sunt aceeași
+ * persoană. Fără ele, motorul de căutare vede două prezențe fără nicio legătură.
+ *
+ * `doarExtern` fiindcă o adresă relativă („/facebook”) ar produce un link mort
+ * în subsol și, mai rău, i-ar spune lui Google că profilul e găzduit pe
+ * domeniul cabinetului.
+ *
+ * Patru, nu toate câte există: astea sunt cele pe care le folosesc cabinetele
+ * din România. Una nouă e un rând în lista de mai jos — formularul, validarea,
+ * subsolul și datele structurate o preiau singure.
+ */
+export const CAMPURI_SOCIAL: CampSchema[] = [
+  {
+    tip: "adresa",
+    cheie: "facebook",
+    eticheta: "Facebook",
+    hint: "Adresa paginii tale, copiată din bara browserului. Ex.: https://facebook.com/cabinetulmeu",
+    doarExtern: true,
+    max: 200,
+  },
+  {
+    tip: "adresa",
+    cheie: "instagram",
+    eticheta: "Instagram",
+    doarExtern: true,
+    max: 200,
+  },
+  {
+    tip: "adresa",
+    cheie: "linkedin",
+    eticheta: "LinkedIn",
+    doarExtern: true,
+    max: 200,
+  },
+  {
+    tip: "adresa",
+    cheie: "youtube",
+    eticheta: "YouTube",
+    doarExtern: true,
+    max: 200,
+  },
+];
+
 /** Ce citește site-ul public din `site_settings.brand`. */
 export type Brand = {
   /** Numele psihologului ca om, separat de numele legal al cabinetului. */
@@ -120,6 +168,50 @@ export type Seo = {
   titlu?: string;
   descriere?: string;
 };
+
+/** Ce citește site-ul public din `site_settings.social`. */
+export type Social = {
+  facebook?: string;
+  instagram?: string;
+  linkedin?: string;
+  youtube?: string;
+};
+
+/** Numele rețelelor, în ordinea în care apar în subsol. */
+const RETELE: { cheie: keyof Social; nume: string }[] = [
+  { cheie: "facebook", nume: "Facebook" },
+  { cheie: "instagram", nume: "Instagram" },
+  { cheie: "linkedin", nume: "LinkedIn" },
+  { cheie: "youtube", nume: "YouTube" },
+];
+
+export type LinkSocial = { nume: string; adresa: string };
+
+/**
+ * Profilurile completate, în ordine, doar cele care chiar duc undeva.
+ *
+ * Filtrul se repetă aici, deși formularul validează deja: în bază pot exista
+ * valori scrise înainte ca validarea să ceară adresă întreagă, iar un link mort
+ * în subsolul unui client e vizibil pentru oricine intră pe site.
+ */
+export function linkurileSociale(social: Social | null | undefined): LinkSocial[] {
+  if (!social) return [];
+
+  return RETELE.flatMap(({ cheie, nume }) => {
+    const adresa = social[cheie]?.trim();
+    if (!adresa) return [];
+
+    try {
+      const url = new URL(adresa);
+      if (url.protocol !== "https:" && url.protocol !== "http:") return [];
+      if (!url.hostname.includes(".")) return [];
+    } catch {
+      return [];
+    }
+
+    return [{ nume, adresa }];
+  });
+}
 
 /**
  * Paginile care pot fi pornite sau oprite din panou.

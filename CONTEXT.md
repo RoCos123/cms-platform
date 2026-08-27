@@ -84,7 +84,9 @@ Găsite căutând în cod, la întrebarea „cât mai e până terminăm":
   `sitemap.xml` și `robots.txt` generate din bază per client, `metadataBase` pe
   domeniul clientului, date structurate `LocalBusiness` + `Person` + `FAQPage` +
   `BlogPosting`, cartonaș social desenat din Setări.
-- **Din Faza 5, Setările au 2 grupuri din 4** — lipsesc Social și Analytics.
+- **Din Faza 5, Setările au 3 grupuri din 4.** Social e făcut (27 aug. 2026):
+  Facebook, Instagram, LinkedIn, YouTube, cu linkuri în subsol și `sameAs` în
+  datele structurate. Lipsește **Analytics**, și nu doar ca muncă — vezi mai jos.
 
 ## Estimare de efort (corectată)
 
@@ -167,3 +169,23 @@ cabinet chiar are atâtea articole încât să nu le mai găsească).
 
 **5. Emailul cu Resend** — ultimul, prin decizie explicită. Vezi „Decizii
 confirmate".
+
+## Analytics: o decizie de produs, nu una tehnică
+
+Grupul Analytics din Setări nu e doar niște câmpuri. Șablonul de politică de
+confidențialitate din `sabloane/` promite negru pe alb, în numele clientului:
+„Site-ul nu pune niciun cookie pe dispozitivul tău" și „Nu folosesc Google
+Analytics și niciun alt program de urmărire".
+
+Google Analytics ar contrazice ambele propoziții. Ar cere, în plus, un banner de
+cookie-uri pe site-ul fiecărui psiholog — pe un site unde vizitatorul caută
+ajutor la o problemă intimă, iar prima interacțiune ar fi o cerere de
+consimțământ pentru urmărire.
+
+Alternativa e o analiză fără cookie-uri (Vercel Analytics, Plausible, Umami):
+fără banner, fără consimțământ cerut prin GDPR, iar politica rămâne aproape
+neschimbată. Clientul tot află câți oameni au intrat și ce pagini au citit —
+adică fix ce vrea de fapt.
+
+De decis înainte de a se scrie cod: se acceptă bannerul pentru GA4, se merge pe
+varianta fără cookie-uri, sau rămâne zero urmărire ca argument de vânzare.

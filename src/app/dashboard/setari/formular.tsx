@@ -9,34 +9,44 @@ import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import type { Template } from "@/lib/templates";
-import { CAMPURI_CABINET, CAMPURI_SEO } from "@/lib/setari";
+import { CAMPURI_CABINET, CAMPURI_SEO, CAMPURI_SOCIAL, linkurileSociale, type Social } from "@/lib/setari";
 import { valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 import { salveazaSetari } from "./actions";
 
 export function FormularSetari({
   cabinetInitial,
   seoInitial,
+  socialInitial,
   domeniu,
   template,
 }: {
   cabinetInitial: ValoareEditor;
   seoInitial: ValoareEditor;
+  socialInitial: ValoareEditor;
   domeniu: string;
   template: Template;
 }) {
   const [cabinet, setCabinet] = useState(cabinetInitial);
   const [seo, setSeo] = useState(seoInitial);
-  const [referinta, setReferinta] = useState({ cabinet: cabinetInitial, seo: seoInitial });
+  const [social, setSocial] = useState(socialInitial);
+  const [referinta, setReferinta] = useState({
+    cabinet: cabinetInitial,
+    seo: seoInitial,
+    social: socialInitial,
+  });
   const [erori, setErori] = useState<Record<string, string>>({});
   const [seSalveaza, setSeSalveaza] = useState(false);
   const [eroare, setEroare] = useState<string | undefined>();
   const { show } = useToast();
 
-  const modificat =
-    JSON.stringify({ cabinet, seo }) !== JSON.stringify(referinta);
+  const modificat = JSON.stringify({ cabinet, seo, social }) !== JSON.stringify(referinta);
 
   async function salveaza() {
-    const gasite = { ...valideaza(cabinet, CAMPURI_CABINET), ...valideaza(seo, CAMPURI_SEO) };
+    const gasite = {
+      ...valideaza(cabinet, CAMPURI_CABINET),
+      ...valideaza(seo, CAMPURI_SEO),
+      ...valideaza(social, CAMPURI_SOCIAL),
+    };
     setErori(gasite);
 
     if (Object.keys(gasite).length > 0) {
@@ -47,7 +57,7 @@ export function FormularSetari({
     setSeSalveaza(true);
     setEroare(undefined);
 
-    const rezultat = await salveazaSetari(cabinet, seo);
+    const rezultat = await salveazaSetari(cabinet, seo, social);
     setSeSalveaza(false);
 
     if (!rezultat.ok) {
@@ -56,7 +66,7 @@ export function FormularSetari({
       return;
     }
 
-    setReferinta({ cabinet, seo });
+    setReferinta({ cabinet, seo, social });
     show("Setările au fost salvate.", "success");
   }
 
@@ -98,6 +108,21 @@ export function FormularSetari({
 
       <Card>
         <CardHeader
+          title="Unde te mai găsesc"
+          description="Profilurile tale de pe rețele. Apar ca linkuri în subsolul site-ului și îi spun lui Google că paginile acelea și site-ul sunt aceeași persoană."
+        />
+        <CardBody>
+          <CampuriSectiune
+            campuri={CAMPURI_SOCIAL}
+            valoare={social}
+            onChange={setSocial}
+            erori={erori}
+          />
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader
           title="Adresa site-ului"
           description="Se schimbă doar de noi — o modificare aici înseamnă și mutarea domeniului."
         />
@@ -120,7 +145,7 @@ export function FormularSetari({
       */}
       <PanouPrevizualizare
         template={template}
-        cheie={JSON.stringify(cabinet)}
+        cheie={JSON.stringify({ cabinet, social })}
         titlu="Antetul și subsolul, pe orice pagină"
         nota="Se actualizează pe măsură ce scrii. Modificările ajung pe site abia după ce apeși Salvează."
       >
@@ -154,6 +179,7 @@ export function FormularSetari({
             email: text("email"),
             adresa: text("adresa"),
             acreditare: text("acreditare"),
+            retele: linkurileSociale(social as Social),
           }}
         />
       </PanouPrevizualizare>
@@ -165,6 +191,7 @@ export function FormularSetari({
         onDiscard={() => {
           setCabinet(referinta.cabinet);
           setSeo(referinta.seo);
+          setSocial(referinta.social);
           setErori({});
           setEroare(undefined);
         }}

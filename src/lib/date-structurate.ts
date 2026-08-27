@@ -16,6 +16,14 @@ export type Cabinet = {
   nume: string;
   /** Numele psihologului ca om. Gol la cabinetele care nu l-au completat. */
   numePersoana?: string;
+  /**
+   * Adresele profilurilor de pe rețele.
+   *
+   * Ajung ca `sameAs`, adică „persoana de pe pagina asta e aceeași cu cea de pe
+   * paginile alea”. Fără ele, un motor de căutare vede două prezențe fără nicio
+   * legătură: un site și un profil de Facebook cu același nume.
+   */
+  profiluri?: string[];
   subtitlu?: string;
   telefon?: string;
   email?: string;
@@ -108,6 +116,10 @@ export function dateleCabinetului(baza: URL, cabinet: Cabinet): Obiect | null {
       !arePsiholog && cabinet.acreditare
         ? { "@type": "Organization", name: cabinet.acreditare }
         : undefined,
+    // Când nu știm cine e omul, profilurile rămân ale firmei — altfel n-ar fi
+    // scrise nicăieri, iar legătura dintre site și pagina de Facebook s-ar
+    // pierde de tot.
+    sameAs: arePsiholog ? undefined : cabinet.profiluri,
     founder: arePsiholog ? { "@id": ancora(baza, ANCORA_PSIHOLOG) } : undefined,
   });
 }
@@ -141,6 +153,9 @@ export function datelePsihologului(baza: URL, cabinet: Cabinet): Obiect | null {
     memberOf: cabinet.acreditare
       ? { "@type": "Organization", name: cabinet.acreditare }
       : undefined,
+    // Profilurile sunt ale omului când îl știm — pagina de Facebook a unui
+    // cabinet individual e ținută de psiholog, nu de o instituție.
+    sameAs: cabinet.profiluri,
     worksFor: cabinet.adresa?.trim() ? { "@id": ancora(baza, ANCORA_CABINET) } : undefined,
   });
 }

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
-import { CAMPURI_CABINET, CAMPURI_SEO } from "@/lib/setari";
+import { CAMPURI_CABINET, CAMPURI_SEO, CAMPURI_SOCIAL } from "@/lib/setari";
 import { catreEditor, catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 
 export type RezultatSetari =
@@ -14,10 +14,11 @@ export type RezultatSetari =
 /**
  * Salvează setările site-ului.
  *
- * Clientul completează un singur formular, dar datele merg în trei locuri:
- * `sites.name`, `site_settings.brand` și `site_settings.seo`. Împărțirea se
- * face aici, nu în formular — dacă ecranul ar trebui să știe unde stă fiecare
- * câmp, orice mutare de coloană ar cere modificări în două locuri.
+ * Clientul completează un singur formular, dar datele merg în patru locuri:
+ * `sites.name`, `site_settings.brand`, `site_settings.seo` și
+ * `site_settings.social`. Împărțirea se face aici, nu în formular — dacă ecranul
+ * ar trebui să știe unde stă fiecare câmp, orice mutare de coloană ar cere
+ * modificări în două locuri.
  *
  * Ca la secțiuni, ce trimite browserul nu se scrie ca atare: trece printr-un
  * dus-întors prin descriere, care păstrează exact câmpurile declarate. Domeniul
@@ -27,6 +28,7 @@ export type RezultatSetari =
 export async function salveazaSetari(
   cabinet: ValoareEditor,
   seo: ValoareEditor,
+  social: ValoareEditor,
 ): Promise<RezultatSetari> {
   const session = await verifySession();
   const supabase = await createClient();
@@ -34,6 +36,7 @@ export async function salveazaSetari(
   const erori = {
     ...valideaza(cabinet, CAMPURI_CABINET),
     ...valideaza(seo, CAMPURI_SEO),
+    ...valideaza(social, CAMPURI_SOCIAL),
   };
 
   if (Object.keys(erori).length > 0) {
@@ -42,6 +45,7 @@ export async function salveazaSetari(
 
   const cabinetCurat = catreStocare(catreEditor(cabinet, CAMPURI_CABINET), CAMPURI_CABINET);
   const seoCurat = catreStocare(catreEditor(seo, CAMPURI_SEO), CAMPURI_SEO);
+  const socialCurat = catreStocare(catreEditor(social, CAMPURI_SOCIAL), CAMPURI_SOCIAL);
 
   const { nume, ...brand } = cabinetCurat as { nume?: string } & Record<string, unknown>;
 
@@ -59,7 +63,10 @@ export async function salveazaSetari(
   // fără el), iar un `update` ar fi trecut în tăcere fără să scrie nimic.
   const { error: eroareSetari } = await supabase
     .from("site_settings")
-    .upsert({ site_id: session.siteId, brand, seo: seoCurat }, { onConflict: "site_id" });
+    .upsert(
+      { site_id: session.siteId, brand, seo: seoCurat, social: socialCurat },
+      { onConflict: "site_id" },
+    );
 
   if (eroareSetari) {
     console.error("Salvarea setărilor a eșuat:", eroareSetari);

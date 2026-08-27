@@ -7,6 +7,8 @@ export type SiteFooterData = {
   /** Acreditări, cod din registrul profesional — apar în toate patru șabloanele. */
   acreditare?: string;
   linkuri?: { text: string; href: string }[];
+  /** Profilurile de pe rețele, deja filtrate de `linkurileSociale`. */
+  retele?: { nume: string; adresa: string }[];
 };
 
 /**
@@ -84,6 +86,43 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
               <span style={{ color: "var(--t-text-secundar-pe-inchis)" }}>{data.adresa}</span>
             )}
           </div>
+
+          {data.retele && data.retele.length > 0 && (
+            <nav
+              aria-label="Pe rețele"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                minWidth: 0,
+                fontSize: "16px",
+                overflowWrap: "anywhere",
+              }}
+            >
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "14px",
+                  color: "var(--t-text-secundar-pe-inchis)",
+                }}
+              >
+                Pe rețele
+              </p>
+              {data.retele.map((retea) => (
+                <a
+                  key={retea.adresa}
+                  href={retea.adresa}
+                  // Profilul e pe alt site: `noopener` ca pagina deschisă să nu
+                  // poată ajunge la fereastra cabinetului prin `window.opener`.
+                  target="_blank"
+                  rel="me noopener noreferrer"
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
+                  {retea.nume}
+                </a>
+              ))}
+            </nav>
+          )}
 
           {data.linkuri && data.linkuri.length > 0 && (
             <nav

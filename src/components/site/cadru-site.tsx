@@ -3,7 +3,7 @@ import { getSesiuneOptionala, getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
 import { articolePublicate } from "@/lib/blog-public";
 import { linkurilePaginilor } from "@/lib/pagini-publice";
-import { paginaEsteActiva } from "@/lib/setari";
+import { linkurileSociale, paginaEsteActiva } from "@/lib/setari";
 import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
@@ -32,7 +32,7 @@ export async function CadruSite({
 }) {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, brand, pagini }, articole, linkuriPagini, sesiune] = await Promise.all([
+  const [{ site, brand, pagini, social }, articole, linkuriPagini, sesiune] = await Promise.all([
     identitateaSiteului(siteId),
     articolePublicate(siteId),
     linkurilePaginilor(siteId),
@@ -94,6 +94,7 @@ export async function CadruSite({
             adresa: brand.adresa,
             acreditare: brand.acreditare,
             linkuri: inSubsol,
+            retele: linkurileSociale(social),
           }}
         />
 

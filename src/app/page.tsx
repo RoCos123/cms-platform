@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
-import { paginaEsteActiva } from "@/lib/setari";
+import { linkurileSociale, paginaEsteActiva } from "@/lib/setari";
 import { serviciiPublicate } from "@/lib/servicii-publice";
 import { articolePublicate } from "@/lib/blog-public";
 import { tenantTable } from "@/lib/supabase/admin";
@@ -52,7 +52,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PublicHomePage() {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, pagini, brand, seo }, { data: rows }, articole, servicii] = await Promise.all([
+  const [{ site, pagini, brand, seo, social }, { data: rows }, articole, servicii] =
+    await Promise.all([
     identitateaSiteului(siteId),
     (await tenantTable("site_content"))
       .select("id, key, variant, tone, data, visible, position")
@@ -103,6 +104,7 @@ export default async function PublicHomePage() {
     adresa: brand.adresa,
     acreditare: brand.acreditare,
     descriere: seo.descriere || brand.descriereSubsol,
+    profiluri: linkurileSociale(social).map((retea) => retea.adresa),
   };
 
   const baza = await adresaSiteului();

@@ -35,7 +35,18 @@ export type CampSchema =
    * scris aici produce un link care nu duce nicăieri, iar clientul n-are cum
    * să-și dea seama — pe pagină arată exact ca unul bun.
    */
-  | (CampComun & { tip: "adresa"; max?: number })
+  | (CampComun & {
+      tip: "adresa";
+      max?: number;
+      /**
+       * Cere o adresă completă către alt site (`https://`), nu una din site-ul
+       * propriu. Pentru un profil de Facebook, un „/facebook” ar trece
+       * validarea obișnuită și ar produce un link care nu duce nicăieri — iar
+       * la datele structurate ar fi mai rău de atât: i-am spune lui Google că
+       * profilul e găzduit chiar pe domeniul cabinetului.
+       */
+      doarExtern?: boolean;
+    })
   /**
    * Partea din adresă care identifică elementul („consiliere-parentala").
    * Se generează din alt câmp, dar rămâne editabilă: odată publicat ceva, adresa

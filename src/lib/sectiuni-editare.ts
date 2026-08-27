@@ -29,6 +29,9 @@ function esteObiect(valoare: unknown): valoare is Record<string, unknown> {
   return typeof valoare === "object" && valoare !== null && !Array.isArray(valoare);
 }
 
+const MESAJ_ADRESA_EXTERNA =
+  "Trebuie adresa întreagă, așa cum apare în bara browserului când ești pe pagina ta. Începe cu https:// și conține numele site-ului.";
+
 const MESAJ_ADRESA =
   "Nu pare o adresă. Începe cu / pentru o pagină din site, cu # pentru un loc din pagina asta, sau cu https:// pentru un site din afară.";
 
@@ -48,6 +51,24 @@ const MESAJ_ADRESA =
  */
 export function esteSlugValid(slug: string): boolean {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug.trim());
+}
+
+/**
+ * O adresă completă către alt site.
+ *
+ * `new URL` face verificarea, nu un `startsWith`: „https://" gol sau
+ * „https://  " trec de o comparație de prefix, dar nu duc nicăieri.
+ */
+export function esteAdresaExterna(adresa: string): boolean {
+  const curat = adresa.trim();
+  if (curat === "") return true;
+
+  try {
+    const url = new URL(curat);
+    return (url.protocol === "https:" || url.protocol === "http:") && url.hostname.includes(".");
+  } catch {
+    return false;
+  }
 }
 
 export function esteAdresaValida(adresa: string): boolean {
@@ -246,7 +267,9 @@ export function valideaza(
       // vreo eroare — ar rămâne pur și simplu invizibilă, iar clientul ar reciti
       // adresa de zece ori întrebându-se ce a greșit.
       erori[drum] = `Adresa „${text}” e folosită deja de site. Alege alta.`;
-    } else if (camp.tip === "adresa" && !esteAdresaValida(text)) {
+    } else if (camp.tip === "adresa" && camp.doarExtern && !esteAdresaExterna(text)) {
+      erori[drum] = MESAJ_ADRESA_EXTERNA;
+    } else if (camp.tip === "adresa" && !camp.doarExtern && !esteAdresaValida(text)) {
       erori[drum] = MESAJ_ADRESA;
     } else if (camp.tip === "email" && text !== "" && !esteEmailValid(text)) {
       // Aceeași verificare ca la formularul public de contact, din același
