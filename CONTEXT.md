@@ -325,11 +325,13 @@ stările prin care trece o comandă (inițiată → plătită → eșuată → r
 Cererile de programare au deja o coloană de stare, deci „plătită” se adaugă
 acolo fără să se rescrie nimic.
 
-**Hotărât (27 aug. 2026): cazul A.** Nu pentru toți, ci ca modul cerut de
-clienții care vor asta pe site-ul lor. Cazul B (noi încasând abonamentele)
-rămâne deschis, separat.
+**Stare: AMÂNAT (27 aug. 2026).** Proprietarul s-a gândit la cazul A — plata
+pe site-ul clienților care o cer — apoi a lăsat-o pentru altă dată: „mi se pare
+că ne-am complica mult dacă am oferi și asta". Judecată bună, iar complicația e
+aproape toată în afara codului. **Nu propune plățile ca următorul pas.** Analiza
+de mai jos rămâne scrisă pentru când se reia discuția.
 
-Ce înseamnă asta, ca să nu fie vândut greșit:
+Ce ar însemna cazul A, dacă se reia:
 
 - **Banii merg direct la client, nu prin noi.** Bine așa: dacă ar trece prin
   conturile noastre, am fi intermediar de plată, adică altă categorie legală cu
