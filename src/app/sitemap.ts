@@ -4,6 +4,8 @@ import { identitateaSiteului } from "@/lib/site-public";
 import { tenantTable } from "@/lib/supabase/admin";
 import { adresaSiteului } from "@/lib/seo";
 import { intrarileSitemapului, type IntrareCitita } from "@/lib/sitemap-reguli";
+import { moduleleSiteului } from "@/lib/module";
+import { seePotFaceProgramari } from "@/lib/programari-publice";
 
 /**
  * `sitemap.xml`, generat din bază — niciodată dintr-o listă scrisă de mână.
@@ -19,7 +21,7 @@ import { intrarileSitemapului, type IntrareCitita } from "@/lib/sitemap-reguli";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { siteId } = await getTenant();
   const baza = await adresaSiteului();
-  const { pagini } = await identitateaSiteului(siteId);
+  const { site, pagini } = await identitateaSiteului(siteId);
 
   const [modificareaPrimeiPagini, ultimaModificareServicii, articole, paginiProprii] =
     await Promise.all([
@@ -31,6 +33,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return intrarileSitemapului(baza, {
     pagini,
+    // Pagina de programare există doar când chiar are ore de oferit — aceeași
+    // regulă ca peste tot aici: în sitemap intră ce răspunde cu 200.
+    areProgramari: await seePotFaceProgramari(siteId, moduleleSiteului(site).programari),
     modificareaPrimeiPagini,
     ultimaModificareServicii,
     articole,

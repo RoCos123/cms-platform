@@ -145,6 +145,16 @@ test("data ultimei modificări ajunge pe adresa potrivită", () => {
   );
 });
 
+test("pagina de programare intră doar când se pot cere ore", () => {
+  const fara = continut({ pagini: { servicii: false, blog: false } });
+
+  assert.deepEqual(adrese(intrarileSitemapului(BAZA, fara)), ["https://cabinet-exemplu.ro/"]);
+  assert.deepEqual(adrese(intrarileSitemapului(BAZA, { ...fara, areProgramari: true })), [
+    "https://cabinet-exemplu.ro/",
+    "https://cabinet-exemplu.ro/programare",
+  ]);
+});
+
 test("un slug cu diacritice se codează, nu rupe adresa", () => {
   const intrari = intrarileSitemapului(
     BAZA,

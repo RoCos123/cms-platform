@@ -100,7 +100,7 @@ begin
       values (s, 'primul', 'Primul articol', 'Extras.', 'Text.', 'published', u);
     insert into public.uploads (site_id, storage_path, filename, mime_type, size_bytes) values (s, s || '/poza.png', 'poza.png', 'image/png', 1000);
     insert into public.contact_messages (site_id, name, email, message) values (s, 'Vizitator', 'v@exemplu.ro', 'Bună ziua.');
-    insert into public.appointments (site_id, name, email, starts_at) values (s, 'Vizitator', 'v@exemplu.ro', now());
+    insert into public.appointments (site_id, name, email, starts_at, status) values (s, 'Vizitator', 'v@exemplu.ro', now(), 'ceruta');
     insert into public.audit_log (site_id, actor_id, action, entity_type) values (s, u, 'update', 'SiteContent');
     insert into public.page_views_daily (site_id, day, path, views) values (s, current_date, '/', 3);
   end loop;

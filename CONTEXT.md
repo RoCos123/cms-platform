@@ -155,13 +155,32 @@ rulează migrările în ordine, seedează doi clienți și rulează verificarea.
 fiindcă mediul de dezvoltare nu ajunge la Supabase, iar fără el au plecat de
 două ori scripturi SQL netestate. Orice migrare nouă trece pe aici întâi.
 
-**2. Programări** — ultimul modul mare din meniu. Hotărât 27 aug. 2026: se
-face, dar ca **modul opțional, contra cost**, nu ca parte din varianta de bază.
-Rezerva din audit rămâne valabilă și e chiar motivul pentru care e opțional —
-multe cabinete mici preferă telefonul, fiindcă vor să audă omul înainte de
-prima ședință. Cine nu-l cumpără nu-l vede pornit.
+**2. ~~Programări~~** — făcut (27 aug. 2026), ca **modul opțional, contra
+cost**. Rezerva din audit rămâne valabilă și e chiar motivul pentru care e
+opțional: multe cabinete mici preferă telefonul, fiindcă vor să audă omul
+înainte de prima ședință. Cine nu-l cumpără vede în panou doar ce face și cum
+se pornește.
 
-Mecanismul e gata (vezi mai jos); ecranul propriu-zis, nu.
+Ce s-a construit: programul de lucru per zi (`/dashboard/programari`), lista de
+cereri cu confirmă/refuză, și pagina publică `/programare` unde vizitatorul își
+alege o oră liberă. Linkul intră în meniul site-ului doar dacă modulul e pornit
+ȘI clientul a bifat măcar o zi — un cabinet care tocmai a cumpărat modulul n-are
+ce oferi până nu-și scrie programul.
+
+**Fără email, prin decizia despre Resend.** Cererea apare în panou, cu emailul și
+telefonul omului ca linkuri pe care se apasă; clientul răspunde el. Când vine
+Resend, aici se leagă confirmarea automată.
+
+Orele libere se calculează în `src/lib/programari.ts`, rupt de bază ca să poată
+fi probat: durata plus pauza dau pasul, ultima ședință trebuie să se TERMINE
+până la ora de închidere, preavizul taie ce e prea aproape, iar o oră ocupată
+scoate tot ce se SUPRAPUNE cu ea, nu doar ora identică. Peste schimbarea orei de
+vară, „luni la 10" rămâne 10 pe ceas — are teste pe ambele treceri din 2026.
+
+Două cereri venite în aceeași secundă pentru aceeași oră: verificarea din
+aplicație le lasă pe amândouă să treacă, fiindcă niciuna nu e încă scrisă.
+Indexul unic `(site_id, starts_at)` pe cererile vii e singurul loc unde „ocupat"
+chiar înseamnă ocupat.
 
 **3. ~~Activitate~~** — făcut (27 aug. 2026), `/dashboard/activitate`. Rândurile
 sunt grupate pe zile („Azi”, „Ieri”, apoi data), cu ora în fusul României — nu

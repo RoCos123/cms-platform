@@ -28,6 +28,8 @@ export type ContinutulSiteului = {
   articole: IntrareCitita[];
   /** Paginile proprii publicate, FĂRĂ cele puse pe „Nicăieri”. */
   paginiProprii: IntrareCitita[];
+  /** Se pot cere ore pe site? Modulul pornit ȘI măcar o zi bifată. */
+  areProgramari?: boolean;
 };
 
 /**
@@ -83,6 +85,10 @@ export function intrarileSitemapului(
       });
     }
   }
+
+  // Fără dată: programul se schimbă rar, dar orele libere se schimbă la
+  // fiecare cerere. O dată aici ar fi ori învechită, ori mereu „acum".
+  if (continut.areProgramari) intrari.push({ url: adresa("/programare") });
 
   for (const pagina of continut.paginiProprii) {
     intrari.push({

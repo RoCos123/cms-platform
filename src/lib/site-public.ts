@@ -20,7 +20,7 @@ export const identitateaSiteului = cache(async (siteId: string) => {
   const service = createServiceClient();
 
   const [{ data: site }, { data: settings }] = await Promise.all([
-    service.from("sites").select("name, template").eq("id", siteId).single(),
+    service.from("sites").select("name, template, appointments_enabled").eq("id", siteId).single(),
     service.from("site_settings").select("brand, seo, pagini, social").eq("site_id", siteId).maybeSingle(),
   ]);
 

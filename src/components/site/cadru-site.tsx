@@ -5,6 +5,8 @@ import { articolePublicate } from "@/lib/blog-public";
 import { linkurilePaginilor } from "@/lib/pagini-publice";
 import { after } from "next/server";
 import { linkurileSociale, paginaEsteActiva } from "@/lib/setari";
+import { moduleleSiteului } from "@/lib/module";
+import { seePotFaceProgramari } from "@/lib/programari-publice";
 import { numaraAfisarea } from "@/lib/vizite-numarare";
 import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
 import { SiteHeader } from "@/components/site/header";
@@ -57,6 +59,18 @@ export async function CadruSite({
     href: `/${pagina.slug}`,
   });
   const inAntet = linkuriPagini.filter((pagina) => pagina.loc === "header").map(catreLink);
+
+  /*
+   * „Programare" intră în meniu doar dacă modulul e cumpărat ȘI clientul a
+   * bifat măcar o zi. A doua condiție contează la fel de mult: un link către o
+   * pagină fără nicio oră liberă e mai rău decât niciun link.
+   *
+   * Se pune la capătul meniului, nu la început: e o acțiune, iar acțiunea vine
+   * după ce omul a citit despre cine ești.
+   */
+  if (await seePotFaceProgramari(siteId, moduleleSiteului(site).programari)) {
+    inAntet.push({ text: "Programare", href: "/programare" });
+  }
   const inSubsol = linkuriPagini.filter((pagina) => pagina.loc === "footer").map(catreLink);
 
   /**
