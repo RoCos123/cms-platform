@@ -3,7 +3,9 @@ import { getSesiuneOptionala, getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
 import { articolePublicate } from "@/lib/blog-public";
 import { linkurilePaginilor } from "@/lib/pagini-publice";
+import { after } from "next/server";
 import { linkurileSociale, paginaEsteActiva } from "@/lib/setari";
+import { numaraAfisarea } from "@/lib/vizite-numarare";
 import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
@@ -56,6 +58,17 @@ export async function CadruSite({
   });
   const inAntet = linkuriPagini.filter((pagina) => pagina.loc === "header").map(catreLink);
   const inSubsol = linkuriPagini.filter((pagina) => pagina.loc === "footer").map(catreLink);
+
+  /**
+   * Numărarea traficului stă aici fiindcă aici trec TOATE paginile publice și
+   * numai ele: o adresă inexistentă face `notFound()` înainte să ajungă la
+   * cadru, iar previzualizarea din panou folosește direct antetul și subsolul,
+   * nu cadrul.
+   *
+   * `after()` o mută după ce răspunsul a plecat — vizitatorul nu așteaptă
+   * niciodată după statistici.
+   */
+  after(numaraAfisarea);
 
   return (
     <>

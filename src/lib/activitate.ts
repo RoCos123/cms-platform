@@ -1,4 +1,5 @@
 import type { ActiuneAudit, EntitateAudit } from "@/lib/audit";
+import { cuZileInUrma, oraLa, ziuaLa, ziuaScrisa } from "@/lib/zile";
 
 /**
  * Cum se citește jurnalul de activitate: ce scrie pe fiecare rând și cum se
@@ -8,11 +9,8 @@ import type { ActiuneAudit, EntitateAudit } from "@/lib/audit";
  * despărțire ca la `sitemap-reguli.ts`. Importul din `audit.ts` e doar de
  * tipuri, deci `server-only` de acolo nu ajunge aici.
  *
- * Fusul e scris explicit: serverul rulează pe UTC, iar clienții sunt în
- * România. Fără el, tot ce se întâmplă după ora 3 dimineața vara ar fi grupat
- * la ziua următoare — adică „azi" ar apărea sub „mâine".
+ * Datele și orele vin din `zile.ts`, unde e scris o singură dată fusul.
  */
-const FUSUL = "Europe/Bucharest";
 
 /** Forma gramaticală a subiectului, de care ascultă verbul. */
 type Forma = "m" | "f" | "plural";
@@ -90,29 +88,9 @@ export type IntrareJurnal = {
 
 export type ZiDeJurnal = { cheie: string; eticheta: string; intrari: IntrareJurnal[] };
 
-const ZIUA_SORTABILA = new Intl.DateTimeFormat("en-CA", {
-  timeZone: FUSUL,
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
-
-const ZIUA_SCRISA = new Intl.DateTimeFormat("ro-RO", {
-  timeZone: FUSUL,
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-});
-
-const ORA = new Intl.DateTimeFormat("ro-RO", {
-  timeZone: FUSUL,
-  hour: "2-digit",
-  minute: "2-digit",
-});
-
 /** Ora la care s-a întâmplat, în fusul clientului. */
 export function oraIntrarii(cand: string): string {
-  return ORA.format(new Date(cand));
+  return oraLa(new Date(cand));
 }
 
 /**
@@ -126,19 +104,19 @@ export function oraIntrarii(cand: string): string {
  * de ceasul mașinii pe care rulează testul.
  */
 export function grupeazaPeZile(intrari: IntrareJurnal[], acum: Date): ZiDeJurnal[] {
-  const azi = ZIUA_SORTABILA.format(acum);
-  const ieri = ZIUA_SORTABILA.format(new Date(acum.getTime() - 24 * 60 * 60 * 1000));
+  const azi = ziuaLa(acum);
+  const ieri = ziuaLa(cuZileInUrma(acum, 1));
 
   const zile = new Map<string, ZiDeJurnal>();
 
   for (const intrare of intrari) {
     const moment = new Date(intrare.cand);
-    const cheie = ZIUA_SORTABILA.format(moment);
+    const cheie = ziuaLa(moment);
 
     if (!zile.has(cheie)) {
       zile.set(cheie, {
         cheie,
-        eticheta: cheie === azi ? "Azi" : cheie === ieri ? "Ieri" : ZIUA_SCRISA.format(moment),
+        eticheta: cheie === azi ? "Azi" : cheie === ieri ? "Ieri" : ziuaScrisa(moment),
         intrari: [],
       });
     }

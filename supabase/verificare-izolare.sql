@@ -80,7 +80,7 @@ begin
     foreach tabel in array array[
       'sites', 'users', 'site_content', 'site_settings', 'pages', 'services',
       'blog_categories', 'blog_articles', 'uploads', 'contact_messages',
-      'appointments', 'audit_log'
+      'appointments', 'audit_log', 'page_views_daily'
     ] loop
       -- În `sites`, clientul E rândul; în rest, îl arată coloana `site_id`.
       coloana := case when tabel = 'sites' then 'id' else 'site_id' end;
@@ -161,7 +161,7 @@ begin
   foreach tabel in array array[
     'sites', 'users', 'site_content', 'site_settings', 'pages', 'services',
     'blog_categories', 'blog_articles', 'uploads', 'contact_messages',
-    'appointments', 'audit_log'
+    'appointments', 'audit_log', 'page_views_daily'
   ] loop
     begin
       execute format('select count(*) from public.%I', tabel) into randuri;
@@ -208,6 +208,35 @@ begin
     perform set_config('role', 'postgres', true);
     return query select
       'Un vizitator anonim nu poate trimite mesaje direct în bază'::text,
+      'OK'::text,
+      'respins: ' || SQLERRM;
+  end;
+
+  -- --------------------------------------------------------------------------
+  -- Un vizitator anonim nu poate umfla cifrele nimănui.
+  --
+  -- `inregistreaza_afisarea` e `security definer`, adică rulează cu drepturi
+  -- depline peste un tabel care n-are nicio politică de scriere. Dacă dreptul
+  -- de execuție ar ajunge la rolurile din browser, oricine deschide site-ul ar
+  -- putea chema funcția într-o buclă și scrie ce cifre vrea în panoul
+  -- clientului — sau, mai rău, în al altui client, dându-i alt `site_id`.
+  -- --------------------------------------------------------------------------
+  perform set_config('role', 'anon', true);
+
+  begin
+    perform public.inregistreaza_afisarea(site_a, current_date, '/verificare-izolare');
+
+    perform set_config('role', 'postgres', true);
+    delete from public.page_views_daily where path = '/verificare-izolare';
+
+    return query select
+      'Un vizitator anonim nu poate umfla cifrele de trafic'::text,
+      'PICAT'::text,
+      'a putut chema inregistreaza_afisarea (rândul de test a fost șters)'::text;
+  exception when others then
+    perform set_config('role', 'postgres', true);
+    return query select
+      'Un vizitator anonim nu poate umfla cifrele de trafic'::text,
       'OK'::text,
       'respins: ' || SQLERRM;
   end;

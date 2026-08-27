@@ -15,13 +15,17 @@ import { resolveTenant, isPlatformHost } from "@/lib/tenant";
 const DEV_TENANT_DOMAIN = process.env.DEV_TENANT_DOMAIN;
 
 /**
- * Antete pe care le stabilim noi, pe baza tenantului rezolvat. Se șterg
- * necondiționat din cererea primită: altfel un client le-ar putea trimite el
- * însuși, iar pe orice cale unde răspundem fără să le rescriem (rewrite,
- * redirect, rute excluse de `matcher`) ar ajunge la aplicație ca și cum le-ar
- * fi pus proxy-ul — adică spoofing de tenant.
+ * Antete pe care le stabilim noi, pe baza cererii. Se șterg necondiționat din
+ * cererea primită: altfel un client le-ar putea trimite el însuși, iar pe orice
+ * cale unde răspundem fără să le rescriem (rewrite, redirect, rute excluse de
+ * `matcher`) ar ajunge la aplicație ca și cum le-ar fi pus proxy-ul — adică
+ * spoofing de tenant.
+ *
+ * `x-cale` e în aceeași listă din același motiv: din el se numără traficul, iar
+ * un vizitator care și l-ar trimite singur ar putea scrie în statisticile
+ * clientului ce pagini vrea el că au fost citite.
  */
-const TENANT_HEADERS = ["x-site-id", "x-site-domain"];
+const TENANT_HEADERS = ["x-site-id", "x-site-domain", "x-cale"];
 
 /**
  * Notă: Next.js 16 a redenumit Middleware în Proxy (funcționalitate identică) —
@@ -111,6 +115,9 @@ export async function proxy(request: NextRequest) {
 
   requestHeaders.set("x-site-id", tenant.siteId);
   requestHeaders.set("x-site-domain", tenant.domain);
+  // Calea cerută, pentru numărarea traficului: un Server Component n-are de
+  // unde să afle singur pe ce adresă a fost cerut.
+  requestHeaders.set("x-cale", request.nextUrl.pathname);
 
   const pathname = request.nextUrl.pathname;
   const isDashboard = pathname.startsWith("/dashboard");

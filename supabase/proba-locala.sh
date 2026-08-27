@@ -93,6 +93,7 @@ begin
     insert into public.contact_messages (site_id, name, email, message) values (s, 'Vizitator', 'v@exemplu.ro', 'Bună ziua.');
     insert into public.appointments (site_id, name, email, starts_at) values (s, 'Vizitator', 'v@exemplu.ro', now());
     insert into public.audit_log (site_id, actor_id, action, entity_type) values (s, u, 'update', 'SiteContent');
+    insert into public.page_views_daily (site_id, day, path, views) values (s, current_date, '/', 3);
   end loop;
 end;
 $$;
