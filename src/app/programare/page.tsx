@@ -54,7 +54,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function PaginaProgramare() {
+export default async function PaginaProgramare({
+  searchParams,
+}: {
+  searchParams: Promise<{ zi?: string; ora?: string }>;
+}) {
+  const cerut = await searchParams;
   const { siteId } = await getTenant();
   const zile = await potiCereOra();
 
@@ -92,6 +97,12 @@ export default async function PaginaProgramare() {
               // Secțiunea are tonul „deschis”, deci caseta merge pe varianta deschisă.
               temaCaptcha="light"
               linkConfidentialitate={confidentialitate ? `/${confidentialitate.slug}` : undefined}
+              // Ce a apăsat pe prima pagină. Se verifică în formular față de
+              // orele chiar libere — o adresă scrisă de mână nu poate alege o
+              // oră care nu se oferă.
+              alegereInitiala={
+                cerut.zi && cerut.ora ? { zi: cerut.zi, ora: cerut.ora } : undefined
+              }
             />
           </div>
         </div>

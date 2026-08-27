@@ -162,8 +162,11 @@ opțional: multe cabinete mici preferă telefonul, fiindcă vor să audă omul
 se pornește.
 
 Ce s-a construit: programul de lucru per zi (`/dashboard/programari`), lista de
-cereri cu confirmă/refuză, și pagina publică `/programare` unde vizitatorul își
-alege o oră liberă. Linkul intră în meniul site-ului doar dacă modulul e pornit
+cereri cu confirmă/refuză, pagina publică `/programare` unde vizitatorul își
+alege o oră liberă, și **secțiunea „Programare online"** de pus pe prima pagină,
+lângă Contact — cu primele ore libere și un buton către pagina întreagă. Fiecare
+oră de acolo duce direct la formular cu ziua și ora deja alese; o adresă scrisă
+de mână nu poate alege o oră care nu se oferă. Linkul intră în meniul site-ului doar dacă modulul e pornit
 ȘI clientul a bifat măcar o zi — un cabinet care tocmai a cumpărat modulul n-are
 ce oferi până nu-și scrie programul.
 

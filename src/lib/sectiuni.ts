@@ -28,7 +28,7 @@ type CampComun = {
 
 export type CampSchema =
   | (CampComun & { tip: "text"; max?: number })
-  /** Ca „text", dar cu tastatură de email pe telefon și verificare a formei. */
+  /** Ca „text”, dar cu tastatură de email pe telefon și verificare a formei. */
   | (CampComun & { tip: "email"; max?: number })
   /**
    * O adresă către care duce un link. Verificată: fără asta, un text oarecare
@@ -48,7 +48,7 @@ export type CampSchema =
       doarExtern?: boolean;
     })
   /**
-   * Partea din adresă care identifică elementul („consiliere-parentala").
+   * Partea din adresă care identifică elementul („consiliere-parentala”).
    * Se generează din alt câmp, dar rămâne editabilă: odată publicat ceva, adresa
    * lui nu mai trebuie să se schimbe singură când i se corectează titlul.
    */
@@ -119,7 +119,7 @@ export type MetaSectiune = {
    *
    * Aici se ține regula, nu în baza de date: migrarea 20260826130000 a scos
    * constrângerea `unique (site_id, key)` tocmai fiindcă Postgres n-are cum să
-   * știe că banda cu citat e repetabilă, iar secțiunea „Servicii" nu.
+   * știe că banda cu citat e repetabilă, iar secțiunea „Servicii” nu.
    */
   repetabila: boolean;
   campuri: CampSchema[];
@@ -471,6 +471,23 @@ const LISTA: MetaSectiune[] = [
             max: 900,
           },
         ],
+      },
+    ],
+  },
+  {
+    cheie: "programare",
+    nume: "Programare online",
+    descriere: "Primele ore libere și un buton către pagina de programare.",
+    repetabila: false,
+    campuri: [
+      ...campuriAntet(),
+      INTRO,
+      {
+        tip: "text",
+        cheie: "textButon",
+        eticheta: "Textul butonului",
+        hint: "Duce la pagina cu toate orele. Ex.: Vezi toate orele libere.",
+        max: 40,
       },
     ],
   },

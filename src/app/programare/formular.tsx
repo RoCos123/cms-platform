@@ -21,16 +21,30 @@ export function FormularProgramare({
   siteKey,
   temaCaptcha,
   linkConfidentialitate,
+  alegereInitiala,
 }: {
   zile: ZiDeAles[];
   servicii: string[];
   siteKey: string | null;
   temaCaptcha: "light" | "dark";
   linkConfidentialitate?: string;
+  /**
+   * Ce a ales omul înainte să ajungă aici — apăsând o oră în secțiunea de pe
+   * prima pagină. Fără asta, linkul „19:00” ar deschide pagina cu altă oră
+   * selectată, iar omul ar trebui să aleagă a doua oară ce alesese deja.
+   *
+   * Se ignoră dacă între timp ora s-a ocupat: pagina se deschide atunci pe
+   * prima liberă, nu pe una care n-ar mai putea fi cerută.
+   */
+  alegereInitiala?: { zi: string; ora: string };
 }) {
   const [stare, actiune, seLucreaza] = useActionState(cereProgramare, STARE_INITIALA);
-  const [zi, setZi] = useState(zile[0]?.zi ?? "");
-  const [ora, setOra] = useState(zile[0]?.ore[0] ?? "");
+
+  const ziValida = zile.find((z) => z.zi === alegereInitiala?.zi);
+  const oraValida = ziValida?.ore.includes(alegereInitiala?.ora ?? "") ? alegereInitiala?.ora : undefined;
+
+  const [zi, setZi] = useState(ziValida?.zi ?? zile[0]?.zi ?? "");
+  const [ora, setOra] = useState(oraValida ?? ziValida?.ore[0] ?? zile[0]?.ore[0] ?? "");
 
   const zileleAlese = zile.find((z) => z.zi === zi) ?? zile[0];
 
@@ -139,8 +153,11 @@ export function FormularProgramare({
             style={{
               height: "44px",
               borderRadius: "10px",
-              border: "1px solid var(--s-chenar)",
-              background: "var(--s-fundal)",
+              border: "1px solid color-mix(in oklab, currentColor 24%, transparent)",
+              // Același fundal ca la celelalte câmpuri (`stilControl` din
+              // form-parts.tsx): `--s-fundal` nu există, iar lista ieșea albă
+              // pe un șablon închis. Prins de `e2e/culori-sectiuni.proba.mjs`.
+              background: "color-mix(in oklab, currentColor 7%, transparent)",
               color: "inherit",
               padding: "0 12px",
               fontSize: "16px",

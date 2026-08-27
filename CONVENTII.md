@@ -99,6 +99,16 @@ de probă cu date inventate:
 5. la final: șterge ruta, `mv src/proxy.ts.deoparte src/proxy.ts`,
    `rm -rf .next/dev/types` (altfel build-ul se plânge de ruta ștearsă)
 
+**O variabilă CSS inventată nu dă nicio eroare.** `var(--s-chenar)` pur și
+simplu nu se aplică: cartonașul rămâne fără chenar, textul fără culoare. S-a
+întâmplat de trei ori într-o zi — `--s-text-pe-accent` (text închis pe fundal
+închis), `--s-chenar`, `--s-fundal` — și toate au fost prinse cu ochiul, din
+noroc. `Section` pune exact cinci: `--s-accent`, `--s-buton-fundal`,
+`--s-buton-text`, `--s-eroare`, `--s-text-secundar`. Pentru chenare și fundaluri
+de câmp se folosește `currentColor`, ca în `stilControl`. Verificarea e în
+`e2e/culori-sectiuni.proba.mjs` și merge în ambele sensuri: prinde și o
+variabilă inventată, și una adăugată în `Section` fără să fie trecută în listă.
+
 **Măsoară, nu presupune.** Lățimea documentului la 390px, contrastul în cifre,
 înălțimea antetului la fiecare prag. Erorile găsite așa: pagina ieșea din ecran
 cu 300px, accentul avea 2,5:1 pe fundal închis, numele cabinetului se tăia peste

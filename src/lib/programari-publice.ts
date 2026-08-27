@@ -3,6 +3,8 @@ import "server-only";
 import { cache } from "react";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { citesteProgramul, oreLibere, primesteProgramari, type Program, type ZiCuOre } from "@/lib/programari";
+import { momentLa, ziuaScrisa } from "@/lib/zile";
+import type { ZiCuOreScrise } from "@/components/site/sections/programare";
 
 /**
  * Ce trebuie ca să se poată cere o oră pe site.
@@ -71,4 +73,34 @@ export const oreleOcupate = cache(async (siteId: string): Promise<Date[]> => {
 export async function oreDeOferit(siteId: string): Promise<ZiCuOre[]> {
   const [program, ocupate] = await Promise.all([programulSiteului(siteId), oreleOcupate(siteId)]);
   return oreLibere(program, ocupate, new Date());
+}
+
+/**
+ * Orele pentru secțiunea de pe prima pagină, cu ziua scrisă în cuvinte.
+ *
+ * Lista goală când modulul nu e pornit — sau când citirea pică. Secțiunea se
+ * stinge atunci singură, ca „Articole recente” fără articole: pe prima pagină a
+ * unui cabinet nu are ce căuta nici o eroare, nici un cadru gol.
+ *
+ * Ziua se scrie AICI, pe server, nu în componentă: altfel ar fi în fusul
+ * telefonului care deschide pagina, iar cineva din altă țară ar vedea altă dată
+ * decât cea la care chiar are loc ședința.
+ */
+export async function oreDeAratatPePrimaPagina(
+  siteId: string,
+  areModulul: boolean,
+): Promise<ZiCuOreScrise[]> {
+  if (!areModulul) return [];
+
+  try {
+    const zile = await oreDeOferit(siteId);
+    return zile.map((zi) => ({
+      ...zi,
+      // Ora 12, nu miezul nopții: o zi scrisă pornind de la 00:00 UTC poate
+      // cădea cu o zi mai devreme pe fusul României.
+      scris: ziuaScrisa(momentLa(zi.zi, "12:00")),
+    }));
+  } catch {
+    return [];
+  }
 }

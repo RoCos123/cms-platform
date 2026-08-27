@@ -6,6 +6,7 @@ import { SaveBar } from "@/components/ui/save-bar";
 import { useToast } from "@/components/ui/toast";
 import { CampuriSectiune } from "@/components/dashboard/campuri-sectiune";
 import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare";
+import type { ZiCuOreScrise } from "@/components/site/sections/programare";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
 import type { ArticolListat } from "@/lib/blog";
 import type { Serviciu } from "@/lib/servicii";
@@ -23,6 +24,7 @@ export function EditorSectiune({
   articole,
   servicii,
   paginaServiciiActiva,
+  oreProgramare,
 }: {
   id: string;
   meta: MetaSectiune;
@@ -32,6 +34,7 @@ export function EditorSectiune({
   articole: ArticolListat[];
   servicii: Serviciu[];
   paginaServiciiActiva: boolean;
+  oreProgramare: ZiCuOreScrise[];
 }) {
   const [valoare, setValoare] = useState(valoareInitiala);
   const [referinta, setReferinta] = useState(valoareInitiala);
@@ -116,7 +119,7 @@ export function EditorSectiune({
           cheie={JSON.stringify(datePreviz)}
           nota="Se actualizează pe măsură ce scrii. Modificările ajung pe site abia după ce apeși Salvează."
         >
-          <RenderSections rows={[randPreviz]} context={{ articole, servicii, paginaServiciiActiva }} />
+          <RenderSections rows={[randPreviz]} context={{ articole, servicii, paginaServiciiActiva, oreProgramare }} />
         </PanouPrevizualizare>
       </div>
 

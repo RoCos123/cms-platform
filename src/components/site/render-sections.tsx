@@ -13,6 +13,7 @@ import { Logos, type LogosData } from "./sections/logos";
 import { Portfolio, type PortfolioData } from "./sections/portfolio";
 import { Contact, type ContactData } from "./sections/contact";
 import { Newsletter, type NewsletterData } from "./sections/newsletter";
+import { Programare, type ProgramareData, type ZiCuOreScrise } from "./sections/programare";
 
 /** Un rând din `site_content`, așa cum vine din baza de date. */
 export type SectionRow = {
@@ -40,10 +41,20 @@ export type SectionContext = {
    * fără pagina lui n-ar avea unde duce.
    */
   articole: Articol[];
-  /** Serviciile publicate. „Serviciile mele" le citește de aici, nu din rândul ei. */
+  /** Serviciile publicate. „Serviciile mele” le citește de aici, nu din rândul ei. */
   servicii: Serviciu[];
   /** E pornită pagina cu serviciile descrise pe larg? Decide dacă mai sunt linkuri. */
   paginaServiciiActiva: boolean;
+  /**
+   * Orele libere, deja calculate și scrise. Goală când modulul Programări nu e
+   * cumpărat, când clientul n-a bifat nicio zi, sau când chiar s-au ocupat
+   * toate — iar secțiunea se stinge singură, ca „Articole recente” fără articole.
+   *
+   * Vine din context, nu din rândul secțiunii, din același motiv ca articolele:
+   * o componentă care își face singură interogarea n-ar putea fi previzualizată
+   * în panou.
+   */
+  oreProgramare: ZiCuOreScrise[];
 };
 
 /**
@@ -76,6 +87,9 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
   logos: (row) => <Logos data={row.data as LogosData} tone={row.tone} />,
   portfolio: (row) => <Portfolio data={row.data as PortfolioData} tone={row.tone} />,
   contact: (row) => <Contact data={row.data as ContactData} tone={row.tone} />,
+  programare: (row, ctx) => (
+    <Programare data={row.data as ProgramareData} zile={ctx.oreProgramare} tone={row.tone} />
+  ),
   newsletter: (row) => <Newsletter data={row.data as NewsletterData} tone={row.tone} />,
 };
 

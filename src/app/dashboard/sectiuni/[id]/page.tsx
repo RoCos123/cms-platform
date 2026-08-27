@@ -8,6 +8,8 @@ import { getTemplate, type SectionTone } from "@/lib/templates";
 import { serviciiPublicate } from "@/lib/servicii-publice";
 import { articolePublicate } from "@/lib/blog-public";
 import { paginaEsteActiva, type Pagini } from "@/lib/setari";
+import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
+import { oreDeAratatPePrimaPagina } from "@/lib/programari-publice";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { EditorSectiune } from "./editor";
 
@@ -28,7 +30,7 @@ export default async function EditorSectiunePage({
     .maybeSingle();
 
   // `.eq("site_id", …)` peste RLS: nu e redundant, e explicit. O secțiune a
-  // altui client dispare aici la fel ca una inexistentă — 404, nu „interzis",
+  // altui client dispare aici la fel ca una inexistentă — 404, nu „interzis”,
   // ca să nu confirmăm nici măcar că id-ul există undeva.
   if (!rand) notFound();
 
@@ -55,16 +57,23 @@ export default async function EditorSectiunePage({
   }
 
   const [{ data: site }, articole, servicii, { data: setari }] = await Promise.all([
-    supabase.from("sites").select("template").eq("id", session.siteId).single(),
-    // Previzualizarea „Articolelor recente" arată articole adevărate, nu
+    supabase.from("sites").select(`template, ${COLOANE_MODULE}`).eq("id", session.siteId).single(),
+    // Previzualizarea „Articolelor recente” arată articole adevărate, nu
     // exemple: altfel clientul n-ar avea cum să vadă că secțiunea dispare
     // singură când nu există niciun articol publicat.
     articolePublicate(session.siteId),
     // Doar cele publicate, ca previzualizarea să arate exact ce vede un
-    // vizitator — inclusiv atunci când asta înseamnă „nimic încă".
+    // vizitator — inclusiv atunci când asta înseamnă „nimic încă”.
     serviciiPublicate(session.siteId),
     supabase.from("site_settings").select("pagini").eq("site_id", session.siteId).maybeSingle(),
   ]);
+
+  // Aceleași ore ca pe site: previzualizarea secțiunii de programare trebuie să
+  // arate exact ce vede un vizitator — inclusiv că se stinge fără ore libere.
+  const oreProgramare = await oreDeAratatPePrimaPagina(
+    session.siteId,
+    moduleleSiteului(site).programari,
+  );
 
   return (
     <EditorSectiune
@@ -78,6 +87,7 @@ export default async function EditorSectiunePage({
       articole={paginaEsteActiva((setari?.pagini ?? {}) as Pagini, "blog") ? articole : []}
       servicii={servicii}
       paginaServiciiActiva={paginaEsteActiva((setari?.pagini ?? {}) as Pagini, "servicii")}
+      oreProgramare={oreProgramare}
     />
   );
 }

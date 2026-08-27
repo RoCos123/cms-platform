@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
 import { linkurileSociale, paginaEsteActiva } from "@/lib/setari";
+import { moduleleSiteului } from "@/lib/module";
+import { oreDeAratatPePrimaPagina } from "@/lib/programari-publice";
 import { serviciiPublicate } from "@/lib/servicii-publice";
 import { articolePublicate } from "@/lib/blog-public";
 import { tenantTable } from "@/lib/supabase/admin";
@@ -60,11 +62,11 @@ export default async function PublicHomePage() {
       .eq("visible", true)
       .order("position", { ascending: true }),
     // Articolele și serviciile se citesc o dată aici, nu în componente:
-    // „Articole recente" și „Serviciile mele" își iau conținutul din altă parte,
+    // „Articole recente” și „Serviciile mele” își iau conținutul din altă parte,
     // dar o componentă care își face singură interogarea n-ar putea fi
     // previzualizată în panou.
     //
-    // Toate articolele, nu primele trei: secțiunea are un câmp „câte se văd",
+    // Toate articolele, nu primele trei: secțiunea are un câmp „câte se văd”,
     // iar o limită fixă aici l-ar fi făcut să nu însemne nimic peste 3. Forma
     // listată nu poartă textul articolelor, deci nu costă.
     articolePublicate(siteId),
@@ -128,6 +130,12 @@ export default async function PublicHomePage() {
             articole: paginaEsteActiva(pagini, "blog") ? articole : [],
             servicii,
             paginaServiciiActiva: paginaEsteActiva(pagini, "servicii"),
+            // Goală când modulul e oprit sau nu sunt ore: secțiunea se stinge
+            // atunci singură, fără să știe de comutator.
+            oreProgramare: await oreDeAratatPePrimaPagina(
+              siteId,
+              moduleleSiteului(site).programari,
+            ),
           }}
         />
       ) : (
