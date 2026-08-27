@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `${titlu} · ${nume}`,
     description: antet.intro,
-    alternates: { canonical: `https://${domain}/servicii` },
+    alternates: { canonical: "/servicii" },
   };
 }
 

@@ -24,12 +24,15 @@ export async function generateMetadata(): Promise<Metadata> {
      * servit cererea. Site-ul e accesibil și de pe adrese de preview; fără linia
      * asta, Google le-ar putea indexa ca pagini separate, iar cabinetul ar
      * concura cu sine însuși în rezultate.
+     *
+     * Scrisă relativ: domeniul vine din `metadataBase`, pus o singură dată în
+     * layoutul rădăcină.
      */
-    alternates: { canonical: `https://${domain}` },
+    alternates: { canonical: "/" },
     openGraph: {
       title: titlu,
       description: descriere,
-      url: `https://${domain}`,
+      url: "/",
       siteName: nume,
       locale: "ro_RO",
       type: "website",

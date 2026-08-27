@@ -40,7 +40,24 @@ export async function generateMetadata({
 
   return {
     title: `${pagina.titlu} · ${site?.name ?? domain}`,
-    alternates: { canonical: `https://${domain}/${pagina.slug}` },
+    // Relativ: domeniul vine din `metadataBase` (layoutul rădăcină).
+    alternates: { canonical: `/${pagina.slug}` },
+    /**
+     * Paginile puse pe „Nicăieri” nu se indexează.
+     *
+     * Nu e o alegere de SEO, e promisiunea făcută clientului în panou: opțiunea
+     * aia îi e explicată prin „Se ajunge doar cu adresa dată de tine”
+     * (`LOCURI_MENIU` din src/lib/pagini.ts). Lăsată indexabilă, pagina ar
+     * ajunge în rezultatele Google, iar cineva ar nimeri-o fără ca adresa să-i
+     * fi fost dată vreodată — exact ce i-am spus că nu se întâmplă.
+     *
+     * Perechea acestei linii e în sitemap: acolo paginile astea sunt sărite.
+     * Amândouă trebuie schimbate odată, dacă se schimbă vreodată promisiunea.
+     *
+     * `follow` rămâne pornit: linkurile dinăuntru duc spre paginile publice ale
+     * aceluiași cabinet, iar acelea merită urmate.
+     */
+    robots: pagina.locMeniu === "none" ? { index: false, follow: true } : undefined,
   };
 }
 

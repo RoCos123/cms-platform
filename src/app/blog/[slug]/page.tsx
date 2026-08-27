@@ -42,7 +42,7 @@ export async function generateMetadata({
   if (!articol) return { title: "Pagina nu există" };
 
   const nume = site?.name ?? domain;
-  const adresa = `https://${domain}/blog/${articol.slug}`;
+  const adresa = `/blog/${articol.slug}`;
 
   return {
     title: `${articol.titlu} · ${nume}`,

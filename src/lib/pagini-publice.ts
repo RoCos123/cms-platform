@@ -47,7 +47,7 @@ export const paginaDupaSlug = cache(
 
     const { data, error } = await service
       .from("pages")
-      .select("id, slug, title, content")
+      .select("id, slug, title, content, nav_location")
       .eq("site_id", siteId)
       .eq("slug", slug)
       .eq("status", "published")
@@ -63,6 +63,11 @@ export const paginaDupaSlug = cache(
       slug: data.slug as string,
       titlu: data.title as string,
       continut: (data.content as string) ?? "",
+      // Aceeași plasă, și aceeași cădere ca la `linkurilePaginilor`: „footer”.
+      // Trebuie să fie identică — dacă aici ar cădea pe „none”, o valoare
+      // necunoscută ar face pagina `noindex` în timp ce subsolul îi ține
+      // linkul la vedere.
+      locMeniu: esteLocMeniu(data.nav_location) ? data.nav_location : "footer",
     };
   },
 );

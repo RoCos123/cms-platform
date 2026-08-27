@@ -101,6 +101,12 @@ export type Pagina = {
   slug: string;
   titlu: string;
   continut: string;
+  /**
+   * Unde se leagă pagina — de care are nevoie și site-ul public, nu doar
+   * meniul: „Nicăieri” e explicat clientului prin „Se ajunge doar cu adresa
+   * dată de tine", iar promisiunea aia se ține punându-i paginii `noindex`.
+   */
+  locMeniu: LocMeniu;
 };
 
 /** Cât îi trebuie antetului și subsolului ca să pună un link. */

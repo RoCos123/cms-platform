@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: `${titlu} · ${nume}`,
-    alternates: { canonical: `https://${domain}/blog` },
+    alternates: { canonical: "/blog" },
   };
 }
 

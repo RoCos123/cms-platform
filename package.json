@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:logica": "node --import ./e2e/alias.mjs --test e2e/*.proba.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.5",
