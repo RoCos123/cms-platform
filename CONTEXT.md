@@ -163,7 +163,10 @@ se pornește.
 
 Ce s-a construit: programul de lucru per zi (`/dashboard/programari`), lista de
 cereri cu confirmă/refuză, pagina publică `/programare` unde vizitatorul își
-alege o oră liberă, și **secțiunea „Programare online"** de pus pe prima pagină,
+alege o oră liberă dintr-un **calendar pe luni** (prima variantă înșira zilele
+ca butoane cu data scrisă în fiecare — la treizeci de zile ieșea un zid de text
+din care nu se vedea nici ziua săptămânii, nici de ce lipsesc unele; zilele fără
+ore rămân acum scrise, doar stinse), și **secțiunea „Programare online"** de pus pe prima pagină,
 lângă Contact — cu primele ore libere și un buton către pagina întreagă. Fiecare
 oră de acolo duce direct la formular cu ziua și ora deja alese; o adresă scrisă
 de mână nu poate alege o oră care nu se oferă. Linkul intră în meniul site-ului doar dacă modulul e pornit

@@ -7,7 +7,8 @@ import { linkurilePaginilor } from "@/lib/pagini-publice";
 import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
 import { oreDeOferit } from "@/lib/programari-publice";
 import { createServiceClient } from "@/lib/supabase/admin";
-import { momentLa, ziuaScrisa } from "@/lib/zile";
+import { lunaScrisa, momentLa, ziuaScrisa } from "@/lib/zile";
+import { luniDeAles } from "@/lib/calendar";
 import { CadruSite } from "@/components/site/cadru-site";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
@@ -78,6 +79,13 @@ export default async function PaginaProgramare({
     scris: ziuaScrisa(momentLa(z.zi, "12:00")),
   }));
 
+  // Calendarul se socotește aici, nu în componentă: numele lunii cere `Intl`
+  // cu fusul cabinetului, iar pe client l-ar face ceasul telefonului.
+  const luni = luniDeAles(
+    zile.map((z) => z.zi),
+    lunaScrisa,
+  );
+
   const confidentialitate = linkuriPagini.find((p) => p.slug.includes("confident"));
 
   return (
@@ -92,6 +100,7 @@ export default async function PaginaProgramare({
           <div style={{ marginTop: "clamp(32px, 4vw, 48px)" }}>
             <FormularProgramare
               zile={deAles}
+              luni={luni}
               servicii={servicii.map((s) => s.titlu)}
               siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || null}
               // Secțiunea are tonul „deschis”, deci caseta merge pe varianta deschisă.

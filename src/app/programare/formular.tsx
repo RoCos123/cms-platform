@@ -5,6 +5,8 @@ import { cereProgramare } from "@/app/actions/programari";
 import { LIMITE, STARE_INITIALA } from "@/lib/formulare";
 import { Camp, Capcana, MesajFormular, stilButonTrimite } from "@/components/site/form-parts";
 import { Turnstile } from "@/components/site/turnstile";
+import { Calendar } from "./calendar";
+import type { LunaCalendar } from "@/lib/calendar";
 import type { ZiCuOre } from "@/lib/programari";
 
 export type ZiDeAles = ZiCuOre & { scris: string };
@@ -17,6 +19,7 @@ export type ZiDeAles = ZiCuOre & { scris: string };
  */
 export function FormularProgramare({
   zile,
+  luni,
   servicii,
   siteKey,
   temaCaptcha,
@@ -24,6 +27,8 @@ export function FormularProgramare({
   alegereInitiala,
 }: {
   zile: ZiDeAles[];
+  /** Zilele libere aranjate pe luni, socotite pe server (`src/lib/calendar.ts`). */
+  luni: LunaCalendar[];
   servicii: string[];
   siteKey: string | null;
   temaCaptcha: "light" | "dark";
@@ -48,6 +53,10 @@ export function FormularProgramare({
 
   const zileleAlese = zile.find((z) => z.zi === zi) ?? zile[0];
 
+  // Căsuța din calendar scrie doar numărul zilei. Data întreagă merge în
+  // `aria-label`, altfel un cititor de ecran ar spune „14”, fără nicio lună.
+  const etichete = Object.fromEntries(zile.map((z) => [z.zi, z.scris]));
+
   // După o cerere reușită, orele s-au schimbat: nu mai arătăm formularul, ca
   // omul să nu ceară din greșeală a doua oară aceeași oră.
   if (stare.status === "succes") {
@@ -66,27 +75,22 @@ export function FormularProgramare({
         <legend style={{ fontSize: "14px", fontWeight: 600, marginBottom: "12px" }}>
           Alege ziua
         </legend>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-          {zile.map((z) => (
-            <button
-              key={z.zi}
-              type="button"
-              onClick={() => {
-                setZi(z.zi);
-                setOra(z.ore[0]);
-              }}
-              aria-pressed={z.zi === zileleAlese?.zi}
-              style={stilOptiune(z.zi === zileleAlese?.zi)}
-            >
-              {z.scris}
-            </button>
-          ))}
-        </div>
+        <Calendar
+          luni={luni}
+          ziAleasa={zileleAlese?.zi ?? ""}
+          etichete={etichete}
+          onAlege={(aleasa) => {
+            setZi(aleasa);
+            // Ora dinainte n-are ce căuta în altă zi: la 14 se putea la 19:00,
+            // la 15 poate nu. Se sare pe prima liberă din ziua nouă.
+            setOra(zile.find((z) => z.zi === aleasa)?.ore[0] ?? "");
+          }}
+        />
       </fieldset>
 
       <fieldset style={{ border: 0, margin: 0, padding: 0 }}>
         <legend style={{ fontSize: "14px", fontWeight: 600, marginBottom: "12px" }}>
-          Alege ora
+          Alege ora {zileleAlese ? `— ${zileleAlese.scris}` : ""}
         </legend>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
           {(zileleAlese?.ore ?? []).map((o) => (
@@ -95,6 +99,7 @@ export function FormularProgramare({
               type="button"
               onClick={() => setOra(o)}
               aria-pressed={o === ora}
+              aria-label={zileleAlese ? `${o}, ${zileleAlese.scris}` : o}
               style={stilOptiune(o === ora)}
             >
               {o}

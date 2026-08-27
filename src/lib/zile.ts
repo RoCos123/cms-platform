@@ -31,6 +31,12 @@ const ZI_SCURTA = new Intl.DateTimeFormat("ro-RO", {
   month: "short",
 });
 
+const LUNA = new Intl.DateTimeFormat("ro-RO", {
+  timeZone: FUSUL,
+  month: "long",
+  year: "numeric",
+});
+
 const ORA = new Intl.DateTimeFormat("ro-RO", {
   timeZone: FUSUL,
   hour: "2-digit",
@@ -50,6 +56,21 @@ export function ziuaScrisa(moment: Date): string {
 /** „27 aug.” — pentru etichetele înghesuite de sub un grafic. */
 export function ziuaScurta(moment: Date): string {
   return ZI_SCURTA.format(moment);
+}
+
+/**
+ * „Septembrie 2026” — capul unui calendar, dintr-o cheie de forma „2026-09”.
+ *
+ * Ziua 15 la prânz, nu 1 la miezul nopții: o lună citită de la marginea ei
+ * poate cădea în cea dinainte pe alt fus, iar capul calendarului ar scrie
+ * august peste o grilă de septembrie.
+ *
+ * Litera mare se pune de mână: în română lunile se scriu cu literă mică, dar
+ * asta e un titlu, iar `Intl` nu știe diferența.
+ */
+export function lunaScrisa(cheie: string): string {
+  const scris = LUNA.format(momentLa(`${cheie}-15`, "12:00"));
+  return scris.charAt(0).toUpperCase() + scris.slice(1);
 }
 
 /** „09:30” — ora la care s-a întâmplat ceva. */
