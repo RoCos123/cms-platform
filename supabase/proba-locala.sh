@@ -110,6 +110,26 @@ $$;
 SQL
 
 echo
+echo "→ provizionez un client cu creeaza_client, ca la un client real"
+ruleaza <<'SQL'
+insert into auth.users (email) values ('proba3@exemplu.ro');
+select public.creeaza_client('proba3.ro', 'Cabinet de probă 3', 'proba3@exemplu.ro', 'liniste', true);
+SQL
+
+psql -h "$SOCK" -U postgres -d postgres <<'SQL'
+-- Ce trebuie să iasă dintr-o singură linie. Numerele sunt scrise aici dinadins:
+-- dacă cineva scoate o secțiune din funcție fără să vrea, se vede la rulare.
+select
+  s.domain,
+  s.template,
+  (select count(*) from public.site_content c where c.site_id = s.id) as sectiuni,
+  (select count(*) from public.site_content c where c.site_id = s.id and c.visible) as vizibile,
+  (select count(*) from public.users u where u.site_id = s.id) as conturi,
+  (select count(*) from public.site_settings t where t.site_id = s.id) as setari,
+  (select string_agg(p.slug || ':' || p.status, ', ') from public.pages p where p.site_id = s.id) as pagini
+from public.sites s where s.domain = 'proba3.ro';
+SQL
+
 echo "→ verificarea de izolare"
 psql -h "$SOCK" -U postgres -d postgres -f "$RADACINA/supabase/verificare-izolare.sql" | tail -n +2
 

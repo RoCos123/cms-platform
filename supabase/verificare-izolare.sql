@@ -315,6 +315,50 @@ begin
       'respins: ' || SQLERRM;
   end;
 
+  -- --------------------------------------------------------------------------
+  -- Un client nu poate provizona site-uri.
+  --
+  -- `creeaza_client` face site-uri și leagă conturi de login. Un client care ar
+  -- putea s-o cheme și-ar face singur al doilea site — sau ar lega contul
+  -- altcuiva de site-ul lui. Apărarea e un `revoke execute … from public`.
+  --
+  -- Rolul se pune AICI, explicit, nu se moștenește: blocul dinainte îl reface
+  -- la `postgres` în handlerul lui de eroare. Prima variantă a verificării ăsteia
+  -- rula ca proprietar și trecea senin — respinsă, dar pentru cu totul alt
+  -- motiv (un email inexistent), adică fix genul de probă care nu dovedește
+  -- nimic.
+  --
+  -- Se cere codul 42501 (`insufficient_privilege`), nu orice eroare: cu „orice
+  -- eroare", un email greșit din argumente ar fi arătat tot ca o apărare care
+  -- ține.
+  -- --------------------------------------------------------------------------
+  perform set_config('role', 'authenticated', true);
+
+  begin
+    perform public.creeaza_client('furat.example.com', 'Furat', 'nimeni@example.com');
+
+    perform set_config('role', 'postgres', true);
+    delete from public.sites where domain = 'furat.example.com';
+
+    return query select
+      'Un client nu poate provizona site-uri'::text,
+      'PICAT'::text,
+      'a putut chema creeaza_client (site-ul făcut a fost șters)'::text;
+  exception
+    when insufficient_privilege then
+      perform set_config('role', 'postgres', true);
+      return query select
+        'Un client nu poate provizona site-uri'::text,
+        'OK'::text,
+        'respins: ' || SQLERRM;
+    when others then
+      perform set_config('role', 'postgres', true);
+      return query select
+        'Un client nu poate provizona site-uri'::text,
+        'NECONCLUDENT'::text,
+        'respinsă din alt motiv decât lipsa dreptului: ' || SQLERRM;
+  end;
+
   perform set_config('role', 'postgres', true);
   perform set_config('request.jwt.claims', '', true);
 end;

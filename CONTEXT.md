@@ -86,8 +86,22 @@ Găsite căutând în cod, la întrebarea „cât mai e până terminăm”:
   dintr-un clic din Vercel, datele nu.
 - **Resetarea parolei nu există.** `/login` are doar email + parolă. Un client
   care își uită parola trebuie deblocat manual din Supabase.
-- **Provizionarea unui client e SQL scris de mână.** `/admin` e doar o
-  redirectare. Nu există script sau ecran pentru „fă-i site unui client nou”.
+- ~~**Provizionarea unui client e SQL scris de mână**~~ — făcut (28 aug. 2026):
+  `public.creeaza_client(domeniu, nume, email, sablon, cu_programari)`, o linie
+  în SQL Editor. Face rândul din `sites`, leagă contul de login (îl caută după
+  email și refuză dacă nu-l găsește), pune cele 13 secțiuni ale paginii
+  principale, setările goale și politica de confidențialitate ca ciornă. Ori
+  toate, ori niciuna.
+
+  **Doar `hero` și `contact` pornesc vizibile**, restul ascunse. Dinadins:
+  site-ul e public din clipa în care domeniul rezolvă, iar un cabinet cu
+  paisprezece secțiuni goale arată a defect. Clientul aprinde fiecare secțiune
+  pe măsură ce o scrie. Asta acoperă jumătate din golul „site public prea
+  devreme” de mai jos, fără ecranul de lansare.
+
+  Refuză: domeniu care există deja, cont inexistent sau deja legat de alt site,
+  șablon scris greșit, adresă cu `https://`. `/admin` rămâne o redirectare, iar
+  un ecran de administrare tot nu există — vezi mai jos de ce.
 - **Domeniul clientului se conectează manual în Vercel.**
 - **Un ecran de administrare al platformei nu există.** Modulele plătite se
   pornesc bifând o coloană în editorul Supabase. Ca să fie un buton în aplicație
