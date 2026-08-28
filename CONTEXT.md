@@ -81,6 +81,13 @@ Găsite căutând în cod, la întrebarea „cât mai e până terminăm”:
   Pași separați, ca X-ul roșu să spună CE a picat. Build-ul nu cere niciun
   secret — verificat rulându-l cu `.env.local` mutat deoparte.
 
+  **Prima rulare a picat, și a picat pe bună dreptate**: `tsc` singur nu găsea
+  `LayoutProps`, un tip GENERAT de Next în `.next/types/`. Pe mașina de lucru
+  exista din build-urile anterioare; pe o clonă curată, nu. Verificarea trecea
+  local de săptămâni și ar fi picat la primul om care clona depozitul.
+  `typecheck` cheamă acum `next typegen` întâi. Prima zi de CI, primul lucru
+  prins — exact ce nu se putea vedea de aici.
+
   **Nu acoperă**: cum arată site-ul (rămâne verificarea vizuală cu capturi) și
   migrările SQL. `supabase/proba-locala.sh` își pornește singur un Postgres;
   merită adăugat ca al doilea job, dar abia după ce e probat pe runner — un

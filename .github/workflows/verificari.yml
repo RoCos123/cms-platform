@@ -48,6 +48,11 @@ jobs:
       - name: Lint
         run: pnpm lint
 
+      # `pnpm typecheck` cheamă întâi `next typegen`, fiindcă `LayoutProps` și
+      # celelalte tipuri de rute sunt GENERATE de Next în `.next/types/`. Pe o
+      # mașină de lucru există din build-urile anterioare, pe o clonă curată nu —
+      # deci verificarea trecea local și pica aici. Prima rulare a workflow-ului
+      # a picat exact așa, ceea ce e și dovada că CI-ul vede ce eu nu văd.
       - name: Tipuri
         run: pnpm typecheck
 
