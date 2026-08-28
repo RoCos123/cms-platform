@@ -152,6 +152,62 @@ Cele patru se re-randează, iar pentru fiecare secțiune se notează unde stă p
 și cum e împărțit rândul, exact cum s-au notat culorile prima dată. Lista de
 așezări de construit iese din datele alea, nu din presupuneri.
 
+### Așezarea, măsurată (28 aug. 2026)
+
+Cele patru s-au re-randat în Chromium la 1440px și s-a notat, pentru fiecare
+secțiune, unde stă poza și ce fracțiune din lățime ocupă. **Maparea fișierelor
+la șabloane e confirmată prin măsurare**, nu presupusă: înălțimile totale ies
+identice cu tabelul de sus (13070 / 8693 / 7594 / 7157 px).
+
+| Fișier | Șablon | Înălțime | `<section>` |
+|---|---|---|---|
+| Renata Iancu | **Căldură** | 13070 px | 13 |
+| Dragoș Geamănă | **Liniște** | 8693 px | 9 |
+| Gina Dafinoiu | **Lumină** | 7594 px | 5 |
+| Ana Rădulescu (Friendly) | **Apropiere** | 7157 px | 6 |
+
+**Prima secțiune — singurul loc unde așezarea chiar diferă:**
+
+| Șablon | Așezare | Măsurat |
+|---|---|---|
+| **Căldură** | Titlu uriaș pe TOATĂ lățimea, iar sub el poza la stânga cu text la dreapta | poză 47% lățime @ 8% stânga |
+| Liniște | Text stânga, poză dreapta în arcadă, cu cartonașe plutitoare peste ea | poză 39% @ 56% |
+| Lumină | Text stânga, poză dreapta în arcadă, cu cartonaș plutitor și legendă în poză | ilustrație SVG, aceeași geometrie |
+| Apropiere | Text stânga, poză dreapta în cartonaș rotunjit, cu cartonașe plutitoare | cartonaș ~40% la dreapta |
+
+**Sunt DOUĂ așezări, nu patru.** Trei din cele patru fac același lucru —
+text stânga, poză dreapta. Doar Căldură rupe tiparul, cu titlul lat peste tot.
+
+**Despre mine:** Căldură (poză 33% @ 8%) și Liniște (36% @ 5%) — amândouă poză
+STÂNGA, text dreapta. Diferă doar insigna suprapusă peste poză: ștampilă rotundă
+la Căldură, cartonaș cu cifră („12+ ani”) la Liniște. Lumină și Apropiere n-au
+secțiune separată; intro-ul stă în prima secțiune.
+
+**Restul secțiunilor: aceeași așezare peste tot.** Grila de articole e literal
+identică la toate trei care o au — trei cartonașe de 26-27% lățime, la 9%, 37%
+și 65%. Serviciile sunt grile de 2-3 coloane. Testimonialele, întrebările,
+contactul: fără poze. Aici diferența e făcută în întregime de culori, fonturi și
+rotunjimi.
+
+**Concluzia pentru construit:** o singură secțiune are nevoie de două așezări —
+`hero`. Nu 21, nu 5. Una.
+
+```
+hero: "titluLat"        → Căldură
+hero: "textPozaDreapta" → Liniște, Lumină, Apropiere
+```
+
+Rafinamentul de nivelul doi, dacă merită mai târziu: cartonașele plutitoare
+peste poză (le au trei din patru, cu conținut diferit) și insigna de pe poza din
+„Despre mine”. Nu schimbă așezarea, doar o îmbogățesc.
+
+**Notă de metodă:** pozele nu se încarcă de pe `file://` (limitarea bundlerului
+lor, semnalată și la prima analiză), dar cutiile rămân la locul lor — s-au
+măsurat cutiile și s-a pus un chenar pe fiecare imagine ca formele să se vadă în
+captură. La Lumină, „poza” e o ilustrație SVG, deci n-a fost prinsă de căutarea
+după `img` sau `background-image`; s-a văzut uitându-mă la captură. Cifrele
+singure ar fi ratat-o.
+
 ## Ordinea de lucru
 
 1. **„Căldură”, integral** — de la editarea în panou până la site-ul public
