@@ -56,7 +56,8 @@ export function Hero({
             poza && !titluLat ? "clamp(40px, 5.2vw, 72px)" : "clamp(48px, 9vw, 118px)",
           lineHeight: 0.98,
           letterSpacing: "-0.035em",
-          fontWeight: 700,
+          fontFamily: "var(--t-font-titlu)",
+          fontWeight: "var(--t-greutate-titlu)" as unknown as number,
           textWrap: "balance",
         }}
       >
@@ -67,7 +68,7 @@ export function Hero({
             <span
               style={{
                 fontFamily: "var(--t-font-secundar)",
-                fontStyle: "italic",
+                fontStyle: "var(--t-stil-accent)",
                 fontWeight: 300,
                 letterSpacing: "-0.01em",
               }}

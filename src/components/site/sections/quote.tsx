@@ -33,7 +33,7 @@ export function Quote({ data, tone }: { data: QuoteData; tone?: SectionTone }) {
             style={{
               margin: 0,
               fontFamily: "var(--t-font-secundar)",
-              fontStyle: "italic",
+              fontStyle: "var(--t-stil-accent)",
               fontWeight: 300,
               fontSize: "clamp(26px, 3.6vw, 44px)",
               lineHeight: 1.28,

@@ -1,6 +1,6 @@
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 /**
  * Rezolvă `@/…` la `src/…`, ca Node să poată încărca direct module scrise
@@ -12,16 +12,37 @@ import { pathToFileURL } from "node:url";
  */
 const radacina = path.resolve(import.meta.dirname, "..");
 
+/** Extensiile pe care le-ar încerca TypeScript, în ordinea lui. */
+function cuExtensie(baza) {
+  // Directorul se sare dinadins: `import "@/lib/templates"` trebuie să ajungă
+  // la `index.ts`, nu la folder — Node refuză importul unui director.
+  const candidati =
+    existsSync(baza) && statSync(baza).isDirectory()
+      ? [path.join(baza, "index.ts"), path.join(baza, "index.tsx")]
+      : [`${baza}.ts`, `${baza}.tsx`, baza];
+
+  return candidati.find((c) => existsSync(c) && statSync(c).isFile()) ?? null;
+}
+
 export function resolve(specifier, context, nextResolve) {
-  if (!specifier.startsWith("@/")) return nextResolve(specifier, context);
+  if (specifier.startsWith("@/")) {
+    const gasit = cuExtensie(path.join(radacina, "src", specifier.slice(2)));
+    if (gasit) return nextResolve(pathToFileURL(gasit).href, context);
+    return nextResolve(specifier, context);
+  }
 
-  const baza = path.join(radacina, "src", specifier.slice(2));
-
-  // Aliasul se scrie fără extensie; le încercăm în ordinea în care le-ar căuta
-  // și TypeScript.
-  for (const candidat of [baza, `${baza}.ts`, `${baza}.tsx`, path.join(baza, "index.ts")]) {
-    if (existsSync(candidat)) {
-      return nextResolve(pathToFileURL(candidat).href, context);
+  /*
+   * Importurile relative dintre fișiere TypeScript se scriu fără extensie
+   * (`import { caldura } from "./caldura"`), iar Node nu le completează singur.
+   * Fără linia asta, un modul împărțit în mai multe fișiere — cum e stratul de
+   * șabloane — nu poate fi probat deloc: aliasul ducea la `index.ts`, iar acolo
+   * primul import relativ pica.
+   */
+  if (specifier.startsWith(".") && context.parentURL?.startsWith("file:")) {
+    const parinte = fileURLToPath(context.parentURL);
+    if (/\.tsx?$/.test(parinte) && !/\.[a-z]+$/i.test(specifier)) {
+      const gasit = cuExtensie(path.resolve(path.dirname(parinte), specifier));
+      if (gasit) return nextResolve(pathToFileURL(gasit).href, context);
     }
   }
 

@@ -51,8 +51,34 @@ export type TemplateTypography = {
   /** Stiva de rezervă, pentru cazul în care fontul nu se încarcă. */
   fallbackPrincipal: string;
   fallbackSecundar: string;
-  /** Titlurile mari folosesc fontul secundar, sau doar accentele din ele? */
+  /**
+   * Titlurile mari folosesc fontul secundar, sau doar accentele din ele?
+   *
+   * Ajunge la componente ca `--t-font-titlu`. Câmpul exista de la început, dar
+   * nu-l citea nimeni — titlurile erau mereu în fontul principal, indiferent de
+   * șablon. S-a văzut abia când „Liniște" a ieșit cu titluri sans, deși
+   * originalul lui le are integral în serif. Cea mai vizibilă diferență dintre
+   * cele patru, ratată de un câmp mort.
+   */
   titluriInSecundar: boolean;
+  /**
+   * Greutatea titlurilor mari. Merge împreună cu cea de sus și nu se poate
+   * deduce din ea: un serif de titlu vrea 400 (Cormorant la „Liniște" și
+   * „Lumină"), iar un sans vrea gros — 700 la „Căldură", 800 la „Apropiere".
+   * Măsurate pe surse.
+   */
+  greutateTitlu: number;
+  /**
+   * Bucata accentuată se scrie în cursivă?
+   *
+   * Nu e o preferință, e o constrângere a fontului: „Caveat", fontul de scris
+   * al lui „Apropiere", n-are tăietură cursivă. Cerută oricum, browserul o
+   * fabrică înclinând literele — pe un font deja scris de mână iese strâmb, iar
+   * defectul se vede doar dacă te uiți la pagina randată.
+   *
+   * Ajunge la componente ca `--t-stil-accent`, nu ca `if` prin zece fișiere.
+   */
+  accentInItalic: boolean;
 };
 
 /**

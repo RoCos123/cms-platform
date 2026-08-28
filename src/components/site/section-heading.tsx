@@ -46,7 +46,8 @@ export function SectionHeading({
             fontSize: "clamp(32px, 4.4vw, 54px)",
             lineHeight: 1.08,
             letterSpacing: "-0.025em",
-            fontWeight: 700,
+            fontFamily: "var(--t-font-titlu)",
+            fontWeight: "var(--t-greutate-titlu)" as unknown as number,
             textWrap: "balance",
           }}
         >
@@ -54,7 +55,7 @@ export function SectionHeading({
           {titluAccent && (
             <>
               {" "}
-              <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "italic", fontWeight: 300 }}>
+              <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
                 {titluAccent}
               </span>
             </>

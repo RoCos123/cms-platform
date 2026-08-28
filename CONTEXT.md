@@ -379,6 +379,12 @@ Implicit OPRIT — pe dos față de `pagini`, unde lipsa valorii înseamnă porn
 platformei nu există încă (`/admin` e doar un alias pentru client), fiindcă
 n-am hotărât cum se autentifică proprietarul platformei — vezi „ce lipsește”.
 
+**Cele patru șabloane sunt construite** (28 aug. 2026): `caldura`, `liniste`,
+`lumina`, `apropiere`. Clientul alege în discuție, iar cheia se scrie în coloana
+`sites.template` — nu există (și nu trebuie) niciun ecran de ales șabloane.
+Contrastul fiecăruia e verificat automat; detaliile în
+`design/sabloane/README.md`.
+
 Bifa aceea face singură și restul: un trigger pe `sites` adaugă rândul secțiunii
 „Programare online” în `site_content`, la coada paginii principale. A trebuit,
 fiindcă panoul n-are flux de „adaugă secțiune” — rândurile vin seedate la

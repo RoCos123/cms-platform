@@ -39,7 +39,7 @@ export function Faq({ data, tone }: { data: FaqData; tone?: SectionTone }) {
         {data.titluAccent && (
           <>
             {" "}
-            <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "italic", fontWeight: 300 }}>
+            <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
               {data.titluAccent}
             </span>
           </>

@@ -208,6 +208,49 @@ captură. La Lumină, „poza” e o ilustrație SVG, deci n-a fost prinsă de c
 după `img` sau `background-image`; s-a văzut uitându-mă la captură. Cifrele
 singure ar fi ratat-o.
 
+### Cele patru, construite (28 aug. 2026)
+
+Toate patru sunt acum fișiere de valori în `src/lib/templates/`. Valorile s-au
+extras măsurând randarea reală în Chromium la 1440px — culori de fundal per ton,
+culori de text, accent, fonturi, greutăți, rotunjimi, spațiere verticală. Ce s-a
+schimbat față de sursă e scris lângă valoare, cu motivul, și e mereu contrast,
+niciodată gust.
+
+| Șablon | Font titlu | Greutate | Accent | Fundal | Așezare hero |
+|---|---|---|---|---|---|
+| Căldură | Manrope | 700 | `#904D39` | `#F8F1EA` | `titluLat` |
+| Liniște | Cormorant Garamond | 400 | `#4C6A52` | `#F3EDE2` | `textPozaDreapta` |
+| Lumină | Cormorant Garamond | 400 | `#5E2976` | `#F1F5FD` | `textPozaDreapta` |
+| Apropiere | Nunito | 800 | `#456B3F` | `#F4EDE2` | `textPozaDreapta` |
+
+**Contrastul e verificat automat** de `e2e/contrast-sabloane.proba.mjs`: fiecare
+rol de culoare, pe fiecare fundal pe care chiar ajunge, la pragul WCAG AA de
+4,5:1. Proba prinde exact accentul original al lui „Căldură” (3,75:1) dacă e pus
+înapoi — cifră care se potrivește cu cea scrisă de mână în comentariul lui,
+scrisă cu luni în urmă.
+
+Două accente au trebuit întunecate față de sursă, din același motiv ca la
+Căldură: verdele lui „Apropiere” dădea 2,25:1 pe cremul lui — și e culoarea de
+pe bucata scrisă de mână din titlu, adică fix ce trebuie citit.
+
+### Două câmpuri moarte, găsite construind
+
+`titluriInSecundar` exista în tip de la început și **nu-l citea nimeni.**
+Titlurile erau mereu în fontul principal, indiferent de șablon. S-a văzut abia
+când „Liniște” a ieșit cu titluri sans, deși originalul le are integral în
+serif — cea mai vizibilă diferență dintre cele patru, ratată de un câmp care
+arăta ca și cum ar face ceva. Acum ajunge la componente ca `--t-font-titlu`,
+împreună cu `greutateTitlu` (nou), fiindcă un serif de titlu vrea 400 iar un
+sans vrea 700–800.
+
+`accentInItalic` e nou și e o constrângere, nu o preferință: „Caveat”, fontul de
+scris al lui „Apropiere”, n-are tăietură cursivă. Cerut oricum, browserul o
+fabrică înclinând literele — pe un font deja scris de mână iese strâmb. Ajunge
+la componente ca `--t-stil-accent`, nu ca `if` prin zece fișiere.
+
+Amândouă spun același lucru: un câmp care nu e citit de nimeni e mai rău decât
+unul care lipsește, fiindcă arată ca o decizie luată.
+
 ## Ordinea de lucru
 
 1. **„Căldură”, integral** — de la editarea în panou până la site-ul public

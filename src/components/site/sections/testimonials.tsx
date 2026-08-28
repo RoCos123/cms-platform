@@ -41,7 +41,7 @@ export function Testimonials({ data, tone }: { data: TestimonialsData; tone?: Se
         {data.titluAccent && (
           <>
             {" "}
-            <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "italic", fontWeight: 300 }}>
+            <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
               {data.titluAccent}
             </span>
           </>
@@ -75,7 +75,7 @@ export function Testimonials({ data, tone }: { data: TestimonialsData; tone?: Se
                 margin: 0,
                 flex: 1,
                 fontFamily: "var(--t-font-secundar)",
-                fontStyle: "italic",
+                fontStyle: "var(--t-stil-accent)",
                 fontSize: "20px",
                 lineHeight: 1.5,
                 textWrap: "pretty",

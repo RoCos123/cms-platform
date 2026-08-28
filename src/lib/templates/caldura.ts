@@ -46,6 +46,8 @@ export const caldura: Template = {
     // Titlurile sunt în Manrope; serif-ul apare doar pe fragmentele accentuate
     // („psiholog clinician." din hero e italic serif, restul e sans).
     titluriInSecundar: false,
+    accentInItalic: true,
+    greutateTitlu: 700,
   },
 
   forme: {

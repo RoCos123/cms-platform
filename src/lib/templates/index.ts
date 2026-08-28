@@ -1,16 +1,25 @@
 import type { CSSProperties } from "react";
 import type { Template, TemplateId } from "./types";
 import { caldura } from "./caldura";
+import { liniste } from "./liniste";
+import { lumina } from "./lumina";
+import { apropiere } from "./apropiere";
 
 export * from "./types";
 
 /**
- * Deocamdată există un singur șablon construit. Celelalte trei se adaugă aici,
- * ca fișiere de valori, după ce primul e validat integral — vezi
- * design/sabloane/README.md, „Ordinea de lucru".
+ * Toate patru, construite. Ordinea e cea în care i se arată clientului:
+ * „Căldură" primul, fiindcă e superset-ul din care s-au validat secțiunile.
+ *
+ * Un șablon nou se adaugă aici și în `TemplateId` — restul e un fișier de
+ * valori. Contrastul fiecăruia e verificat automat de
+ * `e2e/contrast-sabloane.proba.mjs`.
  */
 const TEMPLATES: Record<string, Template> = {
   caldura,
+  liniste,
+  lumina,
+  apropiere,
 };
 
 /**
@@ -54,6 +63,11 @@ export function templateStyle(template: Template): CSSProperties {
     "--t-chenar": p.chenar,
     "--t-font-principal": `"${t.fontPrincipal}", ${t.fallbackPrincipal}`,
     "--t-font-secundar": `"${t.fontSecundar}", ${t.fallbackSecundar}`,
+    "--t-stil-accent": t.accentInItalic ? "italic" : "normal",
+    "--t-font-titlu": t.titluriInSecundar
+      ? `"${t.fontSecundar}", ${t.fallbackSecundar}`
+      : `"${t.fontPrincipal}", ${t.fallbackPrincipal}`,
+    "--t-greutate-titlu": String(t.greutateTitlu),
     "--t-raza": f.raza,
     "--t-raza-buton": f.razaButon,
     "--t-spatiere": f.spatiereSectiune,

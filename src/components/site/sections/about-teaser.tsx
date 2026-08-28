@@ -37,7 +37,7 @@ export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: Sect
             {data.titluAccent && (
               <>
                 {" "}
-                <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "italic", fontWeight: 300 }}>
+                <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
                   {data.titluAccent}
                 </span>
               </>
@@ -82,7 +82,7 @@ export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: Sect
               style={{
                 margin: "28px 0 0",
                 fontFamily: "var(--t-font-secundar)",
-                fontStyle: "italic",
+                fontStyle: "var(--t-stil-accent)",
                 fontWeight: 400,
                 fontSize: "clamp(20px, 2.2vw, 26px)",
                 lineHeight: 1.4,
