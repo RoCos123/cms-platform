@@ -55,6 +55,25 @@ export type TemplateTypography = {
   titluriInSecundar: boolean;
 };
 
+/**
+ * Cum e așezată prima secțiune. Măsurat pe cele patru șabloane-sursă
+ * (design/sabloane/README.md, „Așezarea, măsurată"):
+ *
+ * - `titluLat` — titlul ocupă TOATĂ lățimea, iar sub el vine poza la stânga cu
+ *   textul la dreapta. Doar „Căldură" face asta.
+ * - `textPozaDreapta` — text stânga, poză dreapta, pe două coloane. „Liniște",
+ *   „Lumină" și „Apropiere" fac toate trei același lucru.
+ *
+ * E singura secțiune din 21 unde așezarea chiar diferă între șabloane. Restul
+ * (grile de cartonașe, benzi, formulare) ies identice la măsurare, iar
+ * diferența o fac culorile, fonturile și rotunjimile.
+ */
+export type AsezareHero = "titluLat" | "textPozaDreapta";
+
+export type TemplateAsezari = {
+  hero: AsezareHero;
+};
+
 export type TemplateShape = {
   /** Rotunjirea cardurilor și a imaginilor. */
   raza: string;
@@ -72,6 +91,13 @@ export type Template = {
   paleta: TemplatePalette;
   tipografie: TemplateTypography;
   forme: TemplateShape;
+  /**
+   * Așezările, hotărâte de șablon, nu de client (decizie 28 aug. 2026). De-aia
+   * stau aici, lângă paletă și fonturi, și nu în `site_content.variant`: un
+   * șablon nou rămâne un fișier de valori, fără date per client și fără
+   * migrare.
+   */
+  asezari: TemplateAsezari;
 };
 
 /** Culoarea de fundal și de text pentru un ton dat, într-un șablon dat. */

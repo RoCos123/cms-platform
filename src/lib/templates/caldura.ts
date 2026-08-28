@@ -53,4 +53,8 @@ export const caldura: Template = {
     razaButon: "999px",
     spatiereSectiune: "clamp(72px, 9vw, 128px)",
   },
+
+  // Titlul lat, cu poza dedesubt la stânga. Măsurat pe original: titlul curge
+  // pe toată lățimea, iar poza ocupă 47% din ecran, începând de la 8% stânga.
+  asezari: { hero: "titluLat" },
 };

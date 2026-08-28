@@ -119,7 +119,7 @@ export function EditorSectiune({
           cheie={JSON.stringify(datePreviz)}
           nota="Se actualizează pe măsură ce scrii. Modificările ajung pe site abia după ce apeși Salvează."
         >
-          <RenderSections rows={[randPreviz]} context={{ articole, servicii, paginaServiciiActiva, oreProgramare }} />
+          <RenderSections rows={[randPreviz]} context={{ articole, servicii, paginaServiciiActiva, oreProgramare, asezari: template.asezari }} />
         </PanouPrevizualizare>
       </div>
 

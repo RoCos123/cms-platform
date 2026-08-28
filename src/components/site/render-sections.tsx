@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { SectionTone } from "@/lib/templates";
+import type { SectionTone, TemplateAsezari } from "@/lib/templates";
 import type { Serviciu } from "@/lib/servicii";
 import { Hero, type HeroData } from "./sections/hero";
 import { Quote, type QuoteData } from "./sections/quote";
@@ -59,6 +59,12 @@ export type SectionContext = {
    * în panou.
    */
   oreProgramare: OreDePrimaPagina;
+  /**
+   * Așezările hotărâte de șablon. Vin din context, nu din rândul secțiunii:
+   * sunt o alegere de design a șablonului, nu conținut al clientului (vezi
+   * design/sabloane/README.md).
+   */
+  asezari: TemplateAsezari;
 };
 
 /**
@@ -71,7 +77,9 @@ export type SectionContext = {
  * panoul a mers înaintea codului.
  */
 const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNode> = {
-  hero: (row) => <Hero data={row.data as HeroData} tone={row.tone} />,
+  hero: (row, ctx) => (
+    <Hero data={row.data as HeroData} tone={row.tone} asezare={ctx.asezari.hero} />
+  ),
   quote: (row) => <Quote data={row.data as QuoteData} tone={row.tone} />,
   features: (row, ctx) => (
     <Features

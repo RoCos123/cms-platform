@@ -3,6 +3,7 @@ import { getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
 import { linkurileSociale, paginaEsteActiva } from "@/lib/setari";
 import { moduleleSiteului } from "@/lib/module";
+import { getTemplate } from "@/lib/templates";
 import { oreDeAratatPePrimaPagina } from "@/lib/programari-publice";
 import { serviciiPublicate } from "@/lib/servicii-publice";
 import { articolePublicate } from "@/lib/blog-public";
@@ -136,6 +137,9 @@ export default async function PublicHomePage() {
               siteId,
               moduleleSiteului(site).programari,
             ),
+            // Așezările vin din șablon. Necunoscut sau lipsă → cel implicit,
+            // ca peste tot: o pagină publică trebuie să se randeze mereu.
+            asezari: getTemplate(site?.template as string | null).asezari,
           }}
         />
       ) : (
