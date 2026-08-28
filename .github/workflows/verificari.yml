@@ -1,0 +1,58 @@
+# Verificările care rulau până acum doar dacă îmi aduceam eu aminte.
+#
+# Cerut de proprietar pe 27 aug. 2026, după întrebarea „dacă se strică ceva, se
+# strică toate site-urile?". Răspunsul cinstit era: build-ul stricat nu iese, iar
+# Vercel dă înapoi dintr-un clic — dar nimeni nu verifica automat că probele
+# trec. Adică apărarea era o promisiune, nu o garanție.
+#
+# Ce NU acoperă, ca să nu creadă nimeni altceva:
+#   - cum ARATĂ site-ul. Aia rămâne verificare vizuală cu capturi, de mână.
+#   - migrările SQL. `supabase/proba-locala.sh` cere un Postgres pornit de el;
+#     de adăugat ca al doilea job, separat, când e probat că merge pe runner.
+name: Verificări
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+# O trimitere nouă oprește verificarea celei vechi pe aceeași ramură: la a treia
+# corectură la rând, primele două nu mai interesează pe nimeni.
+concurrency:
+  group: verificari-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verifica:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Versiunea vine din `packageManager` din package.json, ca să nu fie
+      # scrisă în două locuri.
+      - uses: pnpm/action-setup@v4
+
+      # 22, nu mai puțin: probele importă direct fișiere `.ts`, iar Node știe
+      # să le citească singur abia de la 22.18.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Pași separați, nu unul singur: X-ul roșu trebuie să spună CE a picat,
+      # nu doar că ceva a picat.
+      - name: Lint
+        run: pnpm lint
+
+      - name: Tipuri
+        run: pnpm typecheck
+
+      - name: Probe de logică
+        run: pnpm test:logica
+
+      - name: Build
+        run: pnpm build

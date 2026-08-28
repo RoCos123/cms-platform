@@ -75,15 +75,16 @@ Ce s-a hotărât pe parcurs, ca să nu fie redeschis din senin:
 
 Găsite căutând în cod, la întrebarea „cât mai e până terminăm”:
 
-- **Nimic nu rulează probele automat (nu există CI).** `pnpm lint`,
-  `pnpm test:logica` și `pnpm build` se rulează de mână, înainte de fiecare
-  push. Adică apărarea depinde de disciplina sesiunii de dezvoltare — o
-  promisiune, nu o garanție. **De pus** (cerut de proprietar, 27 aug. 2026, după
-  ce a întrebat ce se întâmplă dacă un deploy strică toate site-urile deodată):
-  un fișier în `.github/workflows/` care rulează cele trei la fiecare push și
-  arată roșu pe commit. Nu acoperă cum ARATĂ site-ul (rămâne verificarea
-  vizuală cu capturi) și nu apără de o migrare greșită — codul se dă înapoi
-  dintr-un clic din Vercel, datele nu.
+- ~~**Nimic nu rulează probele automat**~~ — făcut (28 aug. 2026):
+  `.github/workflows/verificari.yml` rulează lint, tipuri, cele 117 probe de
+  logică și build-ul, la fiecare push pe `master` și la fiecare pull request.
+  Pași separați, ca X-ul roșu să spună CE a picat. Build-ul nu cere niciun
+  secret — verificat rulându-l cu `.env.local` mutat deoparte.
+
+  **Nu acoperă**: cum arată site-ul (rămâne verificarea vizuală cu capturi) și
+  migrările SQL. `supabase/proba-locala.sh` își pornește singur un Postgres;
+  merită adăugat ca al doilea job, dar abia după ce e probat pe runner — un
+  workflow stricat care dă roșu pe cod bun strică încrederea în CI din prima zi.
 - **Resetarea parolei nu există.** `/login` are doar email + parolă. Un client
   care își uită parola trebuie deblocat manual din Supabase.
 - ~~**Provizionarea unui client e SQL scris de mână**~~ — făcut (28 aug. 2026):
