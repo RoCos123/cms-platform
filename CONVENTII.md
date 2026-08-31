@@ -5,19 +5,41 @@ care a mers prost o dată și nu trebuie să meargă prost a doua oară.
 
 ---
 
+## Regula care le acoperă pe toate
+
+**Lansarea se face fără grabă, când totul e gata.** Stabilit de proprietar pe
+28 aug. 2026, ca principiu, nu ca preferință de moment: *„Nu ne permitem
+greșeli, erori. Drept urmare, vreau să acorzi cea mai mare atenție și grijă."*
+
+Ce înseamnă în practică, când o sesiune viitoare are de ales:
+
+- **Nu există presiune de timp.** Dacă un lucru cere încă o verificare, se face.
+  Niciodată „merge și așa, corectăm după lansare” — nu există un după-lansare în
+  care greșeala să coste puțin: clienții sunt cabinete de psihologie, iar
+  vizitatorii lor sunt oameni în perioade grele.
+- **Nimic nu pleacă neverificat.** Nu „am scris codul, pare bine”. Rulat, probat,
+  privit cu ochii pe ecran. Regulile din restul fișierului spun cum.
+- **Ce nu s-a putut verifica se spune pe față**, nu se trece sub tăcere. O
+  garanție nedovedită se scrie ca nedovedită.
+- **Când e de ales între repede și corect, se alege corect.** Iar dacă ceva pare
+  gata prea ușor, aia e chiar clipa în care merită mai atent — jumătate din
+  greșelile din fișierul ăsta au arătat exact așa.
+
+---
+
 ## Limba și scrisul
 
 **Totul în română** — cod, comentarii, mesaje de eroare, mesaje de commit,
 denumiri de variabile și de funcții. Proprietarul e român, clienții finali sunt
 psihologi români.
 
-**Ghilimelele românești se scriu `„…”`**, nu `„…"`. Ghilimeaua dreaptă de
+**Ghilimelele românești se scriu `„…”`**, nu `„…”`. Ghilimeaua dreaptă de
 închidere (`"`) termină un șir JavaScript sau un atribut JSX și rupe fișierul.
 S-a întâmplat de vreo cinci ori. Când apare o eroare de sintaxă inexplicabilă
 într-un fișier cu text românesc, ăsta e primul lucru de verificat.
 
 **Textele pentru client descriu ce SE VEDE, nu cum se cheamă.** „Titlul albastru
-pe care se apasă", nu „meta title". Regula a apărut după un „nu înțeleg asta" la
+pe care se apasă", nu „meta title”. Regula a apărut după un „nu înțeleg asta” la
 cardul de previzualizare Google.
 
 ---
@@ -137,12 +159,12 @@ Când scrii ceva cu o regulă în el, pune regula unde poate fi probată.
 
 ## Cum vorbește proprietarul și ce așteaptă
 
-Întreabă „de ce avem nevoie de asta?" și merită un răspuns cinstit, nu unul de
-vânzător. A acceptat de mai multe ori „nu-ți trebuie" și a mulțumit pentru el.
+Întreabă „de ce avem nevoie de asta?” și merită un răspuns cinstit, nu unul de
+vânzător. A acceptat de mai multe ori „nu-ți trebuie” și a mulțumit pentru el.
 
 Când cere ceva ce pare greșit, spune o dată de ce și, dacă insistă, **fă exact ce
 a cerut** — a avut dreptate la limita de cuvinte care chiar oprește scrisul.
 
-Nu ascunde ce n-a mers. A întrebat „cât mai e până terminăm" tocmai fiindcă
+Nu ascunde ce n-a mers. A întrebat „cât mai e până terminăm” tocmai fiindcă
 listele anterioare fuseseră incomplete; răspunsul corect a fost să caut în cod și
 să găsesc trei lucruri care nu erau în niciun plan.
