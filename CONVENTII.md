@@ -27,6 +27,33 @@ Ce înseamnă în practică, când o sesiune viitoare are de ales:
 
 ---
 
+## Plafonul unui furnizor se citește înainte de a-l alege
+
+31 aug. 2026. Alesesem Cloudflare Turnstile pentru anti-spam pe motive bune
+(GDPR, gratuit, ușor de pus). Ce nu verificasem era cum se poartă la scara
+noastră: Turnstile leagă o cheie de cel mult 10 domenii, cu 20 de chei pe cont.
+Pentru o platformă care înseamnă „un site per cabinet”, plafonul acela nu e o
+limită de ocolit — e capătul produsului, la 200 de clienți, iar planul de peste
+el pornește de la 2.000 $/lună.
+
+Regula care rămâne: la orice serviciu extern pe care îl legăm de **domeniul
+clientului**, prima întrebare nu e „cât costă” și nici „e GDPR-friendly”, ci
+**„câte domenii duce, și ce urmează după”**. Turnstile pica la a doua întrebare
+și am aflat abia când n-a mai apărut caseta pe un site.
+
+A doua parte a lecției, mai importantă decât furnizorul: **alegerea trebuie să
+fie o variabilă de mediu, nu cod.** `src/lib/captcha.ts` ține acum ce diferă
+între furnizori (adresa scriptului, obiectul global, numele câmpului ascuns,
+numele opțiunii de limbă, endpointul de verificare) într-un tabel, iar restul
+codului nu știe la cine se uită. Când următorul furnizor schimbă regulile, se
+atinge un fișier.
+
+Corolar pentru probe: dacă o decizie e luată ca să nu ne mai lovim de un plafon,
+ea se apără cu o probă, nu cu un comentariu. `e2e/captcha.proba.mjs` cade dacă
+implicitul nu mai e cel fără plafon.
+
+---
+
 ## Limba și scrisul
 
 **Totul în română** — cod, comentarii, mesaje de eroare, mesaje de commit,

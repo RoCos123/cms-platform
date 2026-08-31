@@ -2,35 +2,53 @@ import "server-only";
 
 import { headers } from "next/headers";
 import { CAMP_CAPCANA } from "@/lib/formulare";
+import { alegeFurnizor, tokenulDinFormular } from "@/lib/captcha";
 
 export function capcanaDeclansata(formData: FormData): boolean {
   const valoare = formData.get(CAMP_CAPCANA);
   return typeof valoare === "string" && valoare.trim() !== "";
 }
 
-const URL_VERIFICARE = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const TIMEOUT_MS = 5000;
 
 export type VerdictAntispam = { ok: true } | { ok: false; motiv: string };
 
 /**
- * Verifică tokenul Turnstile.
+ * Verifică tokenul casetei anti-spam, la furnizorul configurat (vezi
+ * `src/lib/captcha.ts` — implicit hCaptcha, fiindcă e singurul fără plafon de
+ * domenii).
  *
- * Două decizii care se văd în comportament:
+ * Primește `FormData` întreg, nu tokenul: numele câmpului ascuns diferă de la un
+ * furnizor la altul, iar dacă îl citea fiecare acțiune în parte, o schimbare de
+ * furnizor cerea umblat în trei locuri.
  *
- * 1. **Fără `TURNSTILE_SECRET_KEY`, verificarea se sare.** Serverul e autoritatea:
- *    dacă platforma n-a fost configurată cu Turnstile, formularele trebuie totuși
+ * Trei decizii care se văd în comportament:
+ *
+ * 1. **Fără `CAPTCHA_SECRET_KEY`, verificarea se sare.** Serverul e autoritatea:
+ *    dacă platforma n-a fost configurată cu casetă, formularele trebuie totuși
  *    să funcționeze. Capcana și plafoanele din baza de date rămân active.
  *
- * 2. **La eroare de rețea răspundem „trece", nu „pică".** Un verificator
+ * 2. **La eroare de rețea răspundem „trece”, nu „pică”.** Un verificator
  *    inaccesibil nu e o dovadă că cine trimite e bot. Alternativa — să blocăm
- *    tot cât timp Cloudflare are probleme — ar însemna că un om care caută un
- *    psiholog nu poate lua legătura deloc. Un verdict explicit de „invalid" de
- *    la Cloudflare, în schimb, se respectă.
+ *    tot cât timp furnizorul are probleme — ar însemna că un om care caută un
+ *    psiholog nu poate lua legătura deloc. Un verdict explicit de „invalid”, în
+ *    schimb, se respectă.
+ *
+ * 3. **Hostname-ul din răspuns nu se verifică.** Cheia publică e aceeași pentru
+ *    toate cabinetele, deci cineva ar putea, teoretic, s-o folosească de pe
+ *    pagina lui. Numai că tot ar trebui să rezolve o casetă pentru fiecare
+ *    cerere — adică exact costul pe care caseta îl impune oricum — iar
+ *    plafoanele din `programari.ts` și `formulare.ts` mărginesc restul. În
+ *    schimb, o comparație de gazde ar pica pe www vs. fără www, pe domenii cu
+ *    diacritice și în spatele proxy-urilor, blocând oameni adevărați. Câmpul
+ *    `hostname` există în răspuns dacă vreodată se schimbă socoteala.
  */
-export async function verificaTurnstile(token: string | null): Promise<VerdictAntispam> {
-  const secret = process.env.TURNSTILE_SECRET_KEY;
+export async function verificaCaptcha(formData: FormData): Promise<VerdictAntispam> {
+  const secret = process.env.CAPTCHA_SECRET_KEY;
   if (!secret) return { ok: true };
+
+  const furnizor = alegeFurnizor(process.env.NEXT_PUBLIC_CAPTCHA_FURNIZOR);
+  const token = tokenulDinFormular(formData, furnizor);
 
   if (!token) {
     return {
@@ -45,14 +63,14 @@ export async function verificaTurnstile(token: string | null): Promise<VerdictAn
   if (ip) corp.set("remoteip", ip);
 
   try {
-    const raspuns = await fetch(URL_VERIFICARE, {
+    const raspuns = await fetch(furnizor.verificare, {
       method: "POST",
       body: corp,
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
 
     if (!raspuns.ok) {
-      console.warn(`Turnstile a răspuns cu ${raspuns.status}; las cererea să treacă.`);
+      console.warn(`${furnizor.nume} a răspuns cu ${raspuns.status}; las cererea să treacă.`);
       return { ok: true };
     }
 
@@ -65,15 +83,15 @@ export async function verificaTurnstile(token: string | null): Promise<VerdictAn
       motiv: "Verificarea anti-spam nu a trecut. Bifează caseta de verificare și încearcă din nou.",
     };
   } catch (eroare) {
-    console.warn("Turnstile inaccesibil; las cererea să treacă.", eroare);
+    console.warn(`${furnizor.nume} inaccesibil; las cererea să treacă.`, eroare);
     return { ok: true };
   }
 }
 
 /**
  * IP-ul clientului, atât cât se poate ști în spatele unui proxy. Se trimite doar
- * mai departe la Cloudflare, ca semnal suplimentar — nu se stochează și nu se
- * ia nicio decizie pe baza lui aici, fiindcă anteturile astea sunt falsificabile.
+ * mai departe la furnizor, ca semnal suplimentar — nu se stochează și nu se ia
+ * nicio decizie pe baza lui aici, fiindcă anteturile astea sunt falsificabile.
  */
 async function ipulClientului(): Promise<string | null> {
   const anteturi = await headers();

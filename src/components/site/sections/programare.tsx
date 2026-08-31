@@ -66,7 +66,8 @@ export function Programare({
           zile={zile}
           luni={luni}
           textButon={data.textButon}
-          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || null}
+          siteKey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY || null}
+          furnizorCaptcha={process.env.NEXT_PUBLIC_CAPTCHA_FURNIZOR || null}
           // Pe fundalul închis, caseta antispam trebuie să fie și ea închisă —
           // altfel e un dreptunghi alb în mijlocul secțiunii.
           temaCaptcha={tone === "inchis" ? "dark" : "light"}

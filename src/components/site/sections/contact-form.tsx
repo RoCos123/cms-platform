@@ -4,10 +4,11 @@ import { useActionState } from "react";
 import { trimiteMesajContact } from "@/app/actions/formulare";
 import { LIMITE, STARE_INITIALA } from "@/lib/formulare";
 import { Camp, Capcana, MesajFormular, stilButonTrimite } from "@/components/site/form-parts";
-import { Turnstile } from "@/components/site/turnstile";
+import { Caseta } from "@/components/site/captcha";
 
 export function ContactForm({
   siteKey,
+  furnizorCaptcha,
   temaCaptcha,
   textAcord,
   linkConfidentialitate,
@@ -15,6 +16,7 @@ export function ContactForm({
   textButon,
 }: {
   siteKey: string | null;
+  furnizorCaptcha: string | null;
   temaCaptcha: "light" | "dark";
   textAcord: string;
   /** Lipsă = pagina nu există încă, deci textul rămâne fără link. */
@@ -86,11 +88,18 @@ export function ContactForm({
       />
 
       {/*
-        `key` pe numărul de încercări: tokenul Turnstile e de unică folosință,
+        `key` pe numărul de încercări: tokenul casetei e de unică folosință,
         deci după fiecare trimitere widgetul trebuie remontat ca să emită altul.
         Fără asta, a doua trimitere din aceeași pagină ar fi mereu respinsă.
       */}
-      {siteKey && <Turnstile key={stare.incercari} siteKey={siteKey} tema={temaCaptcha} />}
+      {siteKey && (
+            <Caseta
+              key={stare.incercari}
+              siteKey={siteKey}
+              furnizor={furnizorCaptcha}
+              tema={temaCaptcha}
+            />
+          )}
 
       <button type="submit" disabled={seLucreaza} style={stilButonTrimite(seLucreaza)}>
         {seLucreaza ? "Se trimite…" : textButon}

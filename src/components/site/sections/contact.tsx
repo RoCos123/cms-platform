@@ -60,10 +60,11 @@ const ACORD_IMPLICIT =
  * des, exact motivul pentru care caută un psiholog) are unde scrie.
  */
 export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: SectionTone }) {
-  // Cheia publică lipsă înseamnă că platforma n-are Turnstile configurat: nu
-  // randăm caseta. Serverul sare, la rândul lui, peste verificare — cele două
-  // decizii trebuie să rămână împreună (vezi src/lib/antispam.ts).
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || null;
+  // Cheia publică lipsă înseamnă că platforma n-are casetă anti-spam
+  // configurată: nu o randăm. Serverul sare, la rândul lui, peste verificare —
+  // cele două decizii trebuie să rămână împreună (vezi src/lib/antispam.ts).
+  const siteKey = process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY || null;
+  const furnizorCaptcha = process.env.NEXT_PUBLIC_CAPTCHA_FURNIZOR || null;
 
   return (
     <Section tone={tone} id="contact">
@@ -133,6 +134,7 @@ export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: 
 
         <ContactForm
           siteKey={siteKey}
+          furnizorCaptcha={furnizorCaptcha}
           temaCaptcha={tone === "inchis" ? "dark" : "light"}
           textAcord={data.textAcord ?? ACORD_IMPLICIT}
           // Fără valoare implicită: `/confidentialitate` nu există încă, iar un

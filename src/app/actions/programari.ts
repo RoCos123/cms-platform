@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getTenant } from "@/lib/dal";
 import { tenantTable } from "@/lib/supabase/admin";
-import { capcanaDeclansata, verificaTurnstile } from "@/lib/antispam";
+import { capcanaDeclansata, verificaCaptcha } from "@/lib/antispam";
 import { LIMITE, citesteText, esteEmailValid, type StareFormular } from "@/lib/formulare";
 import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
 import { eroriDeContact, motivValid, opresteCererea, oraEsteLibera } from "@/lib/programari";
@@ -83,7 +83,7 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
     return { status: "eroare", mesaj: "Mai lipsește ceva.", erori, valori };
   }
 
-  const antispam = await verificaTurnstile(formData.get("cf-turnstile-response") as string | null);
+  const antispam = await verificaCaptcha(formData);
   if (!antispam.ok) {
     return { status: "eroare", mesaj: antispam.motiv || EROARE_TEHNICA, valori };
   }

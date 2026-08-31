@@ -1,7 +1,7 @@
 "use server";
 
 import { tenantTable } from "@/lib/supabase/admin";
-import { capcanaDeclansata, verificaTurnstile } from "@/lib/antispam";
+import { capcanaDeclansata, verificaCaptcha } from "@/lib/antispam";
 import { LIMITE, citesteText, esteEmailValid, type StareFormular } from "@/lib/formulare";
 
 /**
@@ -75,11 +75,7 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
     return { status: "eroare", erori, valori, mesaj: "Mai lipsește ceva mai jos." };
   }
 
-  const verdict = await verificaTurnstile(
-    typeof formData.get("cf-turnstile-response") === "string"
-      ? (formData.get("cf-turnstile-response") as string)
-      : null,
-  );
+  const verdict = await verificaCaptcha(formData);
 
   if (!verdict.ok) {
     return { status: "eroare", mesaj: verdict.motiv, valori };
@@ -173,11 +169,7 @@ async function proceseazaAbonare(formData: FormData): Promise<Omit<StareFormular
     };
   }
 
-  const verdict = await verificaTurnstile(
-    typeof formData.get("cf-turnstile-response") === "string"
-      ? (formData.get("cf-turnstile-response") as string)
-      : null,
-  );
+  const verdict = await verificaCaptcha(formData);
 
   if (!verdict.ok) {
     return { status: "eroare", mesaj: verdict.motiv, valori };

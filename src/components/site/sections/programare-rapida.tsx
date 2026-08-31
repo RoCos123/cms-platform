@@ -4,7 +4,7 @@ import { useActionState, useState } from "react";
 import { cereProgramare } from "@/app/actions/programari";
 import { LIMITE, STARE_INITIALA } from "@/lib/formulare";
 import { Camp, Capcana, MesajFormular, stilButonTrimite } from "@/components/site/form-parts";
-import { Turnstile } from "@/components/site/turnstile";
+import { Caseta } from "@/components/site/captcha";
 import { Calendar } from "@/components/site/calendar";
 import type { LunaCalendar } from "@/lib/calendar";
 import type { ZiCuOreScrise } from "./programare";
@@ -27,12 +27,14 @@ export function ProgramareRapida({
   luni,
   textButon,
   siteKey,
+  furnizorCaptcha,
   temaCaptcha,
 }: {
   zile: ZiCuOreScrise[];
   luni: LunaCalendar[];
   textButon?: string;
   siteKey: string | null;
+  furnizorCaptcha: string | null;
   temaCaptcha: "light" | "dark";
 }) {
   const [stare, actiune, seLucreaza] = useActionState(cereProgramare, STARE_INITIALA);
@@ -142,7 +144,14 @@ export function ProgramareRapida({
             Datele scrise aici sunt folosite doar ca să fie stabilită programarea.
           </p>
 
-          {siteKey && <Turnstile key={stare.incercari} siteKey={siteKey} tema={temaCaptcha} />}
+          {siteKey && (
+            <Caseta
+              key={stare.incercari}
+              siteKey={siteKey}
+              furnizor={furnizorCaptcha}
+              tema={temaCaptcha}
+            />
+          )}
 
           <button type="submit" disabled={seLucreaza} style={stilButonTrimite(seLucreaza)}>
             {seLucreaza ? "Se trimite…" : textButon || "Cere ora aceasta"}

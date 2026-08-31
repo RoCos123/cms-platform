@@ -53,13 +53,24 @@ Scalează fără limită de bucket-uri la mii de tenanți. Izolarea între tenan
 
 ---
 
-## 5. Resend + Turnstile
+## 5. Resend + casetă anti-spam
 
-Reconfirmate — deciziile din `CONTEXT.md` (§„Decizii confirmate") rămân valabile:
 - **Resend** pentru email tranzacțional (notificări contact + confirmări programări).
-- **Cloudflare Turnstile** pentru anti-spam pe formularele publice (ales explicit în locul reCAPTCHA, pentru GDPR).
+- **hCaptcha** pentru anti-spam pe formularele publice.
 
-Nimic de schimbat aici. Rămâne pe lista „ce rămâne pe tine" din plan: crearea conturilor + obținerea cheilor API, înainte ca Faza 1 să le poată folosi efectiv.
+**Schimbat pe 31 aug. 2026.** Alesesem Cloudflare Turnstile, tot în locul
+reCAPTCHA și tot pentru GDPR. Turnstile acceptă însă cel mult 10 domenii pe cheie
+și 20 de chei pe cont — 200 de domenii cu totul — iar peste ele urmează un plan
+de la 2.000 $/lună. Pentru o platformă cu un site per cabinet, ăla e un capăt de
+drum, nu o factură mai mare. hCaptcha n-are plafonul: o cheie merge implicit pe
+oricâte domenii. Motivul GDPR pentru care respinsesem reCAPTCHA rămâne satisfăcut
+— hCaptcha e al Intuition Machines, nu al Google.
+
+Alegerea e o variabilă de mediu (`NEXT_PUBLIC_CAPTCHA_FURNIZOR`), nu cod: vezi
+`src/lib/captcha.ts` și §„Anti-spam” din `CONTEXT.md`.
+
+Rămâne pe lista „ce rămâne pe tine” din plan: crearea conturilor + obținerea
+cheilor API, înainte ca Faza 1 să le poată folosi efectiv.
 
 ---
 

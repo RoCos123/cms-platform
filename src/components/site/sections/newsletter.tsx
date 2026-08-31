@@ -26,7 +26,8 @@ const NOTA_IMPLICITA =
  * email, care se implementează în Faza 6, când există trimitere de emailuri.
  */
 export function Newsletter({ data, tone = "inchis" }: { data: NewsletterData; tone?: SectionTone }) {
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || null;
+  const siteKey = process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY || null;
+  const furnizorCaptcha = process.env.NEXT_PUBLIC_CAPTCHA_FURNIZOR || null;
 
   return (
     <Section tone={tone} id="newsletter">
@@ -75,6 +76,7 @@ export function Newsletter({ data, tone = "inchis" }: { data: NewsletterData; to
         <div style={{ marginTop: "32px", textAlign: "left" }}>
           <NewsletterForm
             siteKey={siteKey}
+            furnizorCaptcha={furnizorCaptcha}
             temaCaptcha={tone === "inchis" ? "dark" : "light"}
             textButon={data.textButon ?? "Abonează-mă"}
             placeholder={data.placeholder ?? "adresa@exemplu.ro"}

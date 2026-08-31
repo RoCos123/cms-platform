@@ -99,7 +99,8 @@ export default async function PaginaProgramare({
             <FormularProgramare
               zile={deAles}
               luni={luni}
-              siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || null}
+              siteKey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY || null}
+              furnizorCaptcha={process.env.NEXT_PUBLIC_CAPTCHA_FURNIZOR || null}
               // Secțiunea are tonul „deschis”, deci caseta merge pe varianta deschisă.
               temaCaptcha="light"
               linkConfidentialitate={confidentialitate ? `/${confidentialitate.slug}` : undefined}

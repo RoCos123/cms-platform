@@ -4,16 +4,18 @@ import { useActionState } from "react";
 import { aboneazaLaNewsletter } from "@/app/actions/formulare";
 import { LIMITE, STARE_INITIALA } from "@/lib/formulare";
 import { Capcana, MesajFormular, stilButonTrimite, stilControl } from "@/components/site/form-parts";
-import { Turnstile } from "@/components/site/turnstile";
+import { Caseta } from "@/components/site/captcha";
 
 export function NewsletterForm({
   siteKey,
+  furnizorCaptcha,
   temaCaptcha,
   textButon,
   placeholder,
   mesajSucces,
 }: {
   siteKey: string | null;
+  furnizorCaptcha: string | null;
   temaCaptcha: "light" | "dark";
   textButon: string;
   placeholder: string;
@@ -73,11 +75,18 @@ export function NewsletterForm({
       )}
 
       {/*
-        `key` pe numărul de încercări: tokenul Turnstile e de unică folosință,
+        `key` pe numărul de încercări: tokenul casetei e de unică folosință,
         deci după fiecare trimitere widgetul trebuie remontat ca să emită altul.
         Fără asta, a doua trimitere din aceeași pagină ar fi mereu respinsă.
       */}
-      {siteKey && <Turnstile key={stare.incercari} siteKey={siteKey} tema={temaCaptcha} />}
+      {siteKey && (
+            <Caseta
+              key={stare.incercari}
+              siteKey={siteKey}
+              furnizor={furnizorCaptcha}
+              tema={temaCaptcha}
+            />
+          )}
     </form>
   );
 }

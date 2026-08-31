@@ -26,7 +26,7 @@ Reperul de efort: originalul (single-tenant, un client, cu bug-uri de configurar
 - **Stack:** Next.js App Router (RSC + Server Actions, **nu REST**), Supabase (Postgres + Auth + Storage + RLS), Tailwind, TypeScript, Vercel. Confirmat din trafic: originalul nu face niciun apel `/api/` — totul server-rendered + Server Actions.
 - **Multi-tenant din prima migrare:** `site_id` pe fiecare tabel + RLS de la început, nu retrofit ulterior (retrofitarea e dureroasă și riscantă pe date reale).
 - **Rezolvare tenant:** domeniul cererii → `site_id`, printr-un tabel `sites` + middleware.
-- **API-uri externe obligatorii pentru MVP:** Supabase; email tranzacțional (Resend recomandat) pentru notificări contact + confirmări programări; anti-spam (Cloudflare Turnstile — GDPR-friendly, spre deosebire de reCAPTCHA) pe formularele publice.
+- **API-uri externe obligatorii pentru MVP:** Supabase; email tranzacțional (Resend recomandat) pentru notificări contact + confirmări programări; anti-spam (hCaptcha — GDPR-friendly ca și Turnstile, dar fără plafon de domenii; vezi §„Anti-spam”) pe formularele publice.
 - **Emailul tranzacțional se face ULTIMUL** (confirmat 26 aug. 2026, la cererea proprietarului: „nu am ce email să fac acum”). Contul de trimitere nu există încă. Până atunci, mesajele din formular se văd doar în panou, cu numărul de necitite lângă „Mesaje” — vezi `TODO` din `src/app/actions/formulare.ts`. **Nu propune Resend ca următorul pas**; e ultimul de pe listă, indiferent cât de mult ar ajuta.
 - **Pentru scalare (fazele ulterioare):** Vercel Domains API (conectare automată domeniu propriu per client), Stripe (billing).
 - **Opționale:** Google Analytics — DOUĂ integrări distincte (tag `gtag` care colectează pe site-ul public vs. GA4 Data API cu service account care citește datele înapoi în dashboard — originalul confundă asta, de evitat); Google Calendar API / Cal.com pentru sincronizare programări; Search Console API.
@@ -68,7 +68,7 @@ Ce s-a hotărât pe parcurs, ca să nu fie redeschis din senin:
   fost dată. Lipsesc din sitemap ȘI primesc `noindex` — cele două locuri se
   schimbă împreună.
 - **Politica de confidențialitate**: șablon în `sabloane/`, potrivit pe ce face
-  chiar site-ul ăsta (formular, Turnstile, fonturi Google, zero cookie-uri la
+  chiar site-ul ăsta (formular, hCaptcha, fonturi Google, zero cookie-uri la
   vizitatori, zero urmărire). Nu e text juridic verificat.
 
 ## Ce lipsește și nu era în niciun plan
@@ -507,39 +507,58 @@ există deja. Clientul o găsește apoi în „Secțiuni”, de mutat unde vrea.
 n-are nicio zi bifată în program, secțiunea nu se randează pe site: o invitație
 la programare fără nicio oră liberă e mai rea decât nimic.
 
-## Turnstile: limita de 10 domenii pe cheie
+## Anti-spam: de ce am plecat de la Turnstile la hCaptcha
 
 Găsit pe 28 aug. 2026, verificând de ce nu apare caseta anti-spam pe site.
-Cloudflare leagă o pereche de chei de o listă de domenii, iar lista are
+Cloudflare leagă o pereche de chei Turnstile de o listă de domenii, iar lista are
 **maximum 10 intrări**. Metacaracterele NU sunt acceptate, deci
-`*.platformata.ro` nu ține loc de nimic.
+`*.platformata.ro` nu ține loc de nimic. Planul gratuit dă 20 de chei, adică
+**200 de domenii cu totul**. Peste ele urmează Enterprise Bot Management, de la
+**2.000 $/lună** — peste 108.000 lei pe an, adică de două ori și jumătate
+venitul recurent al unui produs cu 200 de clienți la 200 lei/an. Nu e un plan
+mai scump, e un capăt de drum.
 
-**Planul gratuit dă însă 20 de chei**, adică **200 de domenii, gratis**, cu
-cereri nelimitate. Pasul următor al Cloudflare e Enterprise Bot Management, de
-la 2.000 $/lună — adică de peste două ori venitul recurent al unui produs cu 200
-de clienți. Nu e o variantă, și nu trebuie tratată ca una: la 200 de clienți se
-schimbă furnizorul, nu planul.
+Am cântărit întâi un plan de ocolire: o pereche de chei la fiecare zece domenii,
+douăzeci de variabile de mediu pentru două sute de clienți. **L-am aruncat pe
+31 aug. 2026**, când s-a limpezit orizontul real — 200 de clienți în cel mult un
+an, nu „peste ani”. Un ocol care se termină exact acolo unde ajungem oricum nu e
+o soluție, e muncă făcută de două ori.
 
-**Consecința pentru noi:** o singură pereche de chei acoperă primii ~8 clienți
-(plus site-ul proprietarului și cel al firmei). La al nouălea, caseta pur și
-simplu nu se mai randează pe domeniul nou — iar dacă cheia secretă e pusă,
-formularele acelui client se închid complet.
+**Decizia: furnizorul implicit e hCaptcha.** La hCaptcha o cheie merge implicit
+pe ORICE domeniu; lista de domenii e opțională și, când o pui, e nelimitată
+(„some customers need to use many domains per sitekey”,
+docs.hcaptcha.com/configuration). O singură pereche de chei ține toată platforma,
+la 20 de cabinete ca și la 2.000, iar **un client nou nu se mai înregistrează
+nicăieri** — ceea ce contează mai mult decât pare, fiindcă provizionarea unui
+cabinet e o linie de SQL și trebuie să rămână așa. Gratis, cu aceeași poveste
+GDPR pentru care alesesem Turnstile în locul reCAPTCHA (hCaptcha e al Intuition
+Machines, nu al Google, și nu profilează pentru reclame).
 
-**Nu e urgent, dar trebuie făcut înainte de al optulea client:** mai multe
-perechi de chei, câte una la zece domenii.
+**Lecția, care contează mai mult decât furnizorul:** anti-spamul e acum o
+variabilă de mediu, nu cod. `src/lib/captcha.ts` ține tabelul celor doi
+furnizori — adresa scriptului, obiectul global, numele câmpului ascuns, numele
+opțiunii de limbă, endpointul de verificare — și e singurul fișier care se
+atinge dacă vreunul schimbă regulile. `NEXT_PUBLIC_CAPTCHA_FURNIZOR` alege
+(gol = hCaptcha); o valoare scrisă greșit cade pe implicit și lasă un avertisment
+în jurnal, fiindcă un typo într-o variabilă de mediu n-are voie să închidă
+formularele de pe toate site-urile. Probele din `e2e/captcha.proba.mjs` țin
+implicitul și separarea câmpurilor pe loc.
 
-Cheia publică se ține pe rândul site-ului — e publică prin definiție, o vede
-oricine deschide pagina, deci n-are ce căuta ascunsă. Cheile secrete stau în
-variabile de mediu, una per grup: **douăzeci de variabile pentru două sute de
-clienți.** Urât, dar merge, și — important — NU înseamnă secrete per client în
-bază, adică n-are nimic de-a face cu riscul discutat la plăți.
+Cheia publică ajunge oricum în pagină, deci n-are ce căuta ascunsă; secretul stă
+într-o singură variabilă de mediu, `CAPTCHA_SECRET_KEY`. **Zero secrete per
+client în bază** — n-are nicio legătură cu riscul discutat la plăți.
 
-Peste 200 de clienți: alt furnizor (hCaptcha, reCAPTCHA), la care verificarea de
-domeniu se poate opri. Sau deloc — de evaluat atunci, cu cifrele de-atunci.
+Ce NU verificăm: gazda din răspunsul furnizorului. Cheia publică fiind aceeași
+pentru toate cabinetele, cineva ar putea teoretic s-o folosească de pe pagina
+lui — dar tot ar trebui să rezolve o casetă la fiecare cerere, adică exact costul
+pe care caseta îl impune oricum, iar plafoanele din bază mărginesc restul. O
+comparație de gazde, în schimb, ar pica pe www vs. fără www, pe domenii cu
+diacritice și în spatele proxy-urilor, blocând oameni adevărați. Câmpul
+`hostname` există în răspuns dacă vreodată se schimbă socoteala.
 
 De reținut și partea bună: de când formularele nu mai adună text liber și au
-plafoane, spamul costă mai puțin decât înainte. Turnstile rămâne prima linie,
-dar nu mai e singura.
+plafoane, spamul costă mai puțin decât înainte. Caseta e prima linie, dar nu mai
+e singura.
 
 ## Analytics: de ce numărăm noi, și de ce nu numărăm oameni
 

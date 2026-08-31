@@ -29,9 +29,9 @@ export type StareFormular = {
    */
   valori?: Record<string, string>;
   /**
-   * Câte trimiteri s-au încheiat. Nu e telemetrie: tokenul Turnstile e de unică
-   * folosință, iar formularul pune numărul ăsta drept `key` pe widget, ca React
-   * să-l remonteze după fiecare încercare și acesta să emită alt token.
+   * Câte trimiteri s-au încheiat. Nu e telemetrie: tokenul casetei anti-spam e
+   * de unică folosință, iar formularul pune numărul ăsta drept `key` pe widget,
+   * ca React să-l remonteze după fiecare încercare și acesta să emită alt token.
    *
    * Stă în starea acțiunii, nu într-un `useState` sincronizat printr-un efect:
    * un `setState` în efect declanșează redări în cascadă, iar aici valoarea e

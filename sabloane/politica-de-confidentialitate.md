@@ -1,7 +1,7 @@
 # Șablon: Politica de confidențialitate
 
 Text de pornire pentru pagina de confidențialitate a unui cabinet, potrivit pe
-ce face CHIAR acest site: formular de contact, verificare anti-spam Cloudflare,
+ce face CHIAR acest site: formular de contact, verificare anti-spam hCaptcha,
 fonturi de la Google, fără urmărire și fără cookie-uri pentru vizitatori.
 
 **Nu e text juridic verificat.** E o descriere onestă a ce se întâmplă tehnic,
@@ -23,8 +23,11 @@ mai face ceva ce site-ul nu face (newsletter, programări online, plăți).
 
 ## De verificat înainte de publicare
 
-- **Turnstile.** Dacă `TURNSTILE_SECRET_KEY` nu e pus în variabilele de mediu,
-  verificarea anti-spam nu rulează — atunci scoate paragraful despre Cloudflare.
+- **Caseta anti-spam.** Dacă `CAPTCHA_SECRET_KEY` nu e pus în variabilele de
+  mediu, verificarea nu rulează — atunci scoate paragraful despre ea. Dacă e
+  pus, paragraful trebuie să numească furnizorul chiar folosit
+  (`NEXT_PUBLIC_CAPTCHA_FURNIZOR`): implicit hCaptcha (Intuition Machines),
+  altfel Cloudflare Turnstile.
 - **Fonturile.** Cât timp site-ul le încarcă de la Google Fonts, paragraful
   despre ele trebuie să rămână. Dacă le mutăm vreodată pe serverul nostru, se
   scoate.
@@ -45,11 +48,11 @@ Pentru orice întrebare legată de datele tale, scrie-mi la [EMAIL DE CONTACT].
 
 ## Ce date strâng și de ce
 
-Prin formularul de contact de pe site se salvează numele, adresa de email și mesajul tău. Am nevoie de ele pentru un singur lucru: ca să-ți pot răspunde.
+Prin formularul de contact de pe site se salvează numele și numărul tău de telefon, iar adresa de email doar dacă vrei s-o lași. Am nevoie de ele pentru un singur lucru: ca să te pot contacta înapoi.
 
-Formularul nu îți cere numărul de telefon. Dacă mi-l scrii chiar tu în mesaj, ajunge tot acolo, împreună cu restul textului.
+Formularul nu are căsuță de mesaj, dinadins. Nu vreau să ajungă la mine, printr-o pagină de internet, lucruri despre sănătatea ta înainte să fi vorbit vreodată. Ce ai de spus îmi spui la telefon sau la prima ședință.
 
-Ca să nu primesc mesaje trimise automat de programe, formularul folosește un serviciu al Cloudflare, numit Turnstile. Pentru verificarea aceasta, adresa IP a dispozitivului tău ajunge la Cloudflare. Eu nu o primesc și nu o păstrez.
+Ca să nu primesc mesaje trimise automat de programe, formularul folosește un serviciu numit hCaptcha, al firmei Intuition Machines. Pentru verificarea aceasta, adresa IP a dispozitivului tău ajunge la ei. Eu nu o primesc și nu o păstrez.
 
 Fonturile cu care e scris site-ul se încarcă de la Google Fonts, așa că browserul tău cere fișierele acelea direct de la serverele Google, care îți văd adresa IP. E singurul lucru pe care site-ul îl cere de la altcineva în timp ce îl citești.
 
@@ -73,7 +76,7 @@ Site-ul, baza de date și fișierele sunt găzduite de firme care se ocupă de p
 
 — Vercel Inc., pentru găzduirea site-ului
 — Supabase Inc., pentru baza de date și fișierele încărcate
-— Cloudflare Inc., pentru verificarea anti-spam a formularului
+— Intuition Machines Inc. (hCaptcha), pentru verificarea anti-spam a formularului
 
 Niciuna nu are dreptul să folosească datele tale altfel decât ca să țină site-ul în funcțiune.
 
