@@ -145,6 +145,34 @@ bază**. Fără clonare per client: asta e chiar diferența față de „templat
 clonat", iar `site_id` + RLS de la prima migrare există exact ca să nu fie
 nevoie.
 
+## Ce se predă clientului (28 aug. 2026)
+
+Hotărât de proprietar: **se predă un site GOL, iar clientul își pune singur
+textele și pozele.** Proprietarul face doar instructajul. Nu scrie conținut în
+locul lui, nici la primul client.
+
+Consecința, care schimbă ce merită construit: **panoul E produsul.** Nu e o
+unealtă secundară lângă un site făcut manual — e singurul lucru prin care
+clientul își face site-ul. Orice loc în care se împotmolește devine un telefon
+la proprietar, iar la 40 de clienți asta e diferența dintre o afacere și o
+slujbă de suport.
+
+De aici, trei lucruri urcă în prioritate față de cum erau socotite:
+
+1. **Ecranul „Pregătit de lansare”** nu mai e doar argument de vânzare. E
+   lucrul care îi spune clientului *„gata, ai terminat”* fără să te întrebe pe
+   tine. Fără el, fiecare client te sună să te întrebe dacă mai are ceva de
+   făcut.
+2. **Textele din panou** trebuie să fie de sine stătătoare. Regula „descriu ce
+   SE VEDE, nu cum se cheamă” din CONVENTII.md devine obligatorie, nu
+   preferabilă: nu mai există cineva lângă client care să traducă.
+3. **Resetarea parolei** e obligatorie înainte de primul client. Un om care își
+   scrie singur site-ul intră în panou de zeci de ori în prima lună.
+
+Ordinea de lucru convenită după clarificarea asta: resetarea parolei, apoi
+adresa temporară de platformă (ca să nu stea blocat pe dinafară cât se
+răspândește DNS-ul).
+
 ## Estimare de efort (corectată)
 
 Lucrând activ cu Claude generând codul (nu un dev scriind manual):
