@@ -507,6 +507,36 @@ există deja. Clientul o găsește apoi în „Secțiuni”, de mutat unde vrea.
 n-are nicio zi bifată în program, secțiunea nu se randează pe site: o invitație
 la programare fără nicio oră liberă e mai rea decât nimic.
 
+## Turnstile: limita de 10 domenii pe cheie
+
+Găsit pe 28 aug. 2026, verificând de ce nu apare caseta anti-spam pe site.
+Cloudflare leagă o pereche de chei de o listă de domenii, iar lista are
+**maximum 10 intrări pe planul obișnuit**. Metacaracterele NU sunt acceptate,
+deci `*.platformata.ro` nu ține loc de nimic. Ridicarea limitei cere Enterprise,
+sau o funcție în alfa pentru care trebuie vorbit cu ei.
+
+**Consecința pentru noi:** o singură pereche de chei acoperă primii ~8 clienți
+(plus site-ul proprietarului și cel al firmei). La al nouălea, caseta pur și
+simplu nu se mai randează pe domeniul nou — iar dacă cheia secretă e pusă,
+formularele acelui client se închid complet.
+
+**Nu e urgent, dar trebuie hotărât înainte de al optulea client.** Variantele,
+în ordinea în care le-aș încerca:
+
+1. **Cerut Cloudflare ridicarea limitei** sau funcția din alfa. Gratis dacă
+   acceptă; o discuție, nu cod.
+2. **Mai multe perechi de chei, câte una la zece clienți.** Cheia publică se
+   poate ține pe rândul site-ului — e publică prin definiție, o vede oricine
+   deschide pagina. Cheile secrete stau în variabile de mediu, una per grup:
+   zece variabile la o sută de clienți. Urât, dar merge, și NU înseamnă secrete
+   per client în bază.
+3. **Alt furnizor** (hCaptcha, reCAPTCHA), la care verificarea de domeniu se
+   poate opri. De evaluat abia dacă primele două cad.
+
+De reținut și partea bună: de când formularele nu mai adună text liber și au
+plafoane, spamul costă mai puțin decât înainte. Turnstile rămâne prima linie,
+dar nu mai e singura.
+
 ## Analytics: de ce numărăm noi, și de ce nu numărăm oameni
 
 Hotărât 27 aug. 2026, la cererea proprietarului: trebuie să meargă la sute de
