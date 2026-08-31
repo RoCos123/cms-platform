@@ -31,7 +31,7 @@ export default async function MesajePage({
 
   let interogare = supabase
     .from("contact_messages")
-    .select("id, name, email, message, created_at, read_at, deleted_at")
+    .select("id, name, email, phone, message, created_at, read_at, deleted_at")
     .eq("site_id", session.siteId)
     .order("created_at", { ascending: false })
     .limit(LIMITA);
@@ -59,7 +59,10 @@ export default async function MesajePage({
     id: rand.id as string,
     nume: rand.name as string,
     email: rand.email as string,
-    text: rand.message as string,
+    telefon: (rand.phone as string | null) ?? null,
+    // Poate lipsi: mesajele de după 28 aug. 2026 n-au text, formularul nu-l
+    // mai cere. Cele vechi îl păstrează.
+    text: (rand.message as string | null) ?? null,
     primitLa: rand.created_at as string,
     citit: rand.read_at !== null,
     sters: rand.deleted_at !== null,

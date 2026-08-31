@@ -169,7 +169,7 @@ cross join (values
     'eyebrow', 'Contact',
     'titlu', 'Hai să',
     'titluAccent', 'vorbim.',
-    'intro', 'Scrie-mi câteva rânduri despre ce te aduce aici. Nu trebuie să știi de unde să începi — e suficient să începi.',
+    'intro', 'Lasă-mi numele și numărul. Te sun eu, la ora care îți convine.',
     -- Fără câmp de adresă a linkului: telefonul și emailul devin apăsabile
     -- singure, după cum arată conținutul. Programul are două rânduri, ca să se
     -- vadă că se poate.

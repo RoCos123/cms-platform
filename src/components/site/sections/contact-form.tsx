@@ -44,6 +44,21 @@ export function ContactForm({
         valoare={stare.valori?.nume}
       />
 
+      {/*
+        Telefonul e cerut, emailul nu — pe dos față de cum era.
+        „Lasă-mi numele și numărul, te sun" e felul în care lucrează un cabinet
+        mic, iar cine preferă să i se scrie lasă și adresa.
+      */}
+      <Camp
+        id="contact-telefon"
+        name="telefon"
+        eticheta="Telefon"
+        autoComplete="tel"
+        maxLength={40}
+        eroare={stare.erori?.telefon}
+        valoare={stare.valori?.telefon}
+      />
+
       <Camp
         id="contact-email"
         name="email"
@@ -51,19 +66,18 @@ export function ContactForm({
         eticheta="Adresa de email"
         autoComplete="email"
         maxLength={LIMITE.email}
+        obligatoriu={false}
         eroare={stare.erori?.email}
         valoare={stare.valori?.email}
       />
 
-      <Camp
-        id="contact-mesaj"
-        name="mesaj"
-        eticheta="Mesajul tău"
-        randuri={6}
-        maxLength={LIMITE.mesaj}
-        eroare={stare.erori?.mesaj}
-        valoare={stare.valori?.mesaj}
-      />
+      {/*
+        Câmpul de mesaj a fost scos dinadins (28 aug. 2026). Pe site-ul unui
+        psiholog, „scrie-mi câteva rânduri" adună date despre sănătate —
+        categoria cu cerințele legale cele mai stricte. Vezi migrarea
+        `contact_fara_mesaj` pentru raționamentul întreg. Nu se pune la loc
+        fără să se recitească acolo.
+      */}
 
       <Acord
         eroare={stare.erori?.acord}

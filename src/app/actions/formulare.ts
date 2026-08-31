@@ -16,7 +16,7 @@ import { LIMITE, citesteText, esteEmailValid, type StareFormular } from "@/lib/f
  * să nu existe altă cale în afară de asta.
  */
 
-const SUCCES_CONTACT = "Mulțumim pentru mesaj. Vei primi un răspuns cât de curând.";
+const SUCCES_CONTACT = "Am primit datele tale. Vei fi contactat cât de curând.";
 const SUCCES_NEWSLETTER = "Gata. Dacă adresa e nouă, vei primi un email de confirmare.";
 const EROARE_TEHNICA =
   "Mesajul nu a putut fi trimis din cauza unei probleme tehnice. Te rugăm să încerci din nou peste câteva minute.";
@@ -52,15 +52,21 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
 
   const nume = citesteText(formData, "nume", LIMITE.nume);
   const email = citesteText(formData, "email", LIMITE.email);
-  const mesaj = citesteText(formData, "mesaj", LIMITE.mesaj);
+  const telefon = citesteText(formData, "telefon", 40);
   const acord = formData.get("acord") === "da";
-  const valori = { nume, email, mesaj };
+  const valori = { nume, email, telefon };
 
   const erori: Record<string, string> = {};
 
   if (nume.length < 2) erori.nume = "Te rugăm să scrii numele tău.";
-  if (!esteEmailValid(email)) erori.email = "Adresa de email nu pare completă.";
-  if (mesaj.length < 10) erori.mesaj = "Scrie câteva cuvinte despre ce te aduce aici.";
+  /*
+   * Telefonul e cerut, emailul e în plus. Formularul nu mai are câmp de mesaj
+   * (vezi migrarea `contact_fara_mesaj`), deci telefonul e singura cale sigură
+   * prin care cabinetul poate răspunde — aceeași regulă ca la formularul scurt
+   * de programare.
+   */
+  if (!telefon) erori.telefon = "Lasă un număr de telefon, ca să poți fi sunat.";
+  if (email && !esteEmailValid(email)) erori.email = "Adresa de email nu pare completă.";
   // Consimțământul e obligatoriu prin GDPR și trebuie să fie o acțiune, nu o
   // bifă pusă din start — de asta se verifică aici, nu doar prin `required`.
   if (!acord) erori.acord = "Avem nevoie de acordul tău ca să îți putem răspunde.";
@@ -83,9 +89,12 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
     const tabel = await tenantTable("contact_messages");
 
     const de_cand = new Date(Date.now() - FEREASTRA_DUBLARE_MS).toISOString();
+    // Dublarea se caută pe TELEFON, nu pe email: emailul e acum opțional, iar
+    // o căutare pe șir gol ar fi găsit orice altă cerere fără email din ultimul
+    // minut și ar fi aruncat-o în tăcere pe a doua persoană.
     const { data: recent } = await tabel
       .select("id")
-      .eq("email", email)
+      .eq("phone", telefon)
       .gte("created_at", de_cand)
       .limit(1);
 
@@ -112,8 +121,12 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
 
     const { error } = await tabel.insert({
       name: nume,
-      email,
-      message: mesaj,
+      phone: telefon,
+      // `null`, nu șir gol: emailul lipsă și emailul gol sunt lucruri diferite,
+      // iar în panou „" ar fi devenit un link `mailto:` care nu duce nicăieri.
+      email: email || null,
+      // Nu se mai adună. Coloana rămâne, cu mesajele primite până acum.
+      message: null,
       consent: acord,
     });
 

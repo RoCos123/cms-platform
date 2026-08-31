@@ -130,7 +130,7 @@ begin
       )
       when 'contact' then jsonb_build_object(
         'titlu', 'Hai să vorbim',
-        'intro', 'Scrie-mi câteva rânduri și îți răspund.'
+        'intro', 'Lasă-mi numele și numărul, te sun eu.'
       )
       else '{}'::jsonb
     end

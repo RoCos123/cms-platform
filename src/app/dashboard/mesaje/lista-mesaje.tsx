@@ -12,8 +12,11 @@ import { marcheazaCitit, mutaLaSterse, restaureaza, stergeDefinitiv } from "./ac
 export type Mesaj = {
   id: string;
   nume: string;
-  email: string;
-  text: string;
+  /** Poate lipsi: formularul nu-l mai cere, e opțional. */
+  email: string | null;
+  telefon: string | null;
+  /** Lipsește la cererile primite după 28 aug. 2026 — vezi `contact_fara_mesaj`. */
+  text: string | null;
   primitLa: string;
   citit: boolean;
   sters: boolean;
@@ -111,19 +114,36 @@ export function ListaMesaje({
                 </time>
               </div>
 
-              <p className="mt-0.5 text-sm">
-                <a
-                  href={`mailto:${mesaj.email}`}
-                  className="text-muted-foreground underline underline-offset-2"
-                >
-                  {mesaj.email}
-                </a>
+              {/*
+                Telefonul primul: e calea principală de răspuns de când
+                formularul nu mai cere mesajul. Amândouă ca linkuri pe care se
+                apasă — pe telefon, apasă și sună.
+              */}
+              <p className="mt-0.5 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                {mesaj.telefon && (
+                  <a
+                    href={`tel:${mesaj.telefon.replace(/\s/g, "")}`}
+                    className="text-muted-foreground underline underline-offset-2"
+                  >
+                    {mesaj.telefon}
+                  </a>
+                )}
+                {mesaj.email && (
+                  <a
+                    href={`mailto:${mesaj.email}`}
+                    className="text-muted-foreground underline underline-offset-2"
+                  >
+                    {mesaj.email}
+                  </a>
+                )}
               </p>
 
               {/* `whitespace-pre-wrap`: omul a scris pe rânduri, nu într-un bloc. */}
-              <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-                {mesaj.text}
-              </p>
+              {mesaj.text && (
+                <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                  {mesaj.text}
+                </p>
+              )}
 
               <div className="mt-4 flex flex-wrap gap-2">
                 {mesaj.sters ? (
@@ -147,12 +167,20 @@ export function ListaMesaje({
                   </>
                 ) : (
                   <>
-                    {/* Ancoră reală: e navigare către clientul de email, nu o acțiune. */}
+                    {/*
+                      Ancoră reală: e navigare, nu o acțiune. Sună dacă nu există
+                      email — de când formularul cere telefonul, ăla e cazul
+                      obișnuit, iar un `mailto:` gol n-ar duce nicăieri.
+                    */}
                     <a
-                      href={`mailto:${mesaj.email}?subject=${encodeURIComponent(`Răspuns la mesajul tău de pe ${domeniu}`)}`}
+                      href={
+                        mesaj.email
+                          ? `mailto:${mesaj.email}?subject=${encodeURIComponent(`Răspuns la mesajul tău de pe ${domeniu}`)}`
+                          : `tel:${(mesaj.telefon ?? "").replace(/\s/g, "")}`
+                      }
                       className="inline-flex h-8 items-center justify-center rounded-base bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                     >
-                      Răspunde
+                      {mesaj.email ? "Răspunde" : "Sună"}
                     </a>
                     <Button
                       variant="secondary"

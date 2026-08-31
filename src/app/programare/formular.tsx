@@ -185,16 +185,11 @@ export function FormularProgramare({
         </select>
       </label>
 
-      <Camp
-        id="prog-note"
-        name="note"
-        eticheta="Vrei să adaugi ceva?"
-        randuri={3}
-        maxLength={1000}
-        obligatoriu={false}
-        eroare={stare.erori?.note}
-        valoare={stare.valori?.note}
-      />
+      {/*
+        Câmpul „Vrei să adaugi ceva?" a fost scos dinadins (28 aug. 2026): pe
+        site-ul unui psiholog, un câmp liber adună date despre sănătate. Vezi
+        migrarea `contact_fara_mesaj` pentru raționamentul întreg.
+      */}
 
       <p style={{ margin: 0, fontSize: "14px", lineHeight: 1.6, color: "var(--s-text-secundar)" }}>
         Datele scrise aici sunt folosite doar ca să fie stabilită programarea.{" "}

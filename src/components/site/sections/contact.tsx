@@ -50,7 +50,7 @@ function adresaDedusa(valoare: string | undefined): string | null {
 }
 
 const ACORD_IMPLICIT =
-  "Sunt de acord ca datele scrise aici să fie folosite ca să primesc un răspuns. Am citit";
+  "Sunt de acord să fiu contactat la datele lăsate aici. Am citit";
 
 /**
  * „Contact" — formularul prin care ajunge un mesaj la cabinet.
@@ -139,7 +139,7 @@ export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: 
           // link către o pagină inexistentă e mai rău decât lipsa lui.
           linkConfidentialitate={data.linkConfidentialitate}
           mesajSucces={data.mesajSucces}
-          textButon={data.textButon ?? "Trimite mesajul"}
+          textButon={data.textButon ?? "Sună-mă"}
         />
       </div>
     </Section>

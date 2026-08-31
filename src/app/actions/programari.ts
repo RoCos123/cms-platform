@@ -62,10 +62,9 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
   // opțional, iar o pagină rămasă deschisă peste o schimbare de listă n-are de
   // ce să pice.
   const motiv = motivValid(citesteText(formData, "motiv", 120));
-  const note = citesteText(formData, "note", 1000);
   const zi = citesteText(formData, "zi", 10);
   const ora = citesteText(formData, "ora", 5);
-  const valori = { nume, email, telefon, motiv: motiv ?? "", note, zi, ora };
+  const valori = { nume, email, telefon, motiv: motiv ?? "", zi, ora };
 
   // Regula de contact stă în `src/lib/programari.ts`, cu motivul scris acolo:
   // fiecare cerere pleacă cu măcar o cale prin care psihologul poate răspunde,
@@ -113,7 +112,9 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
     // rulată de mână, pentru zero câștig la client; traducerea se face aici și
     // în ecranul din panou, în câte o linie.
     service: motiv,
-    notes: note || null,
+    // Nu se mai adună (vezi `contact_fara_mesaj`). Coloana rămâne, cu
+    // cererile primite până acum.
+    notes: null,
     starts_at: cerut.toISOString(),
     status: "ceruta",
   });
