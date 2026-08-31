@@ -169,9 +169,34 @@ De aici, trei lucruri urcă în prioritate față de cum erau socotite:
 3. **Resetarea parolei** e obligatorie înainte de primul client. Un om care își
    scrie singur site-ul intră în panou de zeci de ori în prima lună.
 
-Ordinea de lucru convenită după clarificarea asta: resetarea parolei, apoi
-adresa temporară de platformă (ca să nu stea blocat pe dinafară cât se
-răspândește DNS-ul).
+**Site-ul pornește cu TOATE secțiunile aprinse**, iar clientul le scoate pe cele
+care nu i se potrivesc. Hotărât de proprietar, corectând o alegere de-a mea:
+funcția de provizionare pornește azi doar `hero` și `contact` vizibile, restul
+stinse. **De schimbat.**
+
+Motivul lui e bun: un client care vede o listă de secțiuni stinse nu știe ce-i
+oferă produsul, mai ales fără cineva lângă el. Văzându-le pe toate, înțelege ce
+poate avea și taie ce nu-i trebuie.
+
+**Dar asta face comutatorul „încă nu e lansat” obligatoriu, nu opțional.**
+Site-ul e public din clipa în care domeniul rezolvă. Cu toate secțiunile
+aprinse și goale, un vizitator — sau Google — poate nimeri peste un cabinet
+care arată neterminat. Cât timp secțiunile porneau stinse, lipsa comutatorului
+era doar neplăcută; acum e o gaură. Ordinea corectă e: întâi comutatorul, apoi
+aprinderea tuturor secțiunilor.
+
+**Instructajul e un videoclip**, trimis clientului, nu o ședință. Sună doar
+dacă nu se descurcă cu el. Două lucruri decurg de aici:
+
+1. **Textele din panou sunt singurul ajutor din momentul acela.** Nu mai există
+   cineva de întrebat la mijloc.
+2. **Videoclipul se învechește la fiecare schimbare de panou.** Deci nu se
+   înregistrează până nu ne oprim din schimbat ecranele — altfel se refilmează
+   sau, mai rău, arată altceva decât vede clientul.
+
+Ordinea de lucru convenită: resetarea parolei, apoi adresa temporară de
+platformă (ca să nu stea blocat pe dinafară cât se răspândește DNS-ul). Cu
+observația de mai sus, comutatorul de lansare le devine tovarăș.
 
 ## Estimare de efort (corectată)
 
