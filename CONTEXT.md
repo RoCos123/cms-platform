@@ -511,27 +511,31 @@ la programare fără nicio oră liberă e mai rea decât nimic.
 
 Găsit pe 28 aug. 2026, verificând de ce nu apare caseta anti-spam pe site.
 Cloudflare leagă o pereche de chei de o listă de domenii, iar lista are
-**maximum 10 intrări pe planul obișnuit**. Metacaracterele NU sunt acceptate,
-deci `*.platformata.ro` nu ține loc de nimic. Ridicarea limitei cere Enterprise,
-sau o funcție în alfa pentru care trebuie vorbit cu ei.
+**maximum 10 intrări**. Metacaracterele NU sunt acceptate, deci
+`*.platformata.ro` nu ține loc de nimic.
+
+**Planul gratuit dă însă 20 de chei**, adică **200 de domenii, gratis**, cu
+cereri nelimitate. Pasul următor al Cloudflare e Enterprise Bot Management, de
+la 2.000 $/lună — adică de peste două ori venitul recurent al unui produs cu 200
+de clienți. Nu e o variantă, și nu trebuie tratată ca una: la 200 de clienți se
+schimbă furnizorul, nu planul.
 
 **Consecința pentru noi:** o singură pereche de chei acoperă primii ~8 clienți
 (plus site-ul proprietarului și cel al firmei). La al nouălea, caseta pur și
 simplu nu se mai randează pe domeniul nou — iar dacă cheia secretă e pusă,
 formularele acelui client se închid complet.
 
-**Nu e urgent, dar trebuie hotărât înainte de al optulea client.** Variantele,
-în ordinea în care le-aș încerca:
+**Nu e urgent, dar trebuie făcut înainte de al optulea client:** mai multe
+perechi de chei, câte una la zece domenii.
 
-1. **Cerut Cloudflare ridicarea limitei** sau funcția din alfa. Gratis dacă
-   acceptă; o discuție, nu cod.
-2. **Mai multe perechi de chei, câte una la zece clienți.** Cheia publică se
-   poate ține pe rândul site-ului — e publică prin definiție, o vede oricine
-   deschide pagina. Cheile secrete stau în variabile de mediu, una per grup:
-   zece variabile la o sută de clienți. Urât, dar merge, și NU înseamnă secrete
-   per client în bază.
-3. **Alt furnizor** (hCaptcha, reCAPTCHA), la care verificarea de domeniu se
-   poate opri. De evaluat abia dacă primele două cad.
+Cheia publică se ține pe rândul site-ului — e publică prin definiție, o vede
+oricine deschide pagina, deci n-are ce căuta ascunsă. Cheile secrete stau în
+variabile de mediu, una per grup: **douăzeci de variabile pentru două sute de
+clienți.** Urât, dar merge, și — important — NU înseamnă secrete per client în
+bază, adică n-are nimic de-a face cu riscul discutat la plăți.
+
+Peste 200 de clienți: alt furnizor (hCaptcha, reCAPTCHA), la care verificarea de
+domeniu se poate opri. Sau deloc — de evaluat atunci, cu cifrele de-atunci.
 
 De reținut și partea bună: de când formularele nu mai adună text liber și au
 plafoane, spamul costă mai puțin decât înainte. Turnstile rămâne prima linie,
