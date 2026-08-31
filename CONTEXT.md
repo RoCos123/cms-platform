@@ -198,6 +198,36 @@ Ordinea de lucru convenită: resetarea parolei, apoi adresa temporară de
 platformă (ca să nu stea blocat pe dinafară cât se răspândește DNS-ul). Cu
 observația de mai sus, comutatorul de lansare le devine tovarăș.
 
+## Fără câmpuri de text liber pe formularele publice (28 aug. 2026)
+
+Hotărât de proprietar, după ce a văzut că trei dintre riscurile mari sunt
+legale și țin toate de același lucru: **produsul ÎNTREABĂ oamenii ce-i doare.**
+
+Se scot amândouă câmpurile de text liber:
+
+- `mesaj` din formularul de contact — care devine „lasă-mi numele și numărul,
+  te sun”;
+- `note` din formularul de programare („Vrei să adaugi ceva?”).
+
+Formularul scurt de pe prima pagină e deja așa: doar nume și telefon.
+
+**Ce se câștigă, exact.** Contractul de prelucrare rămâne obligatoriu —
+numele și telefonul sunt tot date personale. Ce se schimbă e CATEGORIA: datele
+despre sănătate devin întâmplare, nu proiectare. Cineva tot poate scrie „am
+depresie" în câmpul de nume, dar asta e altceva decât un produs care întreabă.
+Scade mult paguba la o eventuală scurgere, iar păstrarea și ștergerea devin
+simple.
+
+**Ce se pierde, și proprietarul a acceptat conștient.** Publicul final sunt
+exact oamenii pentru care e mai ușor să scrie decât să sune. Cineva cu
+anxietate socială poate să nu dea niciun telefon, dar ar fi scris trei rânduri.
+E o alegere de produs, nu una juridică, iar el a ales curățenia.
+
+**De ținut minte la implementare:** coloanele rămân în bază (`contact_messages.
+message`, `appointments.notes`), pentru mesajele deja primite. Se scot doar din
+formulare și din acțiuni. Ștergerea coloanelor e altă discuție, cu backup
+înainte.
+
 ## Estimare de efort (corectată)
 
 Lucrând activ cu Claude generând codul (nu un dev scriind manual):
