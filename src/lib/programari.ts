@@ -233,3 +233,62 @@ export function eroriDeContact(
 
   return erori;
 }
+
+/**
+ * Câte cereri acceptă un cabinet într-o oră.
+ *
+ * Un cabinet real primește una-două pe zi. Zece într-o oră e deja mult peste
+ * orice tipar omenesc, dar destul de sus cât să nu lovească niciodată pe cineva
+ * adevărat — nici măcar în ziua în care psihologul apare la televizor.
+ */
+export const CERERI_PE_ORA = 10;
+
+/**
+ * Câte cereri nerezolvate poate avea aceeași persoană deodată.
+ *
+ * Doi, nu unu: cineva care s-a răzgândit și vrea altă oră trebuie să poată
+ * cere, fără să aștepte ca psihologul să-i refuze prima. Al treilea „în
+ * așteptare" de la același număr nu mai e cineva indecis.
+ */
+export const CERERI_IN_ASTEPTARE_PER_PERSOANA = 2;
+
+/**
+ * Ce oprește o cerere de programare, dacă o oprește ceva.
+ *
+ * DE CE EXISTĂ. Formularul de contact avea de mult un plafon; programările,
+ * niciunul. Adică oricine putea cere, una după alta, toate orele libere ale
+ * unui cabinet pe o lună înainte — fiecare cerere blocând ora până când
+ * psihologul o refuza de mână. Nu e furt de date, e sabotaj, și e ieftin de
+ * făcut. Găsit la trecerea în revistă a riscurilor, 28 aug. 2026.
+ *
+ * DOUĂ PLAFOANE, fiindcă opresc lucruri diferite:
+ *
+ * - cel pe oră mărginește VOLUMUL — cineva care dă înainte fără să se
+ *   oprească;
+ * - cel pe persoană mărginește ce poate ține BLOCAT cineva anume, și prinde
+ *   totodată cazul cinstit al omului care apasă de trei ori fiindcă nu e sigur
+ *   că a mers.
+ *
+ * NU există plafon pe totalul cererilor nerezolvate ale unui cabinet, deși ar
+ * fi fost ușor de pus. Ar fi pedepsit pacienți adevărați pentru neatenția
+ * psihologului: cât timp nu pleacă niciun email, un cabinet poate strânge zece
+ * cereri necitite într-o săptămână fără ca nimeni să fie de vină. Un plafon
+ * acolo ar fi închis ușa unor oameni reali.
+ *
+ * Rupt de acțiune ca să poată fi probat: pragurile sunt o judecată, iar o
+ * judecată scrisă doar în cod se schimbă într-o zi fără să observe nimeni.
+ */
+export function opresteCererea(
+  cereriUltimaOra: number,
+  inAsteptareDeLaAcelasiNumar: number,
+): string | null {
+  if (inAsteptareDeLaAcelasiNumar >= CERERI_IN_ASTEPTARE_PER_PERSOANA) {
+    return "Ai deja o cerere trimisă care așteaptă răspuns. Așteaptă confirmarea sau sună direct la cabinet.";
+  }
+
+  if (cereriUltimaOra >= CERERI_PE_ORA) {
+    return "Au venit multe cereri în ultima oră. Încearcă mai târziu sau sună direct la cabinet.";
+  }
+
+  return null;
+}

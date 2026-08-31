@@ -6,7 +6,7 @@ import { tenantTable } from "@/lib/supabase/admin";
 import { capcanaDeclansata, verificaTurnstile } from "@/lib/antispam";
 import { LIMITE, citesteText, esteEmailValid, type StareFormular } from "@/lib/formulare";
 import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
-import { eroriDeContact, motivValid, oraEsteLibera } from "@/lib/programari";
+import { eroriDeContact, motivValid, opresteCererea, oraEsteLibera } from "@/lib/programari";
 import { oreleOcupate, programulSiteului } from "@/lib/programari-publice";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { momentLa, ziuaScrisa, oraLa } from "@/lib/zile";
@@ -101,7 +101,35 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
     return { status: "eroare", mesaj: ORA_LUATA, valori };
   }
 
-  const { error } = await (await tenantTable("appointments")).insert({
+  /*
+   * Plafoanele. Se numără DUPĂ verificarea orei, ca cineva care nimerește o oră
+   * deja luată să afle asta, nu să fie oprit de plafon pentru o cerere care
+   * oricum n-ar fi trecut.
+   *
+   * `tenantTable` mărginește amândouă numărătorile la cabinetul curent, deci un
+   * cabinet aglomerat nu poate închide ușa altuia.
+   */
+  const tabel = await tenantTable("appointments");
+  const acumOOra = new Date(Date.now() - 3_600_000).toISOString();
+
+  const [{ count: ultimaOra }, { count: inAsteptare }] = await Promise.all([
+    tabel.select("id", { head: true, count: "exact" }).gte("created_at", acumOOra),
+    // Doar cererile VII: una refuzată sau anulată nu mai ține nimic blocat,
+    // deci n-are de ce să-l oprească pe om să ceară din nou.
+    telefon
+      ? tabel
+          .select("id", { head: true, count: "exact" })
+          .eq("phone", telefon)
+          .eq("status", "ceruta")
+      : Promise.resolve({ count: 0 }),
+  ]);
+
+  const oprit = opresteCererea(ultimaOra ?? 0, inAsteptare ?? 0);
+  if (oprit) {
+    return { status: "eroare", mesaj: oprit, valori };
+  }
+
+  const { error } = await tabel.insert({
     name: nume,
     // `null`, nu șir gol: formularul scurt de pe prima pagină n-are câmp de
     // email, iar „" în panou ar fi devenit un link `mailto:` gol.

@@ -358,6 +358,15 @@ până la ora de închidere, preavizul taie ce e prea aproape, iar o oră ocupat
 scoate tot ce se SUPRAPUNE cu ea, nu doar ora identică. Peste schimbarea orei de
 vară, „luni la 10” rămâne 10 pe ceas — are teste pe ambele treceri din 2026.
 
+**Două plafoane** (28 aug. 2026), fiindcă opresc lucruri diferite: cel pe oră
+(10 per cabinet) mărginește volumul, cel pe persoană (2 cereri nerezolvate de la
+același număr) mărginește ce poate ține blocat cineva anume. Fără ele, oricine
+putea cere una după alta toate orele libere pe o lună — nu furt de date,
+sabotaj, și ieftin. Dinadins NU există plafon pe totalul cererilor nerezolvate
+ale unui cabinet: ar fi pedepsit pacienți adevărați pentru neatenția
+psihologului, care fără emailuri poate strânge zece cereri necitite fără să fie
+nimeni de vină.
+
 Două cereri venite în aceeași secundă pentru aceeași oră: verificarea din
 aplicație le lasă pe amândouă să treacă, fiindcă niciuna nu e încă scrisă.
 Indexul unic `(site_id, starts_at)` pe cererile vii e singurul loc unde „ocupat”

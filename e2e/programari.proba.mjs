@@ -5,6 +5,7 @@ import {
   citesteProgramul,
   eroriDeContact,
   motivValid,
+  opresteCererea,
   oraEsteLibera,
   oreLibere,
   primesteProgramari,
@@ -203,4 +204,48 @@ test("câmpul gol și câmpul lipsă sunt lucruri diferite", () => {
   // uita la valoare în loc de prezența câmpului, astea două ar fi identice.
   assert.deepEqual(Object.keys(eroriDeContact(true, "", "0722000000", EMAIL_OK)), ["email"]);
   assert.deepEqual(eroriDeContact(false, "", "0722000000", EMAIL_OK), {});
+});
+
+/**
+ * Plafoanele de la programări. `pnpm test:logica`.
+ *
+ * Formularul de contact avea de mult un plafon; programările, niciunul. Adică
+ * oricine putea cere, una după alta, toate orele libere ale unui cabinet pe o
+ * lună înainte. Probele astea țin pragurile pe loc — o judecată scrisă doar în
+ * cod se schimbă într-o zi fără să observe nimeni.
+ */
+
+test("o cerere obișnuită trece", () => {
+  assert.equal(opresteCererea(0, 0), null);
+  // Un cabinet care a primit deja trei cereri azi tot primește.
+  assert.equal(opresteCererea(3, 0), null);
+  // Și cineva care s-a răzgândit o dată poate cere a doua oară.
+  assert.equal(opresteCererea(3, 1), null);
+});
+
+test("a treia cerere nerezolvată de la același număr se oprește", () => {
+  const mesaj = opresteCererea(0, 2);
+  assert.ok(mesaj, "trebuia oprită");
+  assert.match(mesaj, /așteaptă răspuns/i);
+});
+
+test("peste zece cereri într-o oră, cabinetul se închide temporar", () => {
+  assert.equal(opresteCererea(9, 0), null);
+  const mesaj = opresteCererea(10, 0);
+  assert.ok(mesaj, "trebuia oprită");
+  assert.match(mesaj, /ultima oră/i);
+});
+
+test("plafonul pe persoană bate plafonul pe oră", () => {
+  // Amândouă depășite: omul trebuie să afle că are deja o cerere, nu că
+  // „e aglomerat" — al doilea mesaj l-ar face să încerce din nou peste o oră.
+  assert.match(opresteCererea(50, 5), /așteaptă răspuns/i);
+});
+
+test("mesajele trimit omul către telefon, nu îl acuză", () => {
+  // Cineva oprit de un plafon e aproape sigur un om cinstit care a apăsat de
+  // două ori. Nu i se spune că e bot, i se spune ce poate face.
+  for (const mesaj of [opresteCererea(0, 2), opresteCererea(99, 0)]) {
+    assert.match(mesaj, /sun[ăa] direct la cabinet/i);
+  }
 });
