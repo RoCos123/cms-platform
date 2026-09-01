@@ -339,6 +339,93 @@ const LISTA: MetaSectiune[] = [
     ],
   },
   {
+    cheie: "pricing",
+    nume: "Pachete",
+    descriere: "Prețuri scrise pe față, în una până la patru variante.",
+    repetabila: false,
+    campuri: [
+      ...campuriAntet(),
+      {
+        tip: "lista",
+        cheie: "pachete",
+        eticheta: "Pachete",
+        etichetaElement: "pachet",
+        rezumatDin: "nume",
+        // Patru încap pe un ecran de laptop fără să se micșoreze de necitit, iar
+        // peste patru nimeni nu mai compară, ci se încurcă.
+        max: 4,
+        hint: "Scrie prețul așa cum vrei să-l citească omul, cu tot cu monedă.",
+        campuri: [
+          {
+            tip: "text",
+            cheie: "nume",
+            eticheta: "Numele pachetului",
+            obligatoriu: true,
+            hint: "Ex.: Site complet, 5 ședințe, Evaluare psihologică.",
+            max: 60,
+          },
+          {
+            /*
+             * Text, nu număr, dinadins. Un câmp numeric ar fi cerut și o monedă,
+             * și o regulă de formatare, și tot n-ar fi putut scrie „de la 300 €”
+             * sau „200 lei/an”. Aici prețul e o propoziție scurtă, nu o sumă cu
+             * care se calculează ceva.
+             */
+            tip: "text",
+            cheie: "pret",
+            eticheta: "Prețul",
+            obligatoriu: true,
+            hint: "Ex.: 300 €, de la 250 lei, 200 lei/an.",
+            max: 40,
+          },
+          {
+            tip: "text",
+            cheie: "subPret",
+            eticheta: "Ce se înțelege prin preț",
+            hint: "Ex.: primul an inclus, per ședință, o singură dată.",
+            max: 60,
+          },
+          {
+            tip: "textLung",
+            cheie: "descriere",
+            eticheta: "Pe scurt, pentru cine e",
+            randuri: 2,
+            max: 240,
+          },
+          {
+            tip: "listaText",
+            cheie: "include",
+            eticheta: "Ce include",
+            etichetaElement: "rând",
+            max: 8,
+            hint: "Câte un lucru pe rând. Scrie ce primește omul, nu cum se cheamă pe dinăuntru.",
+          },
+          {
+            /*
+             * O etichetă, nu o bifă „evidențiat". Panoul n-are câmp de tip bifă,
+             * dar asta nu e motivul: eticheta spune și DE CE e scos în față
+             * („Cel mai ales", „Recomandat"), pe când o bifă doar l-ar colora.
+             */
+            tip: "text",
+            cheie: "eticheta",
+            eticheta: "Etichetă (scoate pachetul în față)",
+            hint: "Ex.: Cel mai ales. Lasă gol la restul, altfel nu mai iese niciunul în evidență.",
+            max: 24,
+          },
+          { tip: "link", cheie: "buton", eticheta: "Buton" },
+        ],
+      },
+      {
+        tip: "textLung",
+        cheie: "nota",
+        eticheta: "Notă sub pachete",
+        randuri: 2,
+        hint: "Ex.: Prețurile nu includ costul domeniului. Se plătește după ce site-ul e gata.",
+        max: 300,
+      },
+    ],
+  },
+  {
     cheie: "testimonials",
     nume: "Păreri",
     descriere: "Mărturii de la oameni cu care ai lucrat.",

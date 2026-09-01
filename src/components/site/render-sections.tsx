@@ -18,6 +18,7 @@ import {
   type OreDePrimaPagina,
   type ProgramareData,
 } from "./sections/programare";
+import { Pricing, type PricingData } from "./sections/pricing";
 
 /** Un rând din `site_content`, așa cum vine din baza de date. */
 export type SectionRow = {
@@ -92,6 +93,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
   aboutTeaser: (row) => <AboutTeaser data={row.data as AboutTeaserData} tone={row.tone} />,
   howItWorks: (row) => <HowItWorks data={row.data as HowItWorksData} tone={row.tone} />,
   testimonials: (row) => <Testimonials data={row.data as TestimonialsData} tone={row.tone} />,
+  pricing: (row) => <Pricing data={row.data as PricingData} tone={row.tone} />,
   faq: (row) => <Faq data={row.data as FaqData} tone={row.tone} />,
   latestPosts: (row, ctx) => (
     <LatestPosts data={row.data as LatestPostsData} articole={ctx.articole} tone={row.tone} />

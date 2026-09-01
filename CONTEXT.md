@@ -523,6 +523,28 @@ există deja. Clientul o găsește apoi în „Secțiuni”, de mutat unde vrea.
 n-are nicio zi bifată în program, secțiunea nu se randează pe site: o invitație
 la programare fără nicio oră liberă e mai rea decât nimic.
 
+## Site-ul de vânzări al platformei (1 sept. 2026)
+
+Hotărât de proprietar: **`sitepsihologi.ro` se face CU panoul nostru**, ca orice
+alt client. E și cea mai bună probă posibilă — dacă nu putem face site-ul nostru
+cu el, nu-l putem vinde.
+
+Prețurile se scriu pe față: **300 € o dată, primul an inclus, apoi 200 lei/an.**
+
+Ce lipsea din panou pentru asta, și s-a făcut: **secțiunea „Pachete"**. Era deja
+pe listă din Faza 0 pentru pachete de ședințe (decizii-faza-0.md §6.1), deci
+folosește și psihologilor, nu doar nouă. Prețul e un câmp de TEXT, nu un număr:
+„de la 300 €" și „200 lei/an" sunt prețuri adevărate pe care un câmp numeric
+nu le-ar fi putut ține, iar cu nimic nu se calculează aici. Scoaterea în față a
+unui pachet se face cu o etichetă scrisă („Cel mai ales"), nu cu o bifă:
+eticheta spune și DE CE, o bifă doar l-ar fi colorat.
+
+**Șabloanele se arată întâi ca poze**, iar demo-urile vii vin când există
+domeniul — hotărât de proprietar. Pozele intră în secțiunea „Programe și
+materiale", care există deja, deci galeria nu cere cod nou. Deocamdată nu există
+de unde lua capturile: site-ul de probă e gol, iar o captură a unui site gol nu
+vinde nimic. De lămurit înainte de a merge mai departe.
+
 ## Politica de confidențialitate se schimbă odată cu platforma
 
 Cerut de proprietar, 1 sept. 2026, ca să nu se piardă printre altele.
