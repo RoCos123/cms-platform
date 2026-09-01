@@ -61,12 +61,17 @@ export function templateStyle(template: Template): CSSProperties {
     "--t-eroare": p.eroare,
     "--t-eroare-pe-inchis": p.eroarePeInchis,
     "--t-chenar": p.chenar,
-    "--t-font-principal": `"${t.fontPrincipal}", ${t.fallbackPrincipal}`,
-    "--t-font-secundar": `"${t.fontSecundar}", ${t.fallbackSecundar}`,
+    /*
+     * Familiile de fonturi NU sunt aici, ci în `templateFontStyle` din
+     * `fonturi.ts`, și se pun lângă astea de către componentă.
+     *
+     * Nu e o împărțire de dragul curățeniei. `next/font` se poate încărca doar
+     * înăuntrul build-ului Next; adus aici, ar fi făcut tot fișierul ăsta
+     * neîncărcabil în Node curat — iar probele de contrast, care citesc
+     * culorile de mai sus, s-au și rupt când am încercat. Ce e judecată pură
+     * rămâne probabil; ce ține de unelte stă separat.
+     */
     "--t-stil-accent": t.accentInItalic ? "italic" : "normal",
-    "--t-font-titlu": t.titluriInSecundar
-      ? `"${t.fontSecundar}", ${t.fallbackSecundar}`
-      : `"${t.fontPrincipal}", ${t.fallbackPrincipal}`,
     "--t-greutate-titlu": String(t.greutateTitlu),
     "--t-raza": f.raza,
     "--t-raza-buton": f.razaButon,
@@ -74,21 +79,3 @@ export function templateStyle(template: Template): CSSProperties {
   } as CSSProperties;
 }
 
-/**
- * URL-ul Google Fonts pentru fonturile șablonului. Se încarcă doar ce folosește
- * șablonul ales — nu toate fonturile tuturor șabloanelor.
- */
-export function templateFontsHref(template: Template): string {
-  const { fontPrincipal, fontSecundar } = template.tipografie;
-  const family = (name: string, axes: string) =>
-    `family=${name.replace(/ /g, "+")}:${axes}`;
-
-  return (
-    "https://fonts.googleapis.com/css2?" +
-    [
-      family(fontPrincipal, "wght@400;500;600;700;800"),
-      family(fontSecundar, "ital,wght@0,300;0,400;0,500;1,300;1,400"),
-    ].join("&") +
-    "&display=swap"
-  );
-}

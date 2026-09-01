@@ -101,6 +101,30 @@ niciuna.** Dacă reparam doar proxy-ul, pagina ar fi mers și n-ar fi fost găsi
 de nimeni — iar clientul n-ar fi avut cum să afle de ce. Când o greșeală are
 două capete, se caută amândouă înainte de a repara vreunul.
 
+
+---
+
+## Ce ține de unealtă nu stă lângă ce ține de judecată
+
+1 sept. 2026, mutând fonturile pe serverul nostru. Familiile de font se puneau
+firesc lângă culori, în `templateStyle` — sunt tot variabile CSS ale șablonului.
+Numai că fonturile vin prin `next/font`, care se poate încărca doar înăuntrul
+build-ului Next. Odată adus acolo, fișierul cu toate culorile a devenit
+neîncărcabil în Node curat, iar proba de contrast — cea care apără lizibilitatea
+fiecărui șablon — s-a rupt pe loc.
+
+Împărțit: culorile, spațiile și greutățile rămân în `index.ts`, pur și probabil;
+familiile de font stau în `fonturi.ts`, iar componenta le pune una lângă alta.
+
+Regula: **înainte să adaugi un import într-un fișier probat, întreabă-te dacă
+noul import poate trăi în afara build-ului.** Dacă nu, judecata din fișierul
+acela nu mai poate fi apărată de nicio probă — iar asta se plătește mai târziu,
+la prima schimbare de culoare făcută în grabă.
+
+Semnul că e vorba de asta: probele nu pică una câte una, ci dispare tot fișierul
+de probe deodată. Numărul total scade, dar „fail" rămâne mic — ușor de trecut cu
+vederea dacă te uiți doar la câte au picat.
+
 ---
 
 ## Limba și scrisul

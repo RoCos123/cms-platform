@@ -8,7 +8,8 @@ import { linkurileSociale, paginaEsteActiva } from "@/lib/setari";
 import { moduleleSiteului } from "@/lib/module";
 import { seePotFaceProgramari } from "@/lib/programari-publice";
 import { numaraAfisarea } from "@/lib/vizite-numarare";
-import { getTemplate, templateFontsHref, templateStyle } from "@/lib/templates";
+import { getTemplate, templateStyle } from "@/lib/templates";
+import { templateFontStyle } from "@/lib/templates/fonturi";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { AdminBar } from "@/components/site/admin-bar";
@@ -86,13 +87,10 @@ export async function CadruSite({
 
   return (
     <>
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-      <link rel="stylesheet" href={templateFontsHref(template)} />
-
       <div
         style={{
           ...templateStyle(template),
+          ...templateFontStyle(template),
           background: "var(--t-fundal)",
           color: "var(--t-text)",
           fontFamily: "var(--t-font-principal)",

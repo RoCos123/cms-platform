@@ -17,13 +17,10 @@ import { createPortal } from "react-dom";
  */
 export function CadruPrevizualizare({
   latime,
-  fonturi,
   children,
 }: {
   /** Lățimea ferestrei simulate, în pixeli. 1180 = laptop, 390 = telefon. */
   latime: number;
-  /** Adresa fonturilor șablonului. Fără ele, previzualizarea ar folosi alt font. */
-  fonturi?: string;
   children: ReactNode;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,9 +30,16 @@ export function CadruPrevizualizare({
   const [scara, setScara] = useState(1);
   const [latimeContainer, setLatimeContainer] = useState(0);
 
-  // Stilurile paginii nu ajung singure în iframe. Fără ele lipsește preflight-ul
-  // Tailwind, iar titlurile ar căpăta marginile implicite ale browserului și
-  // listele ar primi buline — adică previzualizarea ar arăta altfel decât site-ul.
+  /*
+   * Stilurile paginii nu ajung singure în iframe. Fără ele lipsește preflight-ul
+   * Tailwind, iar titlurile ar căpăta marginile implicite ale browserului și
+   * listele ar primi buline — adică previzualizarea ar arăta altfel decât site-ul.
+   *
+   * Fonturile vin tot de aici, de când sunt servite de la noi: `next/font` pune
+   * regulile `@font-face` chiar în foaia de stil a aplicației, iar copierea de
+   * mai jos le ia cu ea. Înainte se dădea separat adresa de la Google, într-un
+   * prop; acum n-ar mai avea ce adresă să primească.
+   */
   useEffect(() => {
     const doc = iframeRef.current?.contentDocument;
     if (!doc) return;
@@ -45,13 +49,6 @@ export function CadruPrevizualizare({
       document
         .querySelectorAll('style, link[rel="stylesheet"]')
         .forEach((nod) => doc.head.appendChild(nod.cloneNode(true)));
-
-      if (fonturi) {
-        const link = doc.createElement("link");
-        link.rel = "stylesheet";
-        link.href = fonturi;
-        doc.head.appendChild(link);
-      }
 
       doc.body.style.margin = "0";
       // Previzualizarea se privește, nu se folosește: `inert` scoate tot ce e
@@ -67,7 +64,7 @@ export function CadruPrevizualizare({
     const observator = new MutationObserver(() => copiazaStiluri(doc));
     observator.observe(document.head, { childList: true });
     return () => observator.disconnect();
-  }, [fonturi]);
+  }, []);
 
   // Înălțimea iframe-ului urmează conținutul: altfel ar avea o înălțime fixă și
   // ori ar tăia secțiunea, ori ar lăsa gol sub ea.

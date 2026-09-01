@@ -4,7 +4,8 @@ import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { CadruPrevizualizare } from "./cadru-previzualizare";
 import { LimitaEroare } from "./limita-eroare";
-import { templateFontsHref, templateStyle, type Template } from "@/lib/templates";
+import { templateStyle, type Template } from "@/lib/templates";
+import { templateFontStyle } from "@/lib/templates/fonturi";
 
 const LATIMI = [
   { eticheta: "Laptop", valoare: 1180 },
@@ -68,10 +69,11 @@ export function PanouPrevizualizare({
             </div>
           }
         >
-          <CadruPrevizualizare latime={latime} fonturi={templateFontsHref(template)}>
+          <CadruPrevizualizare latime={latime}>
             <div
               style={{
                 ...templateStyle(template),
+          ...templateFontStyle(template),
                 background: "var(--t-fundal)",
                 color: "var(--t-text)",
                 fontFamily: "var(--t-font-principal)",

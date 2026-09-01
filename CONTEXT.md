@@ -68,7 +68,7 @@ Ce s-a hotărât pe parcurs, ca să nu fie redeschis din senin:
   fost dată. Lipsesc din sitemap ȘI primesc `noindex` — cele două locuri se
   schimbă împreună.
 - **Politica de confidențialitate**: șablon în `sabloane/`, potrivit pe ce face
-  chiar site-ul ăsta (formular, hCaptcha, fonturi Google, zero cookie-uri la
+  chiar site-ul ăsta (formular, hCaptcha, fonturi servite de la noi, zero cookie-uri la
   vizitatori, zero urmărire). Nu e text juridic verificat.
 
 ## Ce lipsește și nu era în niciun plan
@@ -382,19 +382,34 @@ care nu, propoziția se compune din acțiune și entitate, cu acordul corect
 (`descrieIntrarea` din `src/lib/activitate.ts`).
 
 **4. Fonturile, mutate de la Google pe serverul nostru** — de discutat cu
-proprietarul (cerut 27 aug. 2026). Azi fiecare site public cere fonturile de la
-`fonts.googleapis.com`, deci **Google apare în politica de confidențialitate a
-fiecărui client**, iar prima afișare așteaptă o cerere externă.
+proprietarul (cerut 27 aug. 2026). **REZOLVAT pe 1 sept. 2026.**
 
-Aici suntem în urma site-ului auditat: originalul își găzduia fonturile la el,
-prin `next/font`, iar auditul public îl laudă explicit pentru asta — „fără
-cerere externă către Google Fonts — bun și pentru GDPR" (audit-site-public.md
-§6.3, §7.1). E singurul loc găsit până acum unde originalul face ceva mai bine
-decât noi.
+Era: fiecare site public cerea o foaie de stil de la `fonts.googleapis.com`, iar
+aceea cerea fișierele de la `fonts.gstatic.com` — deci Google trebuia scris în
+politica de confidențialitate a fiecărui client, iar prima afișare aștepta o
+cerere externă. Fonturile PANOULUI erau deja curate (`next/font/google` din
+`src/app/layout.tsx` descarcă la build); problema era doar la șabloane.
 
-De discutat: `next/font/google` descarcă fonturile la build și le servește de pe
-domeniul clientului — deci se rezolvă fără să schimbăm șabloanele, doar felul în
-care sunt cerute (`templateFontsHref` din `src/lib/templates/index.ts`).
+Acum toate șase fonturile șabloanelor (Manrope, DM Sans, Inter, Nunito,
+Cormorant Garamond, Caveat) trec prin `next/font/google`, în
+`src/lib/templates/fonturi.ts`. Verificat pe build: 45 de fișiere `.woff2`
+servite de la noi, zero pomeniri de Google în ce ajunge la browser.
+
+Trei lucruri care se puteau rata:
+
+- **`latin-ext`.** Fără el, ă, â, î, ș și ț nu sunt în font și cad pe fontul de
+  sistem — pe un site românesc, jumătate din cuvinte scrise cu alte litere decât
+  cealaltă jumătate. În engleză totul ar fi arătat perfect. Verificat în CSS-ul
+  construit că intervalul `U+100-2BA` (care conține Ă, Ș, Ț) chiar e acolo.
+- **Opțiunile se repetă la fiecare font**, deși sunt aceleași. `next/font` le
+  citește din cod la compilare: un obiect comun împrăștiat cu `...` oprește
+  build-ul cu „Font loader values must be explicitly written literals”.
+- **Cursivele pentru Cormorant Garamond** se cer explicit. Fără ele, browserul ar
+  fi înclinat singur literele drepte — „faux italic”, care la o serifă se vede.
+
+Previzualizarea din panou nu mai primește o adresă de fonturi: iframe-ul copiază
+oricum toate foile de stil ale paginii, iar `next/font` pune `@font-face` chiar
+în ele.
 
 **5. Alte restanțe mici**: imagine per serviciu; categorii de blog (de făcut
 abia când un cabinet chiar are atâtea articole încât să nu le mai găsească).

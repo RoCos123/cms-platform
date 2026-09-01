@@ -2,7 +2,7 @@
 
 Text de pornire pentru pagina de confidențialitate a unui cabinet, potrivit pe
 ce face CHIAR acest site: formular de contact, verificare anti-spam hCaptcha,
-fonturi de la Google, fără urmărire și fără cookie-uri pentru vizitatori.
+fără urmărire și fără cookie-uri pentru vizitatori.
 
 **Nu e text juridic verificat.** E o descriere onestă a ce se întâmplă tehnic,
 scrisă pe înțelesul unui vizitator. Înainte să ajungă pe site-ul unui client,
@@ -28,9 +28,9 @@ mai face ceva ce site-ul nu face (newsletter, programări online, plăți).
   pus, paragraful trebuie să numească furnizorul chiar folosit
   (`NEXT_PUBLIC_CAPTCHA_FURNIZOR`): implicit hCaptcha (Intuition Machines),
   altfel Cloudflare Turnstile.
-- **Fonturile.** Cât timp site-ul le încarcă de la Google Fonts, paragraful
-  despre ele trebuie să rămână. Dacă le mutăm vreodată pe serverul nostru, se
-  scoate.
+- **Fonturile.** Din 1 sept. 2026 sunt servite de pe domeniul cabinetului, deci
+  paragraful despre Google a fost SCOS. Dacă vreodată se adaugă un font încărcat
+  de altundeva, trebuie pus la loc.
 - **Regiunea Supabase.** Dacă proiectul nu e într-o regiune din UE, adaugă o
   frază despre transferul datelor în afara Uniunii.
 
@@ -54,7 +54,7 @@ Formularul nu are căsuță de mesaj, dinadins. Nu vreau să ajungă la mine, pr
 
 Ca să nu primesc mesaje trimise automat de programe, formularul folosește un serviciu numit hCaptcha, al firmei Intuition Machines. Pentru verificarea aceasta, adresa IP a dispozitivului tău ajunge la ei. Eu nu o primesc și nu o păstrez.
 
-Fonturile cu care e scris site-ul se încarcă de la Google Fonts, așa că browserul tău cere fișierele acelea direct de la serverele Google, care îți văd adresa IP. E singurul lucru pe care site-ul îl cere de la altcineva în timp ce îl citești.
+Fonturile cu care e scris site-ul se încarcă de pe același server ca restul paginii. Browserul tău nu cere nimic de la nimeni altcineva în timp ce citești.
 
 ## Ce nu se întâmplă
 

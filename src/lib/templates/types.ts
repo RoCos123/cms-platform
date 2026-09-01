@@ -44,7 +44,8 @@ export type TemplatePalette = {
 };
 
 export type TemplateTypography = {
-  /** Fontul de text curent. Numele exact din Google Fonts. */
+  /** Fontul de text curent. Numele exact din catalogul Google Fonts — de unde
+   * se descarcă la build și se servește de la noi (vezi `fonturi.ts`). */
   fontPrincipal: string;
   /** Fontul de titlu/accent. La toate patru șabloanele e un serif. */
   fontSecundar: string;
