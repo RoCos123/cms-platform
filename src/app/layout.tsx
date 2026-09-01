@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { headers } from "next/headers";
 import { adresaSiteuluiOptionala } from "@/lib/seo";
+import { BandaNepublicat } from "@/components/site/banda-nepublicat";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -44,12 +46,37 @@ export async function generateMetadata(): Promise<Metadata> {
      * ce rămâne nerezolvat.
      */
     metadataBase: await adresaSiteuluiOptionala(),
+    /**
+     * Un site nepublicat nu intră în niciun motor de căutare.
+     *
+     * Aici, în layoutul rădăcină, nu pe fiecare pagină: dacă ar fi de pus în
+     * fiecare, s-ar uita la a treia. Steagul vine din antetul pus de proxy pe
+     * baza lui `sites.published_at` — vezi migrarea `comutator_lansare`.
+     *
+     * Merge la pachet cu `robots.txt` și `sitemap.xml`, care refuză și ele.
+     * CONVENȚIA proiectului: cele trei locuri se schimbă mereu împreună.
+     */
+    ...((await nepublicat()) ? { robots: { index: false, follow: false } } : {}),
     title: "sitepsihologi.ro",
     description: "Platformă CMS multi-tenant pentru site-uri de prezentare profesională.",
   };
 }
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+/** Site-ul cerut e încă nepublicat? Antetul e pus de proxy, nu de cerere. */
+async function nepublicat(): Promise<boolean> {
+  return (await headers()).get("x-nepublicat") === "1";
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  /*
+   * Banda se arată doar pe site-ul public, nu și în panou: în panou clientul are
+   * oricum butonul de publicare în fața ochilor, iar o bandă peste fiecare ecran
+   * ar fi zgomot. `x-cale` e pus tot de proxy.
+   */
+  const cale = (await headers()).get("x-cale") ?? "";
+  const aratBanda =
+    (await nepublicat()) && !cale.startsWith("/dashboard") && cale !== "/login";
+
   return (
     <html
       lang="ro"
@@ -58,6 +85,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          {aratBanda && <BandaNepublicat />}
           {children}
         </ThemeProvider>
       </body>

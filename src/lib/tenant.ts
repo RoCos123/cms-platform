@@ -10,7 +10,7 @@ const PLATFORM_HOST_SUFFIXES = [".vercel.app"];
 const PLATFORM_HOST_EXACT = ["localhost", "127.0.0.1", "[::1]"];
 
 export type ResolvedTenant =
-  | { kind: "found"; siteId: string; domain: string }
+  | { kind: "found"; siteId: string; domain: string; publicat: boolean }
   | { kind: "redirect"; canonicalHost: string }
   | { kind: "unresolved"; isPlatformHost: boolean };
 
@@ -69,12 +69,20 @@ export async function resolveTenant(
 
   const { data: exact } = await supabase
     .from("sites")
-    .select("id, domain")
+    // `published_at` vine în aceeași interogare, nu într-una separată: rezolvarea
+    // tenantului rulează la FIECARE cerere, iar comutatorul de lansare nu are
+    // voie să coste încă un drum la baza de date pe fiecare pagină servită.
+    .select("id, domain, published_at")
     .eq("domain", normalized)
     .maybeSingle();
 
   if (exact) {
-    return { kind: "found", siteId: exact.id, domain: exact.domain };
+    return {
+      kind: "found",
+      siteId: exact.id,
+      domain: exact.domain,
+      publicat: exact.published_at !== null,
+    };
   }
 
   const variant = wwwVariant(normalized);

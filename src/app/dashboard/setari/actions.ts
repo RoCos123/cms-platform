@@ -87,3 +87,59 @@ export async function salveazaSetari(
 
   return { ok: true };
 }
+
+/**
+ * Publică sau retrage site-ul.
+ *
+ * `sites.published_at` null înseamnă „încă nu e lansat": vizitatorii primesc
+ * pagina de așteptare, iar clientul logat vede site-ul adevărat, cu o bandă
+ * deasupra (vezi src/proxy.ts și migrarea `comutator_lansare`).
+ *
+ * Comutatorul e al CLIENTULUI, nu al nostru. El știe când a terminat de scris,
+ * și tot el trebuie să poată retrage site-ul dacă vrea să-l refacă — fără să
+ * sune pe cineva. La nivel de bază de date, dreptul lui de scriere pe `sites`
+ * se oprește la `name` și `published_at`; domeniul și modulele plătite rămân
+ * închise, indiferent ce trimite panoul.
+ *
+ * Data se pune cu `now()` din partea noastră, nu din browser: ceasul unui
+ * calculator poate fi oricum, iar în jurnal ar rămâne o oră care nu s-a
+ * întâmplat niciodată.
+ */
+export async function schimbaPublicarea(publica: boolean): Promise<RezultatSetari> {
+  const session = await verifySession();
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("sites")
+    .update({ published_at: publica ? new Date().toISOString() : null })
+    .eq("id", session.siteId);
+
+  if (error) {
+    console.error("Schimbarea publicării a eșuat:", error);
+    return {
+      ok: false,
+      mesaj: publica
+        ? "Nu am putut publica site-ul. Încearcă din nou."
+        : "Nu am putut retrage site-ul. Încearcă din nou.",
+    };
+  }
+
+  await scrieInJurnal({
+    siteId: session.siteId,
+    actorId: session.userId,
+    actiune: "update",
+    entitate: "Site",
+    diff: {
+      rezumat: publica
+        ? "Site-ul a fost publicat."
+        : "Site-ul a fost retras de pe internet.",
+    },
+  });
+
+  revalidatePath("/dashboard", "layout");
+  // Tot site-ul public, nu doar prima pagină: comutatorul schimbă ce vede
+  // oricine, pe orice adresă — inclusiv `robots.txt` și `sitemap.xml`.
+  revalidatePath("/", "layout");
+
+  return { ok: true };
+}

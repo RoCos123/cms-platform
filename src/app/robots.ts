@@ -38,6 +38,20 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     return { rules: { userAgent: "*", disallow: "/" } };
   }
 
+  /*
+   * Site nepublicat: nu e nimic de indexat, nici măcar pagina de așteptare.
+   *
+   * Contează mai mult decât pare. Un cabinet care intră prima dată în Google cu
+   * „pagina se pregătește" își începe viața în căutare cu pagina aia — și rămâne
+   * așa săptămâni, fiindcă reindexarea nu se cere, se așteaptă.
+   *
+   * Merge la pachet cu `noindex` din layoutul rădăcină și cu sitemap-ul gol.
+   * Cele trei se schimbă mereu împreună.
+   */
+  if ((await headers()).get("x-nepublicat") === "1") {
+    return { rules: { userAgent: "*", disallow: "/" } };
+  }
+
   const baza = await adresaSiteului();
 
   return {

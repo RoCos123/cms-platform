@@ -280,6 +280,23 @@ begin
       'respins: ' || SQLERRM;
   end;
 
+  -- Publicarea TREBUIE să se poată face de client: comutatorul de lansare e al
+  -- lui, iar dacă dreptul pe coloană se pierde vreodată, butonul din Setări ar
+  -- eșua tăcut și clientul n-ar mai putea da drumul site-ului fără să sune.
+  begin
+    update public.sites set published_at = now() where id = site_a;
+
+    return query select
+      'Clientul își poate publica singur site-ul'::text,
+      'OK'::text,
+      'coloana published_at rămâne scriibilă, cum trebuie'::text;
+  exception when others then
+    return query select
+      'Clientul își poate publica singur site-ul'::text,
+      'PICAT'::text,
+      'nu și-a putut publica site-ul: ' || SQLERRM;
+  end;
+
   -- Numele, în schimb, TREBUIE să se poată salva: e singura coloană din `sites`
   -- pe care clientul o editează, din Setări. O apărare care blochează și asta
   -- ar strica ecranul, nu l-ar apăra.

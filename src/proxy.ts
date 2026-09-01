@@ -3,6 +3,7 @@ import type { NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { resolveTenant, isPlatformHost } from "@/lib/tenant";
+import { seServesteNepublicat } from "@/lib/lansare";
 
 /**
  * Fallback de rezolvare a tenantului pentru host-uri care nu aparțin niciunui
@@ -24,8 +25,11 @@ const DEV_TENANT_DOMAIN = process.env.DEV_TENANT_DOMAIN;
  * `x-cale` e în aceeași listă din același motiv: din el se numără traficul, iar
  * un vizitator care și l-ar trimite singur ar putea scrie în statisticile
  * clientului ce pagini vrea el că au fost citite.
+ *
+ * `x-nepublicat` la fel: din el se hotărăște `noindex` și banda „doar tu vezi
+ * site-ul”. Trimis de un vizitator, ar scoate un site publicat din Google.
  */
-const TENANT_HEADERS = ["x-site-id", "x-site-domain", "x-cale"];
+const TENANT_HEADERS = ["x-site-id", "x-site-domain", "x-cale", "x-nepublicat"];
 
 /**
  * Notă: Next.js 16 a redenumit Middleware în Proxy (funcționalitate identică) —
@@ -123,21 +127,51 @@ export async function proxy(request: NextRequest) {
   const isDashboard = pathname.startsWith("/dashboard");
   const isLogin = pathname === "/login";
 
-  if (isDashboard || isLogin) {
-    // Userul aparține tenantului cerut? Un cont valid pe alt domeniu nu dă
-    // acces aici. Verificarea e optimistă (UX) — granița reală rămâne RLS +
-    // verifySession() din DAL.
-    let belongsToTenant = false;
+  /**
+   * Userul aparține tenantului cerut? Un cont valid pe alt domeniu nu dă acces.
+   * Verificarea e optimistă (UX) — granița reală rămâne RLS + verifySession().
+   *
+   * Se cheamă LENEȘ, o singură dată pe cerere: pe un site publicat nu se atinge
+   * deloc, deci comutatorul de lansare nu costă nimic în cazul obișnuit.
+   */
+  let apartenenta: boolean | null = null;
+  // Funcție-expresie, nu declarație: o declarație e ridicată în capul funcției,
+  // iar acolo `tenant` e încă uniunea nerestrânsă și `tenant.siteId` nu există.
+  const esteProprietarul = async (): Promise<boolean> => {
+    if (apartenenta !== null) return apartenenta;
+    if (!user) return (apartenenta = false);
 
-    if (user) {
-      const { data: profile } = await supabaseService
-        .from("users")
-        .select("site_id")
-        .eq("id", user.id)
-        .maybeSingle();
+    const { data: profile } = await supabaseService
+      .from("users")
+      .select("site_id")
+      .eq("id", user.id)
+      .maybeSingle();
 
-      belongsToTenant = profile?.site_id === tenant.siteId;
+    return (apartenenta = profile?.site_id === tenant.siteId);
+  };
+
+  if (!tenant.publicat) {
+    requestHeaders.set("x-nepublicat", "1");
+
+    /*
+     * Comutatorul de lansare. Un site nepublicat nu se arată nimănui din afară —
+     * dar clientul trebuie să poată intra, să scrie și să se uite la ce a ieșit.
+     *
+     * Lista căilor care rămân deschise stă în `src/lib/lansare.ts`, cu motivul
+     * fiecăreia, ca să poată fi probată: greșită într-o parte, îl închide pe
+     * client afară din propriul panou.
+     */
+    if (!seServesteNepublicat(pathname) && !(await esteProprietarul())) {
+      return respond(
+        NextResponse.rewrite(new URL("/nepublicat", request.url), {
+          request: { headers: requestHeaders },
+        }),
+      );
     }
+  }
+
+  if (isDashboard || isLogin) {
+    const belongsToTenant = await esteProprietarul();
 
     // Redirect doar când schimbă efectiv ceva. Bounce-ul necondiționat
     // /login -> /dashboard pentru orice user autentificat crea o buclă

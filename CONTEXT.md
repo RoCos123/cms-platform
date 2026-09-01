@@ -507,6 +507,49 @@ există deja. Clientul o găsește apoi în „Secțiuni”, de mutat unde vrea.
 n-are nicio zi bifată în program, secțiunea nu se randează pe site: o invitație
 la programare fără nicio oră liberă e mai rea decât nimic.
 
+## Comutatorul de lansare, și de ce vine la pachet cu secțiunile aprinse
+
+1 sept. 2026. Cele două nu se pot despărți, iar motivul e o consecință a
+modelului de predare, nu o preferință.
+
+Predarea e „site gol, clientul scrie tot, instructajul e un video”. Ca omul să
+afle ce POATE avea pe site, toate secțiunile trebuie să pornească aprinse: ce nu
+vede, nu știe că există, iar cineva care n-a mai lucrat cu un panou nu se duce
+să caute secțiuni ascunse. E mai ușor să ștergi ce nu-ți trebuie decât să
+ghicești ce ți-ar fi trebuit. Numai că un cabinet cu paisprezece secțiuni goale,
+vizibil pe internet din clipa în care domeniul rezolvă, arată a site stricat —
+și e primul lucru pe care l-ar vedea un pacient. Deci: comutator.
+
+`sites.published_at` null = încă nu e lansat. Proxy-ul trimite vizitatorii la
+`/nepublicat` — o pagină scurtă, cu numele cabinetului, fără glume cu șantiere;
+poate fi primul lucru pe care îl vede un om care caută ajutor. Clientul logat
+vede site-ul adevărat, cu o bandă deasupra care-i spune că doar el îl vede și pe
+unde se publică. Publică singur, din Setări.
+
+Ce trebuia gândit, nu doar scris:
+
+- **Ce rămâne deschis pe un site nepublicat** stă în `src/lib/lansare.ts`, rupt
+  de proxy ca să poată fi probat. Greșit într-o parte, clientul rămâne închis
+  afară din propriul panou și nu-și mai poate publica site-ul fără să sune;
+  greșit în cealaltă, un site nescris ajunge public. Amândouă tăcute.
+  `/login`, `/dashboard`, `robots.txt` și `sitemap.xml` rămân; restul se ascunde.
+- **`robots.txt` gol, `sitemap.xml` gol, `noindex` în layout** — toate trei, nu
+  una. Un cabinet care intră prima dată în Google cu „pagina se pregătește”
+  rămâne așa săptămâni: reindexarea nu se cere, se așteaptă.
+- **Comutatorul e al clientului**, nu al nostru: `grant update (published_at)`
+  lângă `name`, singurele două coloane pe care le poate scrie din panou.
+  Verificarea 13 din `verificare-izolare.sql` ține dreptul ăsta viu — pierdut,
+  butonul ar eșua tăcut.
+- **Costul pe cerere e zero pe un site publicat.** `published_at` vine în
+  aceeași interogare cu rezolvarea tenantului, iar verificarea „e proprietarul?”
+  se face leneș, doar când site-ul chiar e nepublicat.
+- **Politica de confidențialitate ciornă** dă un avertisment pe cardul de
+  publicare, nu o piedică. Legea îi cere CLIENTULUI politica înainte să strângă
+  date prin formulare, dar hotărârea când publică rămâne a lui.
+
+Site-urile care existau la migrare rămân publicate: o migrare n-are voie să
+stingă un site pe care îl vede lumea.
+
 ## Depozitul de fișiere e privat
 
 1 sept. 2026. Bucket-ul `media` era public, iar politica de citire spunea

@@ -26,6 +26,8 @@ export type EntitateAudit =
   | "BlogCategory"
   | "SiteContent"
   | "SiteSettings"
+  // Site-ul ca întreg: deocamdată doar publicarea și retragerea lui.
+  | "Site"
   | "Upload"
   | "ContactSubmission"
   | "Session";

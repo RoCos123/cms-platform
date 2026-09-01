@@ -26,7 +26,11 @@ export const ADRESE_REZERVATE = [
   "blog",
   "dashboard",
   "favicon.ico",
+  // Ruta care servește imaginile din depozitul privat.
+  "imagini",
   "login",
+  // Pagina de așteptare a unui site încă nepublicat.
+  "nepublicat",
   "robots.txt",
   "servicii",
   "site-unavailable",

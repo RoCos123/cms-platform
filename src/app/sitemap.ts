@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { headers } from "next/headers";
 import { getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
 import { tenantTable } from "@/lib/supabase/admin";
@@ -19,6 +20,16 @@ import { seePotFaceProgramari } from "@/lib/programari-publice";
  * același cod servește toți clienții, iar răspunsul diferă per domeniu.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  /*
+   * Site nepublicat: sitemap gol, nu lista adevărată.
+   *
+   * Fără asta, `robots.txt` ar spune „nu intra nicăieri" și tot ar arăta un
+   * sitemap cu toate paginile — adică i-ar da unui motor de căutare exact
+   * harta pe care tocmai i-am refuzat-o. Cele trei locuri (noindex din layout,
+   * robots și sitemap) se schimbă mereu împreună.
+   */
+  if ((await headers()).get("x-nepublicat") === "1") return [];
+
   const { siteId } = await getTenant();
   const baza = await adresaSiteului();
   const { site, pagini } = await identitateaSiteului(siteId);

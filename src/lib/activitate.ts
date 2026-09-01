@@ -29,6 +29,7 @@ const ENTITATI: Record<EntitateAudit, { subiect: string; forma: Forma }> = {
   BlogCategory: { subiect: "O categorie", forma: "f" },
   SiteContent: { subiect: "O secțiune", forma: "f" },
   SiteSettings: { subiect: "Setările", forma: "plural" },
+  Site: { subiect: "Site-ul", forma: "m" },
   Upload: { subiect: "O imagine", forma: "f" },
   ContactSubmission: { subiect: "Un mesaj", forma: "m" },
   Session: { subiect: "Sesiunea", forma: "f" },
