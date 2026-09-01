@@ -219,31 +219,23 @@ test("o cerere obișnuită trece", () => {
   assert.equal(opresteCererea(0, 0), null);
   // Un cabinet care a primit deja trei cereri azi tot primește.
   assert.equal(opresteCererea(3, 0), null);
-  // Și cineva care s-a răzgândit o dată poate cere a doua oară.
-  assert.equal(opresteCererea(3, 1), null);
 });
 
-test("un pacient poate cere luni, marți ȘI miercuri", () => {
+test("o persoană ține un singur slot deodată", () => {
   /*
-   * Proba asta există fiindcă întrebarea a fost pusă exact așa, iar răspunsul
-   * era „nu”: plafonul pe persoană era doi, deci a treia zi cerută se lovea de
-   * un mesaj despre spam. Un părinte cu doi copii, o serie de ședințe luată
-   * înainte, o evaluare ținută în mai multe întâlniri — toate cădeau la fel.
+   * Regula proprietarului, din 31 aug. 2026: „o persoană să poată rezerva doar
+   * un singur slot din calendar, atât.”
    *
-   * Dacă cineva coboară vreodată pragul înapoi, aici trebuie să se oprească.
+   * Scrisă ca probă fiindcă e o judecată, nu o consecință tehnică — iar
+   * pragurile scrise doar în cod se schimbă într-o zi fără să observe nimeni.
+   * S-a și întâmplat: l-am urcat o dată la cinci de capul meu. A doua oară,
+   * pică aici.
    */
-  assert.equal(opresteCererea(0, 0), null, "prima zi");
-  assert.equal(opresteCererea(1, 1), null, "a doua zi");
-  assert.equal(opresteCererea(2, 2), null, "a treia zi");
-  assert.equal(opresteCererea(3, 3), null, "și a patra, dacă vrea");
-});
+  assert.equal(opresteCererea(0, 0), null, "prima oră se rezervă");
 
-test("a șasea cerere nerezolvată de la același număr se oprește", () => {
-  assert.equal(opresteCererea(0, 4), null, "a cincea încă trece");
-
-  const mesaj = opresteCererea(0, 5);
-  assert.ok(mesaj, "trebuia oprită");
-  assert.match(mesaj, /așteaptă răspuns/i);
+  const mesaj = opresteCererea(0, 1);
+  assert.ok(mesaj, "a doua trebuia oprită");
+  assert.match(mesaj, /o oră rezervată/i);
 });
 
 test("peste zece cereri într-o oră, cabinetul se închide temporar", () => {
@@ -254,15 +246,15 @@ test("peste zece cereri într-o oră, cabinetul se închide temporar", () => {
 });
 
 test("plafonul pe persoană bate plafonul pe oră", () => {
-  // Amândouă depășite: omul trebuie să afle că are deja cereri trimise, nu că
+  // Amândouă depășite: omul trebuie să afle că are deja o oră rezervată, nu că
   // „e aglomerat" — al doilea mesaj l-ar face să încerce din nou peste o oră.
-  assert.match(opresteCererea(50, 9), /așteaptă răspuns/i);
+  assert.match(opresteCererea(50, 3), /o oră rezervată/i);
 });
 
 test("mesajele trimit omul către telefon, nu îl acuză", () => {
   // Cineva oprit de un plafon e aproape sigur un om cinstit care a apăsat de
   // două ori. Nu i se spune că e bot, i se spune ce poate face.
-  for (const mesaj of [opresteCererea(0, 5), opresteCererea(99, 0)]) {
+  for (const mesaj of [opresteCererea(0, 1), opresteCererea(99, 0)]) {
     assert.match(mesaj, /sun[ăa] direct la cabinet/i);
   }
 });

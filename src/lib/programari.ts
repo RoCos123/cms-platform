@@ -244,31 +244,20 @@ export function eroriDeContact(
 export const CERERI_PE_ORA = 10;
 
 /**
- * Câte cereri nerezolvate poate avea aceeași persoană deodată.
+ * Câte ore poate ține rezervate aceeași persoană deodată.
  *
- * ERA DOI, ȘI ERA GREȘIT. Ridicat la cinci pe 31 aug. 2026, după o întrebare
- * care a arătat exact unde se rupea: „dacă un pacient vrea și luni, și marți,
- * și miercuri, poate?” Nu putea. A treia cerere se lovea de plafon și primea un
- * mesaj despre spam, deși omul făcea fix ce voiam noi să facă.
+ * UNA. Regulă a proprietarului, stabilită pe 31 aug. 2026: „o persoană să poată
+ * rezerva doar un singur slot din calendar, atât.”
  *
- * Cine sunt oamenii care cer mai multe ore deodată: cineva care își ia o serie
- * de ședințe înainte, un părinte care programează doi copii de pe același
- * telefon, o pereche care vine pe rând, o evaluare care se ține în mai multe
- * întâlniri. Toate obișnuite, toate oprite de „doi”.
+ * Adică: până când psihologul răspunde la cererea trimisă — o confirmă sau o
+ * refuză — de la același număr de telefon nu mai intră alta. După ce a
+ * răspuns, omul poate cere din nou; plafonul numără doar cererile care
+ * așteaptă, nu istoricul.
  *
- * DE CE CINCI, și nu mai mult. O lună de ședințe săptămânale înseamnă patru;
- * cinci lasă loc și pentru cine se răzgândește o dată. Peste cinci cereri
- * neapucate de la același număr nu mai e un tipar de om care se programează.
- *
- * CE NU FACE plafonul ăsta, ca să nu ne mințim singuri: nu oprește sabotajul.
- * Numărul de telefon nu e verificat prin nimic, deci cine vrea să facă rău
- * scrie alt număr la fiecare cerere și nu-l atinge niciodată. Sabotajul e
- * oprit de plafonul pe oră al cabinetului, care nu se poate ocoli. Ăsta de aici
- * prinde doar repetiția cinstită — omul care apasă de trei ori fiindcă nu e
- * sigur că a mers — și de asta trebuie să stea sus, nu jos: paguba lui e că
- * închide ușa unui pacient adevărat, nu că lasă un răufăcător să treacă.
+ * Nu se coboară și nu se urcă fără ca proprietarul s-o ceară. Am ridicat-o o
+ * dată la cinci, de capul meu, și a trebuit dată înapoi.
  */
-export const CERERI_IN_ASTEPTARE_PER_PERSOANA = 5;
+export const CERERI_IN_ASTEPTARE_PER_PERSOANA = 1;
 
 /**
  * Ce oprește o cerere de programare, dacă o oprește ceva.
@@ -283,10 +272,11 @@ export const CERERI_IN_ASTEPTARE_PER_PERSOANA = 5;
  *
  * - cel pe oră mărginește VOLUMUL — cineva care dă înainte fără să se
  *   oprească;
- * - cel pe persoană prinde repetiția cinstită — omul care apasă de mai multe
- *   ori fiindcă nu e sigur că a mers. NU e o apărare împotriva sabotajului:
- *   telefonul nu e verificat, deci se ocolește scriind alt număr. Vezi nota de
- *   la `CERERI_IN_ASTEPTARE_PER_PERSOANA`.
+ * - cel pe persoană ține regula proprietarului: o persoană, un singur slot
+ *   rezervat deodată. Prinde totodată omul care apasă de două ori fiindcă nu e
+ *   sigur că a mers. NU e o apărare împotriva sabotajului: telefonul nu e
+ *   verificat, deci se ocolește scriind alt număr — de aia sabotajul e oprit de
+ *   plafonul pe oră, care nu se poate ocoli.
  *
  * NU există plafon pe totalul cererilor nerezolvate ale unui cabinet, deși ar
  * fi fost ușor de pus. Ar fi pedepsit pacienți adevărați pentru neatenția
@@ -302,10 +292,7 @@ export function opresteCererea(
   inAsteptareDeLaAcelasiNumar: number,
 ): string | null {
   if (inAsteptareDeLaAcelasiNumar >= CERERI_IN_ASTEPTARE_PER_PERSOANA) {
-    // „Cereri", nu „o cerere": plafonul lasă mai multe în așteptare, deci
-    // mesajul nu apare niciodată la prima. Scris la singular, omul căuta o
-    // singură cerere pe care n-o mai găsea.
-    return "Ai deja cereri trimise care așteaptă răspuns. Așteaptă confirmarea sau sună direct la cabinet.";
+    return "Ai deja o oră rezervată care așteaptă confirmarea. Așteaptă răspunsul sau sună direct la cabinet.";
   }
 
   if (cereriUltimaOra >= CERERI_PE_ORA) {
