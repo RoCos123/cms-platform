@@ -1,28 +1,18 @@
 import Image from "next/image";
 
 /**
- * Gazda ale cărei imagini pot trece prin optimizatorul Next (aceeași din
- * `next.config.ts`). `NEXT_PUBLIC_*` e înlocuită la build, deci se citește și
- * într-o componentă de server, și în una de client.
+ * Prin optimizator trec DOAR adresele relative — adică fișierele servite de noi,
+ * din depozitul privat (`/imagini/<id>/<semnătură>`). `next.config.ts` nu mai
+ * are nicio gazdă externă în `remotePatterns`, deci o adresă absolută dusă la
+ * `<Image>` ar arunca și ar dărâma pagina publică a clientului.
+ *
+ * Regula proiectului e că un vizitator nu vede niciodată o eroare fiindcă cineva
+ * a pus o valoare neprevăzută în panou. Deci adresele către alte site-uri, puse
+ * de client, se randează ca `<img>` simplu: imaginea se vede, doar că
+ * neoptimizată.
  */
-const GAZDA_OPTIMIZABILA = (() => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  if (!url) return null;
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return null;
-  }
-})();
-
 function poateFiOptimizata(src: string): boolean {
-  if (!GAZDA_OPTIMIZABILA) return false;
-  try {
-    return new URL(src).hostname === GAZDA_OPTIMIZABILA;
-  } catch {
-    // Adresă relativă („/imagini/x.jpg") — servită de noi, deci optimizabilă.
-    return src.startsWith("/");
-  }
+  return src.startsWith("/");
 }
 
 /**

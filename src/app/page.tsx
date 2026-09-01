@@ -17,6 +17,8 @@ import {
   type Intrebare,
 } from "@/lib/date-structurate";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
+import { rescrieAdresele } from "@/lib/imagini";
+import { adresaImaginii } from "@/lib/imagini-adrese";
 import { CadruSite } from "@/components/site/cadru-site";
 import { DateStructurate } from "@/components/site/date-structurate";
 
@@ -78,7 +80,16 @@ export default async function PublicHomePage() {
   // primește numele tabelului ca `string`, deci supabase-js nu poate deduce forma
   // rândului și cade pe un tip de eroare. De înlocuit cu tipuri generate
   // (`supabase gen types`) când schema se stabilizează.
-  const sections = (rows ?? []) as unknown as SectionRow[];
+  /*
+   * Adresele imaginilor se derivă din `uploadId`, nu se iau din JSON. Cele
+   * scrise acolo sunt de pe vremea depozitului public și nu mai duc nicăieri —
+   * iar o adresă absolută rămasă în conținut nu trebuie să mai poată fi randată
+   * deloc. Vezi `rescrieAdresele` în src/lib/imagini.ts.
+   */
+  const sections = ((rows ?? []) as unknown as SectionRow[]).map((rand) => ({
+    ...rand,
+    data: rescrieAdresele(rand.data, adresaImaginii),
+  }));
 
   /**
    * Întrebările pentru `FAQPage` se iau din secțiunea de pe pagină, nu din tot

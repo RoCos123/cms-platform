@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
+import { adresaImaginii } from "@/lib/imagini-adrese";
 import {
   BUCKET_MEDIA,
   buildStorageFileName,
@@ -93,14 +94,10 @@ export async function uploadImage(formData: FormData): Promise<UploadImageResult
     return { ok: false, error: GENERIC_UPLOAD_ERROR };
   }
 
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from(BUCKET_MEDIA).getPublicUrl(storagePath);
-
   // Biblioteca media și orice ecran care listează imagini stau sub /dashboard.
   // Site-ul public nu se atinge: o imagine abia încărcată nu e încă folosită
   // nicăieri, iar legarea ei de o secțiune trece prin salvarea acelei secțiuni.
   revalidatePath("/dashboard", "layout");
 
-  return { ok: true, image: { uploadId: upload.id, url: publicUrl, altText } };
+  return { ok: true, image: { uploadId: upload.id, url: adresaImaginii(upload.id), altText } };
 }

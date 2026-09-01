@@ -188,6 +188,49 @@ export function rescrieImaginea(
   return { valoare: schimbat ? noua : valoare, schimbat };
 }
 
+/**
+ * Rescrie adresa fiecărei imagini dintr-un conținut, derivând-o din `uploadId`.
+ *
+ * DE CE E NEVOIE. Adresa unei imagini stă în JSON-ul secțiunii, lângă
+ * `uploadId`, de pe vremea când depozitul era public și adresa era un link
+ * direct la Supabase. Acum depozitul e privat, iar acele adrese vechi nu mai
+ * duc nicăieri. Puteam rescrie o dată datele tuturor clienților cu o migrare —
+ * dar o migrare care umblă în conținutul oamenilor e exact felul de operație
+ * care, greșită, nu se mai poate da înapoi.
+ *
+ * Rescrierea la CITIRE nu are riscul ăsta: nu atinge nimic în bază, merge
+ * deopotrivă pe rândurile vechi și pe cele noi, și — partea care contează —
+ * face ca o adresă absolută rămasă în conținut să nu mai poată fi randată
+ * NICIODATĂ. Chiar dacă cineva ar scrie de mână în JSON adresa unui fișier al
+ * altui cabinet, ea se pierde aici, înlocuită cu adresa derivată din `uploadId`.
+ *
+ * Imaginile fără `uploadId` se lasă neatinse: sunt adrese puse de client către
+ * alt site, deci nu sunt fișierele noastre și n-avem ce semna la ele.
+ *
+ * `adresa` se primește ca argument, nu se importă: semnarea are nevoie de
+ * `node:crypto` și de cheia de serviciu, iar fișierul ăsta se încarcă și în
+ * browser (ecranul Imagini arată unde e pusă fiecare poză).
+ */
+export function rescrieAdresele(valoare: unknown, adresa: (uploadId: string) => string): unknown {
+  if (esteImagine(valoare)) {
+    return { ...valoare, url: adresa(valoare.uploadId as string) };
+  }
+
+  if (Array.isArray(valoare)) {
+    return valoare.map((element) => rescrieAdresele(element, adresa));
+  }
+
+  if (esteObiect(valoare)) {
+    const rezultat: Record<string, unknown> = {};
+    for (const [cheie, camp] of Object.entries(valoare)) {
+      rezultat[cheie] = rescrieAdresele(camp, adresa);
+    }
+    return rezultat;
+  }
+
+  return valoare;
+}
+
 // ----------------------------------------------------------------------------
 // Formatări. Stau aici, nu în componenta care le folosește prima, fiindcă
 // aceleași imagini se văd în două locuri — ecranul Imagini și fereastra de

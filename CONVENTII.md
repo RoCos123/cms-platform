@@ -52,6 +52,30 @@ Corolar pentru probe: dacă o decizie e luată ca să nu ne mai lovim de un plaf
 ea se apără cu o probă, nu cu un comentariu. `e2e/captcha.proba.mjs` cade dacă
 implicitul nu mai e cel fără plafon.
 
+
+---
+
+## Ce se cheamă singur nu primește anteturi
+
+1 sept. 2026, la trecerea depozitului de fișiere pe privat. Ruta care servește
+pozele trebuia să verifice că imaginea e a cabinetului al cărui site se
+randează — firesc, din antetul de tenant pus de proxy. Am verificat înainte să
+scriu, și bine am făcut: optimizatorul de imagini din Next își cere singur
+fișierul printr-o cerere construită în memorie, cu `headers = {}`. Zero anteturi.
+
+Ruta ar fi mers pe Vercel (unde cererea vine pe HTTP, cu gazda adevărată) și ar
+fi căzut în dezvoltare. Sau invers, după cum bate vântul. Adică exact felul de
+diferență care nu se vede la nicio probă și se descoperă în ziua lansării.
+
+Regula: **înainte să sprijini o rută pe un antet, cookie sau sesiune, întreabă-te
+cine altcineva o mai cheamă.** Optimizatorul de imagini, prefetch-ul, un job, un
+webhook, o previzualizare — niciunul nu duce cu el contextul cererii omului. Ce
+poate fi chemat din interior trebuie să se apere din ceea ce poartă adresa lui.
+
+Și corolarul care a scos-o la iveală: răspunsul era în `node_modules`, la două
+grep-uri distanță. Când o presupunere despre o unealtă hotărăște forma unei
+soluții, se citește sursa — nu se caută în amintiri și nu se întreabă internetul.
+
 ---
 
 ## Limba și scrisul

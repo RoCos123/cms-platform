@@ -12,6 +12,8 @@ import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
 import { oreDeAratatPePrimaPagina } from "@/lib/programari-publice";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { EditorSectiune } from "./editor";
+import { rescrieAdresele } from "@/lib/imagini";
+import { adresaImaginii } from "@/lib/imagini-adrese";
 
 export default async function EditorSectiunePage({
   params,
@@ -33,6 +35,10 @@ export default async function EditorSectiunePage({
   // altui client dispare aici la fel ca una inexistentă — 404, nu „interzis”,
   // ca să nu confirmăm nici măcar că id-ul există undeva.
   if (!rand) notFound();
+
+  // Aceeași rescriere ca pe site (src/app/page.tsx): previzualizarea din editor
+  // trebuie să arate poza pe adresa ei de acum, nu pe cea veche din JSON.
+  const continut = rescrieAdresele(rand.data, adresaImaginii);
 
   const meta = metaSectiune(rand.key as string);
 
@@ -80,7 +86,7 @@ export default async function EditorSectiunePage({
       id={id}
       meta={meta}
       tone={(rand.tone as SectionTone) ?? "deschis"}
-      valoareInitiala={catreEditor(rand.data, meta.campuri)}
+      valoareInitiala={catreEditor(continut, meta.campuri)}
       template={getTemplate(site?.template as string | null)}
       // Goale când blogul e oprit — exact ca pe site, ca previzualizarea să nu
       // arate o secțiune care în realitate nu apare.

@@ -2,7 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 import { createServiceClient } from "@/lib/supabase/admin";
-import { BUCKET_MEDIA } from "@/lib/uploads";
+import { adresaImaginii } from "@/lib/imagini-adrese";
 import type { Articol, ArticolListat } from "@/lib/blog";
 
 type RandListat = {
@@ -35,7 +35,10 @@ async function coperti(
 
   const { data, error } = await service
     .from("uploads")
-    .select("id, storage_path")
+    // Doar `id`: adresa se derivă din el. Interogarea rămâne fiindcă spune dacă
+    // imaginea mai există — un articol a cărui copertă a fost ștearsă trebuie să
+    // se citească fără copertă, nu cu o poză ruptă.
+    .select("id")
     .in("id", iduri);
 
   if (error) {
@@ -47,7 +50,7 @@ async function coperti(
   return new Map(
     (data ?? []).map((rand) => [
       rand.id as string,
-      service.storage.from(BUCKET_MEDIA).getPublicUrl(rand.storage_path as string).data.publicUrl,
+      adresaImaginii(rand.id as string),
     ]),
   );
 }

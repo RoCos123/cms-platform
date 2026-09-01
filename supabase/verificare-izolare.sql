@@ -360,6 +360,51 @@ begin
   end;
 
   perform set_config('role', 'postgres', true);
+
+  -- --------------------------------------------------------------------------
+  -- 11. Depozitul de fișiere e privat.
+  --
+  -- Verificat în sursa serviciului de Storage: `/object/public/…` rulează prin
+  -- `asSuperUser()` și se uită DOAR la steagul `public` al bucket-ului, nicio
+  -- politică nu-l poate opri. Cât timp steagul e aprins, orice fișier al
+  -- oricărui cabinet e citibil de oricine îi știe adresa — deci steagul e
+  -- verificarea, nu politicile.
+  -- --------------------------------------------------------------------------
+  return query
+  select
+    'Depozitul de fișiere e privat'::text,
+    case when exists (select 1 from storage.buckets where id = 'media' and public)
+      then 'PICAT' else 'OK' end,
+    case when exists (select 1 from storage.buckets where id = 'media' and public)
+      then 'bucket-ul media e încă public: oricine îi știe adresa citește orice fișier'
+      else 'bucket-ul media are public = false' end;
+
+  -- --------------------------------------------------------------------------
+  -- 12. Un vizitator nu poate LISTA fișierele nimănui.
+  --
+  -- Listarea (`/object/list/…`) rulează sub rolul celui care cere, deci trece
+  -- prin politici. O politică de `select` care îl prinde pe `anon` înseamnă că
+  -- un străin poate cere catalogul tuturor fișierelor tuturor cabinetelor — ăsta
+  -- a fost chiar riscul găsit la 28 aug. 2026.
+  -- --------------------------------------------------------------------------
+  return query
+  select
+    'Un vizitator nu poate lista fișierele'::text,
+    case when exists (
+      select 1 from pg_policies
+      where schemaname = 'storage' and tablename = 'objects'
+        and cmd in ('SELECT', 'ALL')
+        and ('anon' = any(roles) or 'public' = any(roles))
+    ) then 'PICAT' else 'OK' end,
+    coalesce(
+      (select 'politică de citire deschisă către anon: ' || string_agg(policyname, ', ')
+       from pg_policies
+       where schemaname = 'storage' and tablename = 'objects'
+         and cmd in ('SELECT', 'ALL')
+         and ('anon' = any(roles) or 'public' = any(roles))),
+      'nicio politică de citire nu-l prinde pe anon'
+    );
+
   perform set_config('request.jwt.claims', '', true);
 end;
 $$;

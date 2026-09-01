@@ -507,6 +507,65 @@ există deja. Clientul o găsește apoi în „Secțiuni”, de mutat unde vrea.
 n-are nicio zi bifată în program, secțiunea nu se randează pe site: o invitație
 la programare fără nicio oră liberă e mai rea decât nimic.
 
+## Depozitul de fișiere e privat
+
+1 sept. 2026. Bucket-ul `media` era public, iar politica de citire spunea
+„oricine poate citi orice din el”, fără nicio despărțire pe cabinete. Nu doar că
+un străin putea deschide o poză știindu-i adresa — putea cere **lista tuturor
+fișierelor tuturor clienților**. Cerința proprietarului, fără nuanțe: un client
+nu atinge niciodată fișierele altui client.
+
+**Prima descoperire, din sursa serviciului de Storage** (supabase/storage,
+`src/http/routes/object/`): `/object/public/…` rulează prin `asSuperUser()` și se
+uită DOAR la steagul `public` al bucket-ului — nicio politică nu-l poate opri;
+`/object/list/…` rulează sub rolul celui care cere, deci trece prin politici. Cu
+alte cuvinte, cât timp steagul e aprins, strânsul politicilor nu apără citirea.
+Trebuie stins steagul.
+
+**A doua descoperire, care a hotărât forma soluției.** Prima idee a fost ca ruta
+care servește pozele să citească tenantul din antetul pus de proxy și să verifice
+acolo apartenența. Nu merge: optimizatorul de imagini din Next își cere singur
+fișierul printr-o cerere construită în memorie, iar `fetchInternalImage` cheamă
+`createRequestResponseMocks({ url, method, socket })` — **fără niciun antet**
+(verificat în `node_modules/next/dist/server/image-optimizer.js` și
+`lib/mock-request.js`). O rută care depinde de antetul de tenant s-ar fi rupt în
+spatele optimizatorului — sau, mai rău, ar fi mers pe Vercel și ar fi căzut în
+dezvoltare, adică exact felul de diferență care se descoperă în ziua lansării.
+
+**Soluția: adresa se apără singură.** Bucket privat; pozele se servesc din
+`/imagini/<uploadId>/<semnătură>`, o rută de-a noastră care descarcă fișierul cu
+cheia de serviciu. Semnătura e un HMAC-SHA256 trunchiat la 16 octeți, cu cheia de
+serviciu drept cheie — deci **nicio variabilă de mediu nouă**, adică nimic care
+poate lipsi și nicio ispită de portiță „mergi și fără semnătură”. Nimeni din
+afară nu poate fabrica adresa unei poze a altui cabinet.
+
+Detaliile care nu se văd, dar contează:
+
+- **SVG-ul.** Panoul acceptă SVG, iar un SVG poate conține `<script>`. Cât timp
+  pozele veneau de pe supabase.co, un SVG rău intenționat rula pe domeniul LOR.
+  Servite de noi, ar rula pe `cabinet.ro` — adică am fi mutat singuri o gaură de
+  XSS pe domeniul clientului, tocmai prin schimbarea care trebuia să-l apere.
+  Ruta trimite `Content-Security-Policy: default-src 'none'; sandbox` și
+  `X-Content-Type-Options: nosniff`.
+- **Adresele vechi** rămase în JSON-ul secțiunilor se rescriu la CITIRE, nu
+  printr-o migrare de date: nu atingem conținutul oamenilor, merge deopotrivă pe
+  rândurile vechi și noi, iar o adresă absolută rămasă acolo nu mai poate fi
+  randată niciodată — se pierde, înlocuită cu cea derivată din `uploadId`.
+- **`remotePatterns` e gol** în `next.config.ts`. Nu e curățenie, e încuietoare:
+  cât timp gazda Supabase stătea acolo, o regresie care ar fi reintrodus adrese
+  publice ar fi mers în tăcere.
+- **Comparația semnăturii se face pe octeți**, nu pe caractere: `timingSafeEqual`
+  aruncă pe lungimi diferite, iar un „ă” ocupă doi octeți — 22 de caractere pot
+  însemna 23 de octeți. Fără paza asta, oricine putea face ruta să arunce.
+
+**Ordinea la punere în producție:** întâi codul, abia apoi migrarea. Ruta nouă
+merge și cu bucket public (descarcă tot cu cheia de serviciu), deci codul poate
+sta liniștit înainte. Invers, migrarea ar stinge toate pozele de pe toate
+site-urile până la deploy.
+
+Verificările 11 și 12 din `supabase/verificare-izolare.sql` țin steagul stins și
+politicile închise; probate că dau PICAT fără migrare.
+
 ## Anti-spam: de ce am plecat de la Turnstile la hCaptcha
 
 Găsit pe 28 aug. 2026, verificând de ce nu apare caseta anti-spam pe site.

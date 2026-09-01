@@ -159,6 +159,15 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    /*
+     * `imagini` e scoasă dinadins, lângă rutele interne ale Next: ruta care
+     * servește pozele din depozitul privat se apără cu semnătura din adresă, nu
+     * cu tenantul din antet — și N-ARE CUM să depindă de antete, fiindcă
+     * optimizatorul de imagini își cere singur fișierul printr-o cerere fără
+     * niciun antet. Trecută prin proxy, ar mai plăti un drum la baza de date
+     * pentru un tenant pe care nu-l folosește, iar pe cererea internă a
+     * optimizatorului rezolvarea n-ar avea de unde începe.
+     */
+    "/((?!_next/static|_next/image|imagini/|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

@@ -346,15 +346,29 @@ export function ImageField({
                 isDraggingOver && "border-primary",
               )}
             >
-              <Image
-                src={value.url}
-                // Previzualizarea nu adaugă informație peste câmpul de mai jos,
-                // unde utilizatorul chiar citește și scrie descrierea.
-                alt=""
-                fill
-                sizes="(max-width: 768px) 100vw, 480px"
-                className="object-contain"
-              />
+              {/*
+                Doar adresele relative merg la optimizator: de când depozitul e
+                privat, `next.config.ts` n-are nicio gazdă externă în
+                `remotePatterns`, iar `<Image>` cu o adresă absolută ARUNCĂ.
+                Pozele noastre sunt toate relative — dar în conținutul unei
+                secțiuni poate sta și o imagine fără `uploadId`, rămasă dintr-o
+                versiune veche sau scrisă de mână, pe care rescrierea o lasă
+                dinadins neatinsă. Aia n-are voie să dărâme ecranul clientului.
+              */}
+              {value.url.startsWith("/") ? (
+                <Image
+                  src={value.url}
+                  // Previzualizarea nu adaugă informație peste câmpul de mai jos,
+                  // unde utilizatorul chiar citește și scrie descrierea.
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 100vw, 480px"
+                  className="object-contain"
+                />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element -- vezi comentariul de mai sus.
+                <img src={value.url} alt="" className="absolute inset-0 h-full w-full object-contain" />
+              )}
             </div>
 
             <TextField

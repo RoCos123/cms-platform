@@ -2,7 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { BUCKET_MEDIA } from "@/lib/uploads";
+import { adresaImaginii } from "@/lib/imagini-adrese";
 import {
   folosirileImaginilor,
   type ImagineBiblioteca,
@@ -57,13 +57,9 @@ export const imaginileBibliotecii = cache(
     });
 
     return (incarcari ?? []).map((rand) => {
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from(BUCKET_MEDIA).getPublicUrl(rand.storage_path as string);
-
       return {
         id: rand.id as string,
-        url: publicUrl,
+        url: adresaImaginii(rand.id as string),
         numeFisier: rand.filename as string,
         descriere: (rand.alt_text as string | null) ?? "",
         marimeOcteti: (rand.size_bytes as number | null) ?? 0,

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CAMPURI_ARTICOL } from "@/lib/blog";
 import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate } from "@/lib/templates";
-import { BUCKET_MEDIA } from "@/lib/uploads";
+import { adresaImaginii } from "@/lib/imagini-adrese";
 import { EditorArticol } from "./editor";
 
 export default async function EditorArticolPage({
@@ -38,19 +38,18 @@ export default async function EditorArticolPage({
   if (articol.cover_upload_id) {
     const { data: incarcare } = await supabase
       .from("uploads")
-      .select("storage_path")
+      // Nu ne mai trebuie calea din depozit — adresa se derivă din id. Interogarea
+      // rămâne fiindcă face altceva, la fel de important: se asigură că imaginea
+      // există ȘI e a acestui cabinet.
+      .select("id")
       .eq("id", articol.cover_upload_id as string)
       .eq("site_id", session.siteId)
-      .maybeSingle<{ storage_path: string }>();
+      .maybeSingle<{ id: string }>();
 
     if (incarcare) {
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from(BUCKET_MEDIA).getPublicUrl(incarcare.storage_path);
-
       coperta = {
         uploadId: articol.cover_upload_id as string,
-        url: publicUrl,
+        url: adresaImaginii(incarcare.id),
         altText: (articol.cover_alt as string | null) ?? "",
       };
     }

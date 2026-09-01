@@ -1,37 +1,25 @@
 import type { NextConfig } from "next";
 
-/**
- * Gazda din care se servesc imaginile încărcate (bucketul public `media`).
- * Se citește din aceeași variabilă ca și clientul Supabase, ca project ref-ul să
- * nu fie scris de mână în două locuri. `next.config.ts` e evaluat DUPĂ ce Next
- * încarcă fișierele `.env*`, deci variabila e disponibilă aici.
- *
- * Fallback-ul acoperă build-urile fără `.env` (CI cu variabile injectate abia la
- * runtime): fără niciun tipar, `next/image` ar arunca „hostname is not
- * configured" la prima previzualizare.
- */
-const SUPABASE_IMAGE_HOST = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-  : "*.supabase.co";
-
 const nextConfig: NextConfig = {
   images: {
     /**
-     * Fără asta, orice `<Image src={url}>` cu o adresă Supabase aruncă în dev
-     * („Invalid src prop … hostname is not configured") și primește 400 de la
-     * optimizator în producție — adică previzualizarea din ImageField și
-     * miniaturile din bibliotecă nu s-ar vedea niciodată.
+     * NICIO gazdă externă. Din 1 sept. 2026, depozitul de fișiere e privat, iar
+     * pozele se servesc doar de la noi, pe adrese relative
+     * (`/imagini/<id>/<semnătură>`) — pe care optimizatorul le acceptă oricum,
+     * fără niciun tipar.
      *
-     * `pathname` e restrâns la prefixul obiectelor publice: optimizatorul nostru
-     * nu are ce căuta pe restul API-ului Supabase.
+     * Lista goală nu e o curățenie, e o încuietoare. Cât timp aici stătea
+     * `**.supabase.co/storage/v1/object/public/**`, o regresie care ar fi
+     * reintrodus adrese publice ar fi mers în tăcere, iar izolarea ar fi căzut
+     * fără ca nimic să pară stricat. Acum o astfel de adresă e refuzată
+     * zgomotos de `next/image`.
+     *
+     * Adresele puse de client către alte site-uri se randează ca `<img>` simplu
+     * (vezi `poateFiOptimizata` în src/components/site/section-image.tsx), deci
+     * nu se rupe nimic pentru vizitator.
      */
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: SUPABASE_IMAGE_HOST,
-        pathname: "/storage/v1/object/public/**",
-      },
-    ],
+    remotePatterns: [],
+
     /**
      * SVG e unul dintre formatele acceptate la încărcare (vezi
      * `ACCEPTED_IMAGE_TYPES`). Next îl refuză implicit, pentru că un SVG poate
