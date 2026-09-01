@@ -12,6 +12,8 @@ import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate } from "@/lib/templates";
 import { FormularSetari } from "./formular";
 import { ComutatorPublicare } from "./comutator-publicare";
+import Link from "next/link";
+import { Card, CardBody, CardHeader } from "@/components/ui/card";
 
 export const metadata = { title: "Setări" };
 
@@ -56,6 +58,40 @@ export default async function SetariPage() {
         // confidențialitate e în aceeași situație ca unul cu ea nepublicată.
         politicaEsteCiorna={politica?.status !== "published"}
       />
+
+      <Card>
+        <CardHeader
+          title="Datele oamenilor"
+          description="Ce ai de făcut când cineva îți cere datele lui, sau când vrei o copie a tot ce ai scris."
+        />
+        <CardBody className="space-y-4 text-sm leading-relaxed text-muted-foreground">
+          <p>
+            <Link href="/dashboard/date-personale" className="font-medium text-foreground underline underline-offset-4">
+              Șterge datele unei persoane
+            </Link>{" "}
+            — dacă cineva îți cere să nu-i mai păstrezi numărul sau adresa. Le cauți după telefon
+            sau email și se șterg din toate locurile deodată, inclusiv numele din Activitate.
+          </p>
+          <p>
+            {/*
+              `<a>`, nu `<Link>`, și nu un buton. Nu e o navigare: ruta întoarce un
+              FIȘIER, cu `Content-Disposition: attachment`. `<Link>` ar face o
+              navigare de client către ceva ce nu e o pagină, iar un buton ar fi
+              cerut cod de client pentru zero câștig. `download` nu e decor: fără
+              el, regula de lint tratează adresa ca pe o pagină și cere `<Link>`.
+            */}
+            <a
+              href="/dashboard/export"
+              download
+              className="font-medium text-foreground underline underline-offset-4"
+            >
+              Descarcă tot conținutul
+            </a>{" "}
+            — un fișier cu tot ce ai scris: pagini, servicii, articole, secțiuni, setări, lista
+            imaginilor. E al tău, oricând, fără să ceri nimănui.
+          </p>
+        </CardBody>
+      </Card>
 
       <FormularSetari
         // Numele stă în alt tabel decât restul, dar în formular e un câmp ca

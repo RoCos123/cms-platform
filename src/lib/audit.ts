@@ -28,6 +28,9 @@ export type EntitateAudit =
   | "SiteSettings"
   // Site-ul ca întreg: deocamdată doar publicarea și retragerea lui.
   | "Site"
+  // Ștergerea datelor cuiva, la cererea lui. Nu e un mesaj și nu e o
+  // programare — de obicei sunt mai multe deodată, din tabele diferite.
+  | "DatePersonale"
   | "Upload"
   | "ContactSubmission"
   | "Session";

@@ -507,6 +507,52 @@ există deja. Clientul o găsește apoi în „Secțiuni”, de mutat unde vrea.
 n-are nicio zi bifată în program, secțiunea nu se randează pe site: o invitație
 la programare fără nicio oră liberă e mai rea decât nimic.
 
+## Ștergerea și exportul datelor
+
+1 sept. 2026. Două butoane pentru două nevoi care se confundă des, dar n-au
+nimic în comun.
+
+**Ștergerea** e pentru datele ALTOR oameni. Prin GDPR, cine a lăsat un număr pe
+site poate cere oricând să nu mai fie păstrat. Până acum se făcea de mână, în
+baza de date, de proprietarul platformei — adică psihologul nu putea răspunde
+singur, iar nicăieri nu rămânea urma că a răspuns.
+
+Partea grea nu e ștergerea, e POTRIVIREA. Același om își scrie numărul altfel de
+fiecare dată: „0721 123 456”, „+40721123456”, „0040-721-123-456”. O căutare pe
+text ar găsi o parte din cereri și le-ar lăsa pe celelalte, iar psihologul ar
+rămâne convins că a șters tot. Se compară pe ultimele nouă cifre — atât are un
+număr românesc fără prefix — și se caută în ambele câmpuri, telefon și email,
+fiindcă cine lasă telefonul la o programare și emailul la newsletter e același
+om. Probele din `e2e/date-personale.proba.mjs` țin asta pe loc, inclusiv cazul
+cel mai periculos: o căutare goală care s-ar potrivi cu tot și ar mătura datele
+tuturor pacienților dintr-o apăsare.
+
+Ce nu era evident: **jurnalul de activitate conține nume.** Scrie propoziții ca
+„Programarea lui Ion Popescu a fost confirmată”. O ștergere care lasă numele
+acolo nu e o ștergere. Dar rândurile NU se șterg, se albesc: jurnalul e dovada
+că nimeni n-a umblat pe ascuns în datele cabinetului, iar unul din care se pot
+scoate rânduri nu mai dovedește nimic. Rămâne că s-a întâmplat ceva, dispare
+cine. Albirea se face cu cheia de serviciu, fiindcă jurnalul e pentru client
+doar de citit și de adăugat — și așa trebuie să rămână; excepția e o operație a
+platformei, cerută de lege, și ea însăși lasă o intrare în jurnal.
+
+Ștergerea e ADEVĂRATĂ, nu `deleted_at`. Mesajele au și un coș, de unde se pot
+recupera — dar o cerere GDPR nu înseamnă „mută la coș”.
+
+**Exportul** e pentru datele CLIENTULUI: tot ce a scris el. Un JSON descărcat
+dintr-o rută sub `/dashboard`, fiindcă un Server Action întoarce date către
+pagină, nu un fișier către browser. Imaginile nu sunt în fișier — ar fi cerut un
+arhivator și zeci de megaocteți — ci lista lor cu adresa fiecăreia.
+
+De ce contează dincolo de lege: fără export, ce ține un client la noi nu e
+calitatea produsului, ci faptul că n-are cum să-și scoată munca. Aia e o
+legătură pe care n-o vrem.
+
+Fișierul conține și datele primite de la oameni, într-o secțiune separată și cu
+un avertisment scris în el: pe un laptop pierdut, e o scurgere de date pe care
+legea o pune în seama cabinetului. Un export care le-ar fi omis în tăcere ar fi
+fost însă mai rău — psihologul E operatorul lor și i se cuvin.
+
 ## Comutatorul de lansare, și de ce vine la pachet cu secțiunile aprinse
 
 1 sept. 2026. Cele două nu se pot despărți, iar motivul e o consecință a
