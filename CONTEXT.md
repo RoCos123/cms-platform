@@ -170,9 +170,9 @@ De aici, trei lucruri urcă în prioritate față de cum erau socotite:
    scrie singur site-ul intră în panou de zeci de ori în prima lună.
 
 **Site-ul pornește cu TOATE secțiunile aprinse**, iar clientul le scoate pe cele
-care nu i se potrivesc. Hotărât de proprietar, corectând o alegere de-a mea:
-funcția de provizionare pornește azi doar `hero` și `contact` vizibile, restul
-stinse. **De schimbat.**
+care nu i se potrivesc. Hotărât de proprietar, corectând o alegere de-a mea.
+**Făcut pe 1 sept. 2026**, împreună cu comutatorul de lansare — vezi secțiunea
+lui mai jos.
 
 Motivul lui e bun: un client care vede o listă de secțiuni stinse nu știe ce-i
 oferă produsul, mai ales fără cineva lângă el. Văzându-le pe toate, înțelege ce
@@ -183,7 +183,8 @@ Site-ul e public din clipa în care domeniul rezolvă. Cu toate secțiunile
 aprinse și goale, un vizitator — sau Google — poate nimeri peste un cabinet
 care arată neterminat. Cât timp secțiunile porneau stinse, lipsa comutatorului
 era doar neplăcută; acum e o gaură. Ordinea corectă e: întâi comutatorul, apoi
-aprinderea tuturor secțiunilor.
+aprinderea tuturor secțiunilor. **Amândouă făcute pe 1 sept. 2026**, în același
+commit, tocmai fiindcă nu se puteau despărți.
 
 **Instructajul e un videoclip**, trimis clientului, nu o ședință. Sună doar
 dacă nu se descurcă cu el. Două lucruri decurg de aici:
@@ -521,6 +522,40 @@ provizionare, așa că un tip nou de secțiune n-avea cum să ajungă pe un site
 există deja. Clientul o găsește apoi în „Secțiuni”, de mutat unde vrea. Cât timp
 n-are nicio zi bifată în program, secțiunea nu se randează pe site: o invitație
 la programare fără nicio oră liberă e mai rea decât nimic.
+
+## Politica de confidențialitate se schimbă odată cu platforma
+
+Cerut de proprietar, 1 sept. 2026, ca să nu se piardă printre altele.
+
+**Ce trebuie ținut minte:** șablonul din `sabloane/` descrie ce face CHIAR
+platforma. De fiecare dată când se schimbă ce pleacă din browserul unui
+vizitator, șablonul trebuie schimbat în același commit — altfel textul minte, iar
+minciuna ajunge la clienți sub semnătura lor, nu a noastră.
+
+**Și, mai important, partea care NU se rezolvă singură:** șablonul actualizat
+nu schimbă pagina niciunui client. Textul lui stă în tabelul `pages`, scris de
+el, din ziua în care și-a făcut site-ul. Un client care și-a publicat politica
+înainte de o schimbare rămâne cu textul vechi până i-l corectează cineva.
+
+### Ce s-a schimbat până acum, și trebuie dus și la clienți
+
+| Când | Ce s-a schimbat tehnic | Ce trebuie să scrie altfel |
+|---|---|---|
+| 30 aug. 2026 | Formularele nu mai au căsuță de mesaj; se cer nume + telefon, emailul opțional | Paragraful despre ce se strânge prin formular. Textul vechi spunea „nume, email și mesaj” și „nu îți cerem telefonul” — pe dos față de acum |
+| 31 aug. 2026 | Anti-spamul a trecut de la Cloudflare Turnstile la hCaptcha | Numele furnizorului, în paragraful despre anti-spam ȘI în lista de firme care ating datele |
+| 1 sept. 2026 | Fonturile se servesc de pe domeniul clientului | Paragraful despre Google Fonts SE SCOATE de tot |
+
+Toate trei sunt deja făcute în șablon. **Niciuna nu e făcută în paginile deja
+scrise de clienți** — deocamdată nu există niciun client care să-și fi publicat
+politica, deci lista e curată. Dar din prima zi în care există unul, tabelul
+ăsta devine o listă de treabă de făcut, nu un istoric.
+
+### De verificat înainte de fiecare client nou
+
+Că șablonul din `sabloane/politica-de-confidentialitate.md` descrie platforma
+așa cum e ÎN ZIUA ACEEA. Lista scurtă: ce câmpuri au formularele, ce furnizor de
+anti-spam e configurat, de unde se încarcă fonturile, unde e găzduită baza de
+date, dacă se trimit emailuri. Cinci întrebări, două minute.
 
 ## Ștergerea și exportul datelor
 

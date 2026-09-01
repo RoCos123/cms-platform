@@ -125,6 +125,28 @@ Semnul că e vorba de asta: probele nu pică una câte una, ci dispare tot fiși
 de probe deodată. Numărul total scade, dar „fail" rămâne mic — ușor de trecut cu
 vederea dacă te uiți doar la câte au picat.
 
+
+---
+
+## Ce pleacă din browserul vizitatorului se scrie în politică, în același commit
+
+Cerut de proprietar, 1 sept. 2026.
+
+Politica de confidențialitate a unui cabinet nu e un text de umplutură: e o
+declarație despre ce face chiar produsul nostru, semnată de client. Când se
+schimbă ce pleacă din browserul unui vizitator — un furnizor de anti-spam, un
+font de la altcineva, un câmp în plus într-un formular — textul devine fals în
+clipa aceea, iar minciuna e sub numele lui, nu al nostru.
+
+Deci: **șablonul din `sabloane/` se schimbă în ACELAȘI commit cu codul.** Nu în
+următorul, nu „când ajungem la documentație”.
+
+Partea care nu se rezolvă singură, și de care trebuie ținut minte separat:
+șablonul actualizat NU schimbă pagina niciunui client. Textul lui stă în baza de
+date, scris de el, din ziua în care și-a făcut site-ul. Tabelul din CONTEXT.md,
+§„Politica de confidențialitate se schimbă odată cu platforma”, ține evidența a
+ce trebuie dus mai departe la clienții care și-au publicat deja politica.
+
 ---
 
 ## Limba și scrisul
