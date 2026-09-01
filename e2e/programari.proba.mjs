@@ -223,8 +223,25 @@ test("o cerere obișnuită trece", () => {
   assert.equal(opresteCererea(3, 1), null);
 });
 
-test("a treia cerere nerezolvată de la același număr se oprește", () => {
-  const mesaj = opresteCererea(0, 2);
+test("un pacient poate cere luni, marți ȘI miercuri", () => {
+  /*
+   * Proba asta există fiindcă întrebarea a fost pusă exact așa, iar răspunsul
+   * era „nu”: plafonul pe persoană era doi, deci a treia zi cerută se lovea de
+   * un mesaj despre spam. Un părinte cu doi copii, o serie de ședințe luată
+   * înainte, o evaluare ținută în mai multe întâlniri — toate cădeau la fel.
+   *
+   * Dacă cineva coboară vreodată pragul înapoi, aici trebuie să se oprească.
+   */
+  assert.equal(opresteCererea(0, 0), null, "prima zi");
+  assert.equal(opresteCererea(1, 1), null, "a doua zi");
+  assert.equal(opresteCererea(2, 2), null, "a treia zi");
+  assert.equal(opresteCererea(3, 3), null, "și a patra, dacă vrea");
+});
+
+test("a șasea cerere nerezolvată de la același număr se oprește", () => {
+  assert.equal(opresteCererea(0, 4), null, "a cincea încă trece");
+
+  const mesaj = opresteCererea(0, 5);
   assert.ok(mesaj, "trebuia oprită");
   assert.match(mesaj, /așteaptă răspuns/i);
 });
@@ -237,15 +254,15 @@ test("peste zece cereri într-o oră, cabinetul se închide temporar", () => {
 });
 
 test("plafonul pe persoană bate plafonul pe oră", () => {
-  // Amândouă depășite: omul trebuie să afle că are deja o cerere, nu că
+  // Amândouă depășite: omul trebuie să afle că are deja cereri trimise, nu că
   // „e aglomerat" — al doilea mesaj l-ar face să încerce din nou peste o oră.
-  assert.match(opresteCererea(50, 5), /așteaptă răspuns/i);
+  assert.match(opresteCererea(50, 9), /așteaptă răspuns/i);
 });
 
 test("mesajele trimit omul către telefon, nu îl acuză", () => {
   // Cineva oprit de un plafon e aproape sigur un om cinstit care a apăsat de
   // două ori. Nu i se spune că e bot, i se spune ce poate face.
-  for (const mesaj of [opresteCererea(0, 2), opresteCererea(99, 0)]) {
+  for (const mesaj of [opresteCererea(0, 5), opresteCererea(99, 0)]) {
     assert.match(mesaj, /sun[ăa] direct la cabinet/i);
   }
 });
