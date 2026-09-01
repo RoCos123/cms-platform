@@ -283,7 +283,10 @@ export function opresteCererea(
   inAsteptareDeLaAcelasiNumar: number,
 ): string | null {
   if (inAsteptareDeLaAcelasiNumar >= CERERI_IN_ASTEPTARE_PER_PERSOANA) {
-    return "Ai deja o cerere trimisă care așteaptă răspuns. Așteaptă confirmarea sau sună direct la cabinet.";
+    // „Cereri", nu „o cerere": plafonul lasă două în așteptare, deci mesajul
+    // apare abia la a treia. Scris la singular, omul căuta o singură cerere pe
+    // care n-o mai găsea.
+    return "Ai deja cereri trimise care așteaptă răspuns. Așteaptă confirmarea sau sună direct la cabinet.";
   }
 
   if (cereriUltimaOra >= CERERI_PE_ORA) {
