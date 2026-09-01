@@ -8,6 +8,8 @@
  * sunt tăcute — nimic nu pare stricat.
  */
 
+import { estePanou, esteConectare } from "@/lib/rute";
+
 /**
  * Căile care se servesc normal chiar și pe un site nepublicat, oricine ar cere.
  *
@@ -23,9 +25,8 @@
  */
 export function seServesteNepublicat(cale: string): boolean {
   return (
-    cale === "/login" ||
-    cale === "/dashboard" ||
-    cale.startsWith("/dashboard/") ||
+    esteConectare(cale) ||
+    estePanou(cale) ||
     cale === "/robots.txt" ||
     cale === "/sitemap.xml"
   );

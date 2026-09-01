@@ -4,6 +4,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { resolveTenant, isPlatformHost } from "@/lib/tenant";
 import { seServesteNepublicat } from "@/lib/lansare";
+import { estePanou, esteConectare } from "@/lib/rute";
 
 /**
  * Fallback de rezolvare a tenantului pentru host-uri care nu aparțin niciunui
@@ -124,8 +125,11 @@ export async function proxy(request: NextRequest) {
   requestHeaders.set("x-cale", request.nextUrl.pathname);
 
   const pathname = request.nextUrl.pathname;
-  const isDashboard = pathname.startsWith("/dashboard");
-  const isLogin = pathname === "/login";
+  // `estePanou`, nu `startsWith("/dashboard")`: clientul are voie să-și facă o
+  // pagină numită `dashboard-ul-meu`, iar cu prefixul ea cerea conectare și
+  // niciun vizitator n-o putea citi. Vezi src/lib/rute.ts.
+  const isDashboard = estePanou(pathname);
+  const isLogin = esteConectare(pathname);
 
   /**
    * Userul aparține tenantului cerut? Un cont valid pe alt domeniu nu dă acces.

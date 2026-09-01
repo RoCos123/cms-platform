@@ -76,6 +76,31 @@ poate fi chemat din interior trebuie să se apere din ceea ce poartă adresa lui
 grep-uri distanță. Când o presupunere despre o unealtă hotărăște forma unei
 soluții, se citește sursa — nu se caută în amintiri și nu se întreabă internetul.
 
+
+---
+
+## Un prefix nu e un segment de cale
+
+1 sept. 2026. Proxy-ul hotăra „e pagină de panou?” cu
+`cale.startsWith("/dashboard")`. Adevărat și pentru `/dashboard-ul-meu` — o
+adresă pe care clientul are voie să și-o facă, fiindcă lista de adrese rezervate
+oprește doar `dashboard` exact. Urmarea: pagina lui cerea conectare, deci n-o
+putea citi niciun vizitator. Aceeași greșeală era și în `robots.txt`, unde
+`Disallow: /dashboard` o ținea afară din Google.
+
+Ce o face urâtă e că nu se vede din nicio parte: pagina exista, se salva, se
+vedea în panou, arăta bine la previzualizare. Doar nu ajungea la nimeni.
+
+Regula: **o cale se compară pe segmente, nu pe litere.** `x === "/a"` sau
+`x.startsWith("/a/")`, niciodată `x.startsWith("/a")`. Iar în `robots.txt`, unde
+potrivirea e pe prefix de text prin însăși definiția formatului, fiecare intrare
+se termină ori cu `/`, ori cu `$`.
+
+Corolarul, care e de fapt lecția: **o reparație pe jumătate e mai rea decât
+niciuna.** Dacă reparam doar proxy-ul, pagina ar fi mers și n-ar fi fost găsită
+de nimeni — iar clientul n-ar fi avut cum să afle de ce. Când o greșeală are
+două capete, se caută amândouă înainte de a repara vreunul.
+
 ---
 
 ## Limba și scrisul

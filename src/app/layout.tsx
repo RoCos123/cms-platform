@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { headers } from "next/headers";
 import { adresaSiteuluiOptionala } from "@/lib/seo";
 import { BandaNepublicat } from "@/components/site/banda-nepublicat";
+import { estePanou, esteConectare } from "@/lib/rute";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -74,8 +75,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
    * ar fi zgomot. `x-cale` e pus tot de proxy.
    */
   const cale = (await headers()).get("x-cale") ?? "";
-  const aratBanda =
-    (await nepublicat()) && !cale.startsWith("/dashboard") && cale !== "/login";
+  const aratBanda = (await nepublicat()) && !estePanou(cale) && !esteConectare(cale);
 
   return (
     <html

@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
 import { isPlatformHost } from "@/lib/tenant";
 import { adresaAbsoluta, adresaSiteului } from "@/lib/seo";
+import { DISALLOW_ROBOTS } from "@/lib/rute";
 
 /**
  * Ce nu are ce căuta în Google, nici măcar ca titlu într-un rezultat.
@@ -9,8 +10,12 @@ import { adresaAbsoluta, adresaSiteului } from "@/lib/seo";
  * `/site-unavailable` e în listă fiindcă e o rută adevărată, nu doar ținta unei
  * rescrieri: cine îi nimerește adresa pe domeniul unui client primește pagina,
  * iar un motor de căutare ar indexa-o ca pagină a cabinetului.
+ *
+ * Lista vine din `src/lib/rute.ts`, scrisă ca să se potrivească pe segment de
+ * cale, nu pe prefix de text: `Disallow: /dashboard` ar fi ținut afară din
+ * Google și o pagină a clientului numită `dashboard-ul-meu`.
  */
-const RUTE_NEPUBLICE = ["/dashboard", "/login", "/admin", "/site-unavailable"];
+const RUTE_NEPUBLICE = DISALLOW_ROBOTS;
 
 /**
  * `robots.txt`, scris pe domeniul clientului, nu pe al nostru.
