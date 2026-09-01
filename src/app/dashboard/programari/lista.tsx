@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { schimbaStarea } from "./actions";
+import { LinkStergereDate } from "@/components/dashboard/link-stergere-date";
 
 export type Cerere = {
   id: string;
@@ -129,6 +130,16 @@ function Rand({ cerere }: { cerere: Cerere }) {
           </button>
         </div>
       )}
+
+      {/*
+        Linkul stă în afara blocului de sus, nu înăuntru: acolo se intră doar
+        pentru cererile încă neapucate. O cerere de ștergere vine de obicei
+        pentru una veche, deja confirmată sau refuzată — exact cazul care ar fi
+        rămas pe dinafară.
+      */}
+      <div className="mt-2">
+        <LinkStergereDate telefon={cerere.telefon} email={cerere.email} />
+      </div>
     </li>
   );
 }

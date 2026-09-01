@@ -8,6 +8,7 @@ import { EmptyState, InlineError } from "@/components/ui/feedback";
 import { useToast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { marcheazaCitit, mutaLaSterse, restaureaza, stergeDefinitiv } from "./actions";
+import { LinkStergereDate } from "@/components/dashboard/link-stergere-date";
 
 export type Mesaj = {
   id: string;
@@ -198,6 +199,12 @@ export function ListaMesaje({
                     >
                       Șterge
                     </Button>
+                    {/*
+                      Altceva decât „Șterge”: ăla mută mesajul la coș, de unde se
+                      poate lua înapoi. Ăsta e răspunsul la o cerere GDPR — șterge
+                      TOT ce ține de omul ăsta, din toate locurile, definitiv.
+                    */}
+                    <LinkStergereDate telefon={mesaj.telefon} email={mesaj.email} />
                   </>
                 )}
               </div>

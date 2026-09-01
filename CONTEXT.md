@@ -539,6 +539,17 @@ platformei, cerută de lege, și ea însăși lasă o intrare în jurnal.
 Ștergerea e ADEVĂRATĂ, nu `deleted_at`. Mesajele au și un coș, de unde se pot
 recupera — dar o cerere GDPR nu înseamnă „mută la coș”.
 
+Ecranul nu caută după NUME, dinadins: doi oameni pot fi „Ion Popescu”, iar o
+ștergere greșită nu se mai poate da înapoi. Numai că asta lăsa o gaură — cererea
+vine la telefon, iar psihologul avea de umblat prin trei ecrane și un copy-paste
+tocmai când are omul pe fir. De asta fiecare mesaj și fiecare cerere de
+programare are un link „Șterge datele acestei persoane”, care duce la ecran cu
+căutarea deja făcută. Link, nu buton cu ștergere pe loc: aceeași persoană poate
+avea și mesaje, și programări, și o abonare, iar un buton pe un rând ar fi lăsat
+impresia că s-a șters doar rândul acela. La programări linkul stă în afara
+blocului cu „Confirmă/Refuză”, care se arată doar la cererile neapucate — o
+cerere de ștergere vine de obicei pentru una veche.
+
 **Exportul** e pentru datele CLIENTULUI: tot ce a scris el. Un JSON descărcat
 dintr-o rută sub `/dashboard`, fiindcă un Server Action întoarce date către
 pagină, nu un fișier către browser. Imaginile nu sunt în fișier — ar fi cerut un

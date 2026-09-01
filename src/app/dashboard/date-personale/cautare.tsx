@@ -27,12 +27,22 @@ function dataScrisa(iso: string): string {
  * O ștergere pornită direct din căsuța de căutare ar fi însemnat că psihologul
  * apasă fără să vadă ce dispare — iar asta nu se mai poate da înapoi.
  */
-export function Cautare() {
-  const [termen, setTermen] = useState("");
+export function Cautare({
+  termenInitial = "",
+  gasiriInitiale = null,
+  mesajInitial = null,
+}: {
+  /** Ce a venit prin `?cauta=`, dintr-un link de pe un mesaj sau o programare. */
+  termenInitial?: string;
+  /** Rezultatele deja căutate pe server, ca ecranul să nu se deschidă gol. */
+  gasiriInitiale?: Gasire[] | null;
+  mesajInitial?: string | null;
+}) {
+  const [termen, setTermen] = useState(termenInitial);
   /** `null` = încă nu s-a căutat. Gol = s-a căutat și nu s-a găsit nimic. */
-  const [gasiri, setGasiri] = useState<Gasire[] | null>(null);
-  const [cautat, setCautat] = useState("");
-  const [mesaj, setMesaj] = useState<string | null>(null);
+  const [gasiri, setGasiri] = useState<Gasire[] | null>(gasiriInitiale);
+  const [cautat, setCautat] = useState(termenInitial);
+  const [mesaj, setMesaj] = useState<string | null>(mesajInitial);
   const [reusita, setReusita] = useState<string | null>(null);
   const [confirmare, setConfirmare] = useState(false);
   const [seLucreaza, porneste] = useTransition();
