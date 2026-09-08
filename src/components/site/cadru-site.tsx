@@ -8,6 +8,7 @@ import { linkurileSociale, paginaEsteActiva } from "@/lib/setari";
 import { moduleleSiteului } from "@/lib/module";
 import { seePotFaceProgramari } from "@/lib/programari-publice";
 import { numaraAfisarea } from "@/lib/vizite-numarare";
+import { headers } from "next/headers";
 import { getTemplate, templateStyle } from "@/lib/templates";
 import { templateFontStyle } from "@/lib/templates/fonturi";
 import { SiteHeader } from "@/components/site/header";
@@ -82,8 +83,19 @@ export async function CadruSite({
    *
    * `after()` o mută după ce răspunsul a plecat — vizitatorul nu așteaptă
    * niciodată după statistici.
+   *
+   * Antetele se citesc AICI, nu înăuntrul lui `after()`: acolo cererea nu mai
+   * poate fi atinsă, iar Next aruncă și pagina cade cu 500. Vezi explicația
+   * lungă din `numaraAfisarea`.
    */
-  after(numaraAfisarea);
+  const antete = await headers();
+  const dateVizita = {
+    siteId,
+    cale: antete.get("x-cale") ?? "",
+    userAgent: antete.get("user-agent"),
+    eProprietarul: sesiune !== null,
+  };
+  after(() => numaraAfisarea(dateVizita));
 
   return (
     <>
