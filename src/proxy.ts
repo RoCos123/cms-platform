@@ -205,7 +205,12 @@ export const config = {
      * niciun antet. Trecută prin proxy, ar mai plăti un drum la baza de date
      * pentru un tenant pe care nu-l folosește, iar pe cererea internă a
      * optimizatorului rezolvarea n-ar avea de unde începe.
+     *
+     * `proba-vanzari` la fel: e o pagină de lucru care randează site-ul de
+     * vânzări fără bază de date, ca să se poată vedea cum arată înainte să
+     * existe. N-are tenant, deci proxy-ul ar trimite-o la „site indisponibil".
+     * În producție dă oricum 404.
      */
-    "/((?!_next/static|_next/image|imagini/|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|imagini/|proba-vanzari|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
