@@ -26,7 +26,7 @@ export default async function EditorSectiunePage({
 
   const { data: rand } = await supabase
     .from("site_content")
-    .select("id, key, tone, data")
+    .select("id, key, variant, tone, data")
     .eq("id", id)
     .eq("site_id", session.siteId)
     .maybeSingle();
@@ -86,6 +86,7 @@ export default async function EditorSectiunePage({
       id={id}
       meta={meta}
       tone={(rand.tone as SectionTone) ?? "deschis"}
+      variant={rand.variant as string | null}
       valoareInitiala={catreEditor(continut, meta.campuri)}
       template={getTemplate(site?.template as string | null)}
       // Goale când blogul e oprit — exact ca pe site, ca previzualizarea să nu

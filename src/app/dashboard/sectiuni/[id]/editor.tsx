@@ -19,6 +19,7 @@ export function EditorSectiune({
   id,
   meta,
   tone,
+  variant,
   valoareInitiala,
   template,
   articole,
@@ -29,6 +30,13 @@ export function EditorSectiune({
   id: string;
   meta: MetaSectiune;
   tone: SectionTone;
+  /**
+   * Așezarea aleasă pentru rândul ăsta. Trebuie să ajungă până aici, altfel
+   * previzualizarea desenează varianta obișnuită și clientul vede în panou
+   * altceva decât are pe site — exact minciuna pe care ecranul ăsta există ca
+   * s-o prevină.
+   */
+  variant: string | null;
   valoareInitiala: ValoareEditor;
   template: Template;
   articole: ArticolListat[];
@@ -53,7 +61,7 @@ export function EditorSectiune({
   const randPreviz: SectionRow = {
     id,
     key: meta.cheie,
-    variant: null,
+    variant,
     tone,
     data: datePreviz,
   };
