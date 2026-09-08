@@ -28,6 +28,15 @@ export type SectionRow = {
    */
   id: string;
   key: string;
+  /**
+   * Altă AȘEZARE a aceleiași secțiuni, nu alt conținut. Se pune din SQL, nu din
+   * panou: panoul scrie doar `data`, `position`, `visible` și `is_demo`, deci o
+   * variantă pusă aici rămâne pusă oricâte editări ar face clientul.
+   *
+   * Ce se știe deocamdată: `features` → `"linie"` (bandă orizontală cu puncte,
+   * în loc de cartonașe). Orice altă valoare cade pe așezarea obișnuită — o
+   * variantă necunoscută nu strică pagina, la fel ca o cheie necunoscută.
+   */
   variant: string | null;
   tone: SectionTone;
   data: unknown;
@@ -87,6 +96,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       data={row.data as FeaturesData}
       servicii={ctx.servicii}
       paginaDetaliata={ctx.paginaServiciiActiva}
+      variant={row.variant}
       tone={row.tone}
     />
   ),

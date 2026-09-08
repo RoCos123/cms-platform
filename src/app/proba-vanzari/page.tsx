@@ -126,7 +126,7 @@ const SECTIUNI: SectionRow[] = [
   {
     id: "features",
     key: "features",
-    variant: null,
+    variant: "linie",
     tone: "deschis",
     data: { titlu: "Ce primești", numar: 6 },
   },

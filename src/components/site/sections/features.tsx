@@ -24,12 +24,15 @@ export function Features({
   data,
   servicii,
   paginaDetaliata,
+  variant,
   tone,
 }: {
   data: FeaturesData;
   servicii: Serviciu[];
   /** E pornită pagina cu descrierile pe larg? Dacă nu, cardurile nu duc nicăieri. */
   paginaDetaliata: boolean;
+  /** `"linie"` = banda orizontală. Orice altceva (inclusiv lipsa) = cartonașe. */
+  variant?: string | null;
   tone?: SectionTone;
 }) {
   // Fără niciun serviciu publicat, secțiunea nu se randează deloc: un titlu
@@ -76,68 +79,180 @@ export function Features({
         }
       />
 
-      <ul
-        style={{
-          listStyle: "none",
-          margin: "56px 0 0",
-          padding: 0,
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(288px, 100%), 1fr))",
-          gap: "20px",
-        }}
-      >
-        {afisate.map((serviciu) => (
-          <li key={serviciu.id}>
-            {/*
-              Cardul întreg e link, nu doar rândul de jos: pe telefon, o țintă de
-              opt pixeli înălțime e greu de nimerit, iar oricine vede un card cu
-              „Află mai multe" încearcă oricum să apese oriunde pe el.
+      {variant === "linie" ? (
+        <Linie servicii={afisate} paginaDetaliata={paginaDetaliata} />
+      ) : (
+        <ul
+          style={{
+            listStyle: "none",
+            margin: "56px 0 0",
+            padding: 0,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(288px, 100%), 1fr))",
+            gap: "20px",
+          }}
+        >
+          {afisate.map((serviciu) => (
+            <li key={serviciu.id}>
+              {/*
+                Cardul întreg e link, nu doar rândul de jos: pe telefon, o țintă de
+                opt pixeli înălțime e greu de nimerit, iar oricine vede un card cu
+                „Află mai multe" încearcă oricum să apese oriunde pe el.
 
-              Fără pagina detaliată n-are unde să ducă, deci nu e link deloc: un
-              card care pare apăsabil și nu face nimic e mai rău decât unul
-              simplu.
-            */}
-            <Card link={paginaDetaliata ? `/servicii#${serviciu.slug}` : undefined}>
-              <h3 style={{ margin: 0, fontSize: "21px", fontWeight: 600, textWrap: "pretty" }}>
-                {serviciu.titlu}
-              </h3>
+                Fără pagina detaliată n-are unde să ducă, deci nu e link deloc: un
+                card care pare apăsabil și nu face nimic e mai rău decât unul
+                simplu.
+              */}
+              <Card link={paginaDetaliata ? `/servicii#${serviciu.slug}` : undefined}>
+                <h3 style={{ margin: 0, fontSize: "21px", fontWeight: 600, textWrap: "pretty" }}>
+                  {serviciu.titlu}
+                </h3>
 
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "16px",
-                  lineHeight: 1.7,
-                  color: "var(--t-text-secundar)",
-                  textWrap: "pretty",
-                }}
-              >
-                {serviciu.descriereScurta}
-              </p>
-
-              {(serviciu.durata || serviciu.pret) && (
-                <p style={{ margin: 0, fontSize: "14px", color: "var(--t-text-secundar)" }}>
-                  {[serviciu.durata, serviciu.pret].filter(Boolean).join(" · ")}
-                </p>
-              )}
-
-              {paginaDetaliata && (
-                <span
+                <p
                   style={{
-                    marginTop: "auto",
-                    paddingTop: "12px",
-                    fontSize: "15px",
-                    fontWeight: 600,
-                    color: "var(--t-accent)",
+                    margin: 0,
+                    fontSize: "16px",
+                    lineHeight: 1.7,
+                    color: "var(--t-text-secundar)",
+                    textWrap: "pretty",
                   }}
                 >
-                  Află mai multe →
-                </span>
-              )}
-            </Card>
-          </li>
-        ))}
-      </ul>
+                  {serviciu.descriereScurta}
+                </p>
+
+                {(serviciu.durata || serviciu.pret) && (
+                  <p style={{ margin: 0, fontSize: "14px", color: "var(--t-text-secundar)" }}>
+                    {[serviciu.durata, serviciu.pret].filter(Boolean).join(" · ")}
+                  </p>
+                )}
+
+                {paginaDetaliata && (
+                  <span
+                    style={{
+                      marginTop: "auto",
+                      paddingTop: "12px",
+                      fontSize: "15px",
+                      fontWeight: 600,
+                      color: "var(--t-accent)",
+                    }}
+                  >
+                    Află mai multe →
+                  </span>
+                )}
+              </Card>
+              </li>
+            ))}
+        </ul>
+      )}
     </Section>
+  );
+}
+
+/**
+ * Varianta „linie": aceleași servicii, așezate pe o bandă orizontală, cu câte un
+ * punct de fiecare. Se cere din `variant` pe rândul de secțiune, nu din date —
+ * e o alegere de așezare, nu conținut al clientului.
+ *
+ * DE CE PUNCTE, NU NUMERE. Numerele ar spune „unul după altul", ca la „Cum
+ * decurge". Serviciile n-au ordine: nimeni nu ia blogul DUPĂ programări. Punctele
+ * dau aceeași bandă continuă fără să promită o succesiune care nu există.
+ *
+ * DE CE `columnGap: 0`. Linia nu e desenată o dată, pe listă, ci bucată cu
+ * bucată: fiecare element își duce propriul punct și propriul segment până la
+ * marginea lui. Așa se leagă singure într-o linie continuă, iar când grila se
+ * rupe în două rânduri fiecare rând își are linia lui — fără nicio interogare de
+ * lățime și fără media queries, pe care stilurile în linie nu le pot exprima.
+ * Aerul dintre coloane vine din padding-ul textului, nu din gap.
+ *
+ * Ultimul segment se stinge în transparent: o linie care se oprește brusc la
+ * marginea din dreapta arată a desen tăiat, nu a capăt de bandă.
+ */
+function Linie({
+  servicii,
+  paginaDetaliata,
+}: {
+  servicii: Serviciu[];
+  paginaDetaliata: boolean;
+}) {
+  return (
+    <ul
+      style={{
+        listStyle: "none",
+        margin: "64px 0 0",
+        padding: 0,
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))",
+        columnGap: 0,
+        rowGap: "52px",
+      }}
+    >
+      {servicii.map((serviciu, index) => (
+        <li key={serviciu.id}>
+          <div aria-hidden style={{ display: "flex", alignItems: "center", height: "14px" }}>
+            <span
+              style={{
+                width: "14px",
+                height: "14px",
+                borderRadius: "999px",
+                background: "var(--s-accent)",
+                flexShrink: 0,
+              }}
+            />
+            <span
+              style={{
+                flex: 1,
+                height: "2px",
+                /*
+                  `currentColor` la opacitate mică, nu `--t-chenar`: linia stă
+                  direct pe fundalul secțiunii, iar `Section` nu dă niciun
+                  `--s-chenar`. Așa se albește singură pe tonul închis, unde un
+                  chenar de card ar fi rămas invizibil.
+                */
+                background:
+                  index === servicii.length - 1
+                    ? "linear-gradient(to right, currentColor, transparent)"
+                    : "currentColor",
+                opacity: 0.2,
+              }}
+            />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px", paddingTop: "24px", paddingRight: "32px" }}>
+            <h3 style={{ margin: 0, fontSize: "20px", fontWeight: 600, textWrap: "pretty" }}>
+              {paginaDetaliata ? (
+                // Ancoră simplă, nu `next/link` — vezi explicația de la cartonașe.
+                <a
+                  href={`/servicii#${serviciu.slug}`}
+                  style={{ color: "inherit", textDecoration: "none" }}
+                >
+                  {serviciu.titlu}
+                </a>
+              ) : (
+                serviciu.titlu
+              )}
+            </h3>
+
+            <p
+              style={{
+                margin: 0,
+                fontSize: "16px",
+                lineHeight: 1.7,
+                color: "var(--s-text-secundar)",
+                textWrap: "pretty",
+              }}
+            >
+              {serviciu.descriereScurta}
+            </p>
+
+            {(serviciu.durata || serviciu.pret) && (
+              <p style={{ margin: 0, fontSize: "14px", color: "var(--s-text-secundar)" }}>
+                {[serviciu.durata, serviciu.pret].filter(Boolean).join(" · ")}
+              </p>
+            )}
+          </div>
+        </li>
+      ))}
+    </ul>
   );
 }
 
