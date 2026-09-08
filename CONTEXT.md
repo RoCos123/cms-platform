@@ -523,6 +523,37 @@ există deja. Clientul o găsește apoi în „Secțiuni”, de mutat unde vrea.
 n-are nicio zi bifată în program, secțiunea nu se randează pe site: o invitație
 la programare fără nicio oră liberă e mai rea decât nimic.
 
+## Migrările intră în CI (8 sept. 2026)
+
+Până azi, CI verifica lintul, tipurile, probele de logică și build-ul. **Nu
+verifica migrările** — singura probă că o migrare se aplică era că-mi aminteam
+eu s-o rulez pe bancul local. Scris ca lipsă chiar în fișa de riscuri: „proba aia
+nu rulează automat, ci doar dacă mi-o cer eu."
+
+Contează mai mult decât pare: migrările se rulează de MÂNĂ, pe baza reală a
+tuturor clienților. E singura operație din tot sistemul care lovește pe toată
+lumea deodată și nu se poate da înapoi. Chiar azi o migrare a plecat cu două
+lucruri rupte — o constrângere de tabel scrisă în altă migrare și un mesaj de
+eroare care mințea — găsite abia fiindcă am rulat-o.
+
+Job separat, `migrari`, fără Node și fără build: rulează în paralel, iar X-ul
+roșu spune limpede că problema e în SQL. Instalează Postgres doar dacă lipsește
+din imaginea GitHub — de obicei pasul nu face nimic, dar în ziua în care imaginea
+se schimbă salvează verificarea în loc s-o rupă.
+
+**Schimbarea care contează cel mai mult e în banc, nu în CI.** `proba-locala.sh`
+doar TIPĂREA tabelul de verificări și ieșea cu 0, chiar dacă una dădea PICAT.
+Adică se sprijinea pe cineva care se uită atent la treisprezece rânduri — merge
+când rulezi o dată, nu merge deloc într-un CI unde nimeni nu se uită dacă scrie
+„verde". Acum iese cu 1 și numește verificarea căzută.
+
+`NECONCLUDENT` cade la fel ca `PICAT`, dinadins: o verificare care n-a putut
+decide nu e o verificare trecută. S-a întâmplat deja o dată — a zecea verificare
+trecea fiindcă rula cu rolul greșit, nu fiindcă apărarea ținea.
+
+Probat în ambele sensuri: cu totul în regulă iese cu 0; cu o migrare care
+redeschide bucket-ul, iese cu 1 și scrie care verificare a picat.
+
 ## Al cincilea șablon: „Claritate" (8 sept. 2026)
 
 Cerut de proprietar pentru site-ul de vânzări: fond alb, profesionist. Niciunul

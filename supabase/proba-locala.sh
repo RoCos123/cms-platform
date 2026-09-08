@@ -133,6 +133,34 @@ SQL
 echo "→ verificarea de izolare"
 psql -h "$SOCK" -U postgres -d postgres -f "$RADACINA/supabase/verificare-izolare.sql" | tail -n +2
 
+# ----------------------------------------------------------------------------
+# Verdictul, citit de mașină, nu cu ochiul.
+#
+# Până acum scriptul doar TIPĂREA tabelul de mai sus și ieșea cu 0, chiar dacă o
+# verificare dădea PICAT. Adică bancul se sprijinea pe cineva care se uită atent
+# la douăsprezece rânduri — ceea ce merge când rulezi o dată și nu merge deloc
+# într-un CI, unde nimeni nu se uită dacă scrie „verde".
+#
+# `NECONCLUDENT` cade la fel ca `PICAT`, dinadins: o verificare care n-a putut
+# decide nu e o verificare trecută. Chiar aici s-a întâmplat o dată — a zecea
+# verificare trecea fiindcă rula cu rolul greșit, nu fiindcă apărarea ținea.
+# ----------------------------------------------------------------------------
+RELE=$(psql -h "$SOCK" -U postgres -d postgres -qtA \
+  -f "$RADACINA/supabase/verificare-izolare.sql" \
+  | awk -F'|' 'NF >= 3 && $2 != "OK" { print "   ✗ " $1 " → " $2 " (" $3 ")" }')
+
+if [ -n "$RELE" ]; then
+  echo
+  echo "VERIFICĂRI PICATE:"
+  echo "$RELE"
+  echo
+  echo "Baza rămâne pornită, ca să te poți uita:"
+  echo "  psql -h $SOCK -U postgres -d postgres"
+  exit 1
+fi
+
+echo
+echo "Toate verificările de izolare au trecut."
 echo
 echo "Baza rămâne pornită. Te conectezi cu:"
 echo "  psql -h $SOCK -U postgres -d postgres"

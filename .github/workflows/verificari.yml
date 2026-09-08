@@ -7,8 +7,6 @@
 #
 # Ce NU acoperă, ca să nu creadă nimeni altceva:
 #   - cum ARATĂ site-ul. Aia rămâne verificare vizuală cu capturi, de mână.
-#   - migrările SQL. `supabase/proba-locala.sh` cere un Postgres pornit de el;
-#     de adăugat ca al doilea job, separat, când e probat că merge pe runner.
 name: Verificări
 
 on:
@@ -61,3 +59,47 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  # ==========================================================================
+  # Migrările SQL, rulate pe un Postgres gol, de la zero.
+  #
+  # DE CE E UN JOB SEPARAT. N-are nevoie de Node, de pnpm și nici de build;
+  # rulează în paralel cu celălalt, iar X-ul roșu spune limpede că problema e în
+  # SQL, nu în cod.
+  #
+  # DE CE CONTEAZĂ MAI MULT DECÂT PARE. Migrările se rulează de MÂNĂ, de
+  # proprietar, pe baza reală a tuturor clienților. E singura operație din tot
+  # sistemul care lovește pe toată lumea deodată și nu se poate da înapoi. Până
+  # acum, singura probă că o migrare se aplică era că mi-o aminteam eu s-o rulez
+  # pe bancul local — adică o promisiune, nu o garanție. Chiar pe 8 sept. 2026 o
+  # migrare a plecat cu două lucruri rupte, găsite abia fiindcă am rulat-o.
+  #
+  # Bancul face trei lucruri, în ordine: aplică TOATE migrările pe o bază goală,
+  # provizionează un client cu `creeaza_client` ca la un client adevărat, apoi
+  # trece cele treisprezece verificări de izolare. Iese cu 1 dacă vreuna dă
+  # PICAT sau NECONCLUDENT.
+  # ==========================================================================
+  migrari:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Imaginea de Ubuntu de la GitHub vine cu PostgreSQL, dar asta e o
+      # presupunere despre mediul altcuiva — genul de lucru care se schimbă
+      # într-o zi fără să anunțe nimeni. Îl instalăm doar dacă lipsește: de
+      # obicei pasul ăsta nu face nimic, iar în ziua în care imaginea se
+      # schimbă, salvează verificarea în loc s-o rupă.
+      - name: Postgres, dacă nu e deja
+        run: |
+          if ! ls -d /usr/lib/postgresql/*/bin >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends postgresql postgresql-client
+          fi
+          ls -d /usr/lib/postgresql/*/bin
+
+      # `sudo`: bancul pornește un Postgres propriu, ceea ce cere scrierea în
+      # /var/lib/postgresql și rularea ca utilizatorul `postgres`.
+      - name: Migrări și verificări de izolare
+        run: sudo bash supabase/proba-locala.sh
