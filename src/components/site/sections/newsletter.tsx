@@ -26,6 +26,15 @@ const NOTA_IMPLICITA =
  * email, care se implementează în Faza 6, când există trimitere de emailuri.
  */
 export function Newsletter({ data, tone = "inchis" }: { data: NewsletterData; tone?: SectionTone }) {
+  /*
+    Fără un titlu, secțiunea nu se randează deloc.
+
+    Nu e prudență: `creeaza_client` aprinde toate secțiunile cu `{}` în ele, iar
+    fără paza asta un site abia provizionat arăta o bandă neagră cu un câmp de email și niciun cuvânt lângă el. Aceeași regulă ca
+    peste tot — o secțiune fără conținut nu desenează nimic, nici măcar ornamentul.
+  */
+  if (!data.titlu?.trim()) return null;
+
   const siteKey = process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY || null;
   const furnizorCaptcha = process.env.NEXT_PUBLIC_CAPTCHA_FURNIZOR || null;
 

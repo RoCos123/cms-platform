@@ -60,6 +60,15 @@ const ACORD_IMPLICIT =
  * des, exact motivul pentru care caută un psiholog) are unde scrie.
  */
 export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: SectionTone }) {
+  /*
+    Fără un titlu, secțiunea nu se randează deloc.
+
+    Nu e prudență: `creeaza_client` aprinde toate secțiunile cu `{}` în ele, iar
+    fără paza asta un site abia provizionat arăta un formular fără nicio explicație deasupra. Aceeași regulă ca
+    peste tot — o secțiune fără conținut nu desenează nimic, nici măcar ornamentul.
+  */
+  if (!data.titlu?.trim()) return null;
+
   const detalii = data.detalii ?? [];
 
   // Cheia publică lipsă înseamnă că platforma n-are casetă anti-spam

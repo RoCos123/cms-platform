@@ -55,3 +55,32 @@ test("nicio componentă de site nu umblă direct pe o listă din `data`", () => 
       "  Pe un site abia provizionat, `data` e `{}` — iar asta cade cu 500.\n",
   );
 });
+
+test("orice secțiune se poate stinge singură când n-are conținut", () => {
+  /*
+   * A doua față a aceleiași probleme, găsită uitându-mă la ecran, nu la coduri
+   * HTTP: după ce secțiunile au încetat să CADĂ pe date goale, au început să
+   * DESENEZE în gol. Banda cu citat arăta o ghilimea albastră singură, iar
+   * newsletterul o bandă neagră cu un câmp de email și niciun cuvânt lângă el.
+   * Pagina răspundea 200 și arăta a site stricat.
+   *
+   * Regula: fiecare secțiune din registru are o cale prin care nu randează
+   * nimic. Verificarea e grosolană — caută `return null` — dar prinde exact ce
+   * trebuie: secțiunea nouă la care nimeni nu s-a gândit că poate fi goală.
+   */
+  const registru = readFileSync("src/components/site/render-sections.tsx", "utf8");
+  const fisiere = [...registru.matchAll(/from "\.\/sections\/([\w-]+)"/g)].map((m) => m[1]);
+  assert.ok(fisiere.length > 5, `am găsit doar ${fisiere.length} secțiuni în registru — s-a schimbat forma?`);
+
+  const fara = fisiere.filter(
+    (nume) => !readFileSync(`src/components/site/sections/${nume}.tsx`, "utf8").includes("return null"),
+  );
+
+  assert.deepEqual(
+    fara,
+    [],
+    `\n  Secțiuni care randează orice li s-ar da: ${fara.join(", ")}\n\n` +
+      "  Pe un site abia provizionat, `data` e `{}`. Adaugă o cale de ieșire\n" +
+      "  (`if (!data.titlu?.trim()) return null;` sau lista goală).\n",
+  );
+});

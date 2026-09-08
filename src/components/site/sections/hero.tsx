@@ -38,6 +38,15 @@ export function Hero({
   tone?: SectionTone;
   asezare?: AsezareHero;
 }) {
+  /*
+    Fără un titlu, secțiunea nu se randează deloc.
+
+    Nu e prudență: `creeaza_client` aprinde toate secțiunile cu `{}` în ele, iar
+    fără paza asta un site abia provizionat arăta o bandă goală în capul paginii. Aceeași regulă ca
+    peste tot — o secțiune fără conținut nu desenează nimic, nici măcar ornamentul.
+  */
+  if (!data.titlu?.trim()) return null;
+
   const poza = data.imagine?.url ? data.imagine : null;
   const titluLat = asezare === "titluLat" && poza !== null;
 

@@ -13,6 +13,15 @@ export type QuoteData = {
  * o dată pe închis — de aceea tonul e prop, nu valoare fixă.
  */
 export function Quote({ data, tone }: { data: QuoteData; tone?: SectionTone }) {
+  /*
+    Fără un citat, secțiunea nu se randează deloc.
+
+    Nu e prudență: `creeaza_client` aprinde toate secțiunile cu `{}` în ele, iar
+    fără paza asta un site abia provizionat arăta o ghilimea albastră singură, atârnând într-o bandă goală. Aceeași regulă ca
+    peste tot — o secțiune fără conținut nu desenează nimic, nici măcar ornamentul.
+  */
+  if (!data.citat?.trim()) return null;
+
   return (
     <Section tone={tone}>
       <figure style={{ margin: 0, display: "flex", gap: "clamp(16px, 3vw, 40px)" }}>
