@@ -176,6 +176,74 @@ const SECTIUNI: SectionRow[] = [
     },
   },
   {
+    id: "sabloane",
+    key: "portfolio",
+    variant: null,
+    tone: "deschis",
+    data: {
+      eyebrow: "Înfățișări",
+      titlu: "Cinci feluri de a arăta.",
+      titluAccent: "Alegi tu, și te răzgândești oricând.",
+      intro:
+        "Aceleași texte, aceleași poze — doar altă înfățișare. Se schimbă dintr-un singur loc, fără să rescrii nimic.",
+      elemente: [
+      {
+        titlu: "Căldură",
+        descriere: "Crem cald și cărămiziu, cu titluri groase. Cel mai primitor dintre toate.",
+        imagine: { url: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20800%20500%22%20width%3D%22800%22%20height%3D%22500%22%3E%0A%3Crect%20width%3D%22800%22%20height%3D%22500%22%20fill%3D%22%23F8F1EA%22/%3E%0A%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%22772%22%20height%3D%22472%22%20fill%3D%22none%22%20stroke%3D%22%23904D39%22%20stroke-width%3D%222%22%20stroke-dasharray%3D%2210%208%22%20opacity%3D%220.55%22/%3E%0A%3Ccircle%20cx%3D%2270%22%20cy%3D%2286%22%20r%3D%227%22%20fill%3D%22%23904D39%22/%3E%0A%3Crect%20x%3D%2294%22%20y%3D%2279%22%20width%3D%22150%22%20height%3D%2213%22%20rx%3D%226%22%20fill%3D%22%23904D39%22%20opacity%3D%220.5%22/%3E%0A%3Ctext%20x%3D%2270%22%20y%3D%22196%22%20font-family%3D%22Manrope%2C%20sans-serif%22%20font-size%3D%2262%22%20font-weight%3D%22700%22%20fill%3D%22%232A1F1A%22%3EC%C4%83ldur%C4%83%3C/text%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22232%22%20width%3D%22520%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%232A1F1A%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22262%22%20width%3D%22430%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%232A1F1A%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22292%22%20width%3D%22470%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%232A1F1A%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22344%22%20width%3D%22180%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%23904D39%22/%3E%0A%3Crect%20x%3D%22266%22%20y%3D%22344%22%20width%3D%22150%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22none%22%20stroke%3D%22%232A1F1A%22%20stroke-width%3D%222%22%20opacity%3D%220.35%22/%3E%0A%3Ctext%20x%3D%2270%22%20y%3D%22452%22%20font-family%3D%22Manrope%2C%20sans-serif%22%20font-size%3D%2219%22%20fill%3D%22%232A1F1A%22%20opacity%3D%220.5%22%3Eexemplu%20%E2%80%94%20aici%20va%20veni%20o%20captur%C4%83%20adev%C4%83rat%C4%83%3C/text%3E%0A%3C/svg%3E", altText: "Șablonul Căldură" },
+      },
+      {
+        titlu: "Liniște",
+        descriere: "Nisip și verde, titluri cu serife. Așezat și liniștit, fără să fie sobru.",
+        imagine: { url: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20800%20500%22%20width%3D%22800%22%20height%3D%22500%22%3E%0A%3Crect%20width%3D%22800%22%20height%3D%22500%22%20fill%3D%22%23F3EDE2%22/%3E%0A%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%22772%22%20height%3D%22472%22%20fill%3D%22none%22%20stroke%3D%22%234C6A52%22%20stroke-width%3D%222%22%20stroke-dasharray%3D%2210%208%22%20opacity%3D%220.55%22/%3E%0A%3Ccircle%20cx%3D%2270%22%20cy%3D%2286%22%20r%3D%227%22%20fill%3D%22%234C6A52%22/%3E%0A%3Crect%20x%3D%2294%22%20y%3D%2279%22%20width%3D%22150%22%20height%3D%2213%22%20rx%3D%226%22%20fill%3D%22%234C6A52%22%20opacity%3D%220.5%22/%3E%0A%3Ctext%20x%3D%2270%22%20y%3D%22196%22%20font-family%3D%22DM%20Sans%2C%20sans-serif%22%20font-size%3D%2262%22%20font-weight%3D%22700%22%20fill%3D%22%231F2A24%22%3ELini%C8%99te%3C/text%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22232%22%20width%3D%22520%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%231F2A24%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22262%22%20width%3D%22430%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%231F2A24%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22292%22%20width%3D%22470%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%231F2A24%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22344%22%20width%3D%22180%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%234C6A52%22/%3E%0A%3Crect%20x%3D%22266%22%20y%3D%22344%22%20width%3D%22150%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22none%22%20stroke%3D%22%231F2A24%22%20stroke-width%3D%222%22%20opacity%3D%220.35%22/%3E%0A%3Ctext%20x%3D%2270%22%20y%3D%22452%22%20font-family%3D%22DM%20Sans%2C%20sans-serif%22%20font-size%3D%2219%22%20fill%3D%22%231F2A24%22%20opacity%3D%220.5%22%3Eexemplu%20%E2%80%94%20aici%20va%20veni%20o%20captur%C4%83%20adev%C4%83rat%C4%83%3C/text%3E%0A%3C/svg%3E", altText: "Șablonul Liniște" },
+      },
+      {
+        titlu: "Lumină",
+        descriere: "Albăstrui deschis și mov. Cel mai luminos, bun pentru cabinete care lucrează cu copii.",
+        imagine: { url: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20800%20500%22%20width%3D%22800%22%20height%3D%22500%22%3E%0A%3Crect%20width%3D%22800%22%20height%3D%22500%22%20fill%3D%22%23F1F5FD%22/%3E%0A%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%22772%22%20height%3D%22472%22%20fill%3D%22none%22%20stroke%3D%22%235E2976%22%20stroke-width%3D%222%22%20stroke-dasharray%3D%2210%208%22%20opacity%3D%220.55%22/%3E%0A%3Ccircle%20cx%3D%2270%22%20cy%3D%2286%22%20r%3D%227%22%20fill%3D%22%235E2976%22/%3E%0A%3Crect%20x%3D%2294%22%20y%3D%2279%22%20width%3D%22150%22%20height%3D%2213%22%20rx%3D%226%22%20fill%3D%22%235E2976%22%20opacity%3D%220.5%22/%3E%0A%3Ctext%20x%3D%2270%22%20y%3D%22196%22%20font-family%3D%22Inter%2C%20sans-serif%22%20font-size%3D%2262%22%20font-weight%3D%22700%22%20fill%3D%22%231D1230%22%3ELumin%C4%83%3C/text%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22232%22%20width%3D%22520%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%231D1230%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22262%22%20width%3D%22430%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%231D1230%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22292%22%20width%3D%22470%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%231D1230%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22344%22%20width%3D%22180%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%235E2976%22/%3E%0A%3Crect%20x%3D%22266%22%20y%3D%22344%22%20width%3D%22150%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22none%22%20stroke%3D%22%231D1230%22%20stroke-width%3D%222%22%20opacity%3D%220.35%22/%3E%0A%3Ctext%20x%3D%2270%22%20y%3D%22452%22%20font-family%3D%22Inter%2C%20sans-serif%22%20font-size%3D%2219%22%20fill%3D%22%231D1230%22%20opacity%3D%220.5%22%3Eexemplu%20%E2%80%94%20aici%20va%20veni%20o%20captur%C4%83%20adev%C4%83rat%C4%83%3C/text%3E%0A%3C/svg%3E", altText: "Șablonul Lumină" },
+      },
+      {
+        titlu: "Apropiere",
+        descriere: "Crem și verde, cu accente scrise de mână. Cald și apropiat, fără formalism.",
+        imagine: { url: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20800%20500%22%20width%3D%22800%22%20height%3D%22500%22%3E%0A%3Crect%20width%3D%22800%22%20height%3D%22500%22%20fill%3D%22%23F4EDE2%22/%3E%0A%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%22772%22%20height%3D%22472%22%20fill%3D%22none%22%20stroke%3D%22%23456B3F%22%20stroke-width%3D%222%22%20stroke-dasharray%3D%2210%208%22%20opacity%3D%220.55%22/%3E%0A%3Ccircle%20cx%3D%2270%22%20cy%3D%2286%22%20r%3D%227%22%20fill%3D%22%23456B3F%22/%3E%0A%3Crect%20x%3D%2294%22%20y%3D%2279%22%20width%3D%22150%22%20height%3D%2213%22%20rx%3D%226%22%20fill%3D%22%23456B3F%22%20opacity%3D%220.5%22/%3E%0A%3Ctext%20x%3D%2270%22%20y%3D%22196%22%20font-family%3D%22Nunito%2C%20sans-serif%22%20font-size%3D%2262%22%20font-weight%3D%22700%22%20fill%3D%22%233D3527%22%3EApropiere%3C/text%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22232%22%20width%3D%22520%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%233D3527%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22262%22%20width%3D%22430%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%233D3527%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22292%22%20width%3D%22470%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%233D3527%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22344%22%20width%3D%22180%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%23456B3F%22/%3E%0A%3Crect%20x%3D%22266%22%20y%3D%22344%22%20width%3D%22150%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22none%22%20stroke%3D%22%233D3527%22%20stroke-width%3D%222%22%20opacity%3D%220.35%22/%3E%0A%3Ctext%20x%3D%2270%22%20y%3D%22452%22%20font-family%3D%22Nunito%2C%20sans-serif%22%20font-size%3D%2219%22%20fill%3D%22%233D3527%22%20opacity%3D%220.5%22%3Eexemplu%20%E2%80%94%20aici%20va%20veni%20o%20captur%C4%83%20adev%C4%83rat%C4%83%3C/text%3E%0A%3C/svg%3E", altText: "Șablonul Apropiere" },
+      },
+      {
+        titlu: "Claritate",
+        descriere: "Alb curat și albastru sobru. Pentru evaluare, expertize, psihologia muncii.",
+        imagine: { url: "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20800%20500%22%20width%3D%22800%22%20height%3D%22500%22%3E%0A%3Crect%20width%3D%22800%22%20height%3D%22500%22%20fill%3D%22%23FFFFFF%22/%3E%0A%3Crect%20x%3D%2214%22%20y%3D%2214%22%20width%3D%22772%22%20height%3D%22472%22%20fill%3D%22none%22%20stroke%3D%22%231B4D7E%22%20stroke-width%3D%222%22%20stroke-dasharray%3D%2210%208%22%20opacity%3D%220.55%22/%3E%0A%3Ccircle%20cx%3D%2270%22%20cy%3D%2286%22%20r%3D%227%22%20fill%3D%22%231B4D7E%22/%3E%0A%3Crect%20x%3D%2294%22%20y%3D%2279%22%20width%3D%22150%22%20height%3D%2213%22%20rx%3D%226%22%20fill%3D%22%231B4D7E%22%20opacity%3D%220.5%22/%3E%0A%3Ctext%20x%3D%2270%22%20y%3D%22196%22%20font-family%3D%22Inter%2C%20sans-serif%22%20font-size%3D%2262%22%20font-weight%3D%22700%22%20fill%3D%22%23111820%22%3EClaritate%3C/text%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22232%22%20width%3D%22520%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%23111820%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22262%22%20width%3D%22430%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%23111820%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22292%22%20width%3D%22470%22%20height%3D%2214%22%20rx%3D%227%22%20fill%3D%22%23111820%22%20opacity%3D%220.22%22/%3E%0A%3Crect%20x%3D%2270%22%20y%3D%22344%22%20width%3D%22180%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22%231B4D7E%22/%3E%0A%3Crect%20x%3D%22266%22%20y%3D%22344%22%20width%3D%22150%22%20height%3D%2252%22%20rx%3D%2210%22%20fill%3D%22none%22%20stroke%3D%22%23111820%22%20stroke-width%3D%222%22%20opacity%3D%220.35%22/%3E%0A%3Ctext%20x%3D%2270%22%20y%3D%22452%22%20font-family%3D%22Inter%2C%20sans-serif%22%20font-size%3D%2219%22%20fill%3D%22%23111820%22%20opacity%3D%220.5%22%3Eexemplu%20%E2%80%94%20aici%20va%20veni%20o%20captur%C4%83%20adev%C4%83rat%C4%83%3C/text%3E%0A%3C/svg%3E", altText: "Șablonul Claritate" },
+      },
+      ],
+    },
+  },
+  {
+    id: "pareri",
+    key: "testimonials",
+    variant: null,
+    tone: "nuantat",
+    data: {
+      eyebrow: "Păreri",
+      titlu: "Ce spun cabinetele",
+      titluAccent: "care lucrează deja cu el",
+      marturii: [
+        {
+          text: "[Aici vine părerea unui client adevărat — două-trei rânduri, cu cuvintele lui. Se adaugă din panou, pe măsură ce oamenii îți scriu.]",
+          autor: "[Numele]",
+          context: "[Cabinetul, orașul]",
+        },
+        {
+          text: "[A doua părere. Cel mai bine merg cele care spun ce se temea omul înainte și ce s-a întâmplat de fapt.]",
+          autor: "[Numele]",
+          context: "[Cabinetul, orașul]",
+        },
+        {
+          text: "[A treia. Secțiunea arată bine cu trei; cu una singură pare că n-ai decât un client.]",
+          autor: "[Numele]",
+          context: "[Cabinetul, orașul]",
+        },
+      ],
+    },
+  },
+  {
     id: "faq",
     key: "faq",
     variant: null,
