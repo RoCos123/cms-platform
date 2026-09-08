@@ -134,7 +134,8 @@ Găsite căutând în cod, la întrebarea „cât mai e până terminăm”:
    calapod. După ăsta se știe ce se repetă, deci ce merită automatizat.
 3. **Clienții** — abia atunci.
 
-**Vor exista 3-4 șabloane** (`caldura`, `spatiu`, și încă unul-două), iar
+**Există cinci șabloane** (`caldura`, `liniste`, `lumina`, `apropiere`,
+`claritate`), iar
 clientul ALEGE dintre ele. Nu e nevoie de niciun ecran de ales: omul se uită la
 demo-uri, spune care îi place, iar proprietarul scrie cheia în linia de
 provizionare. Fiecare șablon nou e un fișier de valori — culori, fonturi,
@@ -276,9 +277,16 @@ Ordinea de mai jos e cea confirmată de proprietar, nu o preferință tehnică.
 **1. Două verificări înainte de primul client real.** Amândouă cer acces la
 Vercel și Supabase, deci le face proprietarul, nu sesiunea de dezvoltare:
 
-- `DEV_TENANT_DOMAIN` NU trebuie să existe în variabilele de Production. E o
-  scurtătură de dezvoltare: setată acolo, orice cerere către gazda platformei
-  (`*.vercel.app`) se rezolvă la un singur client — vezi `src/proxy.ts`.
+- ~~`DEV_TENANT_DOMAIN` NU trebuie să existe în variabilele de Production~~ —
+  **scoasă de proprietar pe 8 sept. 2026**, cu redeploy, și dovedit: adresa
+  `.vercel.app` a proiectului arată acum pagina „Platformă sitepsihologi.ro",
+  varianta care apare DOAR când platforma s-a uitat la adresa venită așa cum a
+  venit. Rămâne pusă pe Preview și Development, unde își face treaba.
+
+  Era o scurtătură de dezvoltare: setată pe Production, orice cerere către gazda
+  platformei (`*.vercel.app`) se rezolva la un singur client — vezi
+  `src/proxy.ts`. Se bătea cap în cap și cu planul de a ține site-ul de vânzări
+  pe o adresă `.vercel.app`.
 - Izolarea între clienți trebuie dovedită, nu presupusă. `e2e/tenant-rls.spec.ts`
   n-a rulat niciodată (mediul de dezvoltare nu ajunge la Supabase). Aceeași
   verificare există acum și ca SQL de lipit în SQL Editor:
@@ -593,21 +601,158 @@ Hotărât de proprietar: **`sitepsihologi.ro` se face CU panoul nostru**, ca ori
 alt client. E și cea mai bună probă posibilă — dacă nu putem face site-ul nostru
 cu el, nu-l putem vinde.
 
-Prețurile se scriu pe față: **300 € o dată, primul an inclus, apoi 200 lei/an.**
+Prețurile se scriu pe față: **300 € o dată — primul an și domeniul incluse —
+apoi 60 €/an, cu domeniul inclus în fiecare an.**
+
+Corectat pe 8 sept. 2026, de proprietar. Nota de aici a rămas o săptămână la
+varianta abandonată („apoi 200 lei/an"), în timp ce site-ul spunea deja 60 €.
+Documentul ăsta e primul citit la fiecare sesiune nouă, deci o cifră greșită
+aici nu stă degeaba: se repetă.
+
+**Stare la 8 sept. 2026: site-ul EXISTĂ.** Provizionat cu `creeaza_client` pe
+`sitepsihologi.vercel.app`, șablonul `claritate`, conținutul turnat din SQL
+generat (vezi mai jos). Nepublicat — îl vede doar proprietarul, logat.
+
+Adresa e temporară, până se cumpără domeniul. **Cât stă pe `.vercel.app`,
+site-ul nu se indexează deloc**: `robots.ts` refuză orice gazdă a platformei, iar
+`*.vercel.app` e una. Nu e o scăpare — regula există ca site-ul unui client să
+nu ajungă în Google pe două adrese deodată, concurând cu sine. Consecința pentru
+noi: e o vitrină pe care o ARĂȚI, nu una pe care o găsește lumea. Costul real e
+zero: un site nou n-ar fi ajuns oricum în căutări în săptămânile astea, iar la
+mutarea pe domeniul propriu indexarea pornește curat, fără adrese vechi agățate.
+Proprietarul știe și a ales asta în cunoștință de cauză.
 
 Ce lipsea din panou pentru asta, și s-a făcut: **secțiunea „Pachete"**. Era deja
 pe listă din Faza 0 pentru pachete de ședințe (decizii-faza-0.md §6.1), deci
 folosește și psihologilor, nu doar nouă. Prețul e un câmp de TEXT, nu un număr:
-„de la 300 €" și „200 lei/an" sunt prețuri adevărate pe care un câmp numeric
+„de la 300 €" și „60 €/an, în jur de 300 de lei" sunt prețuri adevărate pe
+care un câmp numeric
 nu le-ar fi putut ține, iar cu nimic nu se calculează aici. Scoaterea în față a
 unui pachet se face cu o etichetă scrisă („Cel mai ales"), nu cu o bifă:
 eticheta spune și DE CE, o bifă doar l-ar fi colorat.
 
 **Șabloanele se arată întâi ca poze**, iar demo-urile vii vin când există
 domeniul — hotărât de proprietar. Pozele intră în secțiunea „Programe și
-materiale", care există deja, deci galeria nu cere cod nou. Deocamdată nu există
-de unde lua capturile: site-ul de probă e gol, iar o captură a unui site gol nu
-vinde nimic. De lămurit înainte de a merge mai departe.
+materiale", care există deja, deci galeria nu cere cod nou.
+
+**Stare la 8 sept. 2026: galeria e pusă, dar cu desene, nu cu capturi.** Fiecare
+dintre cele cinci cartonașe are un SVG construit din paleta ADEVĂRATĂ a
+șablonului lui — fundal, accent, culoarea textului, fontul — cu chenar punctat
+și scris pe el „exemplu — aici va veni o captură adevărată". Așa se vede
+diferența dintre șabloane fără să mintă nimeni că e o poză finală.
+
+Capturile adevărate cer un site COMPLETAT, cu texte și poze reale, din care să
+se poată fotografia ceva care vinde. Nu există încă niciunul. La fel și
+secțiunea de păreri: are trei locuri goale, în paranteze drepte, scrise ca să
+nu poată fi luate drept recenzii. **Nu se inventează păreri**, nici măcar ca
+probă — un site care vinde ceva nu are voie să pornească cu recenzii false.
+
+## Prima provizionare adevărată (8 sept. 2026), și ce a scos la iveală
+
+Proprietarul a făcut primul site cu `creeaza_client`, pe o adresă `.vercel.app`,
+pentru `sitepsihologi.ro`. Toate cele patru probleme de mai jos existau de zile
+sau săptămâni, în cod care trecea lint, tipuri, build și toate probele. Niciuna
+nu se putea găsi citind. Se citesc ca o listă de lecții, nu ca un istoric.
+
+**1. Baza reală poate rămâne în urma codului, fără ca nimic s-o spună.**
+Migrarea cu al cincilea șablon intrase pe JUMĂTATE: constrângerea de pe tabel se
+aplicase, funcția nu. `creeaza_client` a refuzat `claritate`, iar mesajul lui
+suna a greșeală de scriere. În SQL Editor, cu text selectat se rulează doar
+selecția — de aici jumătatea.
+
+Ce lipsește, și rămâne deschis: **nimic nu compară baza reală cu codul.** Probele
+verifică fișierele între ele; bancul local rulează migrările în ordine, pe o
+bază goală. Niciunul nu se uită la Supabase. Interogarea care lămurește în două
+secunde:
+
+```sql
+select
+  (select pg_get_functiondef(oid) like '%claritate%'
+     from pg_proc where proname = 'creeaza_client') as functia_e_la_zi,
+  (select pg_get_constraintdef(oid)
+     from pg_constraint where conname = 'sites_template_check') as constrangerea;
+```
+
+**2. Un `catch` poate fi întins lângă gaură, nu peste ea.** Numărarea vizitelor
+se cheamă din `after()` și citea `headers()` acolo. Next 16 aruncă, iar pagina
+ÎNTREAGĂ cade cu 500 — deși funcția prindea eroarea și o scria cuminte în
+jurnal, exact cum îi cerea comentariul ei („nu aruncă niciodată"). Next vede
+greșeala înaintea lui `catch`. Vezi convenția din CONVENTII.md.
+
+**3. Un site abia provizionat e o stare pe care n-o probase nimeni.** Toate cele
+paisprezece secțiuni pornesc APRINSE și cu `{}` (hotărâre de la comutatorul de
+lansare, corectă: un site nepublicat nu se vede oricum). Șase componente făceau
+`data.ceva.map(...)` de-a dreptul — 500 pe tot site-ul public al clientului.
+Două aveau chiar o pază, `data.ceva.length === 0`, scrisă pentru lista GOALĂ, nu
+pentru lista LIPSĂ; pica la fel.
+
+**4. Codul 200 nu e o verificare vizuală.** După reparația de mai sus am
+verificat că pagina răspunde 200 și m-am oprit. Proprietarul s-a uitat la ea: o
+ghilimea albastră singură, atârnând într-o bandă goală, și o bandă neagră cât
+ecranul cu un câmp de email și niciun cuvânt lângă el.
+
+### Hotărârea care a ieșit din asta: site-ul nou își arată scheletul
+
+Cerută de proprietar, și mai bună decât ce făcusem. Ascunsul secțiunilor goale
+repara urâțenia și făcea în schimb panoul să MINTĂ: acolo scria „vizibilă" la
+toate paisprezece, pe site se vedeau două.
+
+Acum fiecare secțiune pornește cu numele pe care îl poartă și în panou —
+„Despre mine", „Serviciile mele", „Păreri". Site-ul arată ca un cuprins al lui
+însuși: derulezi și vezi ce ai de scris și unde, iar ce apeși în panou
+regăsești pe site sub aceeași etichetă. Textele stau în `textul_de_pornire`
+(migrarea `schelet_la_provizionare`) — **al patrulea loc** unde trăiește lista
+de secțiuni, după registrul de componente, `metaSectiune` și constrângerea din
+tabel. Are probă, `e2e/schelet-sql.proba.mjs`, care și-a găsit prada din prima:
+`programare` lipsea, fiindcă ea nu vine de la provizionare ci de la un
+declanșator, când se pornește modulul plătit.
+
+Regula de randare: **o secțiune se vede dacă are TITLU**, chiar cu lista de sub
+el goală. Fără titlu ȘI fără conținut, tot nu randează nimic.
+
+### Ce rămâne deschis
+
+**Panoul încă nu spune tot adevărul.** Ecranul de secțiuni citește dacă e
+bifată, nu și dacă are conținut, deci o secțiune golită de client apare
+„vizibilă" fără să se vadă pe site. Cu scheletul pus, cazul e rar; rămâne
+pentru clientul care își golește o secțiune. Proprietarul a amânat reparația,
+în cunoștință de cauză.
+
+### Conținutul site-ului de vânzări se GENEREAZĂ
+
+Textele stau în `src/app/proba-vanzari/continut.ts`, fără JSX, iar
+`scripts/sql-vanzari.mjs` scoate din ele SQL-ul care le toarnă în baza reală:
+
+```
+node --import ./e2e/alias.mjs scripts/sql-vanzari.mjs sitepsihologi.vercel.app
+```
+
+Nu de dragul curățeniei. Node rulează TypeScript direct, dar nu și JSX — iar
+scris de mână, în paralel, SQL-ul ar fi ajuns să se contrazică cu previzualizarea
+pe care proprietarul a aprobat-o, iar diferența s-ar fi văzut abia pe site.
+
+Totul e legat de un singur `site_id`, luat o dată la început, iar dacă domeniul
+nu există se oprește fără să atingă nimic. Rescrie secțiunile și șterge
+serviciile, deci se rulează pe un site gol, nu peste unul la care s-a lucrat.
+
+### Șablonul „Claritate" e argintiu, nu alb
+
+Schimbat pe 8 sept., la cererea proprietarului: „vreau ca albul să fie spre
+argintiu futurist curat". Nu e o nuanță schimbată, ci o inversare — pardoseala
+e argintie (`#EEF2F7`), iar `fundalNuantat` e alb curat, iar cartonașele îl
+folosesc pe ăla. Panourile albe plutesc peste argintiu în loc să se piardă în
+el. **E invers față de celelalte patru șabloane**, unde `nuantat` e mai închis
+decât `fundal`: singurul lucru din fișier care nu se poate copia orbește într-un
+șablon nou.
+
+### „Ce primești" stă pe o bandă orizontală
+
+`features` are acum varianta `linie`, cerută pe coloana `variant` din
+`site_content` — coloana exista de la prima migrare și n-o folosea nimeni.
+Secțiunea NU s-a schimbat pentru toți: își ia conținutul din Servicii, iar la un
+cabinet o linie ar fi greșită (nimeni nu ia terapia de cuplu DUPĂ evaluare).
+Panoul scrie doar `data`, `position`, `visible` și `is_demo`, deci varianta pusă
+din SQL supraviețuiește oricâtor editări.
 
 ## Politica de confidențialitate se schimbă odată cu platforma
 
@@ -809,9 +954,12 @@ Cloudflare leagă o pereche de chei Turnstile de o listă de domenii, iar lista 
 **maximum 10 intrări**. Metacaracterele NU sunt acceptate, deci
 `*.platformata.ro` nu ține loc de nimic. Planul gratuit dă 20 de chei, adică
 **200 de domenii cu totul**. Peste ele urmează Enterprise Bot Management, de la
-**2.000 $/lună** — peste 108.000 lei pe an, adică de două ori și jumătate
-venitul recurent al unui produs cu 200 de clienți la 200 lei/an. Nu e un plan
-mai scump, e un capăt de drum.
+**2.000 $/lună** — peste 108.000 lei pe an, adică mai mult decât tot venitul
+recurent al unui produs cu 200 de clienți la 60 €/an (circa 60.000 lei). Nu e un
+plan mai scump, e un capăt de drum.
+
+(Cifra a fost recalculată pe 8 sept. 2026, odată cu prețul. Concluzia nu se
+schimbă — se întărește.)
 
 Am cântărit întâi un plan de ocolire: o pereche de chei la fiecare zece domenii,
 douăzeci de variabile de mediu pentru două sute de clienți. **L-am aruncat pe

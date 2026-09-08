@@ -104,6 +104,69 @@ două capete, se caută amândouă înainte de a repara vreunul.
 
 ---
 
+## Ce se cheamă după ce răspunsul a plecat nu mai are cerere
+
+8 sept. 2026. Numărarea vizitelor se cheamă din `after()` — mutată după ce
+pagina a plecat spre vizitator, ca o scriere în bază să nu-l facă să aștepte.
+Acolo citea `headers()`, plus `getTenant()` și `getSesiuneOptionala()`, care le
+folosesc și ele. Next 16 aruncă „used `headers()` inside `after()` while
+rendering", iar pagina ÎNTREAGĂ cade cu 500.
+
+**Partea care merită ținută minte nu e regula, ci de ce n-a ajutat plasa.**
+Funcția prindea eroarea și o scria cuminte în jurnal, exact cum îi cerea
+comentariul ei: „nu aruncă niciodată". Și tot cădea pagina — Next vede greșeala
+înaintea lui `catch`. Un `catch` întins lângă gaură, nu peste ea.
+
+Regula: **ce se cheamă din `after()` primește valori, nu citește cererea.**
+Antetele, sesiunea și tenantul se iau în componenta care randează și se dau ca
+argument. Proba e `e2e/dupa-raspuns.proba.mjs` și e mai largă decât cazul: caută
+toate apelurile `after(...)`, urmărește ce funcție cheamă fiecare și interzice
+acolo `next/headers` și `@/lib/dal`.
+
+Nu se putea găsi citind: nici lintul, nici tipurile, nici build-ul nu văd asta.
+S-a găsit în jurnalele Vercel, după digest, pe un site real.
+
+---
+
+## Un site abia provizionat nu e un caz limită, e prima zi a fiecărui client
+
+8 sept. 2026. `creeaza_client` aprinde toate cele paisprezece secțiuni și le
+pune `{}`. Nimeni nu randase vreodată starea aia. Șase componente făceau
+`data.ceva.map(...)` de-a dreptul, deci prima pagină a primului site provizionat
+a căzut cu 500 — și nu doar prima: cadrul e comun, deci tot site-ul public.
+
+Două dintre ele aveau chiar o pază, `if (data.aparitii.length === 0)`. Scrisă
+pentru lista GOALĂ, nu pentru lista LIPSĂ — `.length` pe `undefined` aruncă la
+fel de bine ca `.map`.
+
+Tipurile nu prind asta: `data` e turnat cu `as` din JSON-ul din bază, deci
+TypeScript crede că listele există.
+
+Regula: **în componentele site-ului, o listă din `data` se ia o dată, cu
+`?? []`, într-o variabilă locală.** Niciodată `data.x.map` sau `data.x.length`
+de-a dreptul — nici măcar păzit cu `&&`, ca regula să n-aibă excepții de ținut
+minte. Și fiecare secțiune are o cale prin care nu randează nimic. Probele:
+`e2e/sectiuni-goale.proba.mjs`.
+
+---
+
+## Codul 200 nu e o verificare vizuală
+
+8 sept. 2026, în aceeași zi cu cea de mai sus. După ce am oprit secțiunile din
+căzut, am verificat că pagina răspunde 200 și m-am oprit acolo.
+
+Proprietarul s-a uitat la ea. O ghilimea albastră singură, atârnând într-o bandă
+goală — de două ori, fiindcă șablonul are două benzi cu citat. Și o bandă neagră
+cât ecranul, cu un câmp de email și niciun cuvânt lângă el. Pagina răspundea 200
+și arăta a site stricat.
+
+Regula era deja scrisă mai jos, la „Verificare vizuală"; ce lipsea e că se aplică
+**și după o reparație**, nu doar la o funcție nouă. Dacă schimbarea atinge ce se
+vede, se face captura și se privește. Un cod HTTP spune că serverul n-a căzut,
+nu că pagina arată a ceva.
+
+---
+
 ## Ce ține de unealtă nu stă lângă ce ține de judecată
 
 1 sept. 2026, mutând fonturile pe serverul nostru. Familiile de font se puneau
