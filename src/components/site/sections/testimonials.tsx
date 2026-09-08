@@ -22,6 +22,18 @@ export type TestimonialsData = {
  * poate fi impusă, nu la randare.
  */
 export function Testimonials({ data, tone }: { data: TestimonialsData; tone?: SectionTone }) {
+  /*
+    Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
+    toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
+    un site nepublicat nu se vede oricum, iar clientul stinge ce nu-i trebuie).
+    Fără `?? []`, prima pagină a fiecărui client nou cădea cu 500.
+
+    Goală, secțiunea nu se randează deloc — aceeași regulă ca la „Serviciile
+    mele" și „Pachete": un titlu urmat de nimic arată a site stricat.
+  */
+  const marturii = data.marturii ?? [];
+  if (marturii.length === 0) return null;
+
   return (
     <Section tone={tone} id="pareri">
       {data.eyebrow && <SectionEyebrow>{data.eyebrow}</SectionEyebrow>}
@@ -56,7 +68,7 @@ export function Testimonials({ data, tone }: { data: TestimonialsData; tone?: Se
           gap: "20px",
         }}
       >
-        {data.marturii.map((marturie, i) => (
+        {marturii.map((marturie, i) => (
           <figure
             key={i}
             style={{

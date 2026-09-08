@@ -60,6 +60,8 @@ const ACORD_IMPLICIT =
  * des, exact motivul pentru care caută un psiholog) are unde scrie.
  */
 export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: SectionTone }) {
+  const detalii = data.detalii ?? [];
+
   // Cheia publică lipsă înseamnă că platforma n-are casetă anti-spam
   // configurată: nu o randăm. Serverul sare, la rândul lui, peste verificare —
   // cele două decizii trebuie să rămână împreună (vezi src/lib/antispam.ts).
@@ -85,9 +87,9 @@ export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: 
             maxWidthTitlu="11em"
           />
 
-          {data.detalii && data.detalii.length > 0 && (
+          {detalii.length > 0 && (
             <dl style={{ margin: "40px 0 0", display: "flex", flexDirection: "column", gap: "20px" }}>
-              {data.detalii.map((detaliu) => {
+              {detalii.map((detaliu) => {
                 const adresa = adresaDedusa(detaliu.valoare);
 
                 return (

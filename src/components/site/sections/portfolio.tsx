@@ -30,7 +30,18 @@ export type PortfolioData = {
  * însemnat câmpuri goale pe jumătate din cazuri.
  */
 export function Portfolio({ data, tone }: { data: PortfolioData; tone?: SectionTone }) {
-  if (data.elemente.length === 0) return null;
+  /*
+    Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
+    toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
+    un site nepublicat nu se vede oricum, iar clientul stinge ce nu-i trebuie).
+    Fără `?? []`, prima pagină a fiecărui client nou cădea cu 500.
+
+    Goală, secțiunea nu se randează deloc — aceeași regulă ca la „Serviciile
+    mele" și „Pachete": un titlu urmat de nimic arată a site stricat.
+  */
+  const elemente = data.elemente ?? [];
+  if (elemente.length === 0) return null;
+
 
   return (
     <Section tone={tone} id="programe">
@@ -51,7 +62,7 @@ export function Portfolio({ data, tone }: { data: PortfolioData; tone?: SectionT
           gap: "24px",
         }}
       >
-        {data.elemente.map((element, i) => (
+        {elemente.map((element, i) => (
           <li
             key={`${element.titlu}-${i}`}
             style={{

@@ -34,9 +34,20 @@ export type LogosData = {
  * imagine și context, fiindcă rolul secțiunii e încrederea, nu navigarea.
  */
 export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
+  /*
+    Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
+    toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
+    un site nepublicat nu se vede oricum, iar clientul stinge ce nu-i trebuie).
+    Fără `?? []`, prima pagină a fiecărui client nou cădea cu 500.
+
+    Goală, secțiunea nu se randează deloc — aceeași regulă ca la „Serviciile
+    mele" și „Pachete": un titlu urmat de nimic arată a site stricat.
+  */
+  const aparitii = data.aparitii ?? [];
+  if (aparitii.length === 0) return null;
+
   // Fără apariții, secțiunea dispare — la fel ca la articole: un titlu urmat de
   // gol arată a site stricat.
-  if (data.aparitii.length === 0) return null;
 
   return (
     <Section tone={tone} id="aparitii">
@@ -57,7 +68,7 @@ export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
           gap: "24px",
         }}
       >
-        {data.aparitii.map((aparitie, i) => {
+        {aparitii.map((aparitie, i) => {
           const meta = [aparitie.tip, aparitie.data].filter(Boolean).join(" · ");
 
           return (

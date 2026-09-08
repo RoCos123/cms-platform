@@ -139,7 +139,7 @@ export function Pricing({ data, tone }: { data: PricingData; tone?: SectionTone 
 
               {pachet.include && pachet.include.length > 0 && (
                 <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: "8px" }}>
-                  {pachet.include.map((rand, j) => (
+                  {(pachet.include ?? []).map((rand, j) => (
                     <li
                       key={`${rand}-${j}`}
                       style={{

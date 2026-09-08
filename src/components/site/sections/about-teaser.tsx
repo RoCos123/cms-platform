@@ -16,6 +16,18 @@ export type AboutTeaserData = {
 };
 
 export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: SectionTone }) {
+  /*
+    Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
+    toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
+    un site nepublicat nu se vede oricum, iar clientul stinge ce nu-i trebuie).
+    Fără `?? []`, prima pagină a fiecărui client nou cădea cu 500.
+
+    Goală, secțiunea nu se randează deloc — aceeași regulă ca la „Serviciile
+    mele" și „Pachete": un titlu urmat de nimic arată a site stricat.
+  */
+  const paragrafe = data.paragrafe ?? [];
+  if (paragrafe.length === 0) return null;
+
   const poza = data.imagine?.url ? data.imagine : null;
 
   return (
@@ -62,7 +74,7 @@ export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: Sect
         </div>
 
         <div>
-          {data.paragrafe.map((paragraf, i) => (
+          {paragrafe.map((paragraf, i) => (
             <p
               key={i}
               style={{

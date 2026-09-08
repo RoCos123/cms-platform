@@ -19,6 +19,9 @@ export type SiteFooterData = {
  * dar nu sunt ce caută vizitatorul.
  */
 export function SiteFooter({ data }: { data: SiteFooterData }) {
+  const retele = data.retele ?? [];
+  const linkuri = data.linkuri ?? [];
+
   const an = new Date().getFullYear();
 
   return (
@@ -87,7 +90,7 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
             )}
           </div>
 
-          {data.retele && data.retele.length > 0 && (
+          {retele.length > 0 && (
             <nav
               aria-label="Pe rețele"
               style={{
@@ -108,7 +111,7 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
               >
                 Pe rețele
               </p>
-              {data.retele.map((retea) => (
+              {retele.map((retea) => (
                 <a
                   key={retea.adresa}
                   href={retea.adresa}
@@ -124,7 +127,7 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
             </nav>
           )}
 
-          {data.linkuri && data.linkuri.length > 0 && (
+          {linkuri.length > 0 && (
             <nav
               aria-label="Legături din subsol"
               style={{
@@ -136,7 +139,7 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
                 overflowWrap: "anywhere",
               }}
             >
-              {data.linkuri.map((link) => (
+              {linkuri.map((link) => (
                 <a key={link.href} href={link.href} style={{ color: "inherit", textDecoration: "none" }}>
                   {link.text}
                 </a>

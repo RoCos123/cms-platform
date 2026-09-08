@@ -20,6 +20,18 @@ export type FaqData = {
  * alimentează datele structurate `FAQPage` pentru Google.
  */
 export function Faq({ data, tone }: { data: FaqData; tone?: SectionTone }) {
+  /*
+    Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
+    toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
+    un site nepublicat nu se vede oricum, iar clientul stinge ce nu-i trebuie).
+    Fără `?? []`, prima pagină a fiecărui client nou cădea cu 500.
+
+    Goală, secțiunea nu se randează deloc — aceeași regulă ca la „Serviciile
+    mele" și „Pachete": un titlu urmat de nimic arată a site stricat.
+  */
+  const intrebari = data.intrebari ?? [];
+  if (intrebari.length === 0) return null;
+
   return (
     <Section tone={tone} id="intrebari">
       {data.eyebrow && <SectionEyebrow>{data.eyebrow}</SectionEyebrow>}
@@ -47,12 +59,12 @@ export function Faq({ data, tone }: { data: FaqData; tone?: SectionTone }) {
       </h2>
 
       <div style={{ margin: "48px 0 0", maxWidth: "50em" }}>
-        {data.intrebari.map((item, i) => (
+        {intrebari.map((item, i) => (
           <details
             key={i}
             style={{
               borderTop: "1px solid var(--t-chenar)",
-              borderBottom: i === data.intrebari.length - 1 ? "1px solid var(--t-chenar)" : undefined,
+              borderBottom: i === intrebari.length - 1 ? "1px solid var(--t-chenar)" : undefined,
             }}
           >
             <summary

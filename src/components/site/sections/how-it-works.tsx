@@ -17,6 +17,18 @@ export type HowItWorksData = {
  * pentru care lista e `<ol>` — aici ordinea are înțeles, spre deosebire de servicii.
  */
 export function HowItWorks({ data, tone }: { data: HowItWorksData; tone?: SectionTone }) {
+  /*
+    Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
+    toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
+    un site nepublicat nu se vede oricum, iar clientul stinge ce nu-i trebuie).
+    Fără `?? []`, prima pagină a fiecărui client nou cădea cu 500.
+
+    Goală, secțiunea nu se randează deloc — aceeași regulă ca la „Serviciile
+    mele" și „Pachete": un titlu urmat de nimic arată a site stricat.
+  */
+  const pasi = data.pasi ?? [];
+  if (pasi.length === 0) return null;
+
   return (
     <Section tone={tone} id="proces">
       {data.eyebrow && <SectionEyebrow>{data.eyebrow}</SectionEyebrow>}
@@ -67,7 +79,7 @@ export function HowItWorks({ data, tone }: { data: HowItWorksData; tone?: Sectio
           gap: "36px 28px",
         }}
       >
-        {data.pasi.map((pas, index) => (
+        {pasi.map((pas, index) => (
           <li key={pas.titlu} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
             <span
               aria-hidden
