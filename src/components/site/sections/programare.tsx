@@ -49,7 +49,8 @@ export function Programare({
   luni: LunaCalendar[];
   tone?: SectionTone;
 }) {
-  if (zile.length === 0) return null;
+  // Titlul singur o face vizibilă — vezi explicația din `features.tsx`.
+  if (zile.length === 0 && !data.titlu?.trim()) return null;
 
   return (
     <Section tone={tone} id="programare">

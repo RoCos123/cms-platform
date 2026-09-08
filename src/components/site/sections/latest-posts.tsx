@@ -41,7 +41,18 @@ export function LatestPosts({
 }) {
   // Fără articole publicate, secțiunea nu se randează deloc: un titlu „Articole
   // recente" urmat de nimic arată a site stricat, nu a site nou.
-  if (articole.length === 0) return null;
+  /*
+    Titlul singur e de ajuns ca să se vadă secțiunea, chiar fără nimic sub el.
+
+    Hotărât de proprietar, uitându-se la primul site provizionat: un site nou
+    trebuie să-și arate SCHELETUL — toate secțiunile, fiecare cu numele ei ca
+    text de pornire — ca omul să vadă ce are de completat și unde. Ascunse, ele
+    făceau panoul să mintă: acolo scria „vizibilă", pe site nu era nimic.
+
+    Fără titlu ȘI fără conținut, tot nu se randează nimic: aia e secțiunea pe
+    care clientul a golit-o dinadins.
+  */
+  if (articole.length === 0 && !data.titlu?.trim()) return null;
 
   const afisate = data.numar ? articole.slice(0, data.numar) : articole;
   const maiSunt = articole.length > afisate.length;

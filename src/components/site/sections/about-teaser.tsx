@@ -26,7 +26,18 @@ export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: Sect
     mele" și „Pachete": un titlu urmat de nimic arată a site stricat.
   */
   const paragrafe = data.paragrafe ?? [];
-  if (paragrafe.length === 0) return null;
+  /*
+    Titlul singur e de ajuns ca să se vadă secțiunea, chiar fără nimic sub el.
+
+    Hotărât de proprietar, uitându-se la primul site provizionat: un site nou
+    trebuie să-și arate SCHELETUL — toate secțiunile, fiecare cu numele ei ca
+    text de pornire — ca omul să vadă ce are de completat și unde. Ascunse, ele
+    făceau panoul să mintă: acolo scria „vizibilă", pe site nu era nimic.
+
+    Fără titlu ȘI fără conținut, tot nu se randează nimic: aia e secțiunea pe
+    care clientul a golit-o dinadins.
+  */
+  if (paragrafe.length === 0 && !data.titlu?.trim()) return null;
 
   const poza = data.imagine?.url ? data.imagine : null;
 
