@@ -11,10 +11,15 @@ import type { Template } from "./types";
  *
  * De aici, trei reguli pe care le ține tot fișierul:
  *
- * - **Fundal alb adevărat**, nu crem, nu albăstrui. `#FFFFFF`.
+ * - **Pardoseala e argintie, nu albă.** `#EEF2F7` — un argintiu deschis și rece.
+ *   Albul nu dispare, urcă: `fundalNuantat` e `#FFFFFF` curat, iar cartonașele
+ *   îl folosesc pe el (`--t-fundal-nuantat`, vezi features/portfolio/
+ *   testimonials). Deci panourile albe plutesc peste argintiu, în loc să se
+ *   piardă în el. E invers față de celelalte patru șabloane, unde `nuantat` e
+ *   mai închis decât `fundal` — dinadins, și singurul lucru din fișierul ăsta
+ *   care nu se poate copia orbește într-un șablon nou.
  * - **Rece peste tot**: fiecare gri are o urmă de albastru, niciunul de galben.
- *   Un gri neutru lângă alb pur arată murdar; unul cu urmă de albastru arată
- *   ales.
+ *   Un gri neutru arată murdar; unul cu urmă de albastru arată ales.
  * - **Colțuri mici, nu rotunjite**. 6px, nu 24px, iar butoanele nu sunt pastile.
  *   Rotunjimea mare citește a „prietenos"; aici vrem a „serios".
  *
@@ -32,26 +37,29 @@ export const claritate: Template = {
   descriere: "Alb curat, gri rece, albastru sobru. Pentru cine vrea să arate a birou, nu a living.",
 
   paleta: {
-    fundal: "#FFFFFF",
-    fundalNuantat: "#F4F6F8",
-    fundalRelief: "#E8ECF1",
-    fundalInchis: "#16202B",
+    fundal: "#EEF2F7",
+    fundalNuantat: "#FFFFFF",
+    fundalRelief: "#DFE6EE",
+    fundalInchis: "#0E1720",
 
-    text: "#111820",
-    textSecundar: "#4A5765",
-    textPeInchis: "#FFFFFF",
-    textSecundarPeInchis: "#AEBDCC",
+    text: "#0D141B",
+    textSecundar: "#46556A",
+    // Nu alb pur pe închis: se leagă cu argintiul de sus, în loc să sară din el.
+    textPeInchis: "#F2F6FA",
+    textSecundarPeInchis: "#A6B8CA",
 
-    accent: "#1B4D7E",
+    accent: "#1B5C99",
     accentText: "#FFFFFF",
-    accentPeInchis: "#8FC0EA",
+    accentPeInchis: "#8FC6F5",
 
     eroare: "#B3261E",
     // Roșul de pe fundal deschis n-are contrast pe albastrul-închis. Deschis
     // până trece, păstrând nuanța — aceeași corecție ca la Lumină.
     eroarePeInchis: "#F0A79B",
 
-    chenar: "#DDE3E9",
+    // Mai apăsat decât înainte: pe argintiu, un chenar cât cel de pe alb pur
+    // dispare. Panoul alb are nevoie de o muchie ca să se vadă că e panou.
+    chenar: "#D2DAE4",
   },
 
   tipografie: {
