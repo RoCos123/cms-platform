@@ -11,7 +11,7 @@
 /** Rolul de fundal al unei secțiuni în ritmul paginii, nu o culoare anume. */
 export type SectionTone = "deschis" | "nuantat" | "relief" | "inchis";
 
-export type TemplateId = "caldura" | "liniste" | "lumina" | "apropiere";
+export type TemplateId = "caldura" | "liniste" | "lumina" | "apropiere" | "claritate";
 
 export type TemplatePalette = {
   /** Fundalul paginii și al secțiunilor „deschis". */

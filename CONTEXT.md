@@ -523,6 +523,39 @@ există deja. Clientul o găsește apoi în „Secțiuni”, de mutat unde vrea.
 n-are nicio zi bifată în program, secțiunea nu se randează pe site: o invitație
 la programare fără nicio oră liberă e mai rea decât nimic.
 
+## Al cincilea șablon: „Claritate" (8 sept. 2026)
+
+Cerut de proprietar pentru site-ul de vânzări: fond alb, profesionist. Niciunul
+dintre cele patru nu era — toate sunt portări fidele ale unor site-uri de
+psihologi reali, și toate calde: crem `#F8F1EA`, nisip `#F3EDE2`, lavandă
+`#F1F5FD`, crem `#F4EDE2`.
+
+„Claritate" e primul care NU vine dintr-o sursă măsurată. Alb adevărat
+(`#FFFFFF`), fiecare gri cu o urmă de albastru (un gri neutru lângă alb pur
+arată murdar), colțuri de 6px în loc de 24, butoane drepte în loc de pastile.
+Inter și pentru text, și pentru accente — două fonturi diferite ar fi adus
+căldură pe ușa din dos; accentul se deosebește prin GREUTATE (titlu 700, cuvânt
+accentuat 300), nu prin cursive, care într-un sans dau aer de scrisoare.
+
+Folosește și clienților, nu doar nouă: cine face evaluare psihologică, expertize
+sau psihologia muncii n-avea ce alege dintre patru fundaluri calde.
+
+### Lecția: aceeași listă în TREI locuri, iar al treilea nu se vede
+
+Un șablon nou trebuie trecut în:
+
+1. `TemplateId` și `TEMPLATES`, în cod;
+2. verificarea `p_sablon not in (…)` din `creeaza_client`;
+3. **constrângerea `sites_template_check` din tabel** — scrisă în migrarea din
+   26 aug. 2026 și invizibilă din primele două.
+
+Plus mesajul de eroare al funcției, scris separat de lista pe care o verifică,
+deci liber să mintă.
+
+Le-am găsit pe ultimele două **rulând**, nu citind: funcția accepta deja
+`claritate`, iar `insert`-ul pica pe constrângere. `e2e/sabloane-sql.proba.mjs`
+verifică acum toate trei listele plus mesajul, față de cod.
+
 ## Site-ul de vânzări al platformei (1 sept. 2026)
 
 Hotărât de proprietar: **`sitepsihologi.ro` se face CU panoul nostru**, ca orice

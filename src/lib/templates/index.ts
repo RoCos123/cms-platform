@@ -4,6 +4,7 @@ import { caldura } from "./caldura";
 import { liniste } from "./liniste";
 import { lumina } from "./lumina";
 import { apropiere } from "./apropiere";
+import { claritate } from "./claritate";
 
 export * from "./types";
 
@@ -20,6 +21,7 @@ const TEMPLATES: Record<string, Template> = {
   liniste,
   lumina,
   apropiere,
+  claritate,
 };
 
 /**
