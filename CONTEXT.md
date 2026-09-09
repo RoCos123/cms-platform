@@ -909,6 +909,35 @@ pică fără migrare și trec cu ea — probat în ambele feluri, nu presupus.
 diferă după normalizarea spațiilor. Dacă da, în producție stau versiuni mai vechi
 ale funcțiilor, și se rulează migrările care le definesc.
 
+### Revocarea a rulat și n-a schimbat nimic (9 sept. 2026)
+
+A doua rulare pe baza reală, după migrarea de revocare. Două lucruri:
+
+**Normalizarea spațiilor a fost bună.** Cinci din cele șase cuprinsuri de funcții
+se potrivesc acum la virgulă, inclusiv ale celor două funcții cu pricina. Deci
+textul lor din producție E cel din migrări; diferența de dinainte venea din
+sfârșituri de rând, cum bănuiam. Rămâne unul singur —
+`adauga_sectiunea_programare` — al cărui cuprins chiar diferă, deși migrarea care
+îl scrie n-a fost atinsă din 27 aug. Se lămurește citind textul din bază.
+
+**Drepturile n-au mișcat.** Amândouă funcțiile arată tot
+`anon=X authenticated=X service_role=X`, deși migrarea a rulat.
+
+Cauza, reprodusă pe banc, nu presupusă: **`REVOKE` scoate doar granturile date de
+rolul care revocă.** Un grant dat de altcineva rămâne pe loc, iar comanda nu dă
+eroare — pe bancul nostru n-a dat nici măcar avertizare, a răspuns „REVOKE" și a
+schimbat nimic. Am făcut un rol străin să acorde `execute` lui `anon`, apoi am
+revocat ca proprietar: dreptul a rămas.
+
+**Amprenta n-a putut arăta de ce**, fiindcă tăia partea de după `/` din fiecare
+drept — adică exact cine l-a dat. Acum o scrie, dar numai când acordantul NU e
+proprietarul obiectului: în cazul obișnuit nu se vede nimic, deci nu face zgomot,
+iar în cazul care contează sare în ochi (`anon=X/DAT DE altcineva`).
+
+`supabase/diagnostic-drepturi.sql` întreabă baza reală cine rulează, cine a dat
+fiecare drept, ce spune declarația de drepturi implicite a proiectului, și care e
+cuprinsul funcției care diferă. Patru răspunsuri, o singură lipire.
+
 ### Ce a mai scos un audit pe unghiuri independente (9 sept. 2026)
 
 Concluzia de mai sus a fost pusă la îndoială de trei verificări adversariale, ca

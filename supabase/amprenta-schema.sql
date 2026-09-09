@@ -31,6 +31,13 @@
 -- altfel de la o versiune la alta. Unde nu se poate altfel (constrângeri,
 -- indecși, politici), textul se normalizează la spații simple.
 --
+-- CINE A DAT DREPTUL se scrie doar când NU e proprietarul obiectului. Nu e
+-- amănunt: `REVOKE` scoate numai granturile date de rolul care revocă, iar unul
+-- dat de altcineva rămâne pe loc, cu o simplă avertizare, nu cu o eroare. Pe
+-- 9 sept. o migrare de revocare a „reușit" fără să schimbe nimic, iar amprenta
+-- n-a putut arăta de ce, fiindcă tăia partea de după `/`. Când acordantul E
+-- proprietarul — cazul obișnuit — nu se scrie nimic, ca să nu facă zgomot.
+--
 -- DOUĂ NORMALIZĂRI, amândouă din prima rulare pe baza reală (9 sept. 2026), care
 -- e pe altă versiune majoră decât bancul:
 --
@@ -157,8 +164,12 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
       case when p.prosecdef then 'security definer' else 'security invoker' end,
       'drepturi ' || case when p.proacl is null then 'ORICINE POATE EXECUTA'
         else coalesce((select string_agg(
-            case when split_part(acl::text, '=', 1) = '' then 'oricine' || substr(split_part(acl::text, '/', 1), strpos(split_part(acl::text, '/', 1), '=')) else split_part(acl::text, '/', 1) end,
-            ' ' order by acl::text)
+            case when split_part(acl::text, '=', 1) = '' then 'oricine'
+              else split_part(acl::text, '=', 1) end
+            || '=' || split_part(split_part(acl::text, '/', 1), '=', 2)
+            || case when split_part(acl::text, '/', 2) <> pg_get_userbyid(p.proowner)
+                 then '/DAT DE ' || split_part(acl::text, '/', 2) else '' end,
+            ' ' order by split_part(acl::text, '=', 1))
           from unnest(p.proacl) acl
           where split_part(acl::text, '=', 1) in ('', 'anon', 'authenticated', 'service_role')),
           'nimeni din cei trei') end)
@@ -189,7 +200,9 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
     format('public.%s', c.relname),
     coalesce((select string_agg(
         split_part(acl::text, '=', 1) || '=' ||
-          regexp_replace(split_part(split_part(acl::text, '/', 1), '=', 2), 'm\*?', '', 'g'),
+          regexp_replace(split_part(split_part(acl::text, '/', 1), '=', 2), 'm\*?', '', 'g')
+          || case when split_part(acl::text, '/', 2) <> pg_get_userbyid(c.relowner)
+               then '/DAT DE ' || split_part(acl::text, '/', 2) else '' end,
         ' ' order by split_part(acl::text, '=', 1))
       from unnest(coalesce(c.relacl, '{}'::aclitem[])) acl
       where split_part(acl::text, '=', 1) in ('anon', 'authenticated', 'service_role')),
@@ -210,8 +223,10 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
     -- Fără scoaterea lui `m` de la tabele: MAINTAIN e privilegiu de TABEL, nu de
     -- coloană (`ACL_ALL_RIGHTS_COLUMN` e același pe 16 și pe 17), deci n-are cum
     -- să apară aici. O normalizare care n-are ce normaliza doar minte cititorul.
-    (select string_agg(split_part(acl::text, '/', 1), ' '
-        order by split_part(acl::text, '=', 1))
+    (select string_agg(split_part(acl::text, '/', 1)
+        || case when split_part(acl::text, '/', 2) <> pg_get_userbyid(c.relowner)
+             then '/DAT DE ' || split_part(acl::text, '/', 2) else '' end,
+        ' ' order by split_part(acl::text, '=', 1))
       from unnest(a.attacl) acl
       where split_part(acl::text, '=', 1) in ('anon', 'authenticated', 'service_role'))
   from pg_class c

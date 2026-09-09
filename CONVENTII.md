@@ -181,6 +181,12 @@ Supabase, proiectul are `alter default privileges ... grant all on functions to
 anon, authenticated, service_role`, așa că fiecare funcție nouă primește granturi
 EXPLICITE, pe rol, chiar la creare. Revocarea de la PUBLIC nu le atinge.
 
+A doua zi, aceeași apărare a arătat și partea a doua a lecției: migrarea de
+revocare a rulat, a răspuns „REVOKE", și n-a schimbat nimic. **`REVOKE` scoate
+doar granturile date de rolul care revocă**; unul dat de altcineva rămâne pe loc,
+fără eroare și fără avertizare. Deci la orice revocare care contează, se
+VERIFICĂ pe urmă că dreptul chiar a plecat — răspunsul comenzii nu e o dovadă.
+
 Regula: **la funcții, se revocă și de la roluri, pe nume.** Iar când o apărare stă
 în granturi și nu în RLS, ea se scrie ca verificare în
 `supabase/verificare-izolare.sql` și se probează stricând-o dinadins.
