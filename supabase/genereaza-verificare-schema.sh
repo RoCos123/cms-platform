@@ -83,6 +83,24 @@ done
 # Fișierul. Fără dată înăuntru, dinadins: altfel s-ar schimba la fiecare
 # regenerare, iar CI-ul n-ar mai putea deosebi „migrare nouă, fișier uitat" de
 # „l-am rulat din nou".
+# Valorile așteptate se scriu O DATĂ și se folosesc în AMÂNDOUĂ fișierele de mai
+# jos. Scrise de două ori, cele două verificări ar fi putut ajunge să spună
+# lucruri diferite despre aceeași bază.
+awk -F'\t' -v harta="$LUCRU/harta.tsv" '
+BEGIN {
+  while ((getline linie < harta) > 0) {
+    split(linie, h, "\t");
+    unde[h[1]] = h[2];            # fișierele vin în ordine, deci ultimul rămâne
+  }
+}
+function sql(s) { gsub(/'\''/, "'\'''\''", s); return "'\''" s "'\''"; }
+{
+  n = split($2, bucati, ".");
+  nume = bucati[n]; sub(/\(.*/, "", nume);
+  m = ($1 ~ /^(constrangere|index|politica|functie|declansator|depozit)$/ && (nume in unde)) ? unde[nume] : "—";
+  printf "%s  (%s, %s, %s, %s)\n", (NR == 1 ? " " : ","), sql($1), sql($2), sql($3), sql(m);
+}' "$LUCRU/amprenta.tsv" > "$LUCRU/valori.sql"
+
 # --------------------------------------------------------------------------
 {
 cat <<CAP
@@ -138,20 +156,7 @@ echo ""
 echo "-- Amprenta bazei de probă: migrările noastre, aplicate întregi, în ordine."
 echo "asteptat (fel, cheie, amprenta, ultima_migrare) as (values"
 
-awk -F'\t' -v harta="$LUCRU/harta.tsv" '
-BEGIN {
-  while ((getline linie < harta) > 0) {
-    split(linie, h, "\t");
-    unde[h[1]] = h[2];            # fișierele vin în ordine, deci ultimul rămâne
-  }
-}
-function sql(s) { gsub(/'\''/, "'\'''\''", s); return "'\''" s "'\''"; }
-{
-  n = split($2, bucati, ".");
-  nume = bucati[n]; sub(/\(.*/, "", nume);
-  m = ($1 ~ /^(constrangere|index|politica|functie|declansator|depozit)$/ && (nume in unde)) ? unde[nume] : "—";
-  printf "%s  (%s, %s, %s, %s)\n", (NR == 1 ? " " : ","), sql($1), sql($2), sql($3), sql(m);
-}' "$LUCRU/amprenta.tsv"
+cat "$LUCRU/valori.sql"
 
 cat <<'COADA'
 ),
@@ -187,3 +192,201 @@ COADA
 } > "$IESIRE"
 
 echo "→ scris $IESIRE ($RANDURI lucruri, amprentă luată pe PostgreSQL $MAJOR)"
+
+# ============================================================================
+# Al doilea fișier: verificarea AMĂNUNȚITĂ.
+#
+# Cel de mai sus se uită doar la FORMĂ, și e cel de rulat după o migrare. Ăsta
+# adaugă două lucruri pe care forma nu le poate spune:
+#
+#   COMPORTAMENT — chiar încearcă să vadă datele altui client, să scrie ca
+#     vizitator anonim, să cheme funcțiile platformei. Verificarea de izolare
+#     n-a mai rulat pe baza reală din 26 aug. 2026, iar între timp au apărut
+#     provizionarea, programările, depozitul privat și comutatorul de lansare.
+#
+#   DATE — lucruri pe care nicio schemă nu le poate opri, dar care strică
+#     site-ul unui client: un site fără cont de login, o pagină pe o adresă
+#     rezervată (n-o citește nimeni), un fișier cu calea în afara cabinetului.
+#
+# Amândouă fișierele pleacă din ACEEAȘI amprentă, scrisă o singură dată mai sus.
+# ============================================================================
+COMPLET="$RADACINA/supabase/verificare-completa.sql"
+
+# Adresele rezervate se scot din cod, nu se scriu aici: o a doua listă ar fi
+# exact felul de lucru care rămâne în urmă fără ca nimeni să bage de seamă.
+REZERVATE="$(sed -n '/ADRESE_REZERVATE = \[/,/\] as const;/p' "$RADACINA/src/lib/pagini.ts" \
+  | grep -o '"[^"]*"' | tr '"' "'" | paste -sd, - | sed 's/,/, /g')"
+
+{
+cat <<CAP
+-- ============================================================================
+-- Verificarea amănunțită: formă, comportament și date.
+--
+-- GENERAT din \`supabase/genereaza-verificare-schema.sh\`. Nu se scrie de mână.
+--
+-- CUM SE RULEAZĂ
+--   Supabase → SQL Editor → New query → tot fișierul → Run, FĂRĂ text selectat.
+--   Scrie un singur tabel, cu o linie per verificare.
+--
+-- CE ÎNSEAMNĂ COLOANA \`zona\`
+--   comportament — chiar se încearcă: un client care caută datele altuia, un
+--                  vizitator anonim care scrie, o funcție a platformei chemată
+--                  de cine nu trebuie. Astea nu se pot deduce din schemă.
+--   formă        — cele $RANDURI de lucruri din schemă, față de migrări.
+--   date         — ce nu poate opri nicio schemă, dar strică site-ul cuiva.
+--
+-- CE SCHIMBĂ. Aproape nimic, și nimic ce rămâne: \`search_path\`-ul sesiunii, o
+-- funcție temporară care dispare la închidere, și o singură scriere care TREBUIE
+-- respinsă — dacă totuși trece, rândul se șterge pe loc și verificarea dă PICAT.
+--
+-- CU UN SINGUR CLIENT în bază, comparațiile între clienți se sar și scriu „NU SE
+-- POATE"; restul rulează. Un tabel gol ar fi fost mai rău: se citește ușor drept
+-- „e bine".
+-- ============================================================================
+
+set search_path = public;
+CAP
+
+echo ""
+echo "-- (1) Verificarea de comportament, adusă întreagă din verificare-izolare.sql."
+sed '/^select \* from pg_temp\.verifica_izolarea();$/d' "$RADACINA/supabase/verificare-izolare.sql"
+
+cat <<'MIJLOC'
+
+-- (2) Rezultatele se adună într-un singur loc, ca să iasă un tabel, nu trei.
+drop table if exists _verificare_completa;
+create temporary table _verificare_completa (
+  zona text, verificare text, verdict text, detaliu text
+);
+
+insert into _verificare_completa
+select 'comportament', verificare, verdict, detaliu from pg_temp.verifica_izolarea();
+
+-- (3) Forma: aceeași amprentă ca în verificare-schema.sql.
+insert into _verificare_completa
+with in_baza as (
+MIJLOC
+
+sed '/^--/d; /^$/d' "$RADACINA/supabase/amprenta-schema.sql"
+
+echo "),"
+echo "asteptat (fel, cheie, amprenta, ultima_migrare) as (values"
+cat "$LUCRU/valori.sql"
+
+cat <<'MIJLOC2'
+),
+diferente as (
+  select
+    case
+      when b.cheie is null then 'LIPSEȘTE DIN BAZĂ'
+      when a.cheie is null then 'ÎN PLUS ÎN BAZĂ'
+      else 'ALTFEL ÎN BAZĂ'
+    end as problema,
+    coalesce(a.fel, b.fel) as fel,
+    coalesce(a.cheie, b.cheie) as cheie,
+    coalesce(a.amprenta, '—') as ar_trebui,
+    coalesce(b.amprenta, '—') as este,
+    coalesce(a.ultima_migrare, '—') as migrarea
+  from asteptat a
+  full outer join in_baza b on b.fel = a.fel and b.cheie = a.cheie
+  where a.amprenta is distinct from b.amprenta
+)
+select 'formă', d.fel || ' · ' || d.cheie, d.problema,
+  'ar trebui: ' || d.ar_trebui || '   |   în bază: ' || d.este
+    || case when d.migrarea = '—' then '' else '   |   ' || d.migrarea end
+from diferente d;
+MIJLOC2
+
+cat <<COADA1
+
+insert into _verificare_completa
+select 'formă', 'toate cele $RANDURI de lucruri din schemă', 'OK',
+  'baza reală are exact ce scriu migrările'
+where not exists (select 1 from _verificare_completa where zona = 'formă');
+COADA1
+
+cat <<COADA2
+
+-- (4) Datele. Nimic din ce urmează nu e oprit de vreo constrângere, dar fiecare
+--     strică ceva pe care clientul îl vede — sau nu-l vede, ceea ce e mai rău.
+insert into _verificare_completa
+select 'date', v.ce,
+  case when v.cate = 0 then 'OK' else 'ATENȚIE' end,
+  case when v.cate = 0 then v.bine else v.cate || ': ' || left(v.care, 200) end
+from (
+  select 'Fiecare site are un cont de login' as ce, count(*) as cate,
+    'niciun site fără cont' as bine,
+    coalesce(string_agg(s.domain, ', ' order by s.domain), '') as care
+  from public.sites s
+  where not exists (select 1 from public.users u where u.site_id = s.id)
+
+  union all
+  select 'Fiecare site are rândul lui de setări', count(*),
+    'niciunul fără setări',
+    coalesce(string_agg(s.domain, ', ' order by s.domain), '')
+  from public.sites s
+  where not exists (select 1 from public.site_settings t where t.site_id = s.id)
+
+  union all
+  select 'Nicio pagină pe o adresă a platformei', count(*),
+    'niciuna — altfel n-ar citi-o nimeni',
+    coalesce(string_agg(s.domain || '/' || p.slug, ', ' order by s.domain), '')
+  from public.pages p join public.sites s on s.id = p.site_id
+  where p.slug in ($REZERVATE)
+
+  union all
+  select 'Fișierele stau în dosarul cabinetului lor', count(*),
+    'toate căile încep cu site_id',
+    coalesce(string_agg(u.storage_path, ', ' order by u.storage_path), '')
+  from public.uploads u
+  where u.storage_path not like u.site_id::text || '/%'
+
+  union all
+  select 'Niciun fișier rămas fără rândul lui', count(*),
+    'depozitul și tabelul spun la fel',
+    coalesce(string_agg(o.name, ', ' order by o.name), '')
+  from storage.objects o
+  where o.bucket_id = 'media'
+    and not exists (select 1 from public.uploads u where u.storage_path = o.name)
+
+  union all
+  select 'Niciun site publicat fără vreo secțiune vizibilă', count(*),
+    'fiecare site publicat arată ceva',
+    coalesce(string_agg(s.domain, ', ' order by s.domain), '')
+  from public.sites s
+  where s.published_at is not null
+    and not exists (select 1 from public.site_content c
+                     where c.site_id = s.id and c.visible)
+
+  union all
+  select 'Niciun conținut de probă vizibil pe un site publicat', count(*),
+    'niciunul',
+    coalesce(string_agg(s.domain || ' · ' || c.key, ', ' order by s.domain), '')
+  from public.site_content c join public.sites s on s.id = c.site_id
+  where c.is_demo and c.visible and s.published_at is not null
+
+  union all
+  select 'Programările pornite au și secțiunea lor', count(*),
+    'fiecare cabinet cu modulul pornit o are',
+    coalesce(string_agg(s.domain, ', ' order by s.domain), '')
+  from public.sites s
+  where s.appointments_enabled
+    and not exists (select 1 from public.site_content c
+                     where c.site_id = s.id and c.key = 'programare')
+) v;
+COADA2
+
+cat <<'COADA3'
+
+-- Tabelul de la urmă. Ce nu e OK vine primul, în fiecare zonă.
+select zona, verificare, verdict, detaliu
+from _verificare_completa
+order by
+  case zona when 'comportament' then 1 when 'formă' then 2 else 3 end,
+  case when verdict = 'OK' then 2 else 1 end,
+  verificare;
+COADA3
+} > "$COMPLET"
+
+echo "→ scris $COMPLET (comportament + formă + date)"
+

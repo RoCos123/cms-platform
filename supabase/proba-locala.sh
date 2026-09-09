@@ -29,7 +29,20 @@ rm -rf "$BAZA"; mkdir -p "$BAZA/data" "$BAZA/sock"; chown -R postgres:postgres "
 runuser -u postgres -- "$BIN/initdb" -D "$BAZA/data" -U postgres --auth=trust >/dev/null
 runuser -u postgres -- "$BIN/pg_ctl" -D "$BAZA/data" \
   -o "-k $SOCK -c listen_addresses=''" -l "$BAZA/pg.log" start >/dev/null
-sleep 2
+
+# Se AȘTEAPTĂ până răspunde, nu se numără două secunde. Pe 9 sept. 2026 o rulare
+# a picat fiindcă soclul încă nu exista — pe o mașină mai încărcată, două secunde
+# nu ajung. Un banc care pică din când în când, fără legătură cu ce s-a schimbat,
+# e mai rău decât unul lent: în CI se citește ca „e ceva stricat în cod".
+for _ in $(seq 60); do
+  "$BIN/pg_isready" -h "$SOCK" -U postgres >/dev/null 2>&1 && break
+  sleep 0.5
+done
+if ! "$BIN/pg_isready" -h "$SOCK" -U postgres >/dev/null 2>&1; then
+  echo "Postgres nu a pornit în 30 de secunde. Jurnalul lui:" >&2
+  tail -20 "$BAZA/pg.log" >&2
+  exit 1
+fi
 
 ruleaza() { psql -h "$SOCK" -U postgres -d postgres -v ON_ERROR_STOP=1 -q "$@"; }
 

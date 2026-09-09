@@ -979,6 +979,46 @@ e identic cu migrarea, mai puțin COMENTARIILE. Adică ce s-a rulat pe 27 aug. a
 fost o copie din discuție, nu fișierul. Comportamentul e același; se aliniază
 rulând din nou blocul, care e idempotent.
 
+### Verificarea amănunțită: formă, comportament și date (9 sept. 2026)
+
+`supabase/verificare-completa.sql`, generat din același loc ca celălalt. O
+lipire, un tabel, douăzeci și două de verificări pe o bază curată, în trei zone:
+
+- **comportament** — cele 13 verificări de izolare, care chiar ÎNCEARCĂ: un
+  client care caută datele altuia, un vizitator anonim care scrie, funcțiile
+  platformei chemate de cine nu trebuie. Nu se pot deduce din schemă. **Nu mai
+  rulaseră pe baza reală din 26 aug.**, iar între timp au apărut provizionarea,
+  programările, depozitul privat și comutatorul de lansare.
+- **formă** — cele 247 de lucruri, ca în `verificare-schema.sql`.
+- **date** — opt lucruri pe care nicio constrângere nu le poate opri: un site
+  fără cont de login sau fără setări, o pagină pe o adresă a platformei, un
+  fișier cu calea în afara dosarului cabinetului, un fișier din depozit fără
+  rândul lui, un site publicat fără nicio secțiune vizibilă, conținut de probă
+  vizibil pe un site publicat, modulul de programări pornit fără secțiunea lui.
+
+Probat stricând câte ceva din fiecare zonă. Cele două găuri de azi, puse la loc
+dinadins, sunt prinse de zona de comportament — adică fișierul le-ar fi găsit
+încercând, nu doar citind drepturi.
+
+**Verificarea de izolare merge acum și cu un singur client în bază.** Înainte se
+oprea din prima și scria un singur rând; pe baza reală, unde poate exista un
+singur cabinet, asta însemna un tabel gol în loc de verificări — ușor de citit
+drept „e bine". Acum se sar doar comparațiile între clienți, cu „NU SE POATE"
+scris pe față, iar celelalte unsprezece rulează.
+
+**Găsit în timp ce construiam:** `/programare` e rută a site-ului public de pe
+27 aug., dar lipsea din `ADRESE_REZERVATE`. Adică panoul accepta o pagină cu
+adresa „programare", clientul o scria, o salva, o vedea la previzualizare — și
+n-o citea nimeni, fiindcă ruta noastră câștigă în fața celei după adresă.
+Aceeași formă ca greșeala din 1 sept. cu `/dashboard-ul-meu`. Reparat, și apărat
+de o probă care se uită la rutele de pe disc, nu la o a doua listă scrisă de
+mână. Lipseau și `opengraph-image`, și `proba-vanzari`.
+
+**Și încă una, de mediu:** bancul pornea Postgres și număra două secunde. Pe o
+mașină încărcată nu ajung, iar o rulare a picat din motivul ăsta. Acum așteaptă
+până răspunde. Un banc care pică din când în când fără legătură cu ce s-a
+schimbat e mai rău decât unul lent — în CI se citește ca „e ceva stricat în cod".
+
 ### Ce a mai scos un audit pe unghiuri independente (9 sept. 2026)
 
 Concluzia de mai sus a fost pusă la îndoială de trei verificări adversariale, ca

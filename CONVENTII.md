@@ -96,6 +96,14 @@ Regula: **o cale se compară pe segmente, nu pe litere.** `x === "/a"` sau
 potrivirea e pe prefix de text prin însăși definiția formatului, fiecare intrare
 se termină ori cu `/`, ori cu `$`.
 
+Aceeași formă, în alt loc, pe 9 sept. 2026: `/programare` era rută a site-ului
+public de două săptămâni, dar lipsea din `ADRESE_REZERVATE`. Panoul accepta o
+pagină cu adresa aia, o salva, o arăta la previzualizare — și n-o citea nimeni,
+fiindcă ruta noastră câștigă. **Orice rută nouă e și o adresă luată clientului**,
+iar asta nu se ține minte: `e2e/rute.proba.mjs` se uită acum la ce e pe disc și
+cade dacă o rută nu e trecută în listă. O a doua listă scrisă de mână ar fi fost
+doar încă un loc rămas în urmă.
+
 Corolarul, care e de fapt lecția: **o reparație pe jumătate e mai rea decât
 niciuna.** Dacă reparam doar proxy-ul, pagina ar fi mers și n-ar fi fost găsită
 de nimeni — iar clientul n-ar fi avut cum să afle de ce. Când o greșeală are

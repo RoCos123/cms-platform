@@ -47,16 +47,32 @@ begin
   select u.id, u.site_id into user_b, site_b
   from public.users u where u.site_id <> site_a order by u.site_id, u.id limit 1;
 
-  if user_a is null or user_b is null then
+  -- Fără NICIUN client nu se poate verifica nimic: toate probele de mai jos
+  -- pleacă de la un site adevărat.
+  if user_a is null then
     return query select
       'Doi clienți de comparat'::text,
       'NU SE POATE'::text,
-      'Ai nevoie de cel puțin două site-uri, fiecare cu userul lui. Vezi supabase/seed-test-tenants.sql.'::text;
+      'Nu există niciun site cu cont legat. Vezi supabase/seed-test-tenants.sql.'::text;
     return;
   end if;
 
-  return query select 'Doi clienți de comparat'::text, 'OK'::text,
-    format('%s și %s', site_a, site_b);
+  -- Cu UNUL singur, se sare doar peste ce cere doi, și se spune pe față.
+  --
+  -- Înainte se oprea tot, ceea ce pe baza reală însemna un tabel gol în loc de
+  -- verificări — adică exact felul de „n-a spus nimic" care se citește ușor
+  -- drept „e bine". Restul probelor (vizitatorul anonim, drepturile pe coloane,
+  -- funcțiile, depozitul) nu cer doi clienți și chiar acolo stau găurile găsite
+  -- pe 9 sept. 2026.
+  if user_b is null then
+    return query select
+      'Doi clienți de comparat'::text,
+      'NU SE POATE'::text,
+      'Un singur client în bază. Comparațiile între clienți se sar; restul rulează.'::text;
+  else
+    return query select 'Doi clienți de comparat'::text, 'OK'::text,
+      format('%s și %s', site_a, site_b);
+  end if;
 
   -- --------------------------------------------------------------------------
   -- Fiecare client, logat, vede DOAR datele lui — în TOATE tabelele.
@@ -67,7 +83,7 @@ begin
   -- Un tabel gol pentru clientul de test nu e o eroare, dar nici nu dovedește
   -- nimic — de asta îl numărăm separat, în loc să-l trecem drept „OK".
   -- --------------------------------------------------------------------------
-  for i in 1..2 loop
+  for i in 1..(case when user_b is null then 1 else 2 end) loop
     al_lui   := case when i = 1 then user_a else user_b end;
     site_lui := case when i = 1 then site_a else site_b end;
     dovedite := 0;

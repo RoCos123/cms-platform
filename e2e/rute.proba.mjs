@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readdirSync } from "node:fs";
+import path from "node:path";
 import { DISALLOW_ROBOTS, estePanou, esteConectare } from "@/lib/rute";
 import { ADRESE_REZERVATE } from "@/lib/pagini";
 
@@ -75,4 +77,57 @@ test("adresele noastre chiar sunt oprite din a fi luate de client", () => {
       `„${rezervata}” trebuie să rămână adresă rezervată`,
     );
   }
+});
+
+/**
+ * Fiecare rută adevărată a aplicației e și adresă rezervată.
+ *
+ * Greșeala pe care o apără, găsită pe 9 sept. 2026: `/programare` exista ca rută
+ * de pe 27 aug., dar lipsea din `ADRESE_REZERVATE`. Adică panoul accepta o
+ * pagină cu adresa „programare", clientul o scria, o salva, o vedea la
+ * previzualizare — și n-o citea nimeni niciodată, fiindcă ruta noastră câștigă
+ * în fața celei după adresă. Aceeași formă ca greșeala din 1 sept., într-un alt
+ * loc: ceva ce pare în regulă din toate părțile și pur și simplu nu ajunge la om.
+ *
+ * Se uită la ce e pe disc, nu la o listă scrisă de mână — altfel ar fi doar o a
+ * doua listă de ținut la zi, adică exact problema.
+ */
+test("orice rută de nivel întâi e trecută în adresele rezervate", () => {
+  const APP = path.join(process.cwd(), "src", "app");
+
+  /** Fișierele speciale ale Next care produc singure o adresă. */
+  const DIN_FISIER = {
+    "robots.ts": "robots.txt",
+    "sitemap.ts": "sitemap.xml",
+    "favicon.ico": "favicon.ico",
+    "opengraph-image.tsx": "opengraph-image",
+  };
+
+  const rute = [];
+
+  for (const intrare of readdirSync(APP, { withFileTypes: true })) {
+    if (intrare.isFile()) {
+      if (intrare.name in DIN_FISIER) rute.push(DIN_FISIER[intrare.name]);
+      continue;
+    }
+    // Segmentul după adresă (`[slug]`) e chiar pagina clientului, nu o rută a noastră.
+    if (intrare.name.startsWith("[") || intrare.name.startsWith("_")) continue;
+
+    // Un folder fără `page` sau `route` nu produce nicio adresă.
+    const are = readdirSync(path.join(APP, intrare.name)).some((f) =>
+      /^(page|route)\.(t|j)sx?$/.test(f),
+    );
+    if (are) rute.push(intrare.name);
+  }
+
+  assert.ok(rute.length >= 8, `găsite doar ${rute.length} rute — s-a rupt citirea?`);
+
+  const lipsa = rute.filter((r) => !ADRESE_REZERVATE.includes(r));
+  assert.deepEqual(
+    lipsa,
+    [],
+    `rute ale aplicației care NU sunt rezervate: ${lipsa.join(", ")}.\n` +
+      "Un client își poate face o pagină cu adresa asta, iar pagina lui n-ar fi citită de nimeni.\n" +
+      "Se adaugă în ADRESE_REZERVATE din src/lib/pagini.ts.\n",
+  );
 });
