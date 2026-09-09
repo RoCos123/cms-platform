@@ -124,7 +124,7 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
     'functie',
     format('public.%s(%s)', p.proname, pg_get_function_identity_arguments(p.oid)),
     concat_ws(' | ',
-      'cuprins ' || left(md5(p.prosrc), 12),
+      'cuprins ' || left(md5(regexp_replace(btrim(p.prosrc), '\s+', ' ', 'g')), 12),
       case when p.prosecdef then 'security definer' else 'security invoker' end,
       'drepturi ' || case when p.proacl is null then 'ORICINE POATE EXECUTA'
         else coalesce((select string_agg(
@@ -154,7 +154,10 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
   select
     'drept',
     format('public.%s', c.relname),
-    coalesce((select string_agg(split_part(acl::text, '/', 1), ' ' order by acl::text)
+    coalesce((select string_agg(
+        split_part(acl::text, '=', 1) || '=' ||
+          replace(split_part(split_part(acl::text, '/', 1), '=', 2), 'm', ''),
+        ' ' order by split_part(acl::text, '=', 1))
       from unnest(coalesce(c.relacl, '{}'::aclitem[])) acl
       where split_part(acl::text, '=', 1) in ('anon', 'authenticated', 'service_role')),
       'niciun drept')
@@ -169,7 +172,10 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
   select
     'drept-coloana',
     format('public.%s.%s', c.relname, a.attname),
-    (select string_agg(split_part(acl::text, '/', 1), ' ' order by acl::text)
+    (select string_agg(
+        split_part(acl::text, '=', 1) || '=' ||
+          replace(split_part(split_part(acl::text, '/', 1), '=', 2), 'm', ''),
+        ' ' order by split_part(acl::text, '=', 1))
       from unnest(a.attacl) acl
       where split_part(acl::text, '=', 1) in ('anon', 'authenticated', 'service_role'))
   from pg_class c
@@ -389,12 +395,12 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('drept', 'public.users', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
 ,  ('drept-coloana', 'public.sites.name', 'authenticated=w', '—')
 ,  ('drept-coloana', 'public.sites.published_at', 'authenticated=w', '—')
-,  ('functie', 'public.adauga_sectiunea_programare()', 'cuprins 3aee0228c901 | security definer | drepturi ORICINE POATE EXECUTA', '20260827160000_sectiunea_programare.sql')
-,  ('functie', 'public.creeaza_client(p_domeniu text, p_nume text, p_email text, p_sablon text, p_cu_programari boolean)', 'cuprins b6be23f6d635 | security definer | drepturi nimeni din cei trei', '20260908170000_schelet_la_provizionare.sql')
-,  ('functie', 'public.current_site_id()', 'cuprins 1aa40212ee90 | security definer | drepturi ORICINE POATE EXECUTA', '20260901090000_depozit_privat.sql')
-,  ('functie', 'public.inregistreaza_afisarea(p_site_id uuid, p_zi date, p_cale text)', 'cuprins fe33b6a8e8b4 | security definer | drepturi service_role=X', '20260827100000_vizite.sql')
-,  ('functie', 'public.set_updated_at()', 'cuprins 9b1889f56258 | security invoker | drepturi ORICINE POATE EXECUTA', '20260827160000_sectiunea_programare.sql')
-,  ('functie', 'public.textul_de_pornire(p_cheie text, p_nume text)', 'cuprins f32840357aff | security invoker | drepturi ORICINE POATE EXECUTA', '20260908170000_schelet_la_provizionare.sql')
+,  ('functie', 'public.adauga_sectiunea_programare()', 'cuprins 934ddbb41d43 | security definer | drepturi oricine=X anon=X authenticated=X service_role=X', '20260827160000_sectiunea_programare.sql')
+,  ('functie', 'public.creeaza_client(p_domeniu text, p_nume text, p_email text, p_sablon text, p_cu_programari boolean)', 'cuprins 19f3b7bace5a | security definer | drepturi service_role=X', '20260909100000_drepturi_de_executie.sql')
+,  ('functie', 'public.current_site_id()', 'cuprins 9e5a0c2f19f2 | security definer | drepturi oricine=X anon=X authenticated=X service_role=X', '20260901090000_depozit_privat.sql')
+,  ('functie', 'public.inregistreaza_afisarea(p_site_id uuid, p_zi date, p_cale text)', 'cuprins ebd86d2bfbca | security definer | drepturi service_role=X', '20260909100000_drepturi_de_executie.sql')
+,  ('functie', 'public.set_updated_at()', 'cuprins 0ba6f773f96d | security invoker | drepturi oricine=X anon=X authenticated=X service_role=X', '20260827160000_sectiunea_programare.sql')
+,  ('functie', 'public.textul_de_pornire(p_cheie text, p_nume text)', 'cuprins e6065fa56836 | security invoker | drepturi oricine=X anon=X authenticated=X service_role=X', '20260908170000_schelet_la_provizionare.sql')
 ,  ('index', 'public.appointments.appointments_ora_ocupata_idx', 'CREATE UNIQUE INDEX appointments_ora_ocupata_idx ON public.appointments USING btree (site_id, starts_at) WHERE (status = ANY (ARRAY[''ceruta''::text, ''confirmata''::text]))', '20260827140000_programari.sql')
 ,  ('index', 'public.appointments.appointments_site_id_idx', 'CREATE INDEX appointments_site_id_idx ON public.appointments USING btree (site_id)', '20260825120000_init_schema.sql')
 ,  ('index', 'public.appointments.appointments_site_starts_idx', 'CREATE INDEX appointments_site_starts_idx ON public.appointments USING btree (site_id, starts_at)', '20260827140000_programari.sql')

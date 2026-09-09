@@ -62,6 +62,11 @@ proprietar și o intrare manuală în Supabase.
 
 **6 se filmează ultimul**, dinadins: se învechește la fiecare schimbare de ecran.
 
+**De rulat în Supabase, separat de lista de mai sus:** migrarea
+`20260909100000_drepturi_de_executie.sql`, din 9 sept. Două funcții erau
+chemabile de oricine deschidea site-ul — vezi §„Verificarea că baza reală are ce
+scriu migrările". E o singură comandă, dar până rulează, gaura e deschisă.
+
 ### Ce blochează ARĂTAREA produsului
 
 Site-ul de vânzări e gata, dar nepublicat, pe o adresă temporară care nu se
@@ -855,6 +860,54 @@ ignoră în două săptămâni.
 **Ce NU acoperă:** datele. Se uită la formă — tabele, drepturi, politici — nu la
 ce e în ele. Câte rânduri are fiecare client, dacă un site are secțiunile care
 trebuie, rămâne treaba verificării de izolare și a ochilor.
+
+### Ce a găsit prima rulare pe baza reală (9 sept. 2026)
+
+Douăzeci de rânduri, în două grupe. Una era zgomot, cealaltă nu.
+
+**Zgomotul, paisprezece rânduri:** toate drepturile pe tabel aveau un `m` în plus
+în baza reală. E MAINTAIN, privilegiu apărut în PostgreSQL 17 și cuprins în
+`grant all`; bancul e pe 16, unde nu există. Nu spune nimic despre schema
+noastră, deci se scoate acum din amprentă — altfel verificarea s-ar fi plâns la
+fiecare rulare de ceva nestricat, iar în două săptămâni n-ar mai fi citit-o
+nimeni. De aici știm și că baza reală e pe Postgres 17. Restul amprentei a trecut
+fără nicio diferență — zero la constrângeri, indecși, politici, coloane și
+declanșatori — deci textul pe care Postgres îl recompune singur iese la fel pe 16
+și pe 17 pentru tot ce folosim noi.
+
+**Cealaltă grupă nu era zgomot.** Șase funcții cu alte drepturi de execuție decât
+cele așteptate, și două dintre ele contau:
+
+| Funcția | Pe banc | În producție |
+|---|---|---|
+| `creeaza_client` | niciunul din cele trei roluri | `anon`, `authenticated`, `service_role` |
+| `inregistreaza_afisarea` | doar `service_role` | `anon`, `authenticated`, `service_role` |
+
+Cheia `anon` e publică prin construcție — stă în pachetul trimis browserului —
+iar funcțiile din schema `public` sunt expuse ca RPC. Deci oricine putea chema
+`inregistreaza_afisarea` cu orice `site_id` și umfla cifrele din panoul oricărui
+cabinet. Iar `creeaza_client`, care e `security definer` și rulează cu drepturile
+proprietarului bazei, era chemabilă de orice client conectat.
+
+**De ce n-a văzut-o nimeni.** În Postgres simplu, o funcție nouă poate fi
+executată de PUBLIC, iar `anon` și `authenticated` moștenesc de acolo — deci
+`revoke ... from public` chiar e de ajuns. Pe Supabase nu: proiectul are `alter
+default privileges ... grant all on functions` către cele trei roluri, așa că
+fiecare funcție nouă primește granturi EXPLICITE, pe rol, la creare. Revocarea de
+la PUBLIC nu le atinge. Bancul nu reproducea granturile alea, deci acolo apărarea
+ținea. Verificarea de izolare avea chiar verificările potrivite — 6 („un vizitator
+anonim nu poate umfla cifrele de trafic") și 11 („un client nu poate provizona
+site-uri") — și treceau amândouă, din motivul greșit.
+
+**Reparat în trei locuri, în același commit.** Bancul reproduce acum și
+granturile implicite pe funcții și pe secvențe; migrarea
+`20260909100000_drepturi_de_executie.sql` revocă execuția de la `anon` și
+`authenticated` pe cele două funcții; iar cu bancul fidel, verificările 6 și 11
+pică fără migrare și trec cu ea — probat în ambele feluri, nu presupus.
+
+**Rămâne de văzut la a doua rulare** dacă cele șase cuprinsuri de funcții mai
+diferă după normalizarea spațiilor. Dacă da, în producție stau versiuni mai vechi
+ale funcțiilor, și se rulează migrările care le definesc.
 
 ## Politica de confidențialitate se schimbă odată cu platforma
 

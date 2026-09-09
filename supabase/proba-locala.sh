@@ -74,6 +74,14 @@ SQL
 # jos, iar un `revoke` dintr-o migrare rămâne în picioare, ca acolo.
 ruleaza -c "alter default privileges in schema public grant all on tables to anon, authenticated, service_role;"
 
+# ȘI PE FUNCȚII. Aceeași lecție ca mai sus, în al doilea loc — găsit pe 9 sept. 2026,
+# la prima rulare a verificării de schemă pe baza reală: acolo funcțiile aveau
+# `anon=X authenticated=X service_role=X`, aici niciunul. Adică `revoke execute ...
+# from public` din migrări părea o apărare, fiindcă pe banc nu exista niciun grant
+# explicit pe care să-l lase în picioare.
+ruleaza -c "alter default privileges in schema public grant all on functions to anon, authenticated, service_role;"
+ruleaza -c "alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;"
+
 echo "→ rulez migrările, în ordine"
 for m in "$RADACINA"/supabase/migrations/*.sql; do
   printf "   %-52s" "$(basename "$m")"

@@ -167,6 +167,39 @@ nu că pagina arată a ceva.
 
 ---
 
+## Ce se revocă de la PUBLIC nu e revocat de la roluri
+
+9 sept. 2026, la prima rulare a verificării de schemă pe baza reală. Două funcții
+pe care migrările le închideau cu `revoke execute ... from public` erau, în
+producție, chemabile de `anon` și `authenticated` — adică de oricine deschide
+site-ul, fiindcă cheia `anon` stă în pachetul trimis browserului, iar funcțiile
+din schema `public` sunt expuse ca RPC.
+
+Mecanica: în Postgres simplu, o funcție nouă poate fi executată de PUBLIC, iar
+rolurile moștenesc de acolo, deci o revocare de la PUBLIC le taie pe toate. Pe
+Supabase, proiectul are `alter default privileges ... grant all on functions to
+anon, authenticated, service_role`, așa că fiecare funcție nouă primește granturi
+EXPLICITE, pe rol, chiar la creare. Revocarea de la PUBLIC nu le atinge.
+
+Regula: **la funcții, se revocă și de la roluri, pe nume.** Iar când o apărare stă
+în granturi și nu în RLS, ea se scrie ca verificare în
+`supabase/verificare-izolare.sql` și se probează stricând-o dinadins.
+
+Partea care merită ținută minte e însă alta. Migrarea din 27 aug. spune exact pe
+dos, și o spune cu dovadă: *„Un `revoke ... from anon` în plus n-ar face nimic —
+l-am scris, l-am probat, și nu schimba nimic."* Era adevărat pe banc. **Un lucru
+probat pe un banc infidel e mai periculos decât unul neprobat**, fiindcă închide
+întrebarea: nimeni nu mai verifică ce are „probat" scris lângă.
+
+Corolarul se leagă de regula despre banc de mai jos. Când adaugi o apărare de alt
+fel decât RLS, întrebarea nu e doar „o vede bancul?", ci **„ce face Supabase la
+crearea obiectului, pe care bancul nu-l face?"**. Drepturile implicite pe tabele
+au fost prima oară (27 aug.), cele pe funcții a doua (9 sept.). Aceeași formă, la
+două săptămâni distanță.
+
+
+---
+
 ## Un generator care n-a scris nimic arată exact ca unul care n-a avut ce schimba
 
 9 sept. 2026, la verificarea care compară baza reală cu migrările. Generatorul
@@ -295,6 +328,11 @@ migrare, adică fix apărarea care blochează coloanele pe care clientul n-are v
 să scrie. Garanția „domeniul e blocat prin grant” era scrisă în CONTEXT.md de
 săptămâni și n-a putut fi verificată nici măcar o dată. Când adaugi o apărare de
 alt fel decât RLS, întreabă-te dacă bancul o poate vedea.
+
+S-a repetat pe 9 sept., la funcții: bancul nu reproducea nici granturile pe care
+Supabase le dă implicit pe FUNCȚII noi, deci două `revoke ... from public` păreau
+apărări și nu erau. Vezi §„Ce se revocă de la PUBLIC nu e revocat de la roluri".
+Bancul le pune acum pe amândouă, și pe secvențe.
 
 **Un tip nou de secțiune nu ajunge singur pe un site care există deja.**
 Panoul NU are flux de „adaugă secțiune” — rândurile din `site_content` vin

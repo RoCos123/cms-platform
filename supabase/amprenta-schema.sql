@@ -23,6 +23,21 @@
 -- `pg_get_functiondef`, pe care Postgres îl recompune singur și îl poate scrie
 -- altfel de la o versiune la alta. Unde nu se poate altfel (constrângeri,
 -- indecși, politici), textul se normalizează la spații simple.
+--
+-- DOUĂ NORMALIZĂRI, amândouă din prima rulare pe baza reală (9 sept. 2026), care
+-- e pe altă versiune majoră decât bancul:
+--
+--   * `m` se scoate din drepturile pe tabel și pe coloană. E MAINTAIN, privilegiu
+--     apărut în PostgreSQL 17 și cuprins în `grant all`. Pe 16 nu există. Fără
+--     scoaterea lui, TOATE tabelele ieșeau „diferite" la fiecare rulare, pentru
+--     ceva ce nu e al nostru și nu spune nimic — iar o verificare care se plânge
+--     mereu ajunge să nu mai fie citită.
+--
+--   * cuprinsul funcțiilor se normalizează la spații simple înainte de amprentă.
+--     Textul ajunge în baza reală prin copiere într-un editor din browser, care
+--     poate schimba sfârșiturile de rând. Fără normalizare, o funcție identică
+--     ieșea „altfel în bază". Prețul, scris ca să nu fie uitat: o diferență
+--     făcută DOAR din spații dinăuntrul unui șir de caractere nu se mai vede.
 -- ============================================================================
 
 -- `coalesce` pe amprentă nu e pedanterie: partea generată trece prin text, unde
@@ -126,7 +141,7 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
     'functie',
     format('public.%s(%s)', p.proname, pg_get_function_identity_arguments(p.oid)),
     concat_ws(' | ',
-      'cuprins ' || left(md5(p.prosrc), 12),
+      'cuprins ' || left(md5(regexp_replace(btrim(p.prosrc), '\s+', ' ', 'g')), 12),
       case when p.prosecdef then 'security definer' else 'security invoker' end,
       'drepturi ' || case when p.proacl is null then 'ORICINE POATE EXECUTA'
         else coalesce((select string_agg(
@@ -160,7 +175,10 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
   select
     'drept',
     format('public.%s', c.relname),
-    coalesce((select string_agg(split_part(acl::text, '/', 1), ' ' order by acl::text)
+    coalesce((select string_agg(
+        split_part(acl::text, '=', 1) || '=' ||
+          replace(split_part(split_part(acl::text, '/', 1), '=', 2), 'm', ''),
+        ' ' order by split_part(acl::text, '=', 1))
       from unnest(coalesce(c.relacl, '{}'::aclitem[])) acl
       where split_part(acl::text, '=', 1) in ('anon', 'authenticated', 'service_role')),
       'niciun drept')
@@ -177,7 +195,10 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
   select
     'drept-coloana',
     format('public.%s.%s', c.relname, a.attname),
-    (select string_agg(split_part(acl::text, '/', 1), ' ' order by acl::text)
+    (select string_agg(
+        split_part(acl::text, '=', 1) || '=' ||
+          replace(split_part(split_part(acl::text, '/', 1), '=', 2), 'm', ''),
+        ' ' order by split_part(acl::text, '=', 1))
       from unnest(a.attacl) acl
       where split_part(acl::text, '=', 1) in ('anon', 'authenticated', 'service_role'))
   from pg_class c
