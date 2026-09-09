@@ -62,10 +62,10 @@ proprietar și o intrare manuală în Supabase.
 
 **6 se filmează ultimul**, dinadins: se învechește la fiecare schimbare de ecran.
 
-**De rulat în Supabase, separat de lista de mai sus:** migrarea
-`20260909100000_drepturi_de_executie.sql`, din 9 sept. Două funcții erau
-chemabile de oricine deschidea site-ul — vezi §„Verificarea că baza reală are ce
-scriu migrările". E o singură comandă, dar până rulează, gaura e deschisă.
+**Rulat pe 9 sept.:** `20260909100000_drepturi_de_executie.sql`, care închide două
+funcții ce puteau fi chemate de oricine deschidea site-ul. Verificat într-o
+sesiune separată, după: amândouă au doar `postgres` și `service_role`. Povestea
+întreagă în §„Verificarea că baza reală are ce scriu migrările".
 
 ### Ce blochează ARĂTAREA produsului
 
@@ -937,6 +937,28 @@ iar în cazul care contează sare în ochi (`anon=X/DAT DE altcineva`).
 `supabase/diagnostic-drepturi.sql` întreabă baza reală cine rulează, cine a dat
 fiecare drept, ce spune declarația de drepturi implicite a proiectului, și care e
 cuprinsul funcției care diferă. Patru răspunsuri, o singură lipire.
+
+### Cum s-a închis (9 sept. 2026)
+
+`supabase/repara-drepturi.sql` — care revocă și se uită IMEDIAT, în aceeași
+rulare — a prins din prima. Cele două funcții au acum doar `postgres` și
+`service_role`. Verificat apoi într-o sesiune SEPARATĂ, cu o citire simplă care
+nu revocă nimic: a rămas așa.
+
+Deosebirea aceea nu e pedanterie. Fișierul de reparație repară înainte să se
+uite, deci la a doua rulare ar scrie „închisă" chiar dacă drepturile s-ar fi
+întors între timp. Numai o citire care nu schimbă nimic poate spune că A RĂMAS.
+
+**De ce n-a prins prima încercare nu știm**, și probabil nu vom ști: acordantul
+era `postgres`, tot `postgres` rulează SQL Editor-ul, deci avea toate condițiile.
+Rămâne una dintre acele „reușite" care nu schimbă nimic. De aici regula din
+CONVENTII: la o revocare care contează, te uiți pe urmă — răspunsul comenzii nu e
+o dovadă.
+
+**Ce NU s-a confirmat încă:** verificarea de schemă întreagă n-a mai rulat după
+reparație, deci „TOTUL E LA FEL" pe toate cele 247 de lucruri rămâne nedovedit.
+Cele trei care lipseau sunt însă verificate una câte una. Se închide singur la
+migrarea următoare, care pleacă cu verificarea lipită la coadă.
 
 ### Ce a spus diagnosticul (9 sept. 2026)
 
