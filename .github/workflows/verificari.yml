@@ -76,8 +76,9 @@ jobs:
   #
   # Bancul face trei lucruri, în ordine: aplică TOATE migrările pe o bază goală,
   # provizionează un client cu `creeaza_client` ca la un client adevărat, apoi
-  # trece cele treisprezece verificări de izolare. Iese cu 1 dacă vreuna dă
-  # PICAT sau NECONCLUDENT.
+  # trece verificările de comportament (izolare, drepturi, depozit, structură —
+  # toate derivate din catalog, nu dintr-o listă). Iese cu 1 dacă vreuna dă
+  # PICAT, ATENȚIE sau NECONCLUDENT.
   # ==========================================================================
   migrari:
     runs-on: ubuntu-latest

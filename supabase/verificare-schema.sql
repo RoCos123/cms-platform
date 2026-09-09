@@ -22,7 +22,7 @@
 --     ÎN PLUS ÎN BAZĂ    — există în bază, dar nicio migrare nu-l creează.
 --                          De obicei ceva făcut de mână din tabloul de bord.
 --
--- NU MODIFICĂ NIMIC din date sau din schemă. Singura scriere e -ul
+-- NU MODIFICĂ NIMIC din date sau din schemă. Singura scriere e `search_path`-ul
 -- sesiunii, de mai jos, fără de care textele recompuse de Postgres s-ar putea
 -- scrie altfel aici decât pe bancul de pe care s-a luat amprenta.
 --

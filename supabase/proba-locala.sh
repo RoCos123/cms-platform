@@ -148,6 +148,7 @@ begin
     insert into public.blog_articles (site_id, slug, title, excerpt, content, status, author_id)
       values (s, 'primul', 'Primul articol', 'Extras.', 'Text.', 'published', u);
     insert into public.uploads (site_id, storage_path, filename, mime_type, size_bytes) values (s, s || '/poza.png', 'poza.png', 'image/png', 1000);
+    insert into storage.objects (bucket_id, name) values ('media', s || '/poza.png');
     insert into public.contact_messages (site_id, name, email, message) values (s, 'Vizitator', 'v@exemplu.ro', 'Bună ziua.');
     insert into public.appointments (site_id, name, email, starts_at, status) values (s, 'Vizitator', 'v@exemplu.ro', now(), 'ceruta');
     insert into public.audit_log (site_id, actor_id, action, entity_type) values (s, u, 'update', 'SiteContent');
@@ -186,7 +187,7 @@ psql -h "$SOCK" -U postgres -d postgres -f "$RADACINA/supabase/verificare-izolar
 #
 # Până acum scriptul doar TIPĂREA tabelul de mai sus și ieșea cu 0, chiar dacă o
 # verificare dădea PICAT. Adică bancul se sprijinea pe cineva care se uită atent
-# la douăsprezece rânduri — ceea ce merge când rulezi o dată și nu merge deloc
+# la fiecare rând — ceea ce merge când rulezi o dată și nu merge deloc
 # într-un CI, unde nimeni nu se uită dacă scrie „verde".
 #
 # `NECONCLUDENT` cade la fel ca `PICAT`, dinadins: o verificare care n-a putut

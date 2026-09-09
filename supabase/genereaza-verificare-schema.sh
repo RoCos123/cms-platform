@@ -128,7 +128,7 @@ cat <<CAP
 --     ÎN PLUS ÎN BAZĂ    — există în bază, dar nicio migrare nu-l creează.
 --                          De obicei ceva făcut de mână din tabloul de bord.
 --
--- NU MODIFICĂ NIMIC din date sau din schemă. Singura scriere e `search_path`-ul
+-- NU MODIFICĂ NIMIC din date sau din schemă. Singura scriere e \`search_path\`-ul
 -- sesiunii, de mai jos, fără de care textele recompuse de Postgres s-ar putea
 -- scrie altfel aici decât pe bancul de pe care s-a luat amprenta.
 --
@@ -216,6 +216,19 @@ COMPLET="$RADACINA/supabase/verificare-completa.sql"
 # exact felul de lucru care rămâne în urmă fără ca nimeni să bage de seamă.
 REZERVATE="$(sed -n '/ADRESE_REZERVATE = \[/,/\] as const;/p' "$RADACINA/src/lib/pagini.ts" \
   | grep -o '"[^"]*"' | tr '"' "'" | paste -sd, - | sed 's/,/, /g')"
+
+# Cheile secțiunilor cunoscute, din registrul de componente — al treilea loc în
+# care trăiește lista (după `metaSectiune` și `textul_de_pornire`), deci se
+# citește, nu se copiază. `site_content.key` n-are constrângere în tabel: un
+# rând cu o cheie străină se salvează liniștit și nu randează nimic.
+CHEI="$(sed -n '/^const REGISTRU/,/^};/p' "$RADACINA/src/components/site/render-sections.tsx" \
+  | grep -oE '^  "?[a-zA-Z][a-zA-Z0-9-]*"?:' | tr -d ' ":' | sort -u \
+  | sed "s/.*/'&'/" | paste -sd, - | sed 's/,/, /g')"
+if [ "$(echo "$CHEI" | tr ',' '\n' | wc -l)" -lt 10 ]; then
+  echo "Am găsit prea puține chei de secțiuni în registru: $CHEI" >&2
+  echo "S-a schimbat forma lui src/components/site/render-sections.tsx?" >&2
+  exit 1
+fi
 
 {
 cat <<CAP
@@ -378,6 +391,73 @@ from (
   where s.appointments_enabled
     and not exists (select 1 from public.site_content c
                      where c.site_id = s.id and c.key = 'programare')
+
+  union all
+  select 'Fiecare secțiune are o cheie pe care site-ul o știe randa', count(*),
+    'toate cheile sunt în registru',
+    coalesce(string_agg(s.domain || ' · ' || c.key, ', ' order by s.domain), '')
+  from public.site_content c join public.sites s on s.id = c.site_id
+  where c.key not in ($CHEI)
+
+  union all
+  select 'Nicio poză din secțiuni nu arată spre un fișier inexistent', count(*),
+    'fiecare uploadId din secțiuni are rândul lui în uploads',
+    coalesce(string_agg(distinct s.domain || ' · ' || c.key, ', '), '')
+  from public.site_content c
+  join public.sites s on s.id = c.site_id,
+  lateral jsonb_path_query(c.data, '\$.**.uploadId') as ref(v)
+  where jsonb_typeof(ref.v) = 'string'
+    and not exists (select 1 from public.uploads u where u.id::text = (ref.v #>> '{}'))
+
+  union all
+  select 'Fiecare fișier din tabel există și în depozit', count(*),
+    'niciun rând din uploads fără fișierul lui',
+    coalesce(string_agg(u.storage_path, ', ' order by u.storage_path), '')
+  from public.uploads u
+  where not exists (select 1 from storage.objects o
+                     where o.bucket_id = 'media' and o.name = u.storage_path)
+
+  union all
+  select 'Domeniile sunt scrise curat', count(*),
+    'litere mici, fără https://, fără bară, fără spații',
+    coalesce(string_agg(s.domain, ', ' order by s.domain), '')
+  from public.sites s
+  where s.domain <> lower(s.domain) or s.domain ~ '^[a-z]+://' or s.domain ~ '[/\s]'
+     or s.domain ~ '\.\$' or s.domain ~ '^\.'
+
+  union all
+  select 'Niciun domeniu scris de două ori, cu alte litere', count(*),
+    'niciunul',
+    coalesce(string_agg(d.domenii, '; '), '')
+  from (select string_agg(s.domain, ' / ') as domenii
+          from public.sites s group by lower(s.domain) having count(*) > 1) d
+
+  union all
+  select 'Nicio secțiune vizibilă și goală pe un site publicat', count(*),
+    'niciuna — vizitatorul nu vede benzi goale',
+    coalesce(string_agg(s.domain || ' · ' || c.key, ', ' order by s.domain), '')
+  from public.site_content c join public.sites s on s.id = c.site_id
+  where s.published_at is not null and c.visible and c.data = '{}'::jsonb
+    -- „programare" se randează din programul de lucru, nu din data: `{}` e
+    -- starea ei normală, pusă de declanșator când se pornește modulul.
+    and c.key <> 'programare'
+
+  union all
+  select 'Fiecare site publicat are politica de confidențialitate publicată', count(*),
+    'toate — legea o cere înainte de a strânge date prin formulare',
+    coalesce(string_agg(s.domain, ', ' order by s.domain), '')
+  from public.sites s
+  where s.published_at is not null
+    and not exists (select 1 from public.pages p
+                     where p.site_id = s.id and p.slug = 'politica-de-confidentialitate'
+                       and p.status = 'published')
+
+  union all
+  select 'Conturile de login sunt legate de un site', count(*),
+    'toate conturile au site',
+    coalesce(string_agg(a.email, ', ' order by a.email), '')
+  from auth.users a
+  where not exists (select 1 from public.users u where u.id = a.id)
 ) v
 
 ) tot

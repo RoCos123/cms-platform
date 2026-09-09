@@ -220,7 +220,7 @@ două săptămâni distanță.
 
 ---
 
-## O probă care scrie pe banc scrie și pe producție
+## O probă care scrie nu pune la loc — se anulează
 
 9 sept. 2026, cu o clipă înainte de prima rulare a verificării de izolare pe baza
 reală. Două dintre probele ei TREBUIE să reușească — clientul chiar are voie
@@ -236,11 +236,17 @@ A treia probă punea domeniul la loc pe o valoare SCRISĂ DE MÂNĂ (`client-a.r
 adică cea a clientului de test. Pe producție ar fi mutat un cabinet pe un domeniu
 străin.
 
-Regula: **orice probă care scrie își ia întâi valorile și le pune la loc după —
-pe cele adevărate, citite din bază, nu pe cele pe care le are bancul.** Iar
-restaurarea se citește înapoi și se raportează ca verificare de sine stătătoare:
-una care eșuează tăcut lasă un cabinet publicat din greșeală, iar nimeni n-ar afla
-decât uitându-se la site.
+Prima reparație a fost „ia valorile înainte, pune-le la loc după". A trăit o
+oră. Se sprijinea tot pe cineva care își aduce aminte — la a treia probă nouă,
+cineva n-ar mai fi făcut-o.
+
+Regula, a doua și cea care rămâne: **o probă care scrie nu pune la loc — se
+ANULEAZĂ, prin construcție.** Rulează într-o sub-tranzacție încheiată cu o eroare
+a noastră (`raise sqlstate 'V0RBK'`), deci se anulează și când apărarea a ținut,
+și când n-a ținut. Nu există nimic de pus la loc, fiindcă nu s-a scris nimic.
+Iar la sfârșit, verificarea numără din nou rândurile din fiecare tabel și le
+compară cu cele de la început — dovada se citește, nu se presupune, și e singura
+care ar prinde o probă viitoare scrisă fără sub-tranzacție.
 
 Ce o face ușor de ratat: bancul nu poate arăta niciodată problema asta. Acolo
 datele sunt de aruncat, deci lipsa restaurării arată exact ca prezența ei.

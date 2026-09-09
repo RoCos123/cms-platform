@@ -1,5 +1,6 @@
 -- ============================================================================
--- Verificare: datele unui client nu ajung niciodată la alt client.
+-- Verificare de comportament: datele unui client nu ajung la alt client, și
+-- nimeni nu poate face ce n-are voie — DOVEDIT încercând, nu citind.
 --
 -- E aceeași verificare pe care o face `e2e/tenant-rls.spec.ts`, dar rescrisă
 -- ca să poată fi rulată direct în SQL Editor din Supabase — fără terminal,
@@ -7,19 +8,25 @@
 --
 -- CUM SE RULEAZĂ
 --   Supabase → SQL Editor → New query → lipești TOT fișierul → Run.
---   Rezultatul e un tabel cu o linie per verificare și verdictul ei.
+--   Fără text selectat. Rezultatul e un tabel cu o linie per verificare.
 --
---   „Fără date la alt client" nu e o eroare și nici o slăbiciune a bazei: e un
---   tabel în care NIMENI altcineva n-are rânduri, deci nu există ce să scape.
---   Ca acoperirea să fie completă, măcar unul dintre clienții de test ar trebui
---   să aibă un rând în fiecare tabel.
+-- NU LASĂ NIMIC ÎN URMĂ — prin construcție, nu prin grijă. Fiecare probă care
+-- scrie rulează într-o sub-tranzacție care se ANULEAZĂ întotdeauna: și când
+-- apărarea a ținut, și când n-a ținut. Nu există „pune la loc", fiindcă nu
+-- rămâne nimic de pus la loc. Iar la sfârșit se numără din nou rândurile din
+-- fiecare tabel și rândul clientului de probă, și se compară cu cele de la
+-- început — dovada se citește, nu se presupune. Înainte de 9 sept. 2026,
+-- verificarea asta chiar scria într-un rând adevărat și-l lăsa așa.
 --
--- NU MODIFICĂ NIMIC. Singura scriere pe care o încearcă e una care TREBUIE să
--- fie respinsă; dacă totuși trece, rândul se șterge imediat și verificarea e
--- marcată PICAT.
+-- PRINDE ȘI CE N-A PREVĂZUT NIMENI. Nicio listă de tabele, coloane, funcții
+-- sau depozite nu e scrisă aici de mână: se iau din catalog. Un tabel adăugat
+-- mâine fără RLS, o coloană nouă pe `sites` dată din greșeală clientului, o
+-- funcție `security definer` chemabilă din browser — toate sunt prinse fără ca
+-- cineva să le fi trecut undeva.
 --
--- Are nevoie de CEL PUȚIN DOI clienți în tabelul `sites`, fiecare cu userul
--- lui. Cu unul singur n-are ce compara și ți-o spune, în loc să treacă degeaba.
+-- CU UN SINGUR CLIENT în bază, comparațiile între clienți se sar și scriu
+-- „NU SE POATE"; restul rulează. Un tabel gol ar fi fost mai rău: se citește
+-- ușor drept „e bine".
 -- ============================================================================
 
 create or replace function pg_temp.verifica_izolarea()
@@ -30,20 +37,36 @@ declare
   user_a uuid; site_a uuid;
   user_b uuid; site_b uuid;
   al_lui uuid; site_lui uuid;
-  randuri bigint; straine bigint;
+  randuri bigint; straine bigint; ale_altora bigint;
   dovedite int; fara_ce int; refuzate int;
-  ale_altora bigint;
-  -- Valorile ADEVĂRATE ale rândului pe care scriu probele de mai jos. Se iau
-  -- înainte de orice schimbare de rol și se pun la loc după.
-  publicat_inainte timestamptz; nume_inainte text;
-  domeniu_inainte text; modul_inainte boolean;
   tabel text; coloana text;
-  scurgeri text := '';
-  netestate text := '';
-  refuzuri text := '';
+  scurgeri text; netestate text; refuzuri text; lista text;
+  scriibile text[] := '{}';
+  -- Fotografiile de la început, pentru plasa de siguranță de la sfârșit.
+  inainte jsonb := '{}'; dupa jsonb := '{}';
+  rand_inainte jsonb; rand_dupa jsonb;
 begin
   -- --------------------------------------------------------------------------
-  -- Doi useri din site-uri diferite. Fără ei, restul n-ar dovedi nimic.
+  -- 0. Fotografia de la început: câte rânduri are fiecare tabel.
+  --
+  -- Se compară la sfârșit. Dacă vreo probă ar lăsa ceva în urmă — inclusiv una
+  -- scrisă greșit de acum înainte — aici se vede, cu numele tabelului.
+  -- --------------------------------------------------------------------------
+  for tabel in
+    select format('%I.%I', n.nspname, c.relname)
+    from pg_class c join pg_namespace n on n.oid = c.relnamespace
+    where c.relkind = 'r'
+      and (n.nspname = 'public'
+           or (n.nspname = 'storage' and c.relname in ('objects', 'buckets'))
+           or (n.nspname = 'auth' and c.relname = 'users'))
+    order by 1
+  loop
+    execute format('select count(*) from %s', tabel) into randuri;
+    inainte := inainte || jsonb_build_object(tabel, randuri);
+  end loop;
+
+  -- --------------------------------------------------------------------------
+  -- 1. Doi useri din site-uri diferite.
   -- --------------------------------------------------------------------------
   select u.id, u.site_id into user_a, site_a
   from public.users u order by u.site_id, u.id limit 1;
@@ -51,8 +74,6 @@ begin
   select u.id, u.site_id into user_b, site_b
   from public.users u where u.site_id <> site_a order by u.site_id, u.id limit 1;
 
-  -- Fără NICIUN client nu se poate verifica nimic: toate probele de mai jos
-  -- pleacă de la un site adevărat.
   if user_a is null then
     return query select
       'Doi clienți de comparat'::text,
@@ -61,13 +82,6 @@ begin
     return;
   end if;
 
-  -- Cu UNUL singur, se sare doar peste ce cere doi, și se spune pe față.
-  --
-  -- Înainte se oprea tot, ceea ce pe baza reală însemna un tabel gol în loc de
-  -- verificări — adică exact felul de „n-a spus nimic" care se citește ușor
-  -- drept „e bine". Restul probelor (vizitatorul anonim, drepturile pe coloane,
-  -- funcțiile, depozitul) nu cer doi clienți și chiar acolo stau găurile găsite
-  -- pe 9 sept. 2026.
   if user_b is null then
     return query select
       'Doi clienți de comparat'::text,
@@ -78,63 +92,45 @@ begin
       format('%s și %s', site_a, site_b);
   end if;
 
-  -- --------------------------------------------------------------------------
-  -- Ce scriu probele de mai jos, păstrat ca să poată fi pus la loc.
-  --
-  -- Două dintre verificări TREBUIE să reușească — clientul chiar are voie să-și
-  -- publice site-ul și să-și salveze numele cabinetului — deci ele schimbă un
-  -- rând adevărat. Pe bancul local acolo e un client de probă și nu contează.
-  -- Pe baza reală e un cabinet al cuiva: fără rândurile astea, verificarea i-ar
-  -- PUBLICA site-ul nepublicat și i-ar scrie „Verificare izolare" în loc de
-  -- numele lui, pe site și în datele pentru Google. Găsit pe 9 sept. 2026,
-  -- înainte de prima rulare pe producție.
-  -- --------------------------------------------------------------------------
-  select s.published_at, s.name, s.domain, s.appointments_enabled
-    into publicat_inainte, nume_inainte, domeniu_inainte, modul_inainte
-    from public.sites s where s.id = site_a;
+  select to_jsonb(s) into rand_inainte from public.sites s where s.id = site_a;
 
   -- --------------------------------------------------------------------------
-  -- Fiecare client, logat, vede DOAR datele lui — în TOATE tabelele.
+  -- 2. Fiecare client, logat, vede DOAR datele lui — în TOATE tabelele care au
+  --    `site_id`, luate din catalog, nu dintr-o listă.
   --
   -- Interogări fără niciun filtru: dacă o politică ar fi greșită, rândurile
-  -- celuilalt client ar ieși la iveală.
-  --
-  -- Un tabel gol pentru clientul de test nu e o eroare, dar nici nu dovedește
-  -- nimic — de asta îl numărăm separat, în loc să-l trecem drept „OK".
+  -- celuilalt client ar ieși la iveală. Un tabel gol la clientul de test nu e
+  -- o eroare, dar nici nu dovedește nimic — se numără separat.
   -- --------------------------------------------------------------------------
   for i in 1..(case when user_b is null then 1 else 2 end) loop
     al_lui   := case when i = 1 then user_a else user_b end;
     site_lui := case when i = 1 then site_a else site_b end;
-    dovedite := 0;
-    fara_ce := 0;
-    refuzate := 0;
-    scurgeri := '';
-    netestate := '';
-    refuzuri := '';
+    dovedite := 0; fara_ce := 0; refuzate := 0;
+    scurgeri := ''; netestate := ''; refuzuri := '';
 
-    foreach tabel in array array[
-      'sites', 'users', 'site_content', 'site_settings', 'pages', 'services',
-      'blog_categories', 'blog_articles', 'uploads', 'contact_messages',
-      'appointments', 'audit_log', 'page_views_daily'
-    ] loop
+    for tabel in
+      select c.relname
+      from pg_class c join pg_namespace n on n.oid = c.relnamespace
+      where n.nspname = 'public' and c.relkind = 'r'
+        and (c.relname = 'sites' or exists (
+          select 1 from pg_attribute a
+          where a.attrelid = c.oid and a.attname = 'site_id'
+            and a.attnum > 0 and not a.attisdropped))
+      order by 1
+    loop
       -- În `sites`, clientul E rândul; în rest, îl arată coloana `site_id`.
       coloana := case when tabel = 'sites' then 'id' else 'site_id' end;
 
-      -- Câte rânduri ale ALTOR clienți există în tabel, văzute cu ochii bazei
-      -- (rolul curent e încă cel privilegiat la momentul apelului de mai jos).
-      --
-      -- Ăsta e numărul care hotărăște dacă verificarea dovedește ceva. Un tabel
-      -- gol la clientul nostru NU e „nedovedit", dacă altcineva are rânduri
-      -- acolo: tocmai faptul că nu le vede e dovada. Nedovedit e doar tabelul în
-      -- care nimeni altcineva n-are nimic — acolo n-are ce să scape.
+      -- Câte rânduri ale ALTOR clienți există, văzute cu ochii bazei. Ăsta e
+      -- numărul care hotărăște dacă verificarea dovedește ceva: un tabel în
+      -- care nimeni altcineva n-are nimic n-are ce să scape.
       execute format(
         'select count(*) from public.%I where %I is distinct from $1', tabel, coloana
       ) into ale_altora using site_lui;
 
       begin
         perform set_config('role', 'authenticated', true);
-        perform set_config(
-          'request.jwt.claims',
+        perform set_config('request.jwt.claims',
           json_build_object('sub', al_lui, 'role', 'authenticated')::text, true);
 
         execute format(
@@ -153,12 +149,8 @@ begin
           netestate := netestate || tabel || ', ';
         end if;
       exception when others then
-        -- ATENȚIE: aici refuzul NU e un răspuns bun.
-        --
-        -- Prima variantă a verificării îl număra ca reușită, „n-are voie nici să
-        -- întrebe" — și așa a trecut o politică stricată dinadins, fără să o
-        -- prindă. Un client care nu-și poate citi PROPRIILE date n-are izolare
-        -- bună; are panoul rupt. Se raportează separat.
+        -- Refuzul NU e un răspuns bun aici: un client care nu-și poate citi
+        -- PROPRIILE date n-are izolare bună, are panoul rupt.
         perform set_config('role', 'postgres', true);
         refuzate := refuzate + 1;
         refuzuri := refuzuri || tabel || ', ';
@@ -186,26 +178,61 @@ begin
   end loop;
 
   -- --------------------------------------------------------------------------
-  -- Un vizitator anonim nu poate citi nimic cu cheia publică.
+  -- 3. Orice tabel din `public` aparține unui client.
+  --
+  -- Un tabel fără `site_id` nu poate fi izolat pe client, deci ori e o
+  -- greșeală, ori e ceva ce trebuie hotărât pe față. Bucla de mai sus l-ar fi
+  -- sărit în tăcere; aici se numește.
+  -- --------------------------------------------------------------------------
+  select string_agg(c.relname, ', ' order by c.relname) into lista
+  from pg_class c join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public' and c.relkind = 'r' and c.relname <> 'sites'
+    and not exists (
+      select 1 from pg_attribute a
+      where a.attrelid = c.oid and a.attname = 'site_id'
+        and a.attnum > 0 and not a.attisdropped);
+
+  return query select
+    'Orice tabel aparține unui client'::text,
+    case when lista is null then 'OK' else 'ATENȚIE' end::text,
+    coalesce('tabele fără site_id, pe care izolarea nu le poate apăra: ' || lista,
+             'toate tabelele au site_id')::text;
+
+  -- --------------------------------------------------------------------------
+  -- 4. RLS e pornit pe fiecare tabel din `public`.
+  --
+  -- Fără RLS, politicile nu contează: tabelul e deschis cu totul pentru
+  -- oricine are drept de citire — și drept de citire au toți, din start.
+  -- --------------------------------------------------------------------------
+  select string_agg(c.relname, ', ' order by c.relname) into lista
+  from pg_class c join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public' and c.relkind = 'r' and not c.relrowsecurity;
+
+  return query select
+    'RLS e pornit pe fiecare tabel'::text,
+    case when lista is null then 'OK' else 'PICAT' end::text,
+    coalesce('tabele cu RLS OPRIT: ' || lista, 'toate tabelele au RLS pornit')::text;
+
+  -- --------------------------------------------------------------------------
+  -- 5. Un vizitator anonim nu poate citi nimic, din niciun tabel.
   --
   -- Cheia publishable stă în codul fiecărui site, deci oricine o poate lua.
-  -- După migrarea de întărire, rolul `anon` n-are voie la niciun tabel de date.
+  -- Lista tabelelor vine din catalog: unul nou, fără politici, e prins aici.
   -- --------------------------------------------------------------------------
+  scurgeri := '';
   perform set_config('role', 'anon', true);
 
-  foreach tabel in array array[
-    'sites', 'users', 'site_content', 'site_settings', 'pages', 'services',
-    'blog_categories', 'blog_articles', 'uploads', 'contact_messages',
-    'appointments', 'audit_log', 'page_views_daily'
-  ] loop
+  for tabel in
+    select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace
+    where n.nspname = 'public' and c.relkind = 'r' order by 1
+  loop
     begin
       execute format('select count(*) from public.%I', tabel) into randuri;
       if randuri > 0 then
-        scurgeri := scurgeri || tabel || ' (' || randuri || ' rânduri), ';
+        scurgeri := scurgeri || format('%s (%s rânduri), ', tabel, randuri);
       end if;
     exception when others then
-      -- Refuzul e răspunsul bun: înseamnă că nici măcar n-are voie să întrebe.
-      null;
+      null;  -- refuzul e răspunsul bun: nici măcar n-are voie să întrebe
     end;
   end loop;
 
@@ -217,215 +244,147 @@ begin
     case when scurgeri = '' then 'niciun tabel nu întoarce rânduri'
          else 'citește din: ' || rtrim(scurgeri, ', ') end::text;
 
-  -- --------------------------------------------------------------------------
-  -- Un vizitator anonim nu poate scrie în inboxul nimănui.
-  --
-  -- Inserarea anonimă era `with check (true)`: oricine putea fabrica mesaje în
-  -- contul oricărui client. Formularele publice trec acum prin server, care
-  -- pune el `site_id`-ul.
-  -- --------------------------------------------------------------------------
-  perform set_config('role', 'anon', true);
-
+  -- Și conturile de login, care nu stau în `public`: un client conectat nu
+  -- are ce căuta în lista tuturor conturilor platformei.
   begin
+    perform set_config('role', 'authenticated', true);
+    perform set_config('request.jwt.claims',
+      json_build_object('sub', user_a, 'role', 'authenticated')::text, true);
+    execute 'select count(*) from auth.users' into randuri;
+    perform set_config('role', 'postgres', true);
+    return query select
+      'Un client nu poate citi conturile platformei'::text,
+      'PICAT'::text,
+      format('a citit auth.users: %s conturi', randuri)::text;
+  exception when others then
+    perform set_config('role', 'postgres', true);
+    return query select
+      'Un client nu poate citi conturile platformei'::text,
+      'OK'::text,
+      'respins: ' || SQLERRM;
+  end;
+
+  -- --------------------------------------------------------------------------
+  -- 6. Un vizitator anonim nu poate scrie în inboxul nimănui.
+  --
+  -- Prima probă care SCRIE. Rulează într-o sub-tranzacție încheiată cu o
+  -- eroare a noastră (`V0RBK`), deci se anulează și când inserarea a trecut.
+  -- Nu se șterge nimic după, fiindcă nu rămâne nimic.
+  -- --------------------------------------------------------------------------
+  begin
+    perform set_config('role', 'anon', true);
     insert into public.contact_messages (site_id, name, email, message)
     values (site_a, 'VERIFICARE-IZOLARE', 'verificare@exemplu.ro', 'Ar fi trebuit respins.');
-
-    -- Am ajuns aici: inserarea a trecut, ceea ce e o problemă. Ștergem urma cu
-    -- rolul privilegiat — `anon` n-are drept de ștergere, deci ar rămâne acolo.
-    perform set_config('role', 'postgres', true);
-    delete from public.contact_messages where name = 'VERIFICARE-IZOLARE';
-
-    return query select
-      'Un vizitator anonim nu poate trimite mesaje direct în bază'::text,
-      'PICAT'::text,
-      'inserarea a trecut — spam țintit posibil (rândul de test a fost șters)'::text;
-  exception when others then
-    perform set_config('role', 'postgres', true);
-    return query select
-      'Un vizitator anonim nu poate trimite mesaje direct în bază'::text,
-      'OK'::text,
-      'respins: ' || SQLERRM;
+    raise sqlstate 'V0RBK';
+  exception
+    when sqlstate 'V0RBK' then
+      perform set_config('role', 'postgres', true);
+      return query select
+        'Un vizitator anonim nu poate trimite mesaje direct în bază'::text,
+        'PICAT'::text,
+        'inserarea a trecut (anulată, n-a rămas nimic)'::text;
+    when others then
+      perform set_config('role', 'postgres', true);
+      return query select
+        'Un vizitator anonim nu poate trimite mesaje direct în bază'::text,
+        'OK'::text,
+        'respins: ' || SQLERRM;
   end;
 
   -- --------------------------------------------------------------------------
-  -- Un vizitator anonim nu poate umfla cifrele nimănui.
+  -- 7. Un vizitator anonim nu poate umfla cifrele de trafic.
   --
-  -- `inregistreaza_afisarea` e `security definer`, adică rulează cu drepturi
-  -- depline peste un tabel care n-are nicio politică de scriere. Dacă dreptul
-  -- de execuție ar ajunge la rolurile din browser, oricine deschide site-ul ar
-  -- putea chema funcția într-o buclă și scrie ce cifre vrea în panoul
-  -- clientului — sau, mai rău, în al altui client, dându-i alt `site_id`.
+  -- `inregistreaza_afisarea` e `security definer`: dacă anon o poate chema,
+  -- scrie în panoul oricărui cabinet, cu orice `site_id`. Pe 9 sept. 2026 chiar
+  -- putea, în producție, deși pe banc trecea.
   -- --------------------------------------------------------------------------
-  perform set_config('role', 'anon', true);
-
   begin
+    perform set_config('role', 'anon', true);
     perform public.inregistreaza_afisarea(site_a, current_date, '/verificare-izolare');
-
-    perform set_config('role', 'postgres', true);
-    delete from public.page_views_daily where path = '/verificare-izolare';
-
-    return query select
-      'Un vizitator anonim nu poate umfla cifrele de trafic'::text,
-      'PICAT'::text,
-      'a putut chema inregistreaza_afisarea (rândul de test a fost șters)'::text;
-  exception when others then
-    perform set_config('role', 'postgres', true);
-    return query select
-      'Un vizitator anonim nu poate umfla cifrele de trafic'::text,
-      'OK'::text,
-      'respins: ' || SQLERRM;
+    raise sqlstate 'V0RBK';
+  exception
+    when sqlstate 'V0RBK' then
+      perform set_config('role', 'postgres', true);
+      return query select
+        'Un vizitator anonim nu poate umfla cifrele de trafic'::text,
+        'PICAT'::text,
+        'a putut chema inregistreaza_afisarea (anulat, n-a rămas nimic)'::text;
+    when others then
+      perform set_config('role', 'postgres', true);
+      return query select
+        'Un vizitator anonim nu poate umfla cifrele de trafic'::text,
+        'OK'::text,
+        'respins: ' || SQLERRM;
   end;
 
   -- --------------------------------------------------------------------------
-  -- Un client nu-și poate porni singur un modul plătit.
+  -- 8. În `sites`, clientul scrie EXACT unde are voie: `name` și `published_at`.
   --
-  -- Modulele stau în coloane pe `sites`, iar apărarea lor NU e o politică RLS
-  -- scrisă de noi, ci dreptul de scriere dat pe coloane în migrarea de
-  -- întărire: `grant update (name)`, nimic altceva. Verificarea asta există
-  -- fiindcă e o apărare ușor de pierdut din greșeală — un `grant update on
-  -- public.sites` scris cândva, ca să meargă altceva, ar deschide-o în tăcere,
-  -- iar Programările ar deveni gratuite pentru oricine se pricepe puțin.
+  -- Apărarea de aici nu e RLS, ci dreptul de scriere dat pe coloane. Se
+  -- încearcă FIECARE coloană din catalog, cu `set coloana = coloana` — o
+  -- scriere care nu schimbă valoarea, dar trece prin aceeași verificare de
+  -- drept — și tot într-o sub-tranzacție anulată. Greșit într-o parte,
+  -- clientul își schimbă domeniul sau își pornește singur un modul plătit;
+  -- greșit în cealaltă, nu-și mai poate publica site-ul și panoul dă eroare.
+  -- O coloană nouă e verificată fără ca cineva s-o fi trecut aici.
   -- --------------------------------------------------------------------------
-  perform set_config('role', 'authenticated', true);
-  perform set_config(
-    'request.jwt.claims',
-    json_build_object('sub', (select id from public.users where site_id = site_a limit 1))::text,
-    true
-  );
-
-  -- Domeniul: aceeași apărare, o miză mai mare. Dacă un client și-ar putea
-  -- schimba domeniul, și-ar muta site-ul pe orice adresă neocupată — iar dacă
-  -- unicitatea ar cădea vreodată, pe a altcuiva. CONTEXT.md spune de mult că
-  -- „domeniul e blocat prin grant"; până acum nu se putea dovedi, fiindcă
-  -- bancul local ștergea granturile pe coloane după migrări.
-  begin
-    update public.sites set domain = 'furat-de-client.ro' where id = site_a;
-
+  scriibile := '{}';
+  for coloana in
+    select a.attname from pg_attribute a
+    where a.attrelid = 'public.sites'::regclass and a.attnum > 0 and not a.attisdropped
+    order by a.attnum
+  loop
+    begin
+      perform set_config('role', 'authenticated', true);
+      perform set_config('request.jwt.claims',
+        json_build_object('sub', user_a, 'role', 'authenticated')::text, true);
+      execute format('update public.sites set %I = %I where id = $1', coloana, coloana)
+        using site_a;
+      raise sqlstate 'V0RBK';
+    exception
+      when sqlstate 'V0RBK' then scriibile := scriibile || coloana;
+      when others then null;
+    end;
     perform set_config('role', 'postgres', true);
-    update public.sites set domain = domeniu_inainte where id = site_a;
-
-    return query select
-      'Un client nu-și poate schimba singur domeniul'::text,
-      'PICAT'::text,
-      'și-a mutat site-ul pe alt domeniu (pus la loc)'::text;
-  exception when others then
-    return query select
-      'Un client nu-și poate schimba singur domeniul'::text,
-      'OK'::text,
-      'respins: ' || SQLERRM;
-  end;
-
-  -- Publicarea TREBUIE să se poată face de client: comutatorul de lansare e al
-  -- lui, iar dacă dreptul pe coloană se pierde vreodată, butonul din Setări ar
-  -- eșua tăcut și clientul n-ar mai putea da drumul site-ului fără să sune.
-  begin
-    update public.sites set published_at = now() where id = site_a;
-
-    return query select
-      'Clientul își poate publica singur site-ul'::text,
-      'OK'::text,
-      'coloana published_at rămâne scriibilă, cum trebuie'::text;
-  exception when others then
-    return query select
-      'Clientul își poate publica singur site-ul'::text,
-      'PICAT'::text,
-      'nu și-a putut publica site-ul: ' || SQLERRM;
-  end;
-
-  -- Numele, în schimb, TREBUIE să se poată salva: e singura coloană din `sites`
-  -- pe care clientul o editează, din Setări. O apărare care blochează și asta
-  -- ar strica ecranul, nu l-ar apăra.
-  begin
-    update public.sites set name = 'Verificare izolare' where id = site_a;
-
-    return query select
-      'Clientul își poate salva numele cabinetului'::text,
-      'OK'::text,
-      'coloana name rămâne scriibilă, cum trebuie'::text;
-  exception when others then
-    return query select
-      'Clientul își poate salva numele cabinetului'::text,
-      'PICAT'::text,
-      'apărarea a mers prea departe: ' || SQLERRM;
-  end;
-
-  begin
-    update public.sites set appointments_enabled = true where id = site_a;
-
-    perform set_config('role', 'postgres', true);
-    update public.sites set appointments_enabled = modul_inainte where id = site_a;
-
-    return query select
-      'Un client nu-și poate porni singur un modul plătit'::text,
-      'PICAT'::text,
-      'și-a pornit singur Programările (pus la loc pe oprit)'::text;
-  exception when others then
-    perform set_config('role', 'postgres', true);
-    return query select
-      'Un client nu-și poate porni singur un modul plătit'::text,
-      'OK'::text,
-      'respins: ' || SQLERRM;
-  end;
-
-  -- --------------------------------------------------------------------------
-  -- Rândul clientului, pus la loc — și DOVEDIT că e la loc.
-  --
-  -- Nu e curățenie, e condiția ca verificarea să poată fi rulată pe baza reală.
-  -- Verdictul e citit din bază după scriere, nu presupus: o restaurare care
-  -- eșuează tăcut ar lăsa un cabinet publicat din greșeală sau botezat aiurea,
-  -- iar nimeni n-ar afla decât uitându-se la site.
-  -- --------------------------------------------------------------------------
-  perform set_config('role', 'postgres', true);
-  update public.sites
-     set published_at = publicat_inainte,
-         name         = nume_inainte,
-         domain       = domeniu_inainte,
-         appointments_enabled = modul_inainte
-   where id = site_a;
+  end loop;
 
   return query select
-    'Rândul clientului e pus la loc'::text,
-    case when exists (
-      select 1 from public.sites s
-       where s.id = site_a
-         and s.published_at is not distinct from publicat_inainte
-         and s.name = nume_inainte
-         and s.domain = domeniu_inainte
-         and s.appointments_enabled is not distinct from modul_inainte
-    ) then 'OK' else 'PICAT' end::text,
-    format('nume, domeniu, publicare și modulul plătit, ca înainte (%s)',
-           coalesce(nume_inainte, '—'))::text;
+    'Clientul scrie în sites doar unde are voie'::text,
+    case when scriibile @> array['name', 'published_at']
+          and array['name', 'published_at'] @> scriibile
+      then 'OK' else 'PICAT' end::text,
+    case
+      when not (scriibile @> array['name', 'published_at']) then
+        format('nu-și poate scrie %s — Setările ar da eroare la salvare sau la publicare',
+          array_to_string(array(select x from unnest(array['name', 'published_at']) x
+                                where not x = any(scriibile)), ', '))
+      when not (array['name', 'published_at'] @> scriibile) then
+        format('POATE SCRIE ȘI: %s',
+          array_to_string(array(select x from unnest(scriibile) x
+                                where x not in ('name', 'published_at')), ', '))
+      else 'poate scrie name și published_at, nimic altceva'
+    end::text;
 
   -- --------------------------------------------------------------------------
-  -- Un client nu poate provizona site-uri.
-  --
-  -- `creeaza_client` face site-uri și leagă conturi de login. Un client care ar
-  -- putea s-o cheme și-ar face singur al doilea site — sau ar lega contul
-  -- altcuiva de site-ul lui. Apărarea e un `revoke execute … from public`.
-  --
-  -- Rolul se pune AICI, explicit, nu se moștenește: blocul dinainte îl reface
-  -- la `postgres` în handlerul lui de eroare. Prima variantă a verificării ăsteia
-  -- rula ca proprietar și trecea senin — respinsă, dar pentru cu totul alt
-  -- motiv (un email inexistent), adică fix genul de probă care nu dovedește
-  -- nimic.
+  -- 9. Un client nu poate provizona site-uri.
   --
   -- Se cere codul 42501 (`insufficient_privilege`), nu orice eroare: cu „orice
   -- eroare", un email greșit din argumente ar fi arătat tot ca o apărare care
-  -- ține.
+  -- ține. Dacă apelul trece, sub-tranzacția se anulează: site-ul făcut dispare.
   -- --------------------------------------------------------------------------
-  perform set_config('role', 'authenticated', true);
-
   begin
+    perform set_config('role', 'authenticated', true);
+    perform set_config('request.jwt.claims',
+      json_build_object('sub', user_a, 'role', 'authenticated')::text, true);
     perform public.creeaza_client('furat.example.com', 'Furat', 'nimeni@example.com');
-
-    perform set_config('role', 'postgres', true);
-    delete from public.sites where domain = 'furat.example.com';
-
-    return query select
-      'Un client nu poate provizona site-uri'::text,
-      'PICAT'::text,
-      'a putut chema creeaza_client (site-ul făcut a fost șters)'::text;
+    raise sqlstate 'V0RBK';
   exception
+    when sqlstate 'V0RBK' then
+      perform set_config('role', 'postgres', true);
+      return query select
+        'Un client nu poate provizona site-uri'::text,
+        'PICAT'::text,
+        'a putut chema creeaza_client (anulat, site-ul făcut n-a rămas)'::text;
     when insufficient_privilege then
       perform set_config('role', 'postgres', true);
       return query select
@@ -440,53 +399,145 @@ begin
         'respinsă din alt motiv decât lipsa dreptului: ' || SQLERRM;
   end;
 
-  perform set_config('role', 'postgres', true);
+  -- --------------------------------------------------------------------------
+  -- 10. Nicio funcție `security definer` nu e chemabilă din browser.
+  --
+  -- O astfel de funcție rulează cu drepturile proprietarului bazei, ocolind
+  -- RLS. Chemabilă cu cheia anon sau de un client conectat, face ce-i spune
+  -- oricine. Se uită la TOATE funcțiile din catalog, prin `has_function_privilege`,
+  -- care socotește și PUBLIC, și moștenirea prin roluri.
+  --
+  -- Două excepții, structurale, nu pe nume: funcțiile de declanșator (Postgres
+  -- refuză apelul direct) și `current_site_id`, pe care o cheamă chiar
+  -- politicile RLS sub rolul clientului.
+  -- --------------------------------------------------------------------------
+  select string_agg(format('%s (%s)', p.proname,
+    concat_ws(', ', case when has_function_privilege('anon', p.oid, 'execute') then 'anon' end,
+                    case when has_function_privilege('authenticated', p.oid, 'execute') then 'authenticated' end)),
+    '; ' order by p.proname) into lista
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname = 'public' and p.prosecdef
+    and p.prorettype <> 'trigger'::regtype
+    and p.proname <> 'current_site_id'
+    and (has_function_privilege('anon', p.oid, 'execute')
+         or has_function_privilege('authenticated', p.oid, 'execute'));
+
+  return query select
+    'Nicio funcție security definer nu e chemabilă din browser'::text,
+    case when lista is null then 'OK' else 'PICAT' end::text,
+    coalesce('chemabile: ' || lista, 'niciuna, în afara celor hotărâte')::text;
 
   -- --------------------------------------------------------------------------
-  -- 11. Depozitul de fișiere e privat.
+  -- 11. Depozitul de fișiere: TOATE bucket-urile sunt private.
   --
-  -- Verificat în sursa serviciului de Storage: `/object/public/…` rulează prin
-  -- `asSuperUser()` și se uită DOAR la steagul `public` al bucket-ului, nicio
-  -- politică nu-l poate opri. Cât timp steagul e aprins, orice fișier al
-  -- oricărui cabinet e citibil de oricine îi știe adresa — deci steagul e
-  -- verificarea, nu politicile.
+  -- `/object/public/…` se uită DOAR la steagul `public` al bucket-ului; nicio
+  -- politică nu-l poate opri. Deci steagul e verificarea. Se iau toate din
+  -- catalog: unul nou, făcut public din tabloul de bord, e prins aici.
   -- --------------------------------------------------------------------------
-  return query
-  select
+  select string_agg(b.id, ', ' order by b.id) into lista from storage.buckets b where b.public;
+
+  return query select
     'Depozitul de fișiere e privat'::text,
-    case when exists (select 1 from storage.buckets where id = 'media' and public)
-      then 'PICAT' else 'OK' end,
-    case when exists (select 1 from storage.buckets where id = 'media' and public)
-      then 'bucket-ul media e încă public: oricine îi știe adresa citește orice fișier'
-      else 'bucket-ul media are public = false' end;
+    case when lista is null then 'OK' else 'PICAT' end::text,
+    coalesce('bucket-uri PUBLICE, citibile de oricine le știe adresa: ' || lista,
+             format('toate cele %s bucket-uri au public = false',
+                    (select count(*) from storage.buckets)))::text;
 
   -- --------------------------------------------------------------------------
-  -- 12. Un vizitator nu poate LISTA fișierele nimănui.
+  -- 12. Un vizitator nu poate nici lista, nici atinge fișierele nimănui.
   --
-  -- Listarea (`/object/list/…`) rulează sub rolul celui care cere, deci trece
-  -- prin politici. O politică de `select` care îl prinde pe `anon` înseamnă că
-  -- un străin poate cere catalogul tuturor fișierelor tuturor cabinetelor — ăsta
-  -- a fost chiar riscul găsit la 28 aug. 2026.
+  -- Listarea (`/object/list/…`) trece prin politici. ORICE politică pe
+  -- `storage.objects` care îl prinde pe `anon` — la citire, scriere, orice — e
+  -- o ușă către fișierele tuturor cabinetelor.
   -- --------------------------------------------------------------------------
-  return query
-  select
-    'Un vizitator nu poate lista fișierele'::text,
-    case when exists (
-      select 1 from pg_policies
-      where schemaname = 'storage' and tablename = 'objects'
-        and cmd in ('SELECT', 'ALL')
-        and ('anon' = any(roles) or 'public' = any(roles))
-    ) then 'PICAT' else 'OK' end,
-    coalesce(
-      (select 'politică de citire deschisă către anon: ' || string_agg(policyname, ', ')
-       from pg_policies
-       where schemaname = 'storage' and tablename = 'objects'
-         and cmd in ('SELECT', 'ALL')
-         and ('anon' = any(roles) or 'public' = any(roles))),
-      'nicio politică de citire nu-l prinde pe anon'
-    );
+  select string_agg(format('%s (%s)', policyname, cmd), ', ' order by policyname) into lista
+  from pg_policies
+  where schemaname = 'storage' and tablename = 'objects'
+    and ('anon' = any(roles) or 'public' = any(roles));
 
+  return query select
+    'Un vizitator nu poate lista fișierele'::text,
+    case when lista is null then 'OK' else 'PICAT' end::text,
+    coalesce('politici pe storage.objects care îl prind pe anon: ' || lista,
+             'nicio politică nu-l prinde pe anon')::text;
+
+  -- --------------------------------------------------------------------------
+  -- 13. Structura ține ce promite: constrângeri validate, declanșatori la locul
+  --     lor, indecși pe `site_id`.
+  --
+  -- O cheie străină sau o verificare adăugată cu `not valid` și nevalidată
+  -- niciodată apără doar rândurile noi. Un tabel cu `updated_at` fără
+  -- declanșatorul de actualizare minte în panou. Un tabel cu `site_id` fără
+  -- index e filtrat de RLS la fiecare cerere, pe toate rândurile tuturor
+  -- clienților.
+  -- --------------------------------------------------------------------------
+  select string_agg(format('%s.%s', c.relname, k.conname), ', ' order by 1) into lista
+  from pg_constraint k join pg_class c on c.oid = k.conrelid
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public' and k.contype in ('f', 'c') and not k.convalidated;
+
+  return query select
+    'Toate constrângerile sunt validate'::text,
+    case when lista is null then 'OK' else 'PICAT' end::text,
+    coalesce('nevalidate, deci apără doar rândurile noi: ' || lista,
+             'nicio constrângere lăsată nevalidată')::text;
+
+  select string_agg(c.relname, ', ' order by c.relname) into lista
+  from pg_class c join pg_namespace n on n.oid = c.relnamespace
+  join pg_attribute a on a.attrelid = c.oid and a.attname = 'updated_at' and not a.attisdropped
+  where n.nspname = 'public' and c.relkind = 'r'
+    and not exists (
+      select 1 from pg_trigger t join pg_proc p on p.oid = t.tgfoid
+      where t.tgrelid = c.oid and not t.tgisinternal and p.proname = 'set_updated_at');
+
+  return query select
+    'Fiecare updated_at are declanșatorul lui'::text,
+    case when lista is null then 'OK' else 'PICAT' end::text,
+    coalesce('tabele cu updated_at care nu se actualizează singur: ' || lista,
+             'toate tabelele cu updated_at îl țin la zi')::text;
+
+  select string_agg(c.relname, ', ' order by c.relname) into lista
+  from pg_class c join pg_namespace n on n.oid = c.relnamespace
+  join pg_attribute a on a.attrelid = c.oid and a.attname = 'site_id' and not a.attisdropped
+  where n.nspname = 'public' and c.relkind = 'r'
+    and not exists (
+      select 1 from pg_index x where x.indrelid = c.oid and x.indkey[0] = a.attnum);
+
+  return query select
+    'Fiecare site_id are un index'::text,
+    case when lista is null then 'OK' else 'ATENȚIE' end::text,
+    coalesce('tabele filtrate de RLS fără index pe site_id: ' || lista,
+             'toate tabelele cu site_id au index care începe cu el')::text;
+
+  -- --------------------------------------------------------------------------
+  -- 14. Plasa de siguranță: n-a rămas nimic în urmă.
+  --
+  -- Aceleași numărători ca la început, plus rândul clientului de probă, citit
+  -- din nou. Nu e curățenie, e dovada că verificarea poate fi rulată pe baza
+  -- reală fără să lase urme — și e singura care ar prinde o probă viitoare
+  -- scrisă fără sub-tranzacție.
+  -- --------------------------------------------------------------------------
+  perform set_config('role', 'postgres', true);
   perform set_config('request.jwt.claims', '', true);
+
+  for tabel in select jsonb_object_keys(inainte) order by 1 loop
+    execute format('select count(*) from %s', tabel) into randuri;
+    dupa := dupa || jsonb_build_object(tabel, randuri);
+  end loop;
+  select to_jsonb(s) into rand_dupa from public.sites s where s.id = site_a;
+
+  select string_agg(format('%s (%s → %s)', k, inainte -> k, dupa -> k), ', ' order by k) into lista
+  from jsonb_object_keys(inainte) k where inainte -> k is distinct from dupa -> k;
+
+  return query select
+    'N-a rămas nimic în urmă'::text,
+    case when lista is null and rand_inainte = rand_dupa then 'OK' else 'PICAT' end::text,
+    case
+      when lista is not null then 'tabele cu alt număr de rânduri decât la început: ' || lista
+      when rand_inainte <> rand_dupa then 'rândul clientului de probă s-a schimbat'
+      else format('%s tabele numărate înainte și după, la fel; rândul clientului, la fel',
+                  (select count(*) from jsonb_object_keys(inainte)))
+    end::text;
 end;
 $$;
 

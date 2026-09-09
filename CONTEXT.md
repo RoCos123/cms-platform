@@ -982,23 +982,46 @@ rulând din nou blocul, care e idempotent.
 ### Verificarea amănunțită: formă, comportament și date (9 sept. 2026)
 
 `supabase/verificare-completa.sql`, generat din același loc ca celălalt. O
-lipire, un tabel, douăzeci și două de verificări pe o bază curată, în trei zone:
+lipire, un tabel, treizeci și cinci de verificări pe o bază curată, în trei zone.
+Cerut de proprietar așa: „cât mai amănunțite, să prindă ce nu prevezi, dar să nu
+strice nimic". Cele două jumătăți s-au împăcat pe două principii:
 
-- **comportament** — cele 13 verificări de izolare, care chiar ÎNCEARCĂ: un
-  client care caută datele altuia, un vizitator anonim care scrie, funcțiile
-  platformei chemate de cine nu trebuie. Nu se pot deduce din schemă. **Nu mai
-  rulaseră pe baza reală din 26 aug.**, iar între timp au apărut provizionarea,
-  programările, depozitul privat și comutatorul de lansare.
+**Nicio listă scrisă de mână.** Tabelele de verificat se iau din catalog (toate
+cele cu `site_id`), coloanele lui `sites` la fel, funcțiile, depozitele,
+constrângerile la fel. Un tabel adăugat mâine fără RLS, o coloană nouă pe `sites`
+dată din greșeală clientului, o funcție `security definer` chemabilă din browser
+— prinse fără ca cineva să le fi trecut undeva. Înainte, lista celor 13 tabele
+era scrisă în verificare; al paisprezecelea n-ar fi fost verificat niciodată.
+
+**Nicio scriere care să poată rămâne.** Fiecare probă care scrie rulează într-o
+sub-tranzacție anulată întotdeauna. Vezi CONVENTII, §„O probă care scrie nu pune
+la loc — se anulează".
+
+- **comportament** — 18 probe, care chiar ÎNCEARCĂ: fiecare client caută datele
+  altuia în fiecare tabel cu `site_id`; anonimul citește din fiecare tabel și
+  scrie în inbox; clientul citește conturile platformei; clientul scrie în
+  FIECARE coloană din `sites` (`set coloana = coloana`, anulat) și trebuie să
+  poată exact `name` și `published_at`; funcțiile platformei chemate de cine nu
+  trebuie; nicio funcție `security definer` chemabilă din browser; toate
+  bucket-urile private; nicio politică pe fișiere pentru anon; constrângeri
+  validate; `updated_at` cu declanșator; `site_id` cu index. Și, la urmă,
+  numărătoarea rândurilor din fiecare tabel față de cele de la început. **Nu mai
+  rulaseră pe baza reală din 26 aug.**
 - **formă** — cele 247 de lucruri, ca în `verificare-schema.sql`.
-- **date** — opt lucruri pe care nicio constrângere nu le poate opri: un site
-  fără cont de login sau fără setări, o pagină pe o adresă a platformei, un
-  fișier cu calea în afara dosarului cabinetului, un fișier din depozit fără
-  rândul lui, un site publicat fără nicio secțiune vizibilă, conținut de probă
-  vizibil pe un site publicat, modulul de programări pornit fără secțiunea lui.
+- **date** — 16 lucruri pe care nicio constrângere nu le poate opri: site fără
+  cont sau fără setări, pagină pe o adresă a platformei, fișier în afara
+  dosarului cabinetului, fișier fără rând și rând fără fișier, secțiune cu cheie
+  pe care site-ul n-o știe randa (cheile vin din registrul de componente, la
+  generare), poză care arată spre un fișier inexistent, domeniu scris murdar sau
+  de două ori cu alte litere, site publicat fără nicio secțiune vizibilă sau cu
+  secțiuni vizibile și goale, conținut de probă pe un site publicat, politica de
+  confidențialitate nepublicată pe un site publicat, modulul de programări fără
+  secțiunea lui, conturi de login nelegate de niciun site.
 
-Probat stricând câte ceva din fiecare zonă. Cele două găuri de azi, puse la loc
-dinadins, sunt prinse de zona de comportament — adică fișierul le-ar fi găsit
-încercând, nu doar citind drepturi.
+Probat stricând câte ceva din fiecare zonă — 42 de rânduri roșii dintr-o
+singură rulare, toate cele pregătite. Iar dovada că nu strică: în rularea aia
+trei probe chiar au scris (mesaj anonim, vizită, un site provizionat), și
+numărătorile de dinainte și de după, făcute din afară, au fost identice.
 
 **Verificarea de izolare merge acum și cu un singur client în bază.** Înainte se
 oprea din prima și scria un singur rând; pe baza reală, unde poate exista un
@@ -1020,9 +1043,10 @@ din `sites` și nu punea nimic la loc. Două dintre probele ei trebuie să reuș
 — clientul chiar are voie să-și publice site-ul și să-și salveze numele — deci pe
 baza reală i-ar fi publicat site-ul nepublicat unui cabinet și i-ar fi scris
 „Verificare izolare" în loc de nume. A treia punea domeniul înapoi pe o valoare
-scrisă de mână, a clientului de test. Acum își ia valorile dinainte, le pune la
-loc, și citește înapoi din bază ca să dovedească — a paisprezecea verificare.
-Bancul nu putea arăta asta niciodată: acolo datele sunt de aruncat.
+scrisă de mână, a clientului de test. Reparată întâi cu „pune la loc", apoi,
+în aceeași zi, cu ceva mai tare: probele care scriu se ANULEAZĂ prin construcție,
+iar la sfârșit se numără rândurile din nou. Bancul nu putea arăta asta niciodată:
+acolo datele sunt de aruncat.
 
 **Și încă una, de mediu:** bancul pornea Postgres și număra două secunde. Pe o
 mașină încărcată nu ajung, iar o rulare a picat din motivul ăsta. Acum așteaptă
