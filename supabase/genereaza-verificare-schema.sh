@@ -253,17 +253,13 @@ sed '/^select \* from pg_temp\.verifica_izolarea();$/d' "$RADACINA/supabase/veri
 
 cat <<'MIJLOC'
 
--- (2) Rezultatele se adună într-un singur loc, ca să iasă un tabel, nu trei.
-drop table if exists _verificare_completa;
-create temporary table _verificare_completa (
-  zona text, verificare text, verdict text, detaliu text
-);
-
-insert into _verificare_completa
-select 'comportament', verificare, verdict, detaliu from pg_temp.verifica_izolarea();
-
--- (3) Forma: aceeași amprentă ca în verificare-schema.sql.
-insert into _verificare_completa
+-- (2) Toate cele trei zone, într-o singură interogare.
+--
+-- Fără tabel temporar, dinadins: SQL Editor din Supabase se uită la ce rulezi și
+-- avertizează că se creează „o tabelă fără RLS, la care ar putea ajunge cheile
+-- anon". Pentru o tabelă temporară asta nu e adevărat — trăiește doar în sesiunea
+-- ta și dispare când închizi — dar un avertisment de securitate pe propria ta
+-- unealtă de verificare e exact ce nu vrei să te obișnuiești să ignori.
 with in_baza as (
 MIJLOC
 
@@ -291,25 +287,34 @@ diferente as (
   full outer join in_baza b on b.fel = a.fel and b.cheie = a.cheie
   where a.amprenta is distinct from b.amprenta
 )
+select * from (
+
+select 'comportament' as zona, verificare, verdict, detaliu
+from pg_temp.verifica_izolarea()
+
+union all
+
 select 'formă', d.fel || ' · ' || d.cheie, d.problema,
   'ar trebui: ' || d.ar_trebui || '   |   în bază: ' || d.este
     || case when d.migrarea = '—' then '' else '   |   ' || d.migrarea end
-from diferente d;
+from diferente d
 MIJLOC2
 
 cat <<COADA1
 
-insert into _verificare_completa
+union all
+
 select 'formă', 'toate cele $RANDURI de lucruri din schemă', 'OK',
   'baza reală are exact ce scriu migrările'
-where not exists (select 1 from _verificare_completa where zona = 'formă');
+where not exists (select 1 from diferente)
 COADA1
 
 cat <<COADA2
 
--- (4) Datele. Nimic din ce urmează nu e oprit de vreo constrângere, dar fiecare
+union all
+
+-- (3) Datele. Nimic din ce urmează nu e oprit de vreo constrângere, dar fiecare
 --     strică ceva pe care clientul îl vede — sau nu-l vede, ceea ce e mai rău.
-insert into _verificare_completa
 select 'date', v.ce,
   case when v.cate = 0 then 'OK' else 'ATENȚIE' end,
   case when v.cate = 0 then v.bine else v.cate || ': ' || left(v.care, 200) end
@@ -373,14 +378,13 @@ from (
   where s.appointments_enabled
     and not exists (select 1 from public.site_content c
                      where c.site_id = s.id and c.key = 'programare')
-) v;
+) v
+
+) tot
 COADA2
 
 cat <<'COADA3'
-
--- Tabelul de la urmă. Ce nu e OK vine primul, în fiecare zonă.
-select zona, verificare, verdict, detaliu
-from _verificare_completa
+-- Ce nu e OK vine primul, în fiecare zonă.
 order by
   case zona when 'comportament' then 1 when 'formă' then 2 else 3 end,
   case when verdict = 'OK' then 2 else 1 end,

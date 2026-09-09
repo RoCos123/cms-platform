@@ -220,6 +220,36 @@ două săptămâni distanță.
 
 ---
 
+## O probă care scrie pe banc scrie și pe producție
+
+9 sept. 2026, cu o clipă înainte de prima rulare a verificării de izolare pe baza
+reală. Două dintre probele ei TREBUIE să reușească — clientul chiar are voie
+să-și publice site-ul și să-și salveze numele cabinetului — deci scriu într-un
+rând adevărat din `sites`. Și nu puneau nimic la loc.
+
+Pe bancul local, acolo e „Cabinet de probă 1" și nu contează. Pe baza reală ar fi
+fost cabinetul cuiva: verificarea i-ar fi PUBLICAT site-ul nepublicat și i-ar fi
+scris „Verificare izolare" în loc de numele lui — pe site, în fila din browser și
+în datele pentru Google. O unealtă de verificare care strică exact ce verifică.
+
+A treia probă punea domeniul la loc pe o valoare SCRISĂ DE MÂNĂ (`client-a.ro`),
+adică cea a clientului de test. Pe producție ar fi mutat un cabinet pe un domeniu
+străin.
+
+Regula: **orice probă care scrie își ia întâi valorile și le pune la loc după —
+pe cele adevărate, citite din bază, nu pe cele pe care le are bancul.** Iar
+restaurarea se citește înapoi și se raportează ca verificare de sine stătătoare:
+una care eșuează tăcut lasă un cabinet publicat din greșeală, iar nimeni n-ar afla
+decât uitându-se la site.
+
+Ce o face ușor de ratat: bancul nu poate arăta niciodată problema asta. Acolo
+datele sunt de aruncat, deci lipsa restaurării arată exact ca prezența ei.
+Întrebarea nu e „a trecut proba?", ci **„ce lasă în urmă, dacă rândul e al unui
+om?"**
+
+
+---
+
 ## Un generator care n-a scris nimic arată exact ca unul care n-a avut ce schimba
 
 9 sept. 2026, la verificarea care compară baza reală cu migrările. Generatorul

@@ -33,6 +33,10 @@ declare
   randuri bigint; straine bigint;
   dovedite int; fara_ce int; refuzate int;
   ale_altora bigint;
+  -- Valorile ADEVĂRATE ale rândului pe care scriu probele de mai jos. Se iau
+  -- înainte de orice schimbare de rol și se pun la loc după.
+  publicat_inainte timestamptz; nume_inainte text;
+  domeniu_inainte text; modul_inainte boolean;
   tabel text; coloana text;
   scurgeri text := '';
   netestate text := '';
@@ -73,6 +77,21 @@ begin
     return query select 'Doi clienți de comparat'::text, 'OK'::text,
       format('%s și %s', site_a, site_b);
   end if;
+
+  -- --------------------------------------------------------------------------
+  -- Ce scriu probele de mai jos, păstrat ca să poată fi pus la loc.
+  --
+  -- Două dintre verificări TREBUIE să reușească — clientul chiar are voie să-și
+  -- publice site-ul și să-și salveze numele cabinetului — deci ele schimbă un
+  -- rând adevărat. Pe bancul local acolo e un client de probă și nu contează.
+  -- Pe baza reală e un cabinet al cuiva: fără rândurile astea, verificarea i-ar
+  -- PUBLICA site-ul nepublicat și i-ar scrie „Verificare izolare" în loc de
+  -- numele lui, pe site și în datele pentru Google. Găsit pe 9 sept. 2026,
+  -- înainte de prima rulare pe producție.
+  -- --------------------------------------------------------------------------
+  select s.published_at, s.name, s.domain, s.appointments_enabled
+    into publicat_inainte, nume_inainte, domeniu_inainte, modul_inainte
+    from public.sites s where s.id = site_a;
 
   -- --------------------------------------------------------------------------
   -- Fiecare client, logat, vede DOAR datele lui — în TOATE tabelele.
@@ -283,7 +302,7 @@ begin
     update public.sites set domain = 'furat-de-client.ro' where id = site_a;
 
     perform set_config('role', 'postgres', true);
-    update public.sites set domain = 'client-a.ro' where id = site_a;
+    update public.sites set domain = domeniu_inainte where id = site_a;
 
     return query select
       'Un client nu-și poate schimba singur domeniul'::text,
@@ -334,7 +353,7 @@ begin
     update public.sites set appointments_enabled = true where id = site_a;
 
     perform set_config('role', 'postgres', true);
-    update public.sites set appointments_enabled = false where id = site_a;
+    update public.sites set appointments_enabled = modul_inainte where id = site_a;
 
     return query select
       'Un client nu-și poate porni singur un modul plătit'::text,
@@ -347,6 +366,35 @@ begin
       'OK'::text,
       'respins: ' || SQLERRM;
   end;
+
+  -- --------------------------------------------------------------------------
+  -- Rândul clientului, pus la loc — și DOVEDIT că e la loc.
+  --
+  -- Nu e curățenie, e condiția ca verificarea să poată fi rulată pe baza reală.
+  -- Verdictul e citit din bază după scriere, nu presupus: o restaurare care
+  -- eșuează tăcut ar lăsa un cabinet publicat din greșeală sau botezat aiurea,
+  -- iar nimeni n-ar afla decât uitându-se la site.
+  -- --------------------------------------------------------------------------
+  perform set_config('role', 'postgres', true);
+  update public.sites
+     set published_at = publicat_inainte,
+         name         = nume_inainte,
+         domain       = domeniu_inainte,
+         appointments_enabled = modul_inainte
+   where id = site_a;
+
+  return query select
+    'Rândul clientului e pus la loc'::text,
+    case when exists (
+      select 1 from public.sites s
+       where s.id = site_a
+         and s.published_at is not distinct from publicat_inainte
+         and s.name = nume_inainte
+         and s.domain = domeniu_inainte
+         and s.appointments_enabled is not distinct from modul_inainte
+    ) then 'OK' else 'PICAT' end::text,
+    format('nume, domeniu, publicare și modulul plătit, ca înainte (%s)',
+           coalesce(nume_inainte, '—'))::text;
 
   -- --------------------------------------------------------------------------
   -- Un client nu poate provizona site-uri.

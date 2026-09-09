@@ -61,6 +61,10 @@ declare
   randuri bigint; straine bigint;
   dovedite int; fara_ce int; refuzate int;
   ale_altora bigint;
+  -- Valorile ADEVĂRATE ale rândului pe care scriu probele de mai jos. Se iau
+  -- înainte de orice schimbare de rol și se pun la loc după.
+  publicat_inainte timestamptz; nume_inainte text;
+  domeniu_inainte text; modul_inainte boolean;
   tabel text; coloana text;
   scurgeri text := '';
   netestate text := '';
@@ -101,6 +105,21 @@ begin
     return query select 'Doi clienți de comparat'::text, 'OK'::text,
       format('%s și %s', site_a, site_b);
   end if;
+
+  -- --------------------------------------------------------------------------
+  -- Ce scriu probele de mai jos, păstrat ca să poată fi pus la loc.
+  --
+  -- Două dintre verificări TREBUIE să reușească — clientul chiar are voie să-și
+  -- publice site-ul și să-și salveze numele cabinetului — deci ele schimbă un
+  -- rând adevărat. Pe bancul local acolo e un client de probă și nu contează.
+  -- Pe baza reală e un cabinet al cuiva: fără rândurile astea, verificarea i-ar
+  -- PUBLICA site-ul nepublicat și i-ar scrie „Verificare izolare" în loc de
+  -- numele lui, pe site și în datele pentru Google. Găsit pe 9 sept. 2026,
+  -- înainte de prima rulare pe producție.
+  -- --------------------------------------------------------------------------
+  select s.published_at, s.name, s.domain, s.appointments_enabled
+    into publicat_inainte, nume_inainte, domeniu_inainte, modul_inainte
+    from public.sites s where s.id = site_a;
 
   -- --------------------------------------------------------------------------
   -- Fiecare client, logat, vede DOAR datele lui — în TOATE tabelele.
@@ -311,7 +330,7 @@ begin
     update public.sites set domain = 'furat-de-client.ro' where id = site_a;
 
     perform set_config('role', 'postgres', true);
-    update public.sites set domain = 'client-a.ro' where id = site_a;
+    update public.sites set domain = domeniu_inainte where id = site_a;
 
     return query select
       'Un client nu-și poate schimba singur domeniul'::text,
@@ -362,7 +381,7 @@ begin
     update public.sites set appointments_enabled = true where id = site_a;
 
     perform set_config('role', 'postgres', true);
-    update public.sites set appointments_enabled = false where id = site_a;
+    update public.sites set appointments_enabled = modul_inainte where id = site_a;
 
     return query select
       'Un client nu-și poate porni singur un modul plătit'::text,
@@ -375,6 +394,35 @@ begin
       'OK'::text,
       'respins: ' || SQLERRM;
   end;
+
+  -- --------------------------------------------------------------------------
+  -- Rândul clientului, pus la loc — și DOVEDIT că e la loc.
+  --
+  -- Nu e curățenie, e condiția ca verificarea să poată fi rulată pe baza reală.
+  -- Verdictul e citit din bază după scriere, nu presupus: o restaurare care
+  -- eșuează tăcut ar lăsa un cabinet publicat din greșeală sau botezat aiurea,
+  -- iar nimeni n-ar afla decât uitându-se la site.
+  -- --------------------------------------------------------------------------
+  perform set_config('role', 'postgres', true);
+  update public.sites
+     set published_at = publicat_inainte,
+         name         = nume_inainte,
+         domain       = domeniu_inainte,
+         appointments_enabled = modul_inainte
+   where id = site_a;
+
+  return query select
+    'Rândul clientului e pus la loc'::text,
+    case when exists (
+      select 1 from public.sites s
+       where s.id = site_a
+         and s.published_at is not distinct from publicat_inainte
+         and s.name = nume_inainte
+         and s.domain = domeniu_inainte
+         and s.appointments_enabled is not distinct from modul_inainte
+    ) then 'OK' else 'PICAT' end::text,
+    format('nume, domeniu, publicare și modulul plătit, ca înainte (%s)',
+           coalesce(nume_inainte, '—'))::text;
 
   -- --------------------------------------------------------------------------
   -- Un client nu poate provizona site-uri.
@@ -471,17 +519,13 @@ end;
 $$;
 
 
--- (2) Rezultatele se adună într-un singur loc, ca să iasă un tabel, nu trei.
-drop table if exists _verificare_completa;
-create temporary table _verificare_completa (
-  zona text, verificare text, verdict text, detaliu text
-);
-
-insert into _verificare_completa
-select 'comportament', verificare, verdict, detaliu from pg_temp.verifica_izolarea();
-
--- (3) Forma: aceeași amprentă ca în verificare-schema.sql.
-insert into _verificare_completa
+-- (2) Toate cele trei zone, într-o singură interogare.
+--
+-- Fără tabel temporar, dinadins: SQL Editor din Supabase se uită la ce rulezi și
+-- avertizează că se creează „o tabelă fără RLS, la care ar putea ajunge cheile
+-- anon". Pentru o tabelă temporară asta nu e adevărat — trăiește doar în sesiunea
+-- ta și dispare când închizi — dar un avertisment de securitate pe propria ta
+-- unealtă de verificare e exact ce nu vrei să te obișnuiești să ignori.
 with in_baza as (
 select fel, cheie, coalesce(amprenta, '—') as amprenta from (
   -- Tabelele, cu starea RLS. Un tabel cu RLS stins e o scurgere, nu o
@@ -920,19 +964,28 @@ diferente as (
   full outer join in_baza b on b.fel = a.fel and b.cheie = a.cheie
   where a.amprenta is distinct from b.amprenta
 )
+select * from (
+
+select 'comportament' as zona, verificare, verdict, detaliu
+from pg_temp.verifica_izolarea()
+
+union all
+
 select 'formă', d.fel || ' · ' || d.cheie, d.problema,
   'ar trebui: ' || d.ar_trebui || '   |   în bază: ' || d.este
     || case when d.migrarea = '—' then '' else '   |   ' || d.migrarea end
-from diferente d;
+from diferente d
 
-insert into _verificare_completa
+union all
+
 select 'formă', 'toate cele 247 de lucruri din schemă', 'OK',
   'baza reală are exact ce scriu migrările'
-where not exists (select 1 from _verificare_completa where zona = 'formă');
+where not exists (select 1 from diferente)
 
--- (4) Datele. Nimic din ce urmează nu e oprit de vreo constrângere, dar fiecare
+union all
+
+-- (3) Datele. Nimic din ce urmează nu e oprit de vreo constrângere, dar fiecare
 --     strică ceva pe care clientul îl vede — sau nu-l vede, ceea ce e mai rău.
-insert into _verificare_completa
 select 'date', v.ce,
   case when v.cate = 0 then 'OK' else 'ATENȚIE' end,
   case when v.cate = 0 then v.bine else v.cate || ': ' || left(v.care, 200) end
@@ -996,11 +1049,10 @@ from (
   where s.appointments_enabled
     and not exists (select 1 from public.site_content c
                      where c.site_id = s.id and c.key = 'programare')
-) v;
+) v
 
--- Tabelul de la urmă. Ce nu e OK vine primul, în fiecare zonă.
-select zona, verificare, verdict, detaliu
-from _verificare_completa
+) tot
+-- Ce nu e OK vine primul, în fiecare zonă.
 order by
   case zona when 'comportament' then 1 when 'formă' then 2 else 3 end,
   case when verdict = 'OK' then 2 else 1 end,

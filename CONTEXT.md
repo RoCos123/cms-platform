@@ -1014,6 +1014,16 @@ Aceeași formă ca greșeala din 1 sept. cu `/dashboard-ul-meu`. Reparat, și ap
 de o probă care se uită la rutele de pe disc, nu la o a doua listă scrisă de
 mână. Lipseau și `opengraph-image`, și `proba-vanzari`.
 
+**Găsit cu o clipă înainte de prima rulare pe producție, și e cel mai important
+lucru din secțiunea asta:** verificarea de izolare SCRIA într-un rând adevărat
+din `sites` și nu punea nimic la loc. Două dintre probele ei trebuie să reușească
+— clientul chiar are voie să-și publice site-ul și să-și salveze numele — deci pe
+baza reală i-ar fi publicat site-ul nepublicat unui cabinet și i-ar fi scris
+„Verificare izolare" în loc de nume. A treia punea domeniul înapoi pe o valoare
+scrisă de mână, a clientului de test. Acum își ia valorile dinainte, le pune la
+loc, și citește înapoi din bază ca să dovedească — a paisprezecea verificare.
+Bancul nu putea arăta asta niciodată: acolo datele sunt de aruncat.
+
 **Și încă una, de mediu:** bancul pornea Postgres și număra două secunde. Pe o
 mașină încărcată nu ajung, iar o rulare a picat din motivul ăsta. Acum așteaptă
 până răspunde. Un banc care pică din când în când fără legătură cu ce s-a
