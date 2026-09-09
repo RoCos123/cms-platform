@@ -21,6 +21,60 @@ Reperul de efort: originalul (single-tenant, un client, cu bug-uri de configurar
 
 ---
 
+## Cât mai e până se pot vinde site-uri (9 sept. 2026)
+
+Răspuns la întrebarea proprietarului, verificat în cod, nu din memorie. **Ține
+secțiunea asta la zi** — e prima pe care o va deschide, și data trecută listele
+incomplete l-au costat timp.
+
+**Platforma e, în esență, terminată.** Panoul are 13 ecrane. Site-ul public are
+prima pagină, servicii, blog, pagini proprii, programări. Cinci șabloane.
+Izolarea între clienți e dovedită pe 13 tabele, nu presupusă. Depozitul de
+fișiere e privat. Ștergerea și exportul datelor există. Provizionarea e o linie
+de SQL, iar migrările trec prin CI. Primul site a fost făcut cu ea cap la cap,
+pe 8 sept.
+
+### Ce blochează primul client PLĂTITOR
+
+| # | Ce | Al cui | Cât ține |
+|---|---|---|---|
+| 1 | **Contract + acord de prelucrare (GDPR)** | proprietar + avocat | **săptămâni** |
+| 2 | **Email tranzacțional** | proprietar (hotărârea), apoi cod | zile |
+| 3 | **Resetarea parolei** | cod, după 2 | ~o zi |
+| 4 | **Backup / PITR verificat în Supabase** | proprietar | minute |
+| 5 | **Cele două chei hCaptcha** | proprietar | minute |
+| 6 | **Videoclipul de instructaj** | proprietar, ULTIMUL | ore |
+
+**1 are cel mai lung timp de așteptare din toată lista.** Se începe primul,
+curge în paralel cu restul. Din clipa în care platforma ține numele și telefonul
+pacienților altcuiva, actele nu sunt opționale.
+
+**2 e nodul**, deși a fost amânat dinadins („nu am ce email să fac acum",
+26 aug.). De el atârnă trei lucruri: resetarea parolei, anunțul că a venit un
+mesaj, confirmarea unei programări. Deocamdată clientul află că i-a scris cineva
+**doar dacă intră în panou și se uită** — pentru un cabinet cu două mesaje pe
+săptămână, asta e o problemă reală, nu o comoditate.
+
+**3 e trecută drept obligatorie chiar în documentul ăsta** (§„Ce se predă
+clientului"), și nu există. Un om care își scrie singur site-ul intră în panou
+de zeci de ori în prima lună; când își uită parola, singura cale e un telefon la
+proprietar și o intrare manuală în Supabase.
+
+**6 se filmează ultimul**, dinadins: se învechește la fiecare schimbare de ecran.
+
+### Ce blochează ARĂTAREA produsului
+
+Site-ul de vânzări e gata, dar nepublicat, pe o adresă temporară care nu se
+indexează (vezi §„Site-ul de vânzări"). Mai trebuie: domeniul `sitepsihologi.ro`,
+capturi adevărate de șabloane (cer un site completat, cu texte și poze reale),
+textul „Cine ești?" și în câte zile se livrează. Apoi comutatorul de publicare.
+
+### Amânate în cunoștință de cauză
+
+Plățile cu cardul (Netopia — vezi capitolul lui), categoriile de blog, și semnul
+din panou pentru secțiunile aprinse dar goale (proprietarul a amânat reparația
+pe 8 sept., după ce i-am arătat costul).
+
 ## Decizii confirmate
 
 - **Stack:** Next.js App Router (RSC + Server Actions, **nu REST**), Supabase (Postgres + Auth + Storage + RLS), Tailwind, TypeScript, Vercel. Confirmat din trafic: originalul nu face niciun apel `/api/` — totul server-rendered + Server Actions.
