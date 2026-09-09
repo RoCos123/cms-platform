@@ -364,6 +364,14 @@ lucrează prin interfața web, nu are depozitul deschis în față. Un „ruleaz
 migrarea `2026...sql`" nu înseamnă nimic pentru el. Trimite și fișierul cu
 `SendUserFile`, și textul în chat.
 
+**Și textul acela se SCOATE din fișier, nu se rescrie.** Pe 9 sept. 2026 s-a
+văzut de ce: `adauga_sectiunea_programare` era în producție identică cu migrarea
+mai puțin comentariile — adică ce se rulase pe 27 aug. era o copie din discuție,
+prescurtată, nu fișierul. Ce ajunge în baza reală e ce scrie în chat, deci dacă
+cele două se despart, producția o urmează tăcut pe cea din chat, iar depozitul
+minte de atunci înainte. Când e mai lung de câteva rânduri, îl scoate un script
+din fișier.
+
 **Un test care nu pică niciodată nu dovedește nimic.** Verificarea de izolare a
 trecut senin peste o politică stricată dinadins, fiindcă număra un refuz ca
 reușită. Strică lucrul pe care testul ar trebui să-l prindă și uită-te dacă

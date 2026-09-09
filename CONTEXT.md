@@ -938,6 +938,25 @@ iar în cazul care contează sare în ochi (`anon=X/DAT DE altcineva`).
 fiecare drept, ce spune declarația de drepturi implicite a proiectului, și care e
 cuprinsul funcției care diferă. Patru răspunsuri, o singură lipire.
 
+### Ce a spus diagnosticul (9 sept. 2026)
+
+**Ipoteza mea era greșită.** Acordantul drepturilor e chiar `postgres`, și tot
+`postgres` rulează SQL Editor-ul — deci revocarea avea toate condițiile să
+prindă. Nu e o poveste cu roluri străine; rămâne întrebarea dacă a rulat sau a
+fost desfăcută, la care răspunde `supabase/repara-drepturi.sql`: revocă și se
+uită imediat, în aceeași rulare, cu verdict scris.
+
+**Un lucru s-a lămurit însă de tot:** drepturile implicite pentru schema `public`
+sunt declarate de DOUĂ ori — o dată de `postgres`, o dată de `supabase_admin` —
+și amândouă dau `execute` lui `anon` și `authenticated`. Deci **fiecare funcție
+viitoare chiar se naște deschisă**, nu a fost ceva de o singură dată. Presupunerea
+pe care stă `e2e/drepturi-functii.proba.mjs` e confirmată.
+
+**Iar funcția cu cuprins diferit nu era o versiune veche.** Textul din producție
+e identic cu migrarea, mai puțin COMENTARIILE. Adică ce s-a rulat pe 27 aug. a
+fost o copie din discuție, nu fișierul. Comportamentul e același; se aliniază
+rulând din nou blocul, care e idempotent.
+
 ### Ce a mai scos un audit pe unghiuri independente (9 sept. 2026)
 
 Concluzia de mai sus a fost pusă la îndoială de trei verificări adversariale, ca
