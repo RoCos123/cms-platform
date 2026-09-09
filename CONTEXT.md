@@ -714,10 +714,12 @@ aplicase, funcția nu. `creeaza_client` a refuzat `claritate`, iar mesajul lui
 suna a greșeală de scriere. În SQL Editor, cu text selectat se rulează doar
 selecția — de aici jumătatea.
 
-Ce lipsește, și rămâne deschis: **nimic nu compară baza reală cu codul.** Probele
-verifică fișierele între ele; bancul local rulează migrările în ordine, pe o
-bază goală. Niciunul nu se uită la Supabase. Interogarea care lămurește în două
-secunde:
+~~Ce lipsește, și rămâne deschis: **nimic nu compară baza reală cu codul.**~~ —
+făcut (9 sept. 2026), vezi §„Verificarea că baza reală are ce scriu migrările".
+Probele verificau fișierele între ele; bancul local rulează migrările în ordine,
+pe o bază goală. Niciunul nu se uita la Supabase. Interogarea de mai jos, care
+lămurea cazul ăsta anume în două secunde, a rămas ca punct de plecare al
+verificării de acum:
 
 ```sql
 select
@@ -807,6 +809,52 @@ Secțiunea NU s-a schimbat pentru toți: își ia conținutul din Servicii, iar 
 cabinet o linie ar fi greșită (nimeni nu ia terapia de cuplu DUPĂ evaluare).
 Panoul scrie doar `data`, `position`, `visible` și `is_demo`, deci varianta pusă
 din SQL supraviețuiește oricâtor editări.
+
+## Verificarea că baza reală are ce scriu migrările (9 sept. 2026)
+
+Golul rămas deschis pe 8 sept. — „nimic nu compară baza reală cu codul" — e
+astupat. Se lipește un fișier în SQL Editor și scrie ori „TOTUL E LA FEL", ori
+câte un rând per diferență.
+
+**Cum e construit, fiindcă asta e partea care contează.** Amprenta schemei — 247
+de lucruri: tabele, coloane, constrângeri, indecși, politici RLS, funcții cu
+drepturile lor de execuție, declanșatori, drepturi pe tabel și pe coloană,
+steagul de public al depozitului — se ia cu UN SINGUR `select`,
+`supabase/amprenta-schema.sql`. Același `select` rulează în două locuri: o dată
+pe bancul local (toate migrările, în ordine, pe un Postgres gol) și o dată pe
+baza reală. Scrise separat, cele două părți ar fi putut devia una de alta —
+adică exact greșeala pe care verificarea trebuie s-o prindă.
+
+Rezultatul de pe banc se lipește ca listă de valori în
+`supabase/verificare-schema.sql`, generat de `genereaza-verificare-schema.sh` la
+coada bancului. **Comparația se face ÎN baza reală, nu aici:** mediul de
+dezvoltare nu ajunge la Supabase, și nici nu vrem să ajungă — ar fi însemnat un
+șir de conectare cu parolă ținut undeva. Lista de valori călătorește prin
+fișier; comparația se mută la ea.
+
+**Ce prinde, probat stricând dinadins fiecare:** o migrare care n-a rulat
+(coloana lipsește), una intrată pe jumătate (constrângerea rămasă la patru
+șabloane în loc de cinci — chiar cazul din 8 sept.), o funcție rămasă la o
+versiune veche, o politică RLS ștearsă, RLS stins pe un tabel, un drept lărgit
+pe tăcute, depozitul redeschis, și un tabel făcut de mână din tabloul de bord.
+
+**Trei feluri de diferență, fiindcă se repară altfel:** LIPSEȘTE DIN BAZĂ
+(migrarea n-a rulat), ALTFEL ÎN BAZĂ (există, dar spune altceva), ÎN PLUS ÎN
+BAZĂ (nicio migrare nu-l creează — de obicei ceva făcut de mână). Ultima coloană
+arată ultima migrare care pomenește numele: un indiciu, nu o dovadă, și doar
+pentru numele distinctive. `sites` sau `name` apar în aproape fiecare migrare,
+iar un indiciu care minte e mai rău decât niciunul.
+
+**CI-ul ține fișierul la zi.** Bancul îl rescrie din baza pe care tocmai a
+construit-o; dacă cel comis diferă, verificarea pică și spune ce să rulezi.
+Comparația se sare dacă runner-ul e pe altă versiune majoră de Postgres decât
+cea pe care s-a luat amprenta — o parte din amprentă e text pe care Postgres îl
+recompune singur și îl poate scrie altfel, iar un CI care dă roșu pe cod bun se
+ignoră în două săptămâni.
+
+**Ce NU acoperă:** datele. Se uită la formă — tabele, drepturi, politici — nu la
+ce e în ele. Câte rânduri are fiecare client, dacă un site are secțiunile care
+trebuie, rămâne treaba verificării de izolare și a ochilor.
 
 ## Politica de confidențialitate se schimbă odată cu platforma
 

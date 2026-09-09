@@ -167,6 +167,32 @@ nu că pagina arată a ceva.
 
 ---
 
+## Un generator care n-a scris nimic arată exact ca unul care n-a avut ce schimba
+
+9 sept. 2026, la verificarea care compară baza reală cu migrările. Generatorul
+rulează cu `set -euo pipefail`, iar înăuntru caută nume prin fișierele de migrare
+cu `grep`. `grep` întoarce 1 când un fișier n-are nicio potrivire — ceea ce aici
+e normal, nu o eroare. Cu `pipefail`, acel 1 omora scriptul pe loc, fără niciun
+mesaj, iar fișierul generat rămânea cel de dinainte.
+
+Partea urâtă nu e greșeala, ci ce am făcut cu ea. Ca să dovedesc că generatorul
+scoate același fișier la fiecare rulare, l-am rulat de două ori și am comparat
+rezultatele: identice. Numai că amândouă rulările muriseră în tăcere, iar
+comparația se făcea între același fișier vechi și el însuși. Proba a spus
+„determinist" tocmai fiindcă nu se generase nimic.
+
+Regula: **când rezultatul unei unelte e un fișier, verifică fișierul, nu codul
+de ieșire.** Că s-a schimbat atunci când te așteptai să se schimbe, și că are
+înăuntru ce trebuie. Un `diff` între două rulări nu dovedește nimic dacă niciuna
+n-a scris.
+
+Corolarul se leagă de regula de mai jos despre probe care nu pică niciodată: o
+verificare care iese verde fără să fi rulat lucrul verificat e mai rea decât una
+care lipsește — pe a doua măcar o vezi că lipsește.
+
+
+---
+
 ## Ce ține de unealtă nu stă lângă ce ține de judecată
 
 1 sept. 2026, mutând fonturile pe serverul nostru. Familiile de font se puneau

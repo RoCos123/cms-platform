@@ -159,6 +159,17 @@ if [ -n "$RELE" ]; then
   exit 1
 fi
 
+# ---------------------------------------------------------------------------
+# Amprenta schemei, rescrisă din baza pe care tocmai am construit-o.
+#
+# Stă AICI, nu într-un pas de sine stătător, fiindcă cere baza pornită și
+# fiindcă orice migrare nouă trece oricum pe banc întâi. Așa, fișierul de
+# verificat baza reală nu poate rămâne în urma migrărilor fără ca cineva să vadă
+# o schimbare neașteptată în `git status`.
+# ---------------------------------------------------------------------------
+echo
+PGPROBA_SOCK="$SOCK" bash "$RADACINA/supabase/genereaza-verificare-schema.sh"
+
 echo
 echo "Toate verificările de izolare au trecut."
 echo
