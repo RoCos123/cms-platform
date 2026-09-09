@@ -22,7 +22,9 @@
 --     ÎN PLUS ÎN BAZĂ    — există în bază, dar nicio migrare nu-l creează.
 --                          De obicei ceva făcut de mână din tabloul de bord.
 --
--- NU MODIFICĂ NIMIC. Sunt numai citiri din catalogul Postgres.
+-- NU MODIFICĂ NIMIC din date sau din schemă. Singura scriere e -ul
+-- sesiunii, de mai jos, fără de care textele recompuse de Postgres s-ar putea
+-- scrie altfel aici decât pe bancul de pe care s-a luat amprenta.
 --
 -- DE ȘTIUT: amprenta așteptată e luată pe PostgreSQL 16. O parte din ea
 -- (constrângeri, indecși, politici) e text pe care Postgres îl recompune
@@ -35,6 +37,7 @@
 -- RLS, funcții (cu drepturile lor de execuție), declanșatori, drepturi pe tabel
 -- și pe coloană, și steagul de public al depozitului de fișiere.
 -- ============================================================================
+set search_path = public;
 
 with in_baza as (
 select fel, cheie, coalesce(amprenta, '—') as amprenta from (
@@ -77,6 +80,11 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
   join pg_class c on c.oid = k.conrelid
   join pg_namespace n on n.oid = c.relnamespace
   where n.nspname = 'public'
+    -- Fără `not null`-urile din catalog (`contype = 'n'`), care în PostgreSQL 18
+    -- devin rânduri în `pg_constraint` și pe 16 nu există. Le-ar fi văzut ca
+    -- „ÎN PLUS ÎN BAZĂ", câte unul de fiecare coloană, în ziua în care Supabase
+    -- trece pe 18. Nu se pierde nimic: `not null` e deja în amprenta coloanei.
+    and k.contype in ('c', 'f', 'p', 'u', 'x')
   union all
   -- Indecșii care NU vin dintr-o constrângere; ceilalți sunt deja numărați mai
   -- sus, iar scriși de două ori ar arăta ca două diferențe pentru un lucru.
@@ -156,7 +164,7 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
     format('public.%s', c.relname),
     coalesce((select string_agg(
         split_part(acl::text, '=', 1) || '=' ||
-          replace(split_part(split_part(acl::text, '/', 1), '=', 2), 'm', ''),
+          regexp_replace(split_part(split_part(acl::text, '/', 1), '=', 2), 'm\*?', '', 'g'),
         ' ' order by split_part(acl::text, '=', 1))
       from unnest(coalesce(c.relacl, '{}'::aclitem[])) acl
       where split_part(acl::text, '=', 1) in ('anon', 'authenticated', 'service_role')),
@@ -172,10 +180,11 @@ select fel, cheie, coalesce(amprenta, '—') as amprenta from (
   select
     'drept-coloana',
     format('public.%s.%s', c.relname, a.attname),
-    (select string_agg(
-        split_part(acl::text, '=', 1) || '=' ||
-          replace(split_part(split_part(acl::text, '/', 1), '=', 2), 'm', ''),
-        ' ' order by split_part(acl::text, '=', 1))
+    -- Fără scoaterea lui `m` de la tabele: MAINTAIN e privilegiu de TABEL, nu de
+    -- coloană (`ACL_ALL_RIGHTS_COLUMN` e același pe 16 și pe 17), deci n-are cum
+    -- să apară aici. O normalizare care n-are ce normaliza doar minte cititorul.
+    (select string_agg(split_part(acl::text, '/', 1), ' '
+        order by split_part(acl::text, '=', 1))
       from unnest(a.attacl) acl
       where split_part(acl::text, '=', 1) in ('anon', 'authenticated', 'service_role'))
   from pg_class c

@@ -185,6 +185,12 @@ Regula: **la funcții, se revocă și de la roluri, pe nume.** Iar când o apăr
 în granturi și nu în RLS, ea se scrie ca verificare în
 `supabase/verificare-izolare.sql` și se probează stricând-o dinadins.
 
+Și, fiindcă fiecare funcție VIITOARE se naște la fel de deschisă, regula are o
+probă, nu un comentariu: `e2e/drepturi-functii.proba.mjs` cade dacă o migrare
+adaugă o funcție în `public` fără să-i ia execuția de la `anon` și
+`authenticated`. Se poate trece în lista celor deschise dinadins — dar cu motivul
+scris lângă, ceea ce face din scutire o hotărâre.
+
 Partea care merită ținută minte e însă alta. Migrarea din 27 aug. spune exact pe
 dos, și o spune cu dovadă: *„Un `revoke ... from anon` în plus n-ar face nimic —
 l-am scris, l-am probat, și nu schimba nimic."* Era adevărat pe banc. **Un lucru

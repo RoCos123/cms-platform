@@ -72,21 +72,48 @@ SQL
 # Supabase nu re-acordă nimic după migrările tale; dă drepturile prin
 # `alter default privileges`, la crearea tabelului. Asta face și linia de mai
 # jos, iar un `revoke` dintr-o migrare rămâne în picioare, ca acolo.
-ruleaza -c "alter default privileges in schema public grant all on tables to anon, authenticated, service_role;"
+ruleaza -c "alter default privileges in schema public grant all on tables to postgres, anon, authenticated, service_role;"
 
 # ȘI PE FUNCȚII. Aceeași lecție ca mai sus, în al doilea loc — găsit pe 9 sept. 2026,
 # la prima rulare a verificării de schemă pe baza reală: acolo funcțiile aveau
 # `anon=X authenticated=X service_role=X`, aici niciunul. Adică `revoke execute ...
 # from public` din migrări părea o apărare, fiindcă pe banc nu exista niciun grant
 # explicit pe care să-l lase în picioare.
-ruleaza -c "alter default privileges in schema public grant all on functions to anon, authenticated, service_role;"
-ruleaza -c "alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;"
+ruleaza -c "alter default privileges in schema public grant all on functions to postgres, anon, authenticated, service_role;"
+ruleaza -c "alter default privileges in schema public grant all on sequences to postgres, anon, authenticated, service_role;"
 
 echo "→ rulez migrările, în ordine"
 for m in "$RADACINA"/supabase/migrations/*.sql; do
   printf "   %-52s" "$(basename "$m")"
   ruleaza -f "$m" && echo "ok"
 done
+
+# ---------------------------------------------------------------------------
+# A prins declarația de mai sus?
+#
+# Dacă nu, bancul redevine orb exact pe felul de apărare care ne-a scăpat pe
+# 9 sept.: verificările 6 și 11 ar trece iar din motivul greșit, iar nimic n-ar
+# spune-o. `alter default privileges` se leagă de rolul care o scrie și de schemă
+# — destule feluri de a deveni tăcut inertă la o schimbare de mediu.
+#
+# Se uită la un obiect ADEVĂRAT, creat de migrări, nu la declarație: doar așa se
+# știe că a și fost aplicată, nu doar scrisă.
+# ---------------------------------------------------------------------------
+echo "→ verific că bancul chiar a primit drepturile implicite ale Supabase"
+FIDEL="$(ruleaza -tAc "select coalesce(array_to_string(proacl, ' '), '') like '%anon=X%'
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname = 'public' and p.proname = 'current_site_id'")"
+
+if [ "$FIDEL" != "t" ]; then
+  echo
+  echo "BANCUL E INFIDEL: funcțiile din public n-au primit granturile explicite pe"
+  echo "care Supabase le dă prin 'alter default privileges'. Fără ele, un"
+  echo "'revoke ... from public' pare o apărare și nu e — vezi CONVENTII.md,"
+  echo "§„Ce se revocă de la PUBLIC nu e revocat de la roluri\"."
+  exit 1
+fi
+echo "   drepturile implicite pe funcții: puse"
+echo
 
 echo "→ seedez doi clienți, cu câte un rând în fiecare tabel"
 ruleaza <<'SQL'

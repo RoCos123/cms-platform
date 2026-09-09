@@ -27,7 +27,14 @@ IESIRE="$RADACINA/supabase/verificare-schema.sql"
 LUCRU="$(mktemp -d)"
 trap 'rm -rf "$LUCRU"' EXIT
 
-interoga() { psql -h "$SOCK" -U postgres -d postgres -v ON_ERROR_STOP=1 -qtA "$@"; }
+# `search_path` pus pe față, fiindcă de el atârnă cum scrie Postgres textele pe
+# care le recompune singur (constrângeri, indecși, politici) — calificat sau nu.
+# Aceeași valoare o pune fișierul generat înainte de interogare, ca cele două
+# părți să nu se compare scrise altfel.
+interoga() {
+  PGOPTIONS='-c search_path=public' \
+    psql -h "$SOCK" -U postgres -d postgres -v ON_ERROR_STOP=1 -qtA "$@"
+}
 
 if ! interoga -c 'select 1' >/dev/null 2>&1; then
   echo "Baza de probă nu răspunde la $SOCK." >&2
@@ -103,7 +110,9 @@ cat <<CAP
 --     ÎN PLUS ÎN BAZĂ    — există în bază, dar nicio migrare nu-l creează.
 --                          De obicei ceva făcut de mână din tabloul de bord.
 --
--- NU MODIFICĂ NIMIC. Sunt numai citiri din catalogul Postgres.
+-- NU MODIFICĂ NIMIC din date sau din schemă. Singura scriere e `search_path`-ul
+-- sesiunii, de mai jos, fără de care textele recompuse de Postgres s-ar putea
+-- scrie altfel aici decât pe bancul de pe care s-a luat amprenta.
 --
 -- DE ȘTIUT: amprenta așteptată e luată pe PostgreSQL $MAJOR. O parte din ea
 -- (constrângeri, indecși, politici) e text pe care Postgres îl recompune
@@ -116,9 +125,11 @@ cat <<CAP
 -- RLS, funcții (cu drepturile lor de execuție), declanșatori, drepturi pe tabel
 -- și pe coloană, și steagul de public al depozitului de fișiere.
 -- ============================================================================
-
-with in_baza as (
 CAP
+
+echo "set search_path = public;"
+echo ""
+echo "with in_baza as ("
 
 cat "$RADACINA/supabase/amprenta-schema.sql" | sed '/^--/d; /^$/d'
 

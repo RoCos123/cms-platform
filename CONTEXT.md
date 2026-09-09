@@ -909,6 +909,45 @@ pică fără migrare și trec cu ea — probat în ambele feluri, nu presupus.
 diferă după normalizarea spațiilor. Dacă da, în producție stau versiuni mai vechi
 ale funcțiilor, și se rulează migrările care le definesc.
 
+### Ce a mai scos un audit pe unghiuri independente (9 sept. 2026)
+
+Concluzia de mai sus a fost pusă la îndoială de trei verificări adversariale, ca
+să nu plece o afirmație despre o gaură de securitate pe jumătate dovedită.
+Niciuna n-a putut-o dărâma, iar una a adus dovada care lipsea: **`oricine` (adică
+PUBLIC) lipsește exact și numai la cele două funcții care au `revoke ... from
+public` în migrare.** Deci revocarea chiar a rulat — n-a fost o migrare intrată pe
+jumătate — și pur și simplu n-a fost de ajuns. Restul de patru funcții au
+`oricine=X`, cum se cuvine unora care n-au avut niciun revoke.
+
+Ce a adus în plus, și e reparat:
+
+- **Fiecare funcție VIITOARE se naște la fel de deschisă.** Reparația pe două
+  funcții nu e o reparație pe clasă. De aceea există acum
+  `e2e/drepturi-functii.proba.mjs`: cade dacă o migrare adaugă o funcție în
+  `public` fără să-i ia execuția de la `anon` și `authenticated` — sau fără să o
+  treacă, cu motivul scris, în lista celor deschise dinadins. Cele patru de acolo
+  (`current_site_id`, `set_updated_at`, `adauga_sectiunea_programare`,
+  `textul_de_pornire`) sunt acum o hotărâre scrisă, nu o scăpare.
+- **Mesajele de eroare ale lui `creeaza_client` erau un oracol peste conturi.**
+  „Nu există niciun cont cu emailul X" / „Contul X e deja legat de un site" /
+  „Domeniul X are deja un site" spuneau, fără nicio autentificare, dacă o adresă
+  are cont la noi. Se închide odată cu dreptul de execuție.
+- **`page_views_daily` n-are dinadins nicio politică de scriere**, deci funcția
+  `security definer` era SINGURA cale de scris în ea — și era deschisă. Cifrele
+  puteau fi scrise cu orice `day`, inclusiv în afara ferestrei de 30 de zile pe
+  care o citește panoul, deci fără să se vadă.
+- **Trei capcane viitoare în amprentă**, astupate: `m` nu poate apărea niciodată
+  la drepturile pe coloană (MAINTAIN e privilegiu de tabel), deci normalizarea de
+  acolo era cod mort care promitea o apărare inexistentă; `contype = 'n'` face ca
+  în PostgreSQL 18 fiecare `not null` să devină rând de catalog, adică un potop
+  de „ÎN PLUS ÎN BAZĂ" în ziua în care Supabase trece pe 18; iar `search_path`
+  hotărăște dacă textele recompuse de Postgres se scriu calificat sau nu — la
+  prima rulare s-a potrivit din noroc, acum e pus pe față în fișierul generat.
+- **Bancul își verifică singur fidelitatea.** `alter default privileges` se leagă
+  de rolul care o scrie; devenită tăcut inertă, bancul ar fi redevenit orb exact
+  pe apărarea asta. Acum se uită la un obiect adevărat creat de migrări și se
+  oprește dacă granturile implicite lipsesc.
+
 ## Politica de confidențialitate se schimbă odată cu platforma
 
 Cerut de proprietar, 1 sept. 2026, ca să nu se piardă printre altele.
