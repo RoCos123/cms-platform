@@ -670,7 +670,22 @@ aici nu stă degeaba: se repetă.
 
 **Stare la 8 sept. 2026: site-ul EXISTĂ.** Provizionat cu `creeaza_client` pe
 `sitepsihologi.vercel.app`, șablonul `claritate`, conținutul turnat din SQL
-generat (vezi mai jos). Nepublicat — îl vede doar proprietarul, logat.
+generat (vezi mai jos).
+
+**Publicat de proprietar (confirmat 9 sept. 2026).** `published_at` e setat —
+verificarea de comportament îl arată ca site publicat, iar proprietarul a spus
+că e dinadins. Atenție la o nuanță pe care a lămurit-o tot atunci, fiindcă e ușor
+de citit greșit: pe `.vercel.app` site-ul e NELISTAT, nu ÎNCHIS. Nu se
+INDEXEAZĂ (vezi mai jos), deci nimeni nu dă peste el din căutări — dar se
+ÎNCARCĂ pentru oricine are adresa, fiind publicat i se arată site-ul adevărat,
+nu pagina „nepublicat", și nu e nicio parolă la mijloc (afară de „Deployment
+Protection" din Vercel, opțiune separată). Pentru site-ul NOSTRU de vânzări n-are
+importanță — e conținut public, arătat cui vrea proprietarul. **Dar la un site de
+CLIENT același raționament ar fi o gaură**: acolo „e pe o adresă temporară, deci
+n-o vede nimeni" trebuie citit ca „n-o GĂSEȘTE nimeni", nu „n-o poate DESCHIDE
+nimeni". Consecință de care ține și verificarea completă: pe un site publicat cu
+politica de confidențialitate încă ciornă, cardul de publicare dă un avertisment,
+nu o piedică — vezi §„Comutatorul de lansare".
 
 Adresa e temporară, până se cumpără domeniul. **Cât stă pe `.vercel.app`,
 site-ul nu se indexează deloc**: `robots.ts` refuză orice gazdă a platformei, iar
