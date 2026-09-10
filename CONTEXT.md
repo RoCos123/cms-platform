@@ -132,6 +132,20 @@ Ce s-a hotărât pe parcurs, ca să nu fie redeschis din senin:
   fiecare. Șase servicii ar fi însemnat șase pagini de scris, multe rămase cu
   trei rânduri — șase pagini slabe arată mai rău decât una bună. Fiecare serviciu
   are totuși ancoră proprie (`/servicii#consiliere`).
+- **Un serviciu = un NUME + o DESCRIERE** (10 sept. 2026). Avea două casete de
+  descriere, „scurtă" (cartonașul de pe prima pagină) și „completă" (pagina de
+  servicii); proprietarul s-a împiedicat de ele la primul lui site — le-a citit
+  ca redundante și a turnat conținut de pagină în cartonaș. Acum scrie o singură
+  descriere, iar cartonașul își scoate SINGUR rezumatul din primul ei rând
+  (`rezumatServiciu`). Coloana `excerpt` rămâne — cartonașul citea din ea — dar o
+  umple salvarea, nu clientul. **Serviciile NU au subtitluri:** `##` e oprit de
+  tot acolo (`blocuriText(..., { subtitluri: false })` + `CorpText subtitluri={false}`),
+  fiindcă proprietarul nu vrea ca clientul să scrie cu `##`; un `##` rămas din
+  greșeală se randează ca text simplu, cu diezii scoși. Blog și pagini îl
+  PĂSTREAZĂ (texte lungi, unde un zid fără subtitluri obosește). Probă:
+  `e2e/servicii-rezumat.proba.mjs`. Lecție de fundal: doi oameni deștepți nu se
+  împiedică degeaba de același lucru — a doua confuzie de „care câmp ce face" a
+  fost semnalul că o casetă era de prisos, nu că omul n-a citit.
 - **Comutatorul blogului stinge TOT blogul** — pagina, articolele și secțiunea de
   pe prima pagină. Spre deosebire de servicii, unde cartonașul se citește întreg
   și fără pagina lui, un cartonaș de articol fără pagina articolului n-ar avea
@@ -1184,6 +1198,18 @@ emailuri pe oră); pentru resetări rare e destul, iar rezerva rămâne resetare
 manuală din tabloul Supabase. Când vine domeniul propriu și Resend, se schimbă o
 setare SMTP în Supabase — **codul de aici rămâne neatins**, fiindcă nu știe cine
 trimite emailul.
+
+**Corectare (10 sept. 2026), găsită testând cu proprietarul:** puntea livrează
+o resetare care merge DOAR în același browser din care a fost cerută. Motivul e
+că linkul implicit al Supabase (PKCE, `code`) are nevoie de un cookie pus la
+cerere — deschis pe alt dispozitiv (telefon), cade. Varianta profesională, care
+merge de oriunde, cere linkul cu `token_hash` — adică ȘABLONUL de email
+modificat. Iar Supabase **nu lasă să editezi șablonul de email fără SMTP propriu
+configurat** („Set up custom SMTP to edit and save templates"). Deci resetarea
+profesională, cross-device, **atârnă de domeniu + Resend** — nu e opțională,
+cum părea. Codul e gata (ruta acceptă și `token_hash`, și `code`); ce lipsește e
+temelia de email. De reținut: „făcută pe punte" înseamnă „merge, dar
+same-browser", nu „client-grade".
 
 ## Politica de confidențialitate se schimbă odată cu platforma
 

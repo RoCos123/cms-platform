@@ -61,8 +61,8 @@ export function ComutatorPaginaServicii({ activaInitial }: { activaInitial: bool
             <span className="font-medium text-foreground">Arată pagina pe site</span>
             <span className="mt-1 block text-muted-foreground">
               Oprită, cartonașele de pe prima pagină rămân, dar fără „Află mai multe” —
-              serviciile se văd doar cu descrierea scurtă. Textele lungi nu se pierd, doar
-              nu se afișează nicăieri.
+              serviciile se văd doar pe cartonaș (numele și primul rând al descrierii).
+              Descrierea întreagă nu se pierde, doar n-are unde să apară.
             </span>
           </span>
         </label>
