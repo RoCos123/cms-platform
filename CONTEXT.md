@@ -29,10 +29,12 @@ incomplete l-au costat timp.
 
 **Platforma e, în esență, terminată.** Panoul are 13 ecrane. Site-ul public are
 prima pagină, servicii, blog, pagini proprii, programări. Cinci șabloane.
-Izolarea între clienți e dovedită pe 13 tabele, nu presupusă. Depozitul de
-fișiere e privat. Ștergerea și exportul datelor există. Provizionarea e o linie
-de SQL, iar migrările trec prin CI. Primul site a fost făcut cu ea cap la cap,
-pe 8 sept.
+Izolarea între clienți e dovedită acum pe **baza reală**, nu doar pe banc: pe
+10 sept. verificarea de comportament a trecut întreagă pe Supabase — fiecare
+client caută datele altuia și e refuzat, niciun anonim nu scrie, nicio funcție a
+platformei nu e chemabilă din browser. Depozitul de fișiere e privat. Ștergerea
+și exportul datelor există. Provizionarea e o linie de SQL, iar migrările trec
+prin CI. Primul site a fost făcut cu ea cap la cap, pe 8 sept.
 
 ### Ce blochează primul client PLĂTITOR
 
