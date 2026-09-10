@@ -124,11 +124,11 @@ export function BlocServiciu({ serviciu, primul = true }: { serviciu: Serviciu; 
         </div>
 
         <div>
-          {/* `h3`, nu `h2`: numele serviciului de alături e deja `h2`, iar un
-              subtitlu dinăuntrul lui nu poate fi pe același nivel. */}
+          {/* Fără subtitluri: descrierea unui serviciu e text simplu, iar
+              clientul nu scrie cu `##` (hotărât 10 sept. 2026). */}
           <CorpText
             text={serviciu.descriereCompleta || serviciu.descriereScurta}
-            nivelSubtitlu="h3"
+            subtitluri={false}
           />
         </div>
       </div>

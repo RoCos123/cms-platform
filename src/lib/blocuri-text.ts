@@ -30,7 +30,12 @@ export type BlocText =
  */
 const SUBTITLU = /^#{2,}\s*(.*)$/;
 
-export function blocuriText(text: string): BlocText[] {
+export function blocuriText(text: string, optiuni?: { subtitluri?: boolean }): BlocText[] {
+  // Implicit, `##` face subtitlu (blog, pagini — texte lungi). La servicii se
+  // oprește: acolo textele sunt scurte, iar clientul nu vrea să scrie cu `##`
+  // (hotărât cu proprietarul, 10 sept. 2026). Oprit, o linie cu `##` devine
+  // paragraf obișnuit, cu diezii scoși — un `##` rămas din greșeală nu iese urât.
+  const cuSubtitluri = optiuni?.subtitluri ?? true;
   const blocuri: BlocText[] = [];
 
   for (const rand of text.split("\n")) {
@@ -43,7 +48,8 @@ export function blocuriText(text: string): BlocText[] {
       const titlu = subtitlu[1].trim();
       // „## " singur pe rând nu e un subtitlu, e un rând început și abandonat.
       // Randat, ar ieși un titlu gol care ocupă spațiu fără să spună nimic.
-      if (titlu !== "") blocuri.push({ tip: "subtitlu", text: titlu });
+      if (titlu === "") continue;
+      blocuri.push(cuSubtitluri ? { tip: "subtitlu", text: titlu } : { tip: "paragraf", text: titlu });
       continue;
     }
 

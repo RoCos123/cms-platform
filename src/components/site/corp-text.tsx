@@ -15,14 +15,17 @@ import { blocuriText } from "@/lib/blocuri-text";
 export function CorpText({
   text,
   nivelSubtitlu: Subtitlu = "h2",
+  subtitluri = true,
   maxWidth,
 }: {
   text: string;
   nivelSubtitlu?: "h2" | "h3";
+  /** Oprit la servicii: acolo `##` nu e o notație pe care clientul s-o învețe. */
+  subtitluri?: boolean;
   /** Lungimea rândului. ~34em e măsura la care ochiul găsește ușor rândul următor. */
   maxWidth?: string;
 }) {
-  const blocuri = blocuriText(text);
+  const blocuri = blocuriText(text, { subtitluri });
   if (blocuri.length === 0) return null;
 
   return (

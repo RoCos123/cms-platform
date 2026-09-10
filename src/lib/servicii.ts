@@ -38,7 +38,6 @@ export const CAMPURI_SERVICIU: CampSchema[] = [
     hint: "Cui se adresează, cum decurge, la ce să se aștepte. Primul rând apare pe cartonașul din prima pagină; textul întreg, pe pagina de servicii.",
     obligatoriu: true,
     randuri: 10,
-    cuSubtitluri: true,
     /**
      * 600 de cuvinte — vreo trei minute de citit. Mai puțin decât la un articol,
      * și dinadins: pagina de servicii le arată pe TOATE una sub alta, iar șase
@@ -83,16 +82,19 @@ export type Serviciu = {
 /**
  * Rezumatul de pe cartonașul din prima pagină, scos AUTOMAT din descriere.
  *
- * Clientul scrie o singură descriere; cartonașul ia primul PARAGRAF al ei,
- * sărind peste un eventual subtitlu de la început (`## Cum decurge` n-are ce
- * căuta pe un cartonaș de două rânduri). Se salvează în coloana `excerpt`, de
- * unde cartonașul citea și înainte — deci randarea nu se schimbă, doar sursa.
+ * Clientul scrie o singură descriere, text simplu (fără `##`); cartonașul ia
+ * primul ei rând. Se salvează în coloana `excerpt`, de unde cartonașul citea și
+ * înainte — deci randarea nu se schimbă, doar sursa.
  *
- * Tăiat la o margine de cuvânt, cu „…", ca să nu rupă un cuvânt în două. Node
- * îl poate proba direct: e text curat, fără bază de date, fără JSX.
+ * `subtitluri: false` ca și la randare: un `##` rămas din greșeală se tratează
+ * ca text simplu, nu se sare peste el. Tăiat la o margine de cuvânt, cu „…", ca
+ * să nu rupă un cuvânt în două. Node îl poate proba direct: text curat, fără
+ * bază de date, fără JSX.
  */
 export function rezumatServiciu(descriere: string, maxCaractere = 200): string {
-  const primulParagraf = blocuriText(descriere).find((b) => b.tip === "paragraf");
+  const primulParagraf = blocuriText(descriere, { subtitluri: false }).find(
+    (b) => b.tip === "paragraf",
+  );
   const text = (primulParagraf?.text ?? "").trim();
 
   if (text.length <= maxCaractere) return text;
