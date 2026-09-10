@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { login } from "./actions";
 
 export function LoginForm({ wrongTenant }: { wrongTenant: boolean }) {
@@ -57,6 +58,15 @@ export function LoginForm({ wrongTenant }: { wrongTenant: boolean }) {
       >
         {pending ? "Se conectează…" : "Conectare"}
       </button>
+
+      <p className="text-center text-sm">
+        <Link
+          href="/login/parola-uitata"
+          className="text-zinc-500 underline underline-offset-2 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+        >
+          Ți-ai uitat parola?
+        </Link>
+      </p>
     </form>
   );
 }

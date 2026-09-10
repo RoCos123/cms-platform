@@ -8,7 +8,7 @@
  * sunt tăcute — nimic nu pare stricat.
  */
 
-import { estePanou, esteConectare } from "@/lib/rute";
+import { estePanou, esteConectare, esteResetareParola } from "@/lib/rute";
 
 /**
  * Căile care se servesc normal chiar și pe un site nepublicat, oricine ar cere.
@@ -17,6 +17,11 @@ import { estePanou, esteConectare } from "@/lib/rute";
  *
  * - `/login` și tot `/dashboard`: fără ele s-ar închide singura ușă pe care
  *   clientul poate intra ca să scrie și, la capăt, să publice.
+ * - paginile de resetare a parolei: un client care și-a uitat parola pe un site
+ *   încă nepublicat trebuie să și-o poată reseta — altfel rămâne închis afară
+ *   tocmai în perioada în care intră cel mai des ca să-și scrie site-ul. Iar
+ *   cererea și linkul din email vin FĂRĂ sesiune, deci nu-l apără verificarea
+ *   „ești proprietarul?".
  * - `/robots.txt` și `/sitemap.xml`: sunt fișiere, nu pagini. Rescrise la o
  *   pagină de HTML, un motor de căutare ar primi gunoi în loc de un refuz
  *   limpede. Ele citesc antetul și răspund singure că nu e nimic de indexat.
@@ -26,6 +31,7 @@ import { estePanou, esteConectare } from "@/lib/rute";
 export function seServesteNepublicat(cale: string): boolean {
   return (
     esteConectare(cale) ||
+    esteResetareParola(cale) ||
     estePanou(cale) ||
     cale === "/robots.txt" ||
     cale === "/sitemap.xml"

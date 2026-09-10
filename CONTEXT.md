@@ -42,7 +42,7 @@ prin CI. Primul site a fost făcut cu ea cap la cap, pe 8 sept.
 |---|---|---|---|
 | 1 | **Contract + acord de prelucrare (GDPR)** | proprietar + avocat | **săptămâni** |
 | 2 | **Email tranzacțional** | proprietar (hotărârea), apoi cod | zile |
-| 3 | **Resetarea parolei** | cod, după 2 | ~o zi |
+| 3 | ~~Resetarea parolei~~ — **făcută** (cod, 10 sept.), pe punte | proprietar: 3 setări Supabase | minute |
 | 4 | **Backup / PITR verificat în Supabase** | proprietar | minute |
 | 5 | **Cele două chei hCaptcha** | proprietar | minute |
 | 6 | **Videoclipul de instructaj** | proprietar, ULTIMUL | ore |
@@ -57,10 +57,12 @@ mesaj, confirmarea unei programări. Deocamdată clientul află că i-a scris ci
 **doar dacă intră în panou și se uită** — pentru un cabinet cu două mesaje pe
 săptămână, asta e o problemă reală, nu o comoditate.
 
-**3 e trecută drept obligatorie chiar în documentul ăsta** (§„Ce se predă
-clientului"), și nu există. Un om care își scrie singur site-ul intră în panou
-de zeci de ori în prima lună; când își uită parola, singura cale e un telefon la
-proprietar și o intrare manuală în Supabase.
+**3 e făcută (10 sept.)**, pe puntea cu expeditorul încorporat al Supabase — vezi
+§„Resetarea parolei". Era trecută drept obligatorie chiar în documentul ăsta
+(§„Ce se predă clientului"): un om care își scrie singur site-ul intră în panou
+de zeci de ori în prima lună, iar înainte, când își uita parola, singura cale era
+un telefon la proprietar și o intrare manuală în Supabase. Codul e gata; rămân
+trei setări în tabloul Supabase, minute, făcute de proprietar.
 
 **6 se filmează ultimul**, dinadins: se învechește la fiecare schimbare de ecran.
 
@@ -183,8 +185,9 @@ Găsite căutând în cod, la întrebarea „cât mai e până terminăm”:
   migrările SQL. `supabase/proba-locala.sh` își pornește singur un Postgres;
   merită adăugat ca al doilea job, dar abia după ce e probat pe runner — un
   workflow stricat care dă roșu pe cod bun strică încrederea în CI din prima zi.
-- **Resetarea parolei nu există.** `/login` are doar email + parolă. Un client
-  care își uită parola trebuie deblocat manual din Supabase.
+- ~~**Resetarea parolei nu există.**~~ — făcută (10 sept. 2026), pe punte. Vezi
+  §„Resetarea parolei". `/login` are acum „Ți-ai uitat parola?"; înainte, un
+  client care își uita parola trebuia deblocat manual din Supabase.
 - ~~**Provizionarea unui client e SQL scris de mână**~~ — făcut (28 aug. 2026):
   `public.creeaza_client(domeniu, nume, email, sablon, cu_programari)`, o linie
   în SQL Editor. Face rândul din `sites`, leagă contul de login (îl caută după
@@ -1138,6 +1141,49 @@ Ce a adus în plus, și e reparat:
   de rolul care o scrie; devenită tăcut inertă, bancul ar fi redevenit orb exact
   pe apărarea asta. Acum se uită la un obiect adevărat creat de migrări și se
   oprește dacă granturile implicite lipsesc.
+
+## Resetarea parolei (10 sept. 2026)
+
+Făcută, pe **puntea** cu expeditorul încorporat al Supabase — nu Resend, prin
+decizia despre email. Până acum `/login` avea doar email + parolă.
+
+Fluxul: „Ți-ai uitat parola?" pe `/login` → `/login/parola-uitata` (ceri linkul)
+→ emailul lui Supabase → `/login/confirma-resetare` (preschimbă tokenul într-o
+sesiune de recuperare) → `/login/parola-noua` (pui parola). Trei bucăți de cod;
+emailul îl trimite Supabase, iar parola o ține tot el — codul nostru n-o vede.
+
+Ce a cerut gândire, nu doar scris:
+
+- **Linkul se întoarce pe domeniul CLIENTULUI**, nu pe o adresă a platformei — cel
+  rezolvat de proxy (`x-site-domain`), ca după resetare omul să rămână pe site-ul
+  lui și `/dashboard` să meargă. Costul: fiecare domeniu de client se trece în
+  lista permisă din Supabase (Auth → URL Configuration) — merge la pachet cu
+  conectarea domeniului în Vercel, oricum manuală. Un `*.vercel.app` acoperă tot
+  cât suntem pe adrese temporare. E aceeași capcană de scalare ca la anti-spam,
+  ținută pe un singur loc.
+- **Ruta de confirmare acceptă două forme de link:** `token_hash` (șablonul nostru
+  de email, merge și de pe alt dispozitiv, fiindcă dovada e întreagă în link) și
+  `code` (implicitul PKCE al Supabase, doar în același browser). Așa merge și
+  înainte, și după ce se lipește șablonul din `sabloane/email-resetare-parola.md`.
+- **Paginile rămân deschise pe un site nepublicat** (`seServesteNepublicat`):
+  cererea și linkul vin FĂRĂ sesiune, deci nu le apără „ești proprietarul?", iar
+  un client își uită parola cel mai des tocmai cât își scrie site-ul, nepublicat.
+  Dar NU sunt tratate ca `/login` exact — altfel proxy-ul ar trimite la
+  `/dashboard` un om cu sesiune de recuperare, chiar înainte să-și pună parola.
+  Probele: `e2e/resetare-parola.proba.mjs`.
+- **Nu se spune niciodată dacă adresa are cont** — altfel formularul devine o
+  unealtă de aflat ce emailuri sunt înregistrate.
+
+**Ce trebuie făcut în Supabase, o dată** (proprietarul, nu sesiunea de dev):
+adresa de întoarcere în lista permisă, expeditorul încorporat pornit, și —
+recomandat — șablonul de email în română. Toate trei, pas cu pas, în
+`sabloane/email-resetare-parola.md`.
+
+**Puntea, nu destinația.** Expeditorul încorporat e de mică anvergură (câteva
+emailuri pe oră); pentru resetări rare e destul, iar rezerva rămâne resetarea
+manuală din tabloul Supabase. Când vine domeniul propriu și Resend, se schimbă o
+setare SMTP în Supabase — **codul de aici rămâne neatins**, fiindcă nu știe cine
+trimite emailul.
 
 ## Politica de confidențialitate se schimbă odată cu platforma
 
