@@ -76,6 +76,36 @@ indexează (vezi §„Site-ul de vânzări"). Mai trebuie: domeniul `sitepsiholo
 capturi adevărate de șabloane (cer un site completat, cu texte și poze reale),
 textul „Cine ești?" și în câte zile se livrează. Apoi comutatorul de publicare.
 
+### Munca proprietarului, care nu e nici cod, nici acte
+
+Adăugată pe 10 sept. 2026, fiindcă lista de mai sus era iar incompletă — avea
+codul și actele, dar nu munca de conținut și de vânzare, care e la fel de reală
+și pe care nimeni n-o poate face în locul proprietarului. Fără ea, tehnica gata
+și actele semnate tot nu fac o vânzare.
+
+- **Scrierea conținutului lui `sitepsihologi`.** Site-ul de vânzări e provizionat
+  și are un schelet turnat din SQL, dar textul adevărat — ce e produsul, „Cine
+  ești?", în câte zile se livrează — îl scrie proprietarul. Secțiunea de păreri
+  are trei locuri goale, dinadins: **nu se inventează recenzii.** Ori vin păreri
+  adevărate, ori secțiunea rămâne stinsă la publicare.
+- **Site-uri-model, completate cu texte și poze reale.** Galeria de șabloane de
+  pe `sitepsihologi` arată acum DESENE (SVG-uri din paletă), nu capturi, fiindcă
+  o captură adevărată cere un site plin. Aici se leagă două lucruri într-unul:
+  proprietarul își face întâi **propriul** site cap la cap (primul drum complet,
+  scoate la iveală ce e incomod), apoi **altora** — iar site-urile astea sunt
+  ȘI proba, ȘI materialul din care ies capturile reale pentru fiecare șablon.
+  Ordinea e cea din §„Ordinea de lansare". Fără ele, site-ul de vânzări rămâne cu
+  desene în loc de fotografii.
+- **Contactarea potențialilor clienți.** Nu există încă niciun canal de vânzare.
+  Oricât de bună ar fi platforma, cineva trebuie să ajungă la psihologi. E munca
+  proprietarului și poate — ar trebui — să curgă în PARALEL cu actele: se strâng
+  clienți interesați cât se coace hârtia GDPR, nu după.
+
+Lanțul, ca să nu se piardă: **site-model completat → capturi reale → intră în
+`sitepsihologi` → site de vânzări convingător → publicat → arătat prospecților.**
+Legalul (rândul 1) și lanțul ăsta curg în paralel; vânzarea așteaptă cel mai
+lent dintre ele, nu suma lor.
+
 ### Amânate în cunoștință de cauză
 
 Plățile cu cardul (Netopia — vezi capitolul lui), categoriile de blog, și semnul
