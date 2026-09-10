@@ -29,10 +29,12 @@ incomplete l-au costat timp.
 
 **Platforma e, în esență, terminată.** Panoul are 13 ecrane. Site-ul public are
 prima pagină, servicii, blog, pagini proprii, programări. Cinci șabloane.
-Izolarea între clienți e dovedită pe 13 tabele, nu presupusă. Depozitul de
-fișiere e privat. Ștergerea și exportul datelor există. Provizionarea e o linie
-de SQL, iar migrările trec prin CI. Primul site a fost făcut cu ea cap la cap,
-pe 8 sept.
+Izolarea între clienți e dovedită acum pe **baza reală**, nu doar pe banc: pe
+10 sept. verificarea de comportament a trecut întreagă pe Supabase — fiecare
+client caută datele altuia și e refuzat, niciun anonim nu scrie, nicio funcție a
+platformei nu e chemabilă din browser. Depozitul de fișiere e privat. Ștergerea
+și exportul datelor există. Provizionarea e o linie de SQL, iar migrările trec
+prin CI. Primul site a fost făcut cu ea cap la cap, pe 8 sept.
 
 ### Ce blochează primul client PLĂTITOR
 
@@ -40,7 +42,7 @@ pe 8 sept.
 |---|---|---|---|
 | 1 | **Contract + acord de prelucrare (GDPR)** | proprietar + avocat | **săptămâni** |
 | 2 | **Email tranzacțional** | proprietar (hotărârea), apoi cod | zile |
-| 3 | **Resetarea parolei** | cod, după 2 | ~o zi |
+| 3 | ~~Resetarea parolei~~ — **făcută** (cod, 10 sept.), pe punte | proprietar: 3 setări Supabase | minute |
 | 4 | **Backup / PITR verificat în Supabase** | proprietar | minute |
 | 5 | **Cele două chei hCaptcha** | proprietar | minute |
 | 6 | **Videoclipul de instructaj** | proprietar, ULTIMUL | ore |
@@ -55,12 +57,19 @@ mesaj, confirmarea unei programări. Deocamdată clientul află că i-a scris ci
 **doar dacă intră în panou și se uită** — pentru un cabinet cu două mesaje pe
 săptămână, asta e o problemă reală, nu o comoditate.
 
-**3 e trecută drept obligatorie chiar în documentul ăsta** (§„Ce se predă
-clientului"), și nu există. Un om care își scrie singur site-ul intră în panou
-de zeci de ori în prima lună; când își uită parola, singura cale e un telefon la
-proprietar și o intrare manuală în Supabase.
+**3 e făcută (10 sept.)**, pe puntea cu expeditorul încorporat al Supabase — vezi
+§„Resetarea parolei". Era trecută drept obligatorie chiar în documentul ăsta
+(§„Ce se predă clientului"): un om care își scrie singur site-ul intră în panou
+de zeci de ori în prima lună, iar înainte, când își uita parola, singura cale era
+un telefon la proprietar și o intrare manuală în Supabase. Codul e gata; rămân
+trei setări în tabloul Supabase, minute, făcute de proprietar.
 
 **6 se filmează ultimul**, dinadins: se învechește la fiecare schimbare de ecran.
+
+**Rulat pe 9 sept.:** `20260909100000_drepturi_de_executie.sql`, care închide două
+funcții ce puteau fi chemate de oricine deschidea site-ul. Verificat într-o
+sesiune separată, după: amândouă au doar `postgres` și `service_role`. Povestea
+întreagă în §„Verificarea că baza reală are ce scriu migrările".
 
 ### Ce blochează ARĂTAREA produsului
 
@@ -68,6 +77,36 @@ Site-ul de vânzări e gata, dar nepublicat, pe o adresă temporară care nu se
 indexează (vezi §„Site-ul de vânzări"). Mai trebuie: domeniul `sitepsihologi.ro`,
 capturi adevărate de șabloane (cer un site completat, cu texte și poze reale),
 textul „Cine ești?" și în câte zile se livrează. Apoi comutatorul de publicare.
+
+### Munca proprietarului, care nu e nici cod, nici acte
+
+Adăugată pe 10 sept. 2026, fiindcă lista de mai sus era iar incompletă — avea
+codul și actele, dar nu munca de conținut și de vânzare, care e la fel de reală
+și pe care nimeni n-o poate face în locul proprietarului. Fără ea, tehnica gata
+și actele semnate tot nu fac o vânzare.
+
+- **Scrierea conținutului lui `sitepsihologi`.** Site-ul de vânzări e provizionat
+  și are un schelet turnat din SQL, dar textul adevărat — ce e produsul, „Cine
+  ești?", în câte zile se livrează — îl scrie proprietarul. Secțiunea de păreri
+  are trei locuri goale, dinadins: **nu se inventează recenzii.** Ori vin păreri
+  adevărate, ori secțiunea rămâne stinsă la publicare.
+- **Site-uri-model, completate cu texte și poze reale.** Galeria de șabloane de
+  pe `sitepsihologi` arată acum DESENE (SVG-uri din paletă), nu capturi, fiindcă
+  o captură adevărată cere un site plin. Aici se leagă două lucruri într-unul:
+  proprietarul își face întâi **propriul** site cap la cap (primul drum complet,
+  scoate la iveală ce e incomod), apoi **altora** — iar site-urile astea sunt
+  ȘI proba, ȘI materialul din care ies capturile reale pentru fiecare șablon.
+  Ordinea e cea din §„Ordinea de lansare". Fără ele, site-ul de vânzări rămâne cu
+  desene în loc de fotografii.
+- **Contactarea potențialilor clienți.** Nu există încă niciun canal de vânzare.
+  Oricât de bună ar fi platforma, cineva trebuie să ajungă la psihologi. E munca
+  proprietarului și poate — ar trebui — să curgă în PARALEL cu actele: se strâng
+  clienți interesați cât se coace hârtia GDPR, nu după.
+
+Lanțul, ca să nu se piardă: **site-model completat → capturi reale → intră în
+`sitepsihologi` → site de vânzări convingător → publicat → arătat prospecților.**
+Legalul (rândul 1) și lanțul ăsta curg în paralel; vânzarea așteaptă cel mai
+lent dintre ele, nu suma lor.
 
 ### Amânate în cunoștință de cauză
 
@@ -146,8 +185,9 @@ Găsite căutând în cod, la întrebarea „cât mai e până terminăm”:
   migrările SQL. `supabase/proba-locala.sh` își pornește singur un Postgres;
   merită adăugat ca al doilea job, dar abia după ce e probat pe runner — un
   workflow stricat care dă roșu pe cod bun strică încrederea în CI din prima zi.
-- **Resetarea parolei nu există.** `/login` are doar email + parolă. Un client
-  care își uită parola trebuie deblocat manual din Supabase.
+- ~~**Resetarea parolei nu există.**~~ — făcută (10 sept. 2026), pe punte. Vezi
+  §„Resetarea parolei". `/login` are acum „Ți-ai uitat parola?"; înainte, un
+  client care își uita parola trebuia deblocat manual din Supabase.
 - ~~**Provizionarea unui client e SQL scris de mână**~~ — făcut (28 aug. 2026):
   `public.creeaza_client(domeniu, nume, email, sablon, cu_programari)`, o linie
   în SQL Editor. Face rândul din `sites`, leagă contul de login (îl caută după
@@ -665,7 +705,22 @@ aici nu stă degeaba: se repetă.
 
 **Stare la 8 sept. 2026: site-ul EXISTĂ.** Provizionat cu `creeaza_client` pe
 `sitepsihologi.vercel.app`, șablonul `claritate`, conținutul turnat din SQL
-generat (vezi mai jos). Nepublicat — îl vede doar proprietarul, logat.
+generat (vezi mai jos).
+
+**Publicat de proprietar (confirmat 9 sept. 2026).** `published_at` e setat —
+verificarea de comportament îl arată ca site publicat, iar proprietarul a spus
+că e dinadins. Atenție la o nuanță pe care a lămurit-o tot atunci, fiindcă e ușor
+de citit greșit: pe `.vercel.app` site-ul e NELISTAT, nu ÎNCHIS. Nu se
+INDEXEAZĂ (vezi mai jos), deci nimeni nu dă peste el din căutări — dar se
+ÎNCARCĂ pentru oricine are adresa, fiind publicat i se arată site-ul adevărat,
+nu pagina „nepublicat", și nu e nicio parolă la mijloc (afară de „Deployment
+Protection" din Vercel, opțiune separată). Pentru site-ul NOSTRU de vânzări n-are
+importanță — e conținut public, arătat cui vrea proprietarul. **Dar la un site de
+CLIENT același raționament ar fi o gaură**: acolo „e pe o adresă temporară, deci
+n-o vede nimeni" trebuie citit ca „n-o GĂSEȘTE nimeni", nu „n-o poate DESCHIDE
+nimeni". Consecință de care ține și verificarea completă: pe un site publicat cu
+politica de confidențialitate încă ciornă, cardul de publicare dă un avertisment,
+nu o piedică — vezi §„Comutatorul de lansare".
 
 Adresa e temporară, până se cumpără domeniul. **Cât stă pe `.vercel.app`,
 site-ul nu se indexează deloc**: `robots.ts` refuză orice gazdă a platformei, iar
@@ -714,10 +769,12 @@ aplicase, funcția nu. `creeaza_client` a refuzat `claritate`, iar mesajul lui
 suna a greșeală de scriere. În SQL Editor, cu text selectat se rulează doar
 selecția — de aici jumătatea.
 
-Ce lipsește, și rămâne deschis: **nimic nu compară baza reală cu codul.** Probele
-verifică fișierele între ele; bancul local rulează migrările în ordine, pe o
-bază goală. Niciunul nu se uită la Supabase. Interogarea care lămurește în două
-secunde:
+~~Ce lipsește, și rămâne deschis: **nimic nu compară baza reală cu codul.**~~ —
+făcut (9 sept. 2026), vezi §„Verificarea că baza reală are ce scriu migrările".
+Probele verificau fișierele între ele; bancul local rulează migrările în ordine,
+pe o bază goală. Niciunul nu se uita la Supabase. Interogarea de mai jos, care
+lămurea cazul ăsta anume în două secunde, a rămas ca punct de plecare al
+verificării de acum:
 
 ```sql
 select
@@ -807,6 +864,326 @@ Secțiunea NU s-a schimbat pentru toți: își ia conținutul din Servicii, iar 
 cabinet o linie ar fi greșită (nimeni nu ia terapia de cuplu DUPĂ evaluare).
 Panoul scrie doar `data`, `position`, `visible` și `is_demo`, deci varianta pusă
 din SQL supraviețuiește oricâtor editări.
+
+## Verificarea că baza reală are ce scriu migrările (9 sept. 2026)
+
+Golul rămas deschis pe 8 sept. — „nimic nu compară baza reală cu codul" — e
+astupat. Se lipește un fișier în SQL Editor și scrie ori „TOTUL E LA FEL", ori
+câte un rând per diferență.
+
+**Cum e construit, fiindcă asta e partea care contează.** Amprenta schemei — 247
+de lucruri: tabele, coloane, constrângeri, indecși, politici RLS, funcții cu
+drepturile lor de execuție, declanșatori, drepturi pe tabel și pe coloană,
+steagul de public al depozitului — se ia cu UN SINGUR `select`,
+`supabase/amprenta-schema.sql`. Același `select` rulează în două locuri: o dată
+pe bancul local (toate migrările, în ordine, pe un Postgres gol) și o dată pe
+baza reală. Scrise separat, cele două părți ar fi putut devia una de alta —
+adică exact greșeala pe care verificarea trebuie s-o prindă.
+
+Rezultatul de pe banc se lipește ca listă de valori în
+`supabase/verificare-schema.sql`, generat de `genereaza-verificare-schema.sh` la
+coada bancului. **Comparația se face ÎN baza reală, nu aici:** mediul de
+dezvoltare nu ajunge la Supabase, și nici nu vrem să ajungă — ar fi însemnat un
+șir de conectare cu parolă ținut undeva. Lista de valori călătorește prin
+fișier; comparația se mută la ea.
+
+**Ce prinde, probat stricând dinadins fiecare:** o migrare care n-a rulat
+(coloana lipsește), una intrată pe jumătate (constrângerea rămasă la patru
+șabloane în loc de cinci — chiar cazul din 8 sept.), o funcție rămasă la o
+versiune veche, o politică RLS ștearsă, RLS stins pe un tabel, un drept lărgit
+pe tăcute, depozitul redeschis, și un tabel făcut de mână din tabloul de bord.
+
+**Trei feluri de diferență, fiindcă se repară altfel:** LIPSEȘTE DIN BAZĂ
+(migrarea n-a rulat), ALTFEL ÎN BAZĂ (există, dar spune altceva), ÎN PLUS ÎN
+BAZĂ (nicio migrare nu-l creează — de obicei ceva făcut de mână). Ultima coloană
+arată ultima migrare care pomenește numele: un indiciu, nu o dovadă, și doar
+pentru numele distinctive. `sites` sau `name` apar în aproape fiecare migrare,
+iar un indiciu care minte e mai rău decât niciunul.
+
+**CI-ul ține fișierul la zi.** Bancul îl rescrie din baza pe care tocmai a
+construit-o; dacă cel comis diferă, verificarea pică și spune ce să rulezi.
+Comparația se sare dacă runner-ul e pe altă versiune majoră de Postgres decât
+cea pe care s-a luat amprenta — o parte din amprentă e text pe care Postgres îl
+recompune singur și îl poate scrie altfel, iar un CI care dă roșu pe cod bun se
+ignoră în două săptămâni.
+
+**Ce NU acoperă:** datele. Se uită la formă — tabele, drepturi, politici — nu la
+ce e în ele. Câte rânduri are fiecare client, dacă un site are secțiunile care
+trebuie, rămâne treaba verificării de izolare și a ochilor.
+
+### Ce a găsit prima rulare pe baza reală (9 sept. 2026)
+
+Douăzeci de rânduri, în două grupe. Una era zgomot, cealaltă nu.
+
+**Zgomotul, paisprezece rânduri:** toate drepturile pe tabel aveau un `m` în plus
+în baza reală. E MAINTAIN, privilegiu apărut în PostgreSQL 17 și cuprins în
+`grant all`; bancul e pe 16, unde nu există. Nu spune nimic despre schema
+noastră, deci se scoate acum din amprentă — altfel verificarea s-ar fi plâns la
+fiecare rulare de ceva nestricat, iar în două săptămâni n-ar mai fi citit-o
+nimeni. De aici știm și că baza reală e pe Postgres 17. Restul amprentei a trecut
+fără nicio diferență — zero la constrângeri, indecși, politici, coloane și
+declanșatori — deci textul pe care Postgres îl recompune singur iese la fel pe 16
+și pe 17 pentru tot ce folosim noi.
+
+**Cealaltă grupă nu era zgomot.** Șase funcții cu alte drepturi de execuție decât
+cele așteptate, și două dintre ele contau:
+
+| Funcția | Pe banc | În producție |
+|---|---|---|
+| `creeaza_client` | niciunul din cele trei roluri | `anon`, `authenticated`, `service_role` |
+| `inregistreaza_afisarea` | doar `service_role` | `anon`, `authenticated`, `service_role` |
+
+Cheia `anon` e publică prin construcție — stă în pachetul trimis browserului —
+iar funcțiile din schema `public` sunt expuse ca RPC. Deci oricine putea chema
+`inregistreaza_afisarea` cu orice `site_id` și umfla cifrele din panoul oricărui
+cabinet. Iar `creeaza_client`, care e `security definer` și rulează cu drepturile
+proprietarului bazei, era chemabilă de orice client conectat.
+
+**De ce n-a văzut-o nimeni.** În Postgres simplu, o funcție nouă poate fi
+executată de PUBLIC, iar `anon` și `authenticated` moștenesc de acolo — deci
+`revoke ... from public` chiar e de ajuns. Pe Supabase nu: proiectul are `alter
+default privileges ... grant all on functions` către cele trei roluri, așa că
+fiecare funcție nouă primește granturi EXPLICITE, pe rol, la creare. Revocarea de
+la PUBLIC nu le atinge. Bancul nu reproducea granturile alea, deci acolo apărarea
+ținea. Verificarea de izolare avea chiar verificările potrivite — 6 („un vizitator
+anonim nu poate umfla cifrele de trafic") și 11 („un client nu poate provizona
+site-uri") — și treceau amândouă, din motivul greșit.
+
+**Reparat în trei locuri, în același commit.** Bancul reproduce acum și
+granturile implicite pe funcții și pe secvențe; migrarea
+`20260909100000_drepturi_de_executie.sql` revocă execuția de la `anon` și
+`authenticated` pe cele două funcții; iar cu bancul fidel, verificările 6 și 11
+pică fără migrare și trec cu ea — probat în ambele feluri, nu presupus.
+
+**Rămâne de văzut la a doua rulare** dacă cele șase cuprinsuri de funcții mai
+diferă după normalizarea spațiilor. Dacă da, în producție stau versiuni mai vechi
+ale funcțiilor, și se rulează migrările care le definesc.
+
+### Revocarea a rulat și n-a schimbat nimic (9 sept. 2026)
+
+A doua rulare pe baza reală, după migrarea de revocare. Două lucruri:
+
+**Normalizarea spațiilor a fost bună.** Cinci din cele șase cuprinsuri de funcții
+se potrivesc acum la virgulă, inclusiv ale celor două funcții cu pricina. Deci
+textul lor din producție E cel din migrări; diferența de dinainte venea din
+sfârșituri de rând, cum bănuiam. Rămâne unul singur —
+`adauga_sectiunea_programare` — al cărui cuprins chiar diferă, deși migrarea care
+îl scrie n-a fost atinsă din 27 aug. Se lămurește citind textul din bază.
+
+**Drepturile n-au mișcat.** Amândouă funcțiile arată tot
+`anon=X authenticated=X service_role=X`, deși migrarea a rulat.
+
+Cauza, reprodusă pe banc, nu presupusă: **`REVOKE` scoate doar granturile date de
+rolul care revocă.** Un grant dat de altcineva rămâne pe loc, iar comanda nu dă
+eroare — pe bancul nostru n-a dat nici măcar avertizare, a răspuns „REVOKE" și a
+schimbat nimic. Am făcut un rol străin să acorde `execute` lui `anon`, apoi am
+revocat ca proprietar: dreptul a rămas.
+
+**Amprenta n-a putut arăta de ce**, fiindcă tăia partea de după `/` din fiecare
+drept — adică exact cine l-a dat. Acum o scrie, dar numai când acordantul NU e
+proprietarul obiectului: în cazul obișnuit nu se vede nimic, deci nu face zgomot,
+iar în cazul care contează sare în ochi (`anon=X/DAT DE altcineva`).
+
+`supabase/diagnostic-drepturi.sql` întreabă baza reală cine rulează, cine a dat
+fiecare drept, ce spune declarația de drepturi implicite a proiectului, și care e
+cuprinsul funcției care diferă. Patru răspunsuri, o singură lipire.
+
+### Cum s-a închis (9 sept. 2026)
+
+`supabase/repara-drepturi.sql` — care revocă și se uită IMEDIAT, în aceeași
+rulare — a prins din prima. Cele două funcții au acum doar `postgres` și
+`service_role`. Verificat apoi într-o sesiune SEPARATĂ, cu o citire simplă care
+nu revocă nimic: a rămas așa.
+
+Deosebirea aceea nu e pedanterie. Fișierul de reparație repară înainte să se
+uite, deci la a doua rulare ar scrie „închisă" chiar dacă drepturile s-ar fi
+întors între timp. Numai o citire care nu schimbă nimic poate spune că A RĂMAS.
+
+**De ce n-a prins prima încercare nu știm**, și probabil nu vom ști: acordantul
+era `postgres`, tot `postgres` rulează SQL Editor-ul, deci avea toate condițiile.
+Rămâne una dintre acele „reușite" care nu schimbă nimic. De aici regula din
+CONVENTII: la o revocare care contează, te uiți pe urmă — răspunsul comenzii nu e
+o dovadă.
+
+**Ce NU s-a confirmat încă:** verificarea de schemă întreagă n-a mai rulat după
+reparație, deci „TOTUL E LA FEL" pe toate cele 247 de lucruri rămâne nedovedit.
+Cele trei care lipseau sunt însă verificate una câte una. Se închide singur la
+migrarea următoare, care pleacă cu verificarea lipită la coadă.
+
+### Ce a spus diagnosticul (9 sept. 2026)
+
+**Ipoteza mea era greșită.** Acordantul drepturilor e chiar `postgres`, și tot
+`postgres` rulează SQL Editor-ul — deci revocarea avea toate condițiile să
+prindă. Nu e o poveste cu roluri străine; rămâne întrebarea dacă a rulat sau a
+fost desfăcută, la care răspunde `supabase/repara-drepturi.sql`: revocă și se
+uită imediat, în aceeași rulare, cu verdict scris.
+
+**Un lucru s-a lămurit însă de tot:** drepturile implicite pentru schema `public`
+sunt declarate de DOUĂ ori — o dată de `postgres`, o dată de `supabase_admin` —
+și amândouă dau `execute` lui `anon` și `authenticated`. Deci **fiecare funcție
+viitoare chiar se naște deschisă**, nu a fost ceva de o singură dată. Presupunerea
+pe care stă `e2e/drepturi-functii.proba.mjs` e confirmată.
+
+**Iar funcția cu cuprins diferit nu era o versiune veche.** Textul din producție
+e identic cu migrarea, mai puțin COMENTARIILE. Adică ce s-a rulat pe 27 aug. a
+fost o copie din discuție, nu fișierul. Comportamentul e același; se aliniază
+rulând din nou blocul, care e idempotent.
+
+### Verificarea amănunțită: formă, comportament și date (9 sept. 2026)
+
+`supabase/verificare-completa.sql`, generat din același loc ca celălalt. O
+lipire, un tabel, treizeci și cinci de verificări pe o bază curată, în trei zone.
+Cerut de proprietar așa: „cât mai amănunțite, să prindă ce nu prevezi, dar să nu
+strice nimic". Cele două jumătăți s-au împăcat pe două principii:
+
+**Nicio listă scrisă de mână.** Tabelele de verificat se iau din catalog (toate
+cele cu `site_id`), coloanele lui `sites` la fel, funcțiile, depozitele,
+constrângerile la fel. Un tabel adăugat mâine fără RLS, o coloană nouă pe `sites`
+dată din greșeală clientului, o funcție `security definer` chemabilă din browser
+— prinse fără ca cineva să le fi trecut undeva. Înainte, lista celor 13 tabele
+era scrisă în verificare; al paisprezecelea n-ar fi fost verificat niciodată.
+
+**Nicio scriere care să poată rămâne.** Fiecare probă care scrie rulează într-o
+sub-tranzacție anulată întotdeauna. Vezi CONVENTII, §„O probă care scrie nu pune
+la loc — se anulează".
+
+- **comportament** — 18 probe, care chiar ÎNCEARCĂ: fiecare client caută datele
+  altuia în fiecare tabel cu `site_id`; anonimul citește din fiecare tabel și
+  scrie în inbox; clientul citește conturile platformei; clientul scrie în
+  FIECARE coloană din `sites` (`set coloana = coloana`, anulat) și trebuie să
+  poată exact `name` și `published_at`; funcțiile platformei chemate de cine nu
+  trebuie; nicio funcție `security definer` chemabilă din browser; toate
+  bucket-urile private; nicio politică pe fișiere pentru anon; constrângeri
+  validate; `updated_at` cu declanșator; `site_id` cu index. Și, la urmă,
+  numărătoarea rândurilor din fiecare tabel față de cele de la început. **Nu mai
+  rulaseră pe baza reală din 26 aug.**
+- **formă** — cele 247 de lucruri, ca în `verificare-schema.sql`.
+- **date** — 16 lucruri pe care nicio constrângere nu le poate opri: site fără
+  cont sau fără setări, pagină pe o adresă a platformei, fișier în afara
+  dosarului cabinetului, fișier fără rând și rând fără fișier, secțiune cu cheie
+  pe care site-ul n-o știe randa (cheile vin din registrul de componente, la
+  generare), poză care arată spre un fișier inexistent, domeniu scris murdar sau
+  de două ori cu alte litere, site publicat fără nicio secțiune vizibilă sau cu
+  secțiuni vizibile și goale, conținut de probă pe un site publicat, politica de
+  confidențialitate nepublicată pe un site publicat, modulul de programări fără
+  secțiunea lui, conturi de login nelegate de niciun site.
+
+Probat stricând câte ceva din fiecare zonă — 42 de rânduri roșii dintr-o
+singură rulare, toate cele pregătite. Iar dovada că nu strică: în rularea aia
+trei probe chiar au scris (mesaj anonim, vizită, un site provizionat), și
+numărătorile de dinainte și de după, făcute din afară, au fost identice.
+
+**Verificarea de izolare merge acum și cu un singur client în bază.** Înainte se
+oprea din prima și scria un singur rând; pe baza reală, unde poate exista un
+singur cabinet, asta însemna un tabel gol în loc de verificări — ușor de citit
+drept „e bine". Acum se sar doar comparațiile între clienți, cu „NU SE POATE"
+scris pe față, iar celelalte unsprezece rulează.
+
+**Găsit în timp ce construiam:** `/programare` e rută a site-ului public de pe
+27 aug., dar lipsea din `ADRESE_REZERVATE`. Adică panoul accepta o pagină cu
+adresa „programare", clientul o scria, o salva, o vedea la previzualizare — și
+n-o citea nimeni, fiindcă ruta noastră câștigă în fața celei după adresă.
+Aceeași formă ca greșeala din 1 sept. cu `/dashboard-ul-meu`. Reparat, și apărat
+de o probă care se uită la rutele de pe disc, nu la o a doua listă scrisă de
+mână. Lipseau și `opengraph-image`, și `proba-vanzari`.
+
+**Găsit cu o clipă înainte de prima rulare pe producție, și e cel mai important
+lucru din secțiunea asta:** verificarea de izolare SCRIA într-un rând adevărat
+din `sites` și nu punea nimic la loc. Două dintre probele ei trebuie să reușească
+— clientul chiar are voie să-și publice site-ul și să-și salveze numele — deci pe
+baza reală i-ar fi publicat site-ul nepublicat unui cabinet și i-ar fi scris
+„Verificare izolare" în loc de nume. A treia punea domeniul înapoi pe o valoare
+scrisă de mână, a clientului de test. Reparată întâi cu „pune la loc", apoi,
+în aceeași zi, cu ceva mai tare: probele care scriu se ANULEAZĂ prin construcție,
+iar la sfârșit se numără rândurile din nou. Bancul nu putea arăta asta niciodată:
+acolo datele sunt de aruncat.
+
+**Și încă una, de mediu:** bancul pornea Postgres și număra două secunde. Pe o
+mașină încărcată nu ajung, iar o rulare a picat din motivul ăsta. Acum așteaptă
+până răspunde. Un banc care pică din când în când fără legătură cu ce s-a
+schimbat e mai rău decât unul lent — în CI se citește ca „e ceva stricat în cod".
+
+### Ce a mai scos un audit pe unghiuri independente (9 sept. 2026)
+
+Concluzia de mai sus a fost pusă la îndoială de trei verificări adversariale, ca
+să nu plece o afirmație despre o gaură de securitate pe jumătate dovedită.
+Niciuna n-a putut-o dărâma, iar una a adus dovada care lipsea: **`oricine` (adică
+PUBLIC) lipsește exact și numai la cele două funcții care au `revoke ... from
+public` în migrare.** Deci revocarea chiar a rulat — n-a fost o migrare intrată pe
+jumătate — și pur și simplu n-a fost de ajuns. Restul de patru funcții au
+`oricine=X`, cum se cuvine unora care n-au avut niciun revoke.
+
+Ce a adus în plus, și e reparat:
+
+- **Fiecare funcție VIITOARE se naște la fel de deschisă.** Reparația pe două
+  funcții nu e o reparație pe clasă. De aceea există acum
+  `e2e/drepturi-functii.proba.mjs`: cade dacă o migrare adaugă o funcție în
+  `public` fără să-i ia execuția de la `anon` și `authenticated` — sau fără să o
+  treacă, cu motivul scris, în lista celor deschise dinadins. Cele patru de acolo
+  (`current_site_id`, `set_updated_at`, `adauga_sectiunea_programare`,
+  `textul_de_pornire`) sunt acum o hotărâre scrisă, nu o scăpare.
+- **Mesajele de eroare ale lui `creeaza_client` erau un oracol peste conturi.**
+  „Nu există niciun cont cu emailul X" / „Contul X e deja legat de un site" /
+  „Domeniul X are deja un site" spuneau, fără nicio autentificare, dacă o adresă
+  are cont la noi. Se închide odată cu dreptul de execuție.
+- **`page_views_daily` n-are dinadins nicio politică de scriere**, deci funcția
+  `security definer` era SINGURA cale de scris în ea — și era deschisă. Cifrele
+  puteau fi scrise cu orice `day`, inclusiv în afara ferestrei de 30 de zile pe
+  care o citește panoul, deci fără să se vadă.
+- **Trei capcane viitoare în amprentă**, astupate: `m` nu poate apărea niciodată
+  la drepturile pe coloană (MAINTAIN e privilegiu de tabel), deci normalizarea de
+  acolo era cod mort care promitea o apărare inexistentă; `contype = 'n'` face ca
+  în PostgreSQL 18 fiecare `not null` să devină rând de catalog, adică un potop
+  de „ÎN PLUS ÎN BAZĂ" în ziua în care Supabase trece pe 18; iar `search_path`
+  hotărăște dacă textele recompuse de Postgres se scriu calificat sau nu — la
+  prima rulare s-a potrivit din noroc, acum e pus pe față în fișierul generat.
+- **Bancul își verifică singur fidelitatea.** `alter default privileges` se leagă
+  de rolul care o scrie; devenită tăcut inertă, bancul ar fi redevenit orb exact
+  pe apărarea asta. Acum se uită la un obiect adevărat creat de migrări și se
+  oprește dacă granturile implicite lipsesc.
+
+## Resetarea parolei (10 sept. 2026)
+
+Făcută, pe **puntea** cu expeditorul încorporat al Supabase — nu Resend, prin
+decizia despre email. Până acum `/login` avea doar email + parolă.
+
+Fluxul: „Ți-ai uitat parola?" pe `/login` → `/login/parola-uitata` (ceri linkul)
+→ emailul lui Supabase → `/login/confirma-resetare` (preschimbă tokenul într-o
+sesiune de recuperare) → `/login/parola-noua` (pui parola). Trei bucăți de cod;
+emailul îl trimite Supabase, iar parola o ține tot el — codul nostru n-o vede.
+
+Ce a cerut gândire, nu doar scris:
+
+- **Linkul se întoarce pe domeniul CLIENTULUI**, nu pe o adresă a platformei — cel
+  rezolvat de proxy (`x-site-domain`), ca după resetare omul să rămână pe site-ul
+  lui și `/dashboard` să meargă. Costul: fiecare domeniu de client se trece în
+  lista permisă din Supabase (Auth → URL Configuration) — merge la pachet cu
+  conectarea domeniului în Vercel, oricum manuală. Un `*.vercel.app` acoperă tot
+  cât suntem pe adrese temporare. E aceeași capcană de scalare ca la anti-spam,
+  ținută pe un singur loc.
+- **Ruta de confirmare acceptă două forme de link:** `token_hash` (șablonul nostru
+  de email, merge și de pe alt dispozitiv, fiindcă dovada e întreagă în link) și
+  `code` (implicitul PKCE al Supabase, doar în același browser). Așa merge și
+  înainte, și după ce se lipește șablonul din `sabloane/email-resetare-parola.md`.
+- **Paginile rămân deschise pe un site nepublicat** (`seServesteNepublicat`):
+  cererea și linkul vin FĂRĂ sesiune, deci nu le apără „ești proprietarul?", iar
+  un client își uită parola cel mai des tocmai cât își scrie site-ul, nepublicat.
+  Dar NU sunt tratate ca `/login` exact — altfel proxy-ul ar trimite la
+  `/dashboard` un om cu sesiune de recuperare, chiar înainte să-și pună parola.
+  Probele: `e2e/resetare-parola.proba.mjs`.
+- **Nu se spune niciodată dacă adresa are cont** — altfel formularul devine o
+  unealtă de aflat ce emailuri sunt înregistrate.
+
+**Ce trebuie făcut în Supabase, o dată** (proprietarul, nu sesiunea de dev):
+adresa de întoarcere în lista permisă, expeditorul încorporat pornit, și —
+recomandat — șablonul de email în română. Toate trei, pas cu pas, în
+`sabloane/email-resetare-parola.md`.
+
+**Puntea, nu destinația.** Expeditorul încorporat e de mică anvergură (câteva
+emailuri pe oră); pentru resetări rare e destul, iar rezerva rămâne resetarea
+manuală din tabloul Supabase. Când vine domeniul propriu și Resend, se schimbă o
+setare SMTP în Supabase — **codul de aici rămâne neatins**, fiindcă nu știe cine
+trimite emailul.
 
 ## Politica de confidențialitate se schimbă odată cu platforma
 

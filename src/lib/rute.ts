@@ -33,6 +33,26 @@ export function esteConectare(cale: string): boolean {
 }
 
 /**
+ * Paginile de resetare a parolei, sub `/login`.
+ *
+ * Stau separat de `esteConectare` dinadins. `esteConectare` hotărăște și
+ * redirectarea „ești logat pe /login → mergi la /dashboard" din proxy; dacă
+ * paginile astea ar intra acolo, un om venit pe linkul de resetare — care ARE o
+ * sesiune de recuperare — ar fi trimis la panou tocmai când vrea să-și pună
+ * parola nouă. Aici sunt folosite doar ca să rămână deschise pe un site
+ * nepublicat (vezi `seServesteNepublicat`), nu la redirectare.
+ */
+export const CAI_RESETARE = [
+  "/login/parola-uitata",
+  "/login/confirma-resetare",
+  "/login/parola-noua",
+] as const;
+
+export function esteResetareParola(cale: string): boolean {
+  return (CAI_RESETARE as readonly string[]).includes(cale);
+}
+
+/**
  * Ce se trece în `robots.txt` la `Disallow`.
  *
  * `Disallow` din robots.txt se potrivește ca PREFIX de text, nu ca segment de
@@ -48,4 +68,7 @@ export function esteConectare(cale: string): boolean {
 export const DISALLOW_ROBOTS = [
   ...RADACINI_PROPRII.flatMap((radacina) => [`${radacina}/`, `${radacina}$`]),
   "/login$",
+  // Prinde și paginile de resetare a parolei (`/login/parola-noua` etc.): sunt
+  // tranzitorii, cer un token din email și n-au ce căuta în căutări.
+  "/login/",
 ];

@@ -96,6 +96,14 @@ Regula: **o cale se compară pe segmente, nu pe litere.** `x === "/a"` sau
 potrivirea e pe prefix de text prin însăși definiția formatului, fiecare intrare
 se termină ori cu `/`, ori cu `$`.
 
+Aceeași formă, în alt loc, pe 9 sept. 2026: `/programare` era rută a site-ului
+public de două săptămâni, dar lipsea din `ADRESE_REZERVATE`. Panoul accepta o
+pagină cu adresa aia, o salva, o arăta la previzualizare — și n-o citea nimeni,
+fiindcă ruta noastră câștigă. **Orice rută nouă e și o adresă luată clientului**,
+iar asta nu se ține minte: `e2e/rute.proba.mjs` se uită acum la ce e pe disc și
+cade dacă o rută nu e trecută în listă. O a doua listă scrisă de mână ar fi fost
+doar încă un loc rămas în urmă.
+
 Corolarul, care e de fapt lecția: **o reparație pe jumătate e mai rea decât
 niciuna.** Dacă reparam doar proxy-ul, pagina ar fi mers și n-ar fi fost găsită
 de nimeni — iar clientul n-ar fi avut cum să afle de ce. Când o greșeală are
@@ -164,6 +172,113 @@ Regula era deja scrisă mai jos, la „Verificare vizuală"; ce lipsea e că se 
 **și după o reparație**, nu doar la o funcție nouă. Dacă schimbarea atinge ce se
 vede, se face captura și se privește. Un cod HTTP spune că serverul n-a căzut,
 nu că pagina arată a ceva.
+
+---
+
+## Ce se revocă de la PUBLIC nu e revocat de la roluri
+
+9 sept. 2026, la prima rulare a verificării de schemă pe baza reală. Două funcții
+pe care migrările le închideau cu `revoke execute ... from public` erau, în
+producție, chemabile de `anon` și `authenticated` — adică de oricine deschide
+site-ul, fiindcă cheia `anon` stă în pachetul trimis browserului, iar funcțiile
+din schema `public` sunt expuse ca RPC.
+
+Mecanica: în Postgres simplu, o funcție nouă poate fi executată de PUBLIC, iar
+rolurile moștenesc de acolo, deci o revocare de la PUBLIC le taie pe toate. Pe
+Supabase, proiectul are `alter default privileges ... grant all on functions to
+anon, authenticated, service_role`, așa că fiecare funcție nouă primește granturi
+EXPLICITE, pe rol, chiar la creare. Revocarea de la PUBLIC nu le atinge.
+
+A doua zi, aceeași apărare a arătat și partea a doua a lecției: migrarea de
+revocare a rulat, a răspuns „REVOKE", și n-a schimbat nimic. **`REVOKE` scoate
+doar granturile date de rolul care revocă**; unul dat de altcineva rămâne pe loc,
+fără eroare și fără avertizare. Deci la orice revocare care contează, se
+VERIFICĂ pe urmă că dreptul chiar a plecat — răspunsul comenzii nu e o dovadă.
+
+Regula: **la funcții, se revocă și de la roluri, pe nume.** Iar când o apărare stă
+în granturi și nu în RLS, ea se scrie ca verificare în
+`supabase/verificare-izolare.sql` și se probează stricând-o dinadins.
+
+Și, fiindcă fiecare funcție VIITOARE se naște la fel de deschisă, regula are o
+probă, nu un comentariu: `e2e/drepturi-functii.proba.mjs` cade dacă o migrare
+adaugă o funcție în `public` fără să-i ia execuția de la `anon` și
+`authenticated`. Se poate trece în lista celor deschise dinadins — dar cu motivul
+scris lângă, ceea ce face din scutire o hotărâre.
+
+Partea care merită ținută minte e însă alta. Migrarea din 27 aug. spune exact pe
+dos, și o spune cu dovadă: *„Un `revoke ... from anon` în plus n-ar face nimic —
+l-am scris, l-am probat, și nu schimba nimic."* Era adevărat pe banc. **Un lucru
+probat pe un banc infidel e mai periculos decât unul neprobat**, fiindcă închide
+întrebarea: nimeni nu mai verifică ce are „probat" scris lângă.
+
+Corolarul se leagă de regula despre banc de mai jos. Când adaugi o apărare de alt
+fel decât RLS, întrebarea nu e doar „o vede bancul?", ci **„ce face Supabase la
+crearea obiectului, pe care bancul nu-l face?"**. Drepturile implicite pe tabele
+au fost prima oară (27 aug.), cele pe funcții a doua (9 sept.). Aceeași formă, la
+două săptămâni distanță.
+
+
+---
+
+## O probă care scrie nu pune la loc — se anulează
+
+9 sept. 2026, cu o clipă înainte de prima rulare a verificării de izolare pe baza
+reală. Două dintre probele ei TREBUIE să reușească — clientul chiar are voie
+să-și publice site-ul și să-și salveze numele cabinetului — deci scriu într-un
+rând adevărat din `sites`. Și nu puneau nimic la loc.
+
+Pe bancul local, acolo e „Cabinet de probă 1" și nu contează. Pe baza reală ar fi
+fost cabinetul cuiva: verificarea i-ar fi PUBLICAT site-ul nepublicat și i-ar fi
+scris „Verificare izolare" în loc de numele lui — pe site, în fila din browser și
+în datele pentru Google. O unealtă de verificare care strică exact ce verifică.
+
+A treia probă punea domeniul la loc pe o valoare SCRISĂ DE MÂNĂ (`client-a.ro`),
+adică cea a clientului de test. Pe producție ar fi mutat un cabinet pe un domeniu
+străin.
+
+Prima reparație a fost „ia valorile înainte, pune-le la loc după". A trăit o
+oră. Se sprijinea tot pe cineva care își aduce aminte — la a treia probă nouă,
+cineva n-ar mai fi făcut-o.
+
+Regula, a doua și cea care rămâne: **o probă care scrie nu pune la loc — se
+ANULEAZĂ, prin construcție.** Rulează într-o sub-tranzacție încheiată cu o eroare
+a noastră (`raise sqlstate 'V0RBK'`), deci se anulează și când apărarea a ținut,
+și când n-a ținut. Nu există nimic de pus la loc, fiindcă nu s-a scris nimic.
+Iar la sfârșit, verificarea numără din nou rândurile din fiecare tabel și le
+compară cu cele de la început — dovada se citește, nu se presupune, și e singura
+care ar prinde o probă viitoare scrisă fără sub-tranzacție.
+
+Ce o face ușor de ratat: bancul nu poate arăta niciodată problema asta. Acolo
+datele sunt de aruncat, deci lipsa restaurării arată exact ca prezența ei.
+Întrebarea nu e „a trecut proba?", ci **„ce lasă în urmă, dacă rândul e al unui
+om?"**
+
+
+---
+
+## Un generator care n-a scris nimic arată exact ca unul care n-a avut ce schimba
+
+9 sept. 2026, la verificarea care compară baza reală cu migrările. Generatorul
+rulează cu `set -euo pipefail`, iar înăuntru caută nume prin fișierele de migrare
+cu `grep`. `grep` întoarce 1 când un fișier n-are nicio potrivire — ceea ce aici
+e normal, nu o eroare. Cu `pipefail`, acel 1 omora scriptul pe loc, fără niciun
+mesaj, iar fișierul generat rămânea cel de dinainte.
+
+Partea urâtă nu e greșeala, ci ce am făcut cu ea. Ca să dovedesc că generatorul
+scoate același fișier la fiecare rulare, l-am rulat de două ori și am comparat
+rezultatele: identice. Numai că amândouă rulările muriseră în tăcere, iar
+comparația se făcea între același fișier vechi și el însuși. Proba a spus
+„determinist" tocmai fiindcă nu se generase nimic.
+
+Regula: **când rezultatul unei unelte e un fișier, verifică fișierul, nu codul
+de ieșire.** Că s-a schimbat atunci când te așteptai să se schimbe, și că are
+înăuntru ce trebuie. Un `diff` între două rulări nu dovedește nimic dacă niciuna
+n-a scris.
+
+Corolarul se leagă de regula de mai jos despre probe care nu pică niciodată: o
+verificare care iese verde fără să fi rulat lucrul verificat e mai rea decât una
+care lipsește — pe a doua măcar o vezi că lipsește.
+
 
 ---
 
@@ -270,6 +385,11 @@ să scrie. Garanția „domeniul e blocat prin grant” era scrisă în CONTEXT.
 săptămâni și n-a putut fi verificată nici măcar o dată. Când adaugi o apărare de
 alt fel decât RLS, întreabă-te dacă bancul o poate vedea.
 
+S-a repetat pe 9 sept., la funcții: bancul nu reproducea nici granturile pe care
+Supabase le dă implicit pe FUNCȚII noi, deci două `revoke ... from public` păreau
+apărări și nu erau. Vezi §„Ce se revocă de la PUBLIC nu e revocat de la roluri".
+Bancul le pune acum pe amândouă, și pe secvențe.
+
 **Un tip nou de secțiune nu ajunge singur pe un site care există deja.**
 Panoul NU are flux de „adaugă secțiune” — rândurile din `site_content` vin
 seedate la provizionare, iar clientul le poate doar reordona, ascunde și edita.
@@ -287,6 +407,14 @@ verificarea de izolare. Rulează-l. Au plecat de două ori scripturi netestate
 lucrează prin interfața web, nu are depozitul deschis în față. Un „rulează
 migrarea `2026...sql`" nu înseamnă nimic pentru el. Trimite și fișierul cu
 `SendUserFile`, și textul în chat.
+
+**Și textul acela se SCOATE din fișier, nu se rescrie.** Pe 9 sept. 2026 s-a
+văzut de ce: `adauga_sectiunea_programare` era în producție identică cu migrarea
+mai puțin comentariile — adică ce se rulase pe 27 aug. era o copie din discuție,
+prescurtată, nu fișierul. Ce ajunge în baza reală e ce scrie în chat, deci dacă
+cele două se despart, producția o urmează tăcut pe cea din chat, iar depozitul
+minte de atunci înainte. Când e mai lung de câteva rânduri, îl scoate un script
+din fișier.
 
 **Un test care nu pică niciodată nu dovedește nimic.** Verificarea de izolare a
 trecut senin peste o politică stricată dinadins, fiindcă număra un refuz ca

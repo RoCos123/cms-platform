@@ -31,6 +31,14 @@ export const ADRESE_REZERVATE = [
   "login",
   // Pagina de așteptare a unui site încă nepublicat.
   "nepublicat",
+  // Ecranul public de programare. Lipsea până pe 9 sept. 2026, deși ruta există
+  // de pe 27 aug.: panoul accepta o pagină „programare", care apoi nu se vedea
+  // niciodată, fiindcă ruta noastră câștigă în fața celei după adresă.
+  "opengraph-image",
+  "programare",
+  // Previzualizarea site-ului de vânzări. Rută de lucru, dar cât timp există,
+  // umbrește o pagină a clientului cu aceeași adresă.
+  "proba-vanzari",
   "robots.txt",
   "servicii",
   "site-unavailable",

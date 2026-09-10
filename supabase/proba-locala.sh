@@ -29,7 +29,20 @@ rm -rf "$BAZA"; mkdir -p "$BAZA/data" "$BAZA/sock"; chown -R postgres:postgres "
 runuser -u postgres -- "$BIN/initdb" -D "$BAZA/data" -U postgres --auth=trust >/dev/null
 runuser -u postgres -- "$BIN/pg_ctl" -D "$BAZA/data" \
   -o "-k $SOCK -c listen_addresses=''" -l "$BAZA/pg.log" start >/dev/null
-sleep 2
+
+# Se AȘTEAPTĂ până răspunde, nu se numără două secunde. Pe 9 sept. 2026 o rulare
+# a picat fiindcă soclul încă nu exista — pe o mașină mai încărcată, două secunde
+# nu ajung. Un banc care pică din când în când, fără legătură cu ce s-a schimbat,
+# e mai rău decât unul lent: în CI se citește ca „e ceva stricat în cod".
+for _ in $(seq 60); do
+  "$BIN/pg_isready" -h "$SOCK" -U postgres >/dev/null 2>&1 && break
+  sleep 0.5
+done
+if ! "$BIN/pg_isready" -h "$SOCK" -U postgres >/dev/null 2>&1; then
+  echo "Postgres nu a pornit în 30 de secunde. Jurnalul lui:" >&2
+  tail -20 "$BAZA/pg.log" >&2
+  exit 1
+fi
 
 ruleaza() { psql -h "$SOCK" -U postgres -d postgres -v ON_ERROR_STOP=1 -q "$@"; }
 
@@ -72,13 +85,48 @@ SQL
 # Supabase nu re-acordă nimic după migrările tale; dă drepturile prin
 # `alter default privileges`, la crearea tabelului. Asta face și linia de mai
 # jos, iar un `revoke` dintr-o migrare rămâne în picioare, ca acolo.
-ruleaza -c "alter default privileges in schema public grant all on tables to anon, authenticated, service_role;"
+ruleaza -c "alter default privileges in schema public grant all on tables to postgres, anon, authenticated, service_role;"
+
+# ȘI PE FUNCȚII. Aceeași lecție ca mai sus, în al doilea loc — găsit pe 9 sept. 2026,
+# la prima rulare a verificării de schemă pe baza reală: acolo funcțiile aveau
+# `anon=X authenticated=X service_role=X`, aici niciunul. Adică `revoke execute ...
+# from public` din migrări părea o apărare, fiindcă pe banc nu exista niciun grant
+# explicit pe care să-l lase în picioare.
+ruleaza -c "alter default privileges in schema public grant all on functions to postgres, anon, authenticated, service_role;"
+ruleaza -c "alter default privileges in schema public grant all on sequences to postgres, anon, authenticated, service_role;"
 
 echo "→ rulez migrările, în ordine"
 for m in "$RADACINA"/supabase/migrations/*.sql; do
   printf "   %-52s" "$(basename "$m")"
   ruleaza -f "$m" && echo "ok"
 done
+
+# ---------------------------------------------------------------------------
+# A prins declarația de mai sus?
+#
+# Dacă nu, bancul redevine orb exact pe felul de apărare care ne-a scăpat pe
+# 9 sept.: verificările 6 și 11 ar trece iar din motivul greșit, iar nimic n-ar
+# spune-o. `alter default privileges` se leagă de rolul care o scrie și de schemă
+# — destule feluri de a deveni tăcut inertă la o schimbare de mediu.
+#
+# Se uită la un obiect ADEVĂRAT, creat de migrări, nu la declarație: doar așa se
+# știe că a și fost aplicată, nu doar scrisă.
+# ---------------------------------------------------------------------------
+echo "→ verific că bancul chiar a primit drepturile implicite ale Supabase"
+FIDEL="$(ruleaza -tAc "select coalesce(array_to_string(proacl, ' '), '') like '%anon=X%'
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname = 'public' and p.proname = 'current_site_id'")"
+
+if [ "$FIDEL" != "t" ]; then
+  echo
+  echo "BANCUL E INFIDEL: funcțiile din public n-au primit granturile explicite pe"
+  echo "care Supabase le dă prin 'alter default privileges'. Fără ele, un"
+  echo "'revoke ... from public' pare o apărare și nu e — vezi CONVENTII.md,"
+  echo "§„Ce se revocă de la PUBLIC nu e revocat de la roluri\"."
+  exit 1
+fi
+echo "   drepturile implicite pe funcții: puse"
+echo
 
 echo "→ seedez doi clienți, cu câte un rând în fiecare tabel"
 ruleaza <<'SQL'
@@ -100,6 +148,7 @@ begin
     insert into public.blog_articles (site_id, slug, title, excerpt, content, status, author_id)
       values (s, 'primul', 'Primul articol', 'Extras.', 'Text.', 'published', u);
     insert into public.uploads (site_id, storage_path, filename, mime_type, size_bytes) values (s, s || '/poza.png', 'poza.png', 'image/png', 1000);
+    insert into storage.objects (bucket_id, name) values ('media', s || '/poza.png');
     insert into public.contact_messages (site_id, name, email, message) values (s, 'Vizitator', 'v@exemplu.ro', 'Bună ziua.');
     insert into public.appointments (site_id, name, email, starts_at, status) values (s, 'Vizitator', 'v@exemplu.ro', now(), 'ceruta');
     insert into public.audit_log (site_id, actor_id, action, entity_type) values (s, u, 'update', 'SiteContent');
@@ -138,7 +187,7 @@ psql -h "$SOCK" -U postgres -d postgres -f "$RADACINA/supabase/verificare-izolar
 #
 # Până acum scriptul doar TIPĂREA tabelul de mai sus și ieșea cu 0, chiar dacă o
 # verificare dădea PICAT. Adică bancul se sprijinea pe cineva care se uită atent
-# la douăsprezece rânduri — ceea ce merge când rulezi o dată și nu merge deloc
+# la fiecare rând — ceea ce merge când rulezi o dată și nu merge deloc
 # într-un CI, unde nimeni nu se uită dacă scrie „verde".
 #
 # `NECONCLUDENT` cade la fel ca `PICAT`, dinadins: o verificare care n-a putut
@@ -158,6 +207,17 @@ if [ -n "$RELE" ]; then
   echo "  psql -h $SOCK -U postgres -d postgres"
   exit 1
 fi
+
+# ---------------------------------------------------------------------------
+# Amprenta schemei, rescrisă din baza pe care tocmai am construit-o.
+#
+# Stă AICI, nu într-un pas de sine stătător, fiindcă cere baza pornită și
+# fiindcă orice migrare nouă trece oricum pe banc întâi. Așa, fișierul de
+# verificat baza reală nu poate rămâne în urma migrărilor fără ca cineva să vadă
+# o schimbare neașteptată în `git status`.
+# ---------------------------------------------------------------------------
+echo
+PGPROBA_SOCK="$SOCK" bash "$RADACINA/supabase/genereaza-verificare-schema.sh"
 
 echo
 echo "Toate verificările de izolare au trecut."

@@ -76,8 +76,9 @@ jobs:
   #
   # Bancul face trei lucruri, în ordine: aplică TOATE migrările pe o bază goală,
   # provizionează un client cu `creeaza_client` ca la un client adevărat, apoi
-  # trece cele treisprezece verificări de izolare. Iese cu 1 dacă vreuna dă
-  # PICAT sau NECONCLUDENT.
+  # trece verificările de comportament (izolare, drepturi, depozit, structură —
+  # toate derivate din catalog, nu dintr-o listă). Iese cu 1 dacă vreuna dă
+  # PICAT, ATENȚIE sau NECONCLUDENT.
   # ==========================================================================
   migrari:
     runs-on: ubuntu-latest
@@ -103,3 +104,38 @@ jobs:
       # /var/lib/postgresql și rularea ca utilizatorul `postgres`.
       - name: Migrări și verificări de izolare
         run: sudo bash supabase/proba-locala.sh
+
+      # ----------------------------------------------------------------------
+      # Amprenta schemei e la zi?
+      #
+      # Bancul rescrie `supabase/verificare-schema.sql` din baza pe care tocmai
+      # a construit-o. Dacă fișierul comis diferă, cineva a schimbat o migrare
+      # fără să regenereze — iar fișierul cu care se verifică baza reală ar fi
+      # rămas să spună „totul e la fel" despre o schemă care nu mai e aia.
+      #
+      # DE CE SE SARE PESTE, LA ALTĂ VERSIUNE MAJORĂ. O parte din amprentă
+      # (constrângeri, indecși, politici) e text pe care Postgres îl recompune
+      # singur și îl poate scrie altfel de la o versiune la alta. În ziua în
+      # care imaginea GitHub trece pe alt Postgres, comparația asta ar da roșu
+      # pe cod bun — iar un CI care dă roșu pe cod bun se ignoră în două
+      # săptămâni. Atunci se regenerează local pe versiunea nouă, o dată.
+      # ----------------------------------------------------------------------
+      - name: Amprenta schemei e la zi
+        run: |
+          FISIER=supabase/verificare-schema.sql
+          MAJOR_AMPRENTA=$(sed -n 's/.*luată pe PostgreSQL \([0-9]\{1,\}\).*/\1/p' "$FISIER" | head -1)
+          MAJOR_AICI=$(ls -d /usr/lib/postgresql/*/bin | sed 's|.*/postgresql/||; s|/bin||' | sort -V | tail -1)
+
+          if [ "$MAJOR_AMPRENTA" != "$MAJOR_AICI" ]; then
+            echo "Amprenta e luată pe PostgreSQL $MAJOR_AMPRENTA, aici e $MAJOR_AICI."
+            echo "Sar peste comparație: diferențele ar fi de scriere, nu de schemă."
+            exit 0
+          fi
+
+          if ! git diff --exit-code -- "$FISIER"; then
+            echo
+            echo "$FISIER nu mai e la zi cu migrările."
+            echo "Rulează local  bash supabase/proba-locala.sh  și comite fișierul rescris."
+            exit 1
+          fi
+          echo "Amprenta e la zi (PostgreSQL $MAJOR_AICI)."
