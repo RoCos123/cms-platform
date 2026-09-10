@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
-import { CAMPURI_SERVICIU } from "@/lib/servicii";
+import { CAMPURI_SERVICIU, rezumatServiciu } from "@/lib/servicii";
 import { catreEditor, catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 
 export type RezultatServiciu =
@@ -100,9 +100,16 @@ export async function salveazaServiciu(
   // ajungă.
   const curat = catreStocare(catreEditor(valori, CAMPURI_SERVICIU), CAMPURI_SERVICIU);
 
+  // Rezumatul de pe cartonaș se scoate din descriere, nu se scrie de mână.
+  // Coloana `excerpt` rămâne (cartonașul citea din ea), dar acum o umplem noi.
+  const curatCuRezumat = {
+    ...curat,
+    excerpt: rezumatServiciu(String(curat.content ?? "")),
+  };
+
   const { error } = await supabase
     .from("services")
-    .update(curat)
+    .update(curatCuRezumat)
     .eq("id", id)
     .eq("site_id", session.siteId);
 

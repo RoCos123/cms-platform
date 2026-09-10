@@ -113,7 +113,7 @@ export function ListaServicii({ initiale }: { initiale: RandServiciuLista[] }) {
                 )}
               </p>
               <p className="mt-0.5 truncate text-sm text-muted-foreground">
-                {rand.descriereScurta || "Fără descriere scurtă."}
+                {rand.descriereScurta || "Fără descriere."}
               </p>
             </div>
 

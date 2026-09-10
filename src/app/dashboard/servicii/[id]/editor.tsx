@@ -9,7 +9,7 @@ import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare
 import { BlocServiciu } from "@/components/site/sections/servicii-detaliate";
 import { Section } from "@/components/site/section";
 import type { Template } from "@/lib/templates";
-import { CAMPURI_SERVICIU } from "@/lib/servicii";
+import { CAMPURI_SERVICIU, rezumatServiciu } from "@/lib/servicii";
 import { catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 import { salveazaServiciu } from "../actions";
 
@@ -67,8 +67,8 @@ export function EditorServiciu({
           {String(valoare.title ?? "") || "Serviciu"}
         </h1>
         <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          Se vede pe pagina de servicii. Cartonașul de pe prima pagină ia doar numele și
-          descrierea scurtă.
+          Se vede pe pagina de servicii, iar pe cartonașul din prima pagină apar numele și
+          primul rând al descrierii.
         </p>
       </div>
 
@@ -92,7 +92,7 @@ export function EditorServiciu({
                 id,
                 slug: String(date.slug ?? ""),
                 titlu: String(date.title ?? "") || "Numele serviciului",
-                descriereScurta: String(date.excerpt ?? ""),
+                descriereScurta: rezumatServiciu(String(date.content ?? "")),
                 descriereCompleta: String(date.content ?? ""),
                 pret: String(date.price_label ?? "") || null,
                 durata: String(date.duration_label ?? "") || null,

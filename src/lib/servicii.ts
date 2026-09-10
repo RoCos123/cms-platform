@@ -1,13 +1,15 @@
 import type { CampSchema } from "@/lib/sectiuni";
+import { blocuriText } from "@/lib/blocuri-text";
 
 /**
  * Un serviciu, așa cum îl scrie clientul.
  *
- * Se scrie O SINGURĂ DATĂ, aici. Cartonașul de pe prima pagină ia numele și
- * descrierea scurtă; pagina de servicii le ia pe toate. Fără regula asta,
- * clientul ar scrie fiecare serviciu de două ori, iar peste trei luni ar
- * schimba prețul într-un loc și l-ar uita în celălalt — site-ul s-ar contrazice
- * singur, exact ce semnala auditul site-ului original.
+ * Se scrie O SINGURĂ DATĂ, aici: un NUME și o DESCRIERE, atât. Cartonașul de pe
+ * prima pagină ia numele și își scoate SINGUR un rezumat din primul rând al
+ * descrierii (vezi `rezumatServiciu`); pagina de servicii ia descrierea
+ * întreagă. Clientul nu mai scrie un „scurt" și un „lung" care se contrazic
+ * peste trei luni — hotărât cu proprietarul pe 10 sept. 2026, după ce cele două
+ * casete de descriere l-au încurcat la primul lui site.
  */
 
 export const CAMPURI_SERVICIU: CampSchema[] = [
@@ -31,18 +33,10 @@ export const CAMPURI_SERVICIU: CampSchema[] = [
   },
   {
     tip: "textLung",
-    cheie: "excerpt",
-    eticheta: "Descrierea scurtă",
-    hint: "Cele două rânduri de pe cartonașul din prima pagină. Cât să înțeleagă cineva dintr-o privire dacă e pentru el.",
-    obligatoriu: true,
-    randuri: 3,
-    max: 300,
-  },
-  {
-    tip: "textLung",
     cheie: "content",
-    eticheta: "Descrierea completă",
-    hint: "Ce se citește pe pagina de servicii: cui se adresează, cum decurge, la ce să se aștepte. Lasă gol dacă n-ai pornit pagina de servicii — atunci nu are unde să apară.",
+    eticheta: "Descriere",
+    hint: "Cui se adresează, cum decurge, la ce să se aștepte. Primul rând apare pe cartonașul din prima pagină; textul întreg, pe pagina de servicii.",
+    obligatoriu: true,
     randuri: 10,
     cuSubtitluri: true,
     /**
@@ -85,3 +79,24 @@ export type Serviciu = {
   pret?: string | null;
   durata?: string | null;
 };
+
+/**
+ * Rezumatul de pe cartonașul din prima pagină, scos AUTOMAT din descriere.
+ *
+ * Clientul scrie o singură descriere; cartonașul ia primul PARAGRAF al ei,
+ * sărind peste un eventual subtitlu de la început (`## Cum decurge` n-are ce
+ * căuta pe un cartonaș de două rânduri). Se salvează în coloana `excerpt`, de
+ * unde cartonașul citea și înainte — deci randarea nu se schimbă, doar sursa.
+ *
+ * Tăiat la o margine de cuvânt, cu „…", ca să nu rupă un cuvânt în două. Node
+ * îl poate proba direct: e text curat, fără bază de date, fără JSX.
+ */
+export function rezumatServiciu(descriere: string, maxCaractere = 200): string {
+  const primulParagraf = blocuriText(descriere).find((b) => b.tip === "paragraf");
+  const text = (primulParagraf?.text ?? "").trim();
+
+  if (text.length <= maxCaractere) return text;
+
+  const taiat = text.slice(0, maxCaractere).replace(/\s+\S*$/, "").trimEnd();
+  return `${taiat}…`;
+}
