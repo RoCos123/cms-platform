@@ -136,9 +136,13 @@ Ce s-a hotărât pe parcurs, ca să nu fie redeschis din senin:
   descriere, „scurtă" (cartonașul de pe prima pagină) și „completă" (pagina de
   servicii); proprietarul s-a împiedicat de ele la primul lui site — le-a citit
   ca redundante și a turnat conținut de pagină în cartonaș. Acum scrie o singură
-  descriere, iar cartonașul își scoate SINGUR rezumatul din primul ei paragraf
-  (`rezumatServiciu`, sărind peste un `##` de la început). Coloana `excerpt`
-  rămâne — cartonașul citea din ea — dar o umple salvarea, nu clientul. Probă:
+  descriere, iar cartonașul își scoate SINGUR rezumatul din primul ei rând
+  (`rezumatServiciu`). Coloana `excerpt` rămâne — cartonașul citea din ea — dar o
+  umple salvarea, nu clientul. **Serviciile NU au subtitluri:** `##` e oprit de
+  tot acolo (`blocuriText(..., { subtitluri: false })` + `CorpText subtitluri={false}`),
+  fiindcă proprietarul nu vrea ca clientul să scrie cu `##`; un `##` rămas din
+  greșeală se randează ca text simplu, cu diezii scoși. Blog și pagini îl
+  PĂSTREAZĂ (texte lungi, unde un zid fără subtitluri obosește). Probă:
   `e2e/servicii-rezumat.proba.mjs`. Lecție de fundal: doi oameni deștepți nu se
   împiedică degeaba de același lucru — a doua confuzie de „care câmp ce face" a
   fost semnalul că o casetă era de prisos, nu că omul n-a citit.
