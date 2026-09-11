@@ -164,7 +164,18 @@ aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
    să-i lege `onLoad`, deci evenimentul nu vine — dimensiunile se citesc direct
    din `<img>` la momentul tragerii, nu dintr-un `onLoad`. RĂMÂNE pentru mai
    târziu: coperta articolelor de blog (alt mecanism, `cover_upload_id`).
-2. **Link în butonul de la Pachete** — butonul să ducă spre un program/curs.
+2. **Link în butonul de la Pachete** (+ punctul 6, același buton) — GATA. Câmpul
+   „unde duce" al oricărui buton era o casetă liberă cu exemplul „/contact" — dar
+   `/contact` NU e o pagină (secțiunea de contact e `#contact`), deci cine urma
+   exemplul ajungea la 404. Acum e o LISTĂ (`SelectField`) cu destinațiile care
+   chiar există pe site-ul lui: secțiunile vizibile (ca `#ancoră` — toate stau pe
+   prima pagină, deci ancora duce mereu unde trebuie) și paginile publicate (ca
+   `/adresă`), plus „O altă adresă" pentru un link în afară. Butonul de la Pachete
+   se leagă acum de „Programe și experiențe" (`#programe`) sau de un curs extern
+   dintr-un clic. Logica listei: `src/lib/destinatii.ts` (probată în
+   `e2e/destinatii.proba.mjs`); adusă în editor prin `page.tsx` → `editor.tsx` →
+   `CampuriSectiune` (`CampLink`). O adresă veche stricată apare ca „altă adresă",
+   ca s-o poți repara alegând din listă.
 3. **Video în secțiunea Apariții (`logos`)** — acum doar link; de adăugat
    încorporare video cu buton de play (model: Renata Iancu).
 4. **Fișiere de descărcat** — depozit pentru documente (fișe Word/PDF) pe care
@@ -180,8 +191,10 @@ aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
    componenta `src/components/site/bula-whatsapp.tsx`, montată în
    `cadru-site.tsx` (urcată deasupra barei de administrare pentru proprietarul
    logat). Gol → butonul nu apare. Verificat vizual la 1200px și 390px.
-6. **Bug: butonul de la Pachete** — setat spre Contact, dar pe site duce la o
-   pagină inexistentă. De reparat.
+6. **Bug: butonul de la Pachete** — GATA, rezolvat odată cu punctul 2. Cauza era
+   exemplul „/contact" din câmpul de link, care e o pagină inexistentă (contactul
+   e secțiunea `#contact`). Lista de destinații nu mai lasă butonul să nimerească
+   un loc care nu există.
 7. **Aliniere text/poză la „Despre mine" (`aboutTeaser`)** — textul din dreapta
    să fie în dreptul pozei (acum stă sus, lângă titlu, iar poza e jos).
 

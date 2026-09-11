@@ -1,4 +1,9 @@
-import type { InputHTMLAttributes, TextareaHTMLAttributes, ReactNode } from "react";
+import type {
+  InputHTMLAttributes,
+  SelectHTMLAttributes,
+  TextareaHTMLAttributes,
+  ReactNode,
+} from "react";
 import { useId } from "react";
 import { cn } from "@/lib/cn";
 
@@ -88,6 +93,28 @@ export function TextField({ label, hint, error, className, ...props }: TextField
           className={cn(CONTROL_CLASS, error && "border-danger", className)}
           {...props}
         />
+      )}
+    </FieldShell>
+  );
+}
+
+export type SelectFieldProps = Omit<SelectHTMLAttributes<HTMLSelectElement>, "id"> & {
+  label: string;
+  hint?: ReactNode;
+  error?: string;
+};
+
+export function SelectField({ label, hint, error, className, children, ...props }: SelectFieldProps) {
+  return (
+    <FieldShell label={label} hint={hint} error={error} required={props.required}>
+      {(binding) => (
+        <select
+          {...binding}
+          className={cn(CONTROL_CLASS, error && "border-danger", className)}
+          {...props}
+        >
+          {children}
+        </select>
       )}
     </FieldShell>
   );
