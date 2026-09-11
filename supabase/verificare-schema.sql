@@ -33,7 +33,7 @@
 -- coloanele alăturate, care arată amândouă textele. Rândurile „LIPSEȘTE" și „ÎN
 -- PLUS" nu au ambiguitatea asta.
 --
--- 254 lucruri verificate: tabele, coloane, constrângeri, indecși, politici
+-- 256 lucruri verificate: tabele, coloane, constrângeri, indecși, politici
 -- RLS, funcții (cu drepturile lor de execuție), declanșatori, drepturi pe tabel
 -- și pe coloană, și steagul de public al depozitului de fișiere.
 -- ============================================================================
@@ -418,8 +418,10 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('drept', 'public.users', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
 ,  ('drept-coloana', 'public.sites.name', 'authenticated=w', '—')
 ,  ('drept-coloana', 'public.sites.published_at', 'authenticated=w', '—')
+,  ('functie', 'public._cloneaza_tabel(p_tabel text, p_sursa uuid, p_overrides jsonb)', 'cuprins ab2172fadbb0 | security invoker | drepturi nimeni din cei trei', '20260911130000_cloneaza_site.sql')
 ,  ('functie', 'public.adauga_sectiunea_programare()', 'cuprins 934ddbb41d43 | security definer | drepturi oricine=X anon=X authenticated=X service_role=X', '20260827160000_sectiunea_programare.sql')
-,  ('functie', 'public.creeaza_client(p_domeniu text, p_nume text, p_email text, p_sablon text, p_cu_programari boolean)', 'cuprins 19f3b7bace5a | security definer | drepturi service_role=X', '20260909100000_drepturi_de_executie.sql')
+,  ('functie', 'public.cloneaza_site(p_sursa_domeniu text, p_tinta_domeniu text, p_tinta_nume text, p_tinta_email text, p_tinta_sablon text)', 'cuprins e12f1f919996 | security definer | drepturi service_role=X', '20260911130000_cloneaza_site.sql')
+,  ('functie', 'public.creeaza_client(p_domeniu text, p_nume text, p_email text, p_sablon text, p_cu_programari boolean)', 'cuprins 19f3b7bace5a | security definer | drepturi service_role=X', '20260911130000_cloneaza_site.sql')
 ,  ('functie', 'public.current_site_id()', 'cuprins 9e5a0c2f19f2 | security definer | drepturi oricine=X anon=X authenticated=X service_role=X', '20260901090000_depozit_privat.sql')
 ,  ('functie', 'public.inregistreaza_afisarea(p_site_id uuid, p_zi date, p_cale text)', 'cuprins ebd86d2bfbca | security definer | drepturi service_role=X', '20260909100000_drepturi_de_executie.sql')
 ,  ('functie', 'public.set_updated_at()', 'cuprins 0ba6f773f96d | security invoker | drepturi oricine=X anon=X authenticated=X service_role=X', '20260827160000_sectiunea_programare.sql')

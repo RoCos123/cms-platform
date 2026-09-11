@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { verificaProprietar } from "@/lib/proprietar";
+import { createServiceClient } from "@/lib/supabase/admin";
 import { listTemplates } from "@/lib/templates";
 import { ClientNouForm } from "./client-nou-form";
 
@@ -12,6 +13,17 @@ export default async function ClientNouPage() {
   // una singură (`listTemplates`), iar clientul nu importă tot registrul de
   // șabloane în pachetul lui.
   const sabloane = listTemplates().map((t) => ({ id: t.id, nume: t.nume }));
+
+  // Site-urile existente, ca surse posibile de clonare.
+  const service = createServiceClient();
+  const { data: siteuri } = await service
+    .from("sites")
+    .select("domain, name")
+    .order("name", { ascending: true });
+  const surse = ((siteuri ?? []) as { domain: string; name: string }[]).map((s) => ({
+    domeniu: s.domain,
+    nume: s.name,
+  }));
 
   return (
     <div className="min-h-full bg-zinc-50 dark:bg-zinc-950">
@@ -27,7 +39,7 @@ export default async function ClientNouPage() {
       </header>
 
       <main className="mx-auto flex max-w-5xl justify-center px-4 py-8 sm:px-6">
-        <ClientNouForm sabloane={sabloane} />
+        <ClientNouForm sabloane={sabloane} surse={surse} />
       </main>
     </div>
   );

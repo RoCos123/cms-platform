@@ -8,7 +8,13 @@ const eticheta = "text-sm font-medium text-zinc-700 dark:text-zinc-300";
 const camp =
   "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50";
 
-export function ClientNouForm({ sabloane }: { sabloane: { id: string; nume: string }[] }) {
+export function ClientNouForm({
+  sabloane,
+  surse,
+}: {
+  sabloane: { id: string; nume: string }[];
+  surse: { domeniu: string; nume: string }[];
+}) {
   const [state, action, pending] = useActionState(creeazaClientNou, undefined);
 
   if (state && "ok" in state) {
@@ -46,6 +52,23 @@ export function ClientNouForm({ sabloane }: { sabloane: { id: string; nume: stri
         <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Client nou</h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           Face contul de login și site-ul dintr-o mișcare. Domeniul îl conectezi separat în Vercel.
+        </p>
+      </div>
+
+      <div className="space-y-1">
+        <label htmlFor="sursa" className={eticheta}>
+          Pornește de la
+        </label>
+        <select id="sursa" name="sursa" defaultValue="" className={camp}>
+          <option value="">Site gol (conținut demo)</option>
+          {surse.map((s) => (
+            <option key={s.domeniu} value={s.domeniu}>
+              Copie a: {s.nume} ({s.domeniu})
+            </option>
+          ))}
+        </select>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          Alegi un site aici și îi clonez tot conținutul pe șablonul de mai jos. Pozele se reîncarcă separat.
         </p>
       </div>
 
