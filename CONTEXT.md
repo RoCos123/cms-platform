@@ -205,6 +205,18 @@ nouă → disponibilă la toți, dar apare doar unde e folosită. O aranjare cer
 UNUL se face ca `variant` (mecanism deja construit, nefolosit), nu ca rescriere.
 Regula de business: se vând funcții și opțiuni, nu personalizări per client.
 
+## Panoul pe telefon (11 sept. 2026)
+
+Cerut de proprietar. Meniul din stânga era fix, 256px, mereu la vedere — pe un
+telefon de 390px mânca tot ecranul. Acum, pe ecran lat rămâne cum era, iar pe
+telefon se ascunde și se deschide ca un SERTAR dintr-un buton hamburger (se
+închide din link, fundal, X sau Escape). Scheletul a fost scos din
+`layout.tsx` (rămas server) într-o componentă de client,
+`src/components/dashboard/cadru-panou.tsx`, care primește antetul, meniul și
+uneltele ca slot-uri. Emailul din antet dispare primul pe telefon. Restul
+ecranelor se așezau deja pe o coloană sub `lg:` — blocajul era doar bara din
+stânga. Probat vizual la 390px și 1280px.
+
 ---
 
 ## Decizii confirmate
