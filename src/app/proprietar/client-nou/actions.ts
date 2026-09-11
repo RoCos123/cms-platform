@@ -38,6 +38,9 @@ export async function creeazaClientNou(
   const parola = String(formData.get("parola") ?? "");
   const sablon = String(formData.get("sablon") ?? "caldura");
   const cuProgramari = formData.get("programari") === "on";
+  // Gol → site nou cu conținut demo. Un domeniu → clonează conținutul acelui
+  // site pe șablonul ales.
+  const sursa = String(formData.get("sursa") ?? "").trim().toLowerCase();
 
   if (!nume || !domeniu || !email || !parola) {
     return { error: "Numele, domeniul, emailul și parola inițială sunt toate obligatorii." };
@@ -68,14 +71,24 @@ export async function creeazaClientNou(
     return { error: `Nu am putut crea contul de login: ${eCreat.message}` };
   }
 
-  // 2. Provizionarea.
-  const { data: rez, error: eRpc } = await service.rpc("creeaza_client", {
-    p_domeniu: domeniu,
-    p_nume: nume,
-    p_email: email,
-    p_sablon: sablon,
-    p_cu_programari: cuProgramari,
-  });
+  // 2. Provizionarea: fie un site gol (`creeaza_client`), fie o copie exactă a
+  //    altui site (`cloneaza_site`). Ambele funcții existente, chemate după ce
+  //    contul e făcut; `service_role` are execuția pe amândouă.
+  const { data: rez, error: eRpc } = sursa
+    ? await service.rpc("cloneaza_site", {
+        p_sursa_domeniu: sursa,
+        p_tinta_domeniu: domeniu,
+        p_tinta_nume: nume,
+        p_tinta_email: email,
+        p_tinta_sablon: sablon,
+      })
+    : await service.rpc("creeaza_client", {
+        p_domeniu: domeniu,
+        p_nume: nume,
+        p_email: email,
+        p_sablon: sablon,
+        p_cu_programari: cuProgramari,
+      });
 
   if (eRpc) {
     if (amCreatCont && userId) {
