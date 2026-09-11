@@ -382,8 +382,13 @@ const LISTA: MetaSectiune[] = [
             tip: "text",
             cheie: "subPret",
             eticheta: "Ce se înțelege prin preț",
-            hint: "Ex.: primul an inclus, per ședință, o singură dată.",
-            max: 60,
+            // Se chema un scurt calificativ („primul an inclus”), de-aici 60. Dar
+            // clienții îl folosesc pentru o propoziție întreagă („3 ședințe
+            // gratuite să ne cunoaștem și să facem planul”), care nu încăpea. Sub
+            // preț se randează ca paragraf, deci un rând mai lung doar se rupe pe
+            // două — nu strică pachetul.
+            hint: "Ex.: primul an inclus, per ședință, sau o propoziție scurtă despre ce intră în preț.",
+            max: 140,
           },
           {
             tip: "textLung",
