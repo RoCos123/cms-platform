@@ -1,4 +1,5 @@
 import type { SectionTone } from "@/lib/templates";
+import type { PunctFocal } from "@/lib/punct-focal";
 import { Section, SectionEyebrow } from "@/components/site/section";
 import { SectionImage } from "@/components/site/section-image";
 
@@ -12,7 +13,7 @@ export type AboutTeaserData = {
   fraza?: string;
   buton?: { text: string; href: string };
   /** Aceeași formă ca la încărcare (`ImageValue`). De obicei portretul. */
-  imagine?: { url: string; altText?: string };
+  imagine?: { url: string; altText?: string; pozitie?: PunctFocal };
 };
 
 export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: SectionTone }) {
@@ -79,6 +80,7 @@ export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: Sect
                 alt={poza.altText ?? ""}
                 aspectRatio="4 / 5"
                 sizes="(max-width: 720px) 100vw, 380px"
+                pozitie={poza.pozitie}
               />
             </div>
           )}

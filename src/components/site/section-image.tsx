@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { pozitiaImaginii, type PunctFocal } from "@/lib/punct-focal";
 
 /**
  * Prin optimizator trec DOAR adresele relative — adică fișierele servite de noi,
@@ -28,6 +29,9 @@ function poateFiOptimizata(src: string): boolean {
  *
  * `aspectRatio` e obligatoriu, nu opțional: fără el, înălțimea imaginii se află
  * abia după încărcare și conținutul de dedesubt sare (CLS).
+ *
+ * `pozitie` (punctul focal) hotărăște ce rămâne în cadru când poza e tăiată. Un
+ * `object-position` derivat din el; lipsă → „50% 50%", exact ca înainte.
  */
 export function SectionImage({
   src,
@@ -35,12 +39,14 @@ export function SectionImage({
   aspectRatio,
   sizes = "(max-width: 720px) 100vw, 50vw",
   priority = false,
+  pozitie,
 }: {
   src: string;
   alt: string;
   aspectRatio: string;
   sizes?: string;
   priority?: boolean;
+  pozitie?: PunctFocal;
 }) {
   const stilInvelis: React.CSSProperties = {
     position: "relative",
@@ -49,10 +55,12 @@ export function SectionImage({
     background: "color-mix(in oklab, currentColor 8%, transparent)",
   };
 
+  const objectPosition = pozitiaImaginii(pozitie);
+
   return (
     <div style={stilInvelis}>
       {poateFiOptimizata(src) ? (
-        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} style={{ objectFit: "cover" }} />
+        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} style={{ objectFit: "cover", objectPosition }} />
       ) : (
         // eslint-disable-next-line @next/next/no-img-element -- vezi comentariul de mai sus: gazdă necunoscută.
         <img
@@ -60,7 +68,7 @@ export function SectionImage({
           alt={alt}
           loading={priority ? "eager" : "lazy"}
           decoding="async"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition }}
         />
       )}
     </div>

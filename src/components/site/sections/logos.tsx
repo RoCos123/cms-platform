@@ -1,4 +1,5 @@
 import type { SectionTone } from "@/lib/templates";
+import type { PunctFocal } from "@/lib/punct-focal";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
@@ -18,7 +19,7 @@ export type LogosData = {
     data?: string;
     href?: string;
     /** Aceeași formă ca la încărcare (`ImageValue`): `altText`, nu `alt`. */
-    imagine?: { url: string; altText?: string };
+    imagine?: { url: string; altText?: string; pozitie?: PunctFocal };
   }[];
 };
 
@@ -91,6 +92,7 @@ export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
                     alt={aparitie.imagine.altText ?? ""}
                     aspectRatio="16 / 9"
                     sizes="(max-width: 720px) 100vw, 560px"
+                    pozitie={aparitie.imagine.pozitie}
                   />
                 )}
 
