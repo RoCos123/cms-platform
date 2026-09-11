@@ -90,13 +90,18 @@ export function BibliotecaImagini({
           laAlegere.current = null;
         }}
         uploads={incarcari}
-        onSelect={(aleasa) =>
+        onSelect={(aleasa) => {
+          // Poziția aleasă a pozei vine cu ea din bibliotecă, ca la o poză pusă
+          // într-o nouă secțiune să pornească de unde a lăsat-o clientul, nu de
+          // la centru.
+          const originala = imagini.find((imagine) => imagine.id === aleasa.id);
           laAlegere.current?.({
             uploadId: aleasa.id,
             url: aleasa.url,
             altText: aleasa.altText,
-          })
-        }
+            ...(originala?.pozitie ? { pozitie: originala.pozitie } : {}),
+          });
+        }}
       />
     </Context.Provider>
   );

@@ -53,3 +53,31 @@ export function pozitiaImaginii(punct: unknown): string {
   const p = normalizeazaPunctFocal(punct);
   return `${p.x}% ${p.y}%`;
 }
+
+/**
+ * Noul punct focal după ce omul a TRAS de imagine cu `dx`/`dy` pixeli — ca la
+ * Facebook, unde muți poza în ramă, nu pui un punct.
+ *
+ * `object-position` se măsoară pe cât de mult IESE imaginea din ramă
+ * (`surplus`): la 0% se vede marginea din stânga/sus, la 100% cea din
+ * dreapta/jos. A trage imaginea la dreapta (`dx > 0`) dezvelește stânga, deci
+ * procentul SCADE — de aici minusul. Pe axa unde imaginea încape fix (surplus
+ * 0) nu e nimic de mutat, deci procentul rămâne.
+ *
+ * Se pleacă de la valoarea de la ÎNCEPUTUL tragerii plus deplasarea totală, nu
+ * pas cu pas: altfel rotunjirile s-ar aduna și punctul ar aluneca singur.
+ *
+ * Logică pură (fără DOM), ca s-o putem proba cu Node — surplusul îl măsoară
+ * componenta din browser și îl dă ca argument.
+ */
+export function dupaTragere(
+  start: PunctFocal,
+  deplasare: { dx: number; dy: number; surplusX: number; surplusY: number },
+): PunctFocal {
+  const { dx, dy, surplusX, surplusY } = deplasare;
+
+  const x = surplusX > 0 ? start.x - (dx / surplusX) * 100 : start.x;
+  const y = surplusY > 0 ? start.y - (dy / surplusY) * 100 : start.y;
+
+  return normalizeazaPunctFocal({ x, y });
+}

@@ -143,19 +143,27 @@ la salvarea secțiunii — dar e fix mecanismul pe care se sprijină clonele.
 Proprietarul a trimis o listă cu șapte lucruri. Fiindcă șabloanele împart
 aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
 
-1. **Repoziționarea pozelor la încărcare** (punct focal) — GATA. În loc de „tras
-   în ramă" (care ar fi mințit: aceeași poză se taie la forme diferite pe
-   secțiuni diferite), clientul pune un PUNCT focal pe poză — pe ce vrea să
-   rămână mereu în cadru, de obicei fața — și-l vede aplicat pe exemple de
-   tăiere live. Un punct ales o dată e valabil pe toate formele. Logica pură în
-   `src/lib/punct-focal.ts` (procente 0–100, clamp defensiv, `object-position`;
-   probată în `e2e/punct-focal.proba.mjs`); `pozitie?` adăugat la `ImageValue`,
-   trece prin dus-întorsul de editare fără să fie șters; `SectionImage` îl aplică
-   pe toate cele patru secțiuni cu poză (hero, aboutTeaser, portfolio, logos);
-   selectorul din panou (trage cu mausul sau săgeți) în
-   `src/components/ui/punct-focal-field.tsx`. Fără punct ales → centru, exact ca
-   înainte. RĂMÂNE pentru mai târziu: coperta articolelor de blog (alt mecanism,
-   `cover_upload_id`, nu obiectul de imagine), dacă proprietarul o cere.
+1. **Repoziționarea pozelor** — GATA, refăcut. Prima variantă (un PUNCT focal
+   de pus, per secțiune) a fost respinsă de proprietar de trei ori: „fara punct
+   ca nu stie utilizatorul ce sa faca, fa ca la facebook unde poti sa deplasezi
+   imaginea". LECȚIA: cererea era clară de la început („trasă în ramă, ca la
+   Facebook") — am impus o soluție de-a mea (punctul) fiindcă mi s-a părut mai
+   robustă, și am consumat trei runde până m-am întors la ce ceruse. Acum:
+   clientul TRAGE poza în ramă cu mausul, ca la Facebook, și poziția e o însușire
+   a POZEI — aleasă o dată (la încărcare sau din bibliotecă), valabilă peste tot
+   unde e pusă. Stă pe `uploads.focal_x/focal_y` (migrarea
+   `20260911140000_pozitie_imagini.sql`); `pozitioneazaImagine` o scrie și-o
+   propagă în toate secțiunile care folosesc poza, exact ca `alt_text`
+   (`salveazaDescriereaImaginii`) — deci site-ul public o citește tot din
+   conținutul secțiunii, fără un al doilea tabel. Componenta de tragere:
+   `src/components/ui/repozitionare-imagine.tsx` (matematica surplusului în
+   `dupaTragere` din `punct-focal.ts`, probată). Reglabilă din câmpul de imagine
+   al secțiunii (`image-field.tsx`, `cuRepozitionare`) ȘI din panoul Imagini
+   (`panou-imagine.tsx`). Fără poziție aleasă → centru, exact ca înainte.
+   CAPCANĂ prinsă la probă: o poză deja în cache e `complete` înainte ca React
+   să-i lege `onLoad`, deci evenimentul nu vine — dimensiunile se citesc direct
+   din `<img>` la momentul tragerii, nu dintr-un `onLoad`. RĂMÂNE pentru mai
+   târziu: coperta articolelor de blog (alt mecanism, `cover_upload_id`).
 2. **Link în butonul de la Pachete** — butonul să ducă spre un program/curs.
 3. **Video în secțiunea Apariții (`logos`)** — acum doar link; de adăugat
    încorporare video cu buton de play (model: Renata Iancu).

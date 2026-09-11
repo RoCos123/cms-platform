@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
 import { BUCKET_MEDIA } from "@/lib/uploads";
 import { MAXIM_DESCRIERE_IMAGINE, rescrieImaginea, type RandSectiune } from "@/lib/imagini";
+import { normalizeazaPunctFocal } from "@/lib/punct-focal";
 
 export type RezultatImagine = { ok: true } | { ok: false; mesaj: string };
 
@@ -151,6 +152,80 @@ export async function salveazaDescriereaImaginii(
     entitate: "Upload",
     entitateId: uploadId,
     diff: { rezumat: `Descrierea imaginii „${existenta.filename}” a fost schimbată.` },
+  });
+
+  reimprospateaza();
+  return { ok: true };
+}
+
+/**
+ * Schimbă poziția unei imagini (punctul pe care se centrează când e tăiată),
+ * peste tot unde e folosită.
+ *
+ * Ca și descrierea: poziția e o însușire a POZEI, nu a locului. Clientul o trage
+ * în ramă o dată — la încărcare sau din bibliotecă — și rămâne așa în toate
+ * secțiunile. Baza e coloana din `uploads`; copia din conținutul secțiunilor,
+ * ținută la zi aici, e ce citește site-ul public fără a mai întreba un al doilea
+ * tabel.
+ */
+export async function pozitioneazaImagine(
+  uploadId: string,
+  x: number,
+  y: number,
+): Promise<RezultatImagine> {
+  const session = await verifySession();
+
+  if (!idValid(uploadId)) {
+    return { ok: false, mesaj: "Nu știu ce imagine să poziționez. Reîncarcă pagina și încearcă din nou." };
+  }
+
+  // Curățat înainte de bază: o valoare din afara intervalului ar cădea altfel
+  // constrângerea `uploads_focal_pereche_in_interval` cu o eroare de Postgres.
+  const punct = normalizeazaPunctFocal({ x, y });
+  const supabase = await createClient();
+
+  const { data: existenta } = await supabase
+    .from("uploads")
+    .select("filename")
+    .eq("id", uploadId)
+    .eq("site_id", session.siteId)
+    .maybeSingle<{ filename: string }>();
+
+  if (!existenta) {
+    return { ok: false, mesaj: "Imaginea nu mai există. Probabil a fost ștearsă între timp." };
+  }
+
+  const { error } = await supabase
+    .from("uploads")
+    .update({ focal_x: punct.x, focal_y: punct.y })
+    .eq("id", uploadId)
+    .eq("site_id", session.siteId);
+
+  if (error) {
+    console.error("Salvarea poziției imaginii a eșuat:", error);
+    return { ok: false, mesaj: "Nu am putut salva poziția. Mai încearcă o dată." };
+  }
+
+  const propagat = await rescrieInSectiuni(supabase, session.siteId, uploadId, (imagine) => ({
+    ...imagine,
+    pozitie: punct,
+  }));
+
+  if (!propagat) {
+    return {
+      ok: false,
+      mesaj:
+        "Poziția s-a salvat pe poză, dar nu în toate locurile de pe site. Reîncarcă pagina și salvează din nou.",
+    };
+  }
+
+  await scrieInJurnal({
+    siteId: session.siteId,
+    actorId: session.userId,
+    actiune: "update",
+    entitate: "Upload",
+    entitateId: uploadId,
+    diff: { rezumat: `Poziția imaginii „${existenta.filename}” a fost schimbată.` },
   });
 
   reimprospateaza();

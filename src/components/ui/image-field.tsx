@@ -15,8 +15,8 @@ import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
 import { InlineError } from "@/components/ui/feedback";
 import { cn } from "@/lib/cn";
-import { SelectorPunctFocal } from "@/components/ui/punct-focal-field";
-import { normalizeazaPunctFocal } from "@/lib/punct-focal";
+import { RepozitionareImagine } from "@/components/ui/repozitionare-imagine";
+import { normalizeazaPunctFocal, type PunctFocal } from "@/lib/punct-focal";
 import {
   ACCEPTED_IMAGE_LABEL,
   IMAGE_INPUT_ACCEPT,
@@ -49,12 +49,17 @@ export type ImageFieldProps = {
   /** Eroare venită din validarea formularului părinte, ex. la salvare. */
   error?: string;
   /**
-   * Arată alegerea punctului focal (pe ce parte a pozei se centrează când e
-   * tăiată pe site). Opțional fiindcă nu toate câmpurile de imagine se
-   * randează cu tăiere — iar unde punctul n-ar avea unde să fie salvat, un
-   * control care nu face nimic ar deruta.
+   * Arată repoziționarea pozei (o tragi în ramă ca la Facebook, alegi ce rămâne
+   * în cadru când site-ul o taie). Opțional fiindcă nu toate câmpurile de imagine
+   * se randează cu tăiere.
    */
-  cuPunctFocal?: boolean;
+  cuRepozitionare?: boolean;
+  /**
+   * Salvează poziția pe POZĂ (nu doar în acest câmp), ca să apară la fel peste
+   * tot unde e pusă. E prop, nu import: ImageField rămâne folosibil fără panoul
+   * de imagini, iar componenta nu se leagă de o acțiune anume.
+   */
+  onReposition?: (uploadId: string, pozitie: PunctFocal) => void;
   className?: string;
 };
 
@@ -100,7 +105,8 @@ export function ImageField({
   required,
   onPickFromLibrary,
   error,
-  cuPunctFocal,
+  cuRepozitionare,
+  onReposition,
   className,
 }: ImageFieldProps) {
   const labelId = useId();
@@ -350,49 +356,53 @@ export function ImageField({
       >
         {value ? (
           <div className="space-y-3">
-            <div
-              className={cn(
-                "relative h-48 w-full overflow-hidden rounded-base border border-border bg-surface-muted",
-                isDraggingOver && "border-primary",
-              )}
-            >
-              {/*
-                Doar adresele relative merg la optimizator: de când depozitul e
-                privat, `next.config.ts` n-are nicio gazdă externă în
-                `remotePatterns`, iar `<Image>` cu o adresă absolută ARUNCĂ.
-                Pozele noastre sunt toate relative — dar în conținutul unei
-                secțiuni poate sta și o imagine fără `uploadId`, rămasă dintr-o
-                versiune veche sau scrisă de mână, pe care rescrierea o lasă
-                dinadins neatinsă. Aia n-are voie să dărâme ecranul clientului.
-              */}
-              {value.url.startsWith("/") ? (
-                <Image
-                  src={value.url}
-                  // Previzualizarea nu adaugă informație peste câmpul de mai jos,
-                  // unde utilizatorul chiar citește și scrie descrierea.
-                  alt=""
-                  fill
-                  sizes="(max-width: 768px) 100vw, 480px"
-                  className="object-contain"
-                />
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element -- vezi comentariul de mai sus.
-                <img src={value.url} alt="" className="absolute inset-0 h-full w-full object-contain" />
-              )}
-            </div>
-
-            {cuPunctFocal && (
+            {/*
+              Cu repoziționare (și cu o poză de-a noastră, cu `uploadId`): o tragi
+              în ramă, ca la Facebook. O imagine externă, fără `uploadId`, n-are
+              unde să-și salveze poziția, deci rămâne doar previzualizată.
+            */}
+            {cuRepozitionare && value.uploadId ? (
               <div className="space-y-1.5">
-                <p className="text-sm font-medium text-foreground">Punct focal</p>
-                <p className="text-xs text-muted-foreground">
-                  Trage cerculețul peste ce vrei să rămână mereu în cadru — de obicei fața. Pe
-                  unele forme, site-ul taie poza pe margini; locul ăsta stă mereu vizibil.
-                </p>
-                <SelectorPunctFocal
+                <RepozitionareImagine
                   src={value.url}
                   value={normalizeazaPunctFocal(value.pozitie)}
                   onChange={(pozitie) => onChange({ ...value, pozitie })}
+                  onCommit={(pozitie) => onReposition?.(value.uploadId, pozitie)}
                 />
+                <p className="text-xs text-muted-foreground">
+                  Trage poza ca s-o poziționezi. Se salvează pe poză și apare la fel peste tot unde e pusă.
+                </p>
+              </div>
+            ) : (
+              <div
+                className={cn(
+                  "relative h-48 w-full overflow-hidden rounded-base border border-border bg-surface-muted",
+                  isDraggingOver && "border-primary",
+                )}
+              >
+                {/*
+                  Doar adresele relative merg la optimizator: de când depozitul e
+                  privat, `next.config.ts` n-are nicio gazdă externă în
+                  `remotePatterns`, iar `<Image>` cu o adresă absolută ARUNCĂ.
+                  Pozele noastre sunt toate relative — dar în conținutul unei
+                  secțiuni poate sta și o imagine fără `uploadId`, rămasă dintr-o
+                  versiune veche sau scrisă de mână, pe care rescrierea o lasă
+                  dinadins neatinsă. Aia n-are voie să dărâme ecranul clientului.
+                */}
+                {value.url.startsWith("/") ? (
+                  <Image
+                    src={value.url}
+                    // Previzualizarea nu adaugă informație peste câmpul de mai jos,
+                    // unde utilizatorul chiar citește și scrie descrierea.
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 100vw, 480px"
+                    className="object-contain"
+                  />
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element -- vezi comentariul de mai sus.
+                  <img src={value.url} alt="" className="absolute inset-0 h-full w-full object-contain" />
+                )}
               </div>
             )}
 

@@ -29,7 +29,7 @@ export const imaginileBibliotecii = cache(
     const [{ data: incarcari, error }, { data: sectiuni }, { data: articole }] = await Promise.all([
       supabase
         .from("uploads")
-        .select("id, storage_path, filename, size_bytes, width, height, alt_text, created_at")
+        .select("id, storage_path, filename, size_bytes, width, height, alt_text, focal_x, focal_y, created_at")
         .eq("site_id", siteId)
         .order("created_at", { ascending: false }),
       // Cele două locuri din care se referă imagini: conținutul secțiunilor și
@@ -65,6 +65,10 @@ export const imaginileBibliotecii = cache(
         marimeOcteti: (rand.size_bytes as number | null) ?? 0,
         latime: (rand.width as number | null) ?? null,
         inaltime: (rand.height as number | null) ?? null,
+        pozitie:
+          rand.focal_x != null && rand.focal_y != null
+            ? { x: rand.focal_x as number, y: rand.focal_y as number }
+            : undefined,
         incarcataLa: rand.created_at as string,
         folosiri: folosiri.get(rand.id as string) ?? [],
       } satisfies ImagineBiblioteca;
