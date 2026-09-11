@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { verificaProprietar } from "@/lib/proprietar";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { signOutProprietar } from "./actions";
@@ -68,7 +69,15 @@ export default async function PanouProprietar({
             </p>
           </div>
           <div className="flex items-center gap-3 text-sm">
-            <span className="text-zinc-500 dark:text-zinc-400">{proprietar.email}</span>
+            <Link
+              href="/proprietar/client-nou"
+              className="rounded-md bg-zinc-900 px-3 py-1.5 font-medium text-white hover:opacity-90 dark:bg-zinc-100 dark:text-zinc-900"
+            >
+              Client nou
+            </Link>
+            <span className="hidden text-zinc-500 sm:inline dark:text-zinc-400">
+              {proprietar.email}
+            </span>
             <form action={signOutProprietar}>
               <button
                 type="submit"
