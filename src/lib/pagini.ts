@@ -39,6 +39,9 @@ export const ADRESE_REZERVATE = [
   // Previzualizarea site-ului de vânzări. Rută de lucru, dar cât timp există,
   // umbrește o pagină a clientului cu aceeași adresă.
   "proba-vanzari",
+  // Panoul de proprietar (tu, peste toate site-urile). E ruta noastră, deci un
+  // client nu poate avea o pagină numită „proprietar".
+  "proprietar",
   "robots.txt",
   "servicii",
   "site-unavailable",

@@ -183,10 +183,20 @@ begin
   -- Un tabel fără `site_id` nu poate fi izolat pe client, deci ori e o
   -- greșeală, ori e ceva ce trebuie hotărât pe față. Bucla de mai sus l-ar fi
   -- sărit în tăcere; aici se numește.
+  --
+  -- Două excepții, amândouă hotărâri, nu scăpări:
+  --   • `sites` — clientul nu e un RÂND cu `site_id`, el E rândul (`id`).
+  --   • `platform_owners` — e o tabelă a PLATFORMEI (cine ești TU, cel care le
+  --     vede pe toate), nu a unui cabinet, deci n-are `site_id` dinadins.
+  --     Izolarea pe tenant n-o apără; o apără altceva — RLS pornit fără nicio
+  --     politică, plus drepturile revocate de la roluri. Scutirea asta NU e pe
+  --     cuvânt: proba „Un client nu poate citi proprietarii platformei" (mai
+  --     jos) o dovedește, semănând un proprietar și arătând că nu-l vede nimeni.
   -- --------------------------------------------------------------------------
   select string_agg(c.relname, ', ' order by c.relname) into lista
   from pg_class c join pg_namespace n on n.oid = c.relnamespace
-  where n.nspname = 'public' and c.relkind = 'r' and c.relname <> 'sites'
+  where n.nspname = 'public' and c.relkind = 'r'
+    and c.relname not in ('sites', 'platform_owners')
     and not exists (
       select 1 from pg_attribute a
       where a.attrelid = c.oid and a.attname = 'site_id'
@@ -262,6 +272,43 @@ begin
       'Un client nu poate citi conturile platformei'::text,
       'OK'::text,
       'respins: ' || SQLERRM;
+  end;
+
+  -- Și lista proprietarilor PLATFORMEI (`platform_owners`). E tabela trecută
+  -- dinadins în excepția de la punctul 3 (n-are `site_id`), așa că aici i se
+  -- apără scutirea: semănăm un proprietar, îl citim ca un CLIENT conectat, și
+  -- dovedim că nu-l vede. Totul într-o sub-tranzacție anulată (`V0RBK`), deci nu
+  -- rămâne niciun proprietar de probă — vezi CONVENTII, §„O probă care scrie nu
+  -- pune la loc — se anulează".
+  --
+  -- Trece în DOUĂ feluri, fiindcă amândouă înseamnă „clientul nu vede nimic":
+  -- refuzat din drepturi (cum e pe banc, unde revocarea prinde), SAU zero rânduri
+  -- din RLS fără politică (cum ar fi în producție dacă revocarea de drept n-ar
+  -- prinde). Pică doar dacă un rând chiar iese la iveală.
+  begin
+    insert into public.platform_owners (user_id, email)
+    values (user_a, 'proba-izolare@exemplu.ro');
+
+    perform set_config('role', 'authenticated', true);
+    perform set_config('request.jwt.claims',
+      json_build_object('sub', user_a, 'role', 'authenticated')::text, true);
+
+    begin
+      execute 'select count(*) from public.platform_owners' into randuri;
+    exception when others then
+      randuri := -1;  -- refuzat din drepturi: nici măcar n-are voie să întrebe
+    end;
+
+    perform set_config('role', 'postgres', true);
+    raise sqlstate 'V0RBK';
+  exception when sqlstate 'V0RBK' then
+    perform set_config('role', 'postgres', true);
+    return query select
+      'Un client nu poate citi proprietarii platformei'::text,
+      case when randuri <= 0 then 'OK' else 'PICAT' end::text,
+      case when randuri < 0 then 'respins din drepturi, deși există un proprietar'
+           when randuri = 0 then 'nu vede niciun rând (RLS fără politică), deși există unul'
+           else format('a citit %s proprietari — SCURGERE', randuri) end::text;
   end;
 
   -- --------------------------------------------------------------------------

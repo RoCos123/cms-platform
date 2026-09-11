@@ -11,7 +11,7 @@
 --   comportament — chiar se încearcă: un client care caută datele altuia, un
 --                  vizitator anonim care scrie, o funcție a platformei chemată
 --                  de cine nu trebuie. Astea nu se pot deduce din schemă.
---   formă        — cele 247 de lucruri din schemă, față de migrări.
+--   formă        — cele 254 de lucruri din schemă, față de migrări.
 --   date         — ce nu poate opri nicio schemă, dar strică site-ul cuiva.
 --
 -- CE SCHIMBĂ. Aproape nimic, și nimic ce rămâne: `search_path`-ul sesiunii, o
@@ -211,10 +211,20 @@ begin
   -- Un tabel fără `site_id` nu poate fi izolat pe client, deci ori e o
   -- greșeală, ori e ceva ce trebuie hotărât pe față. Bucla de mai sus l-ar fi
   -- sărit în tăcere; aici se numește.
+  --
+  -- Două excepții, amândouă hotărâri, nu scăpări:
+  --   • `sites` — clientul nu e un RÂND cu `site_id`, el E rândul (`id`).
+  --   • `platform_owners` — e o tabelă a PLATFORMEI (cine ești TU, cel care le
+  --     vede pe toate), nu a unui cabinet, deci n-are `site_id` dinadins.
+  --     Izolarea pe tenant n-o apără; o apără altceva — RLS pornit fără nicio
+  --     politică, plus drepturile revocate de la roluri. Scutirea asta NU e pe
+  --     cuvânt: proba „Un client nu poate citi proprietarii platformei" (mai
+  --     jos) o dovedește, semănând un proprietar și arătând că nu-l vede nimeni.
   -- --------------------------------------------------------------------------
   select string_agg(c.relname, ', ' order by c.relname) into lista
   from pg_class c join pg_namespace n on n.oid = c.relnamespace
-  where n.nspname = 'public' and c.relkind = 'r' and c.relname <> 'sites'
+  where n.nspname = 'public' and c.relkind = 'r'
+    and c.relname not in ('sites', 'platform_owners')
     and not exists (
       select 1 from pg_attribute a
       where a.attrelid = c.oid and a.attname = 'site_id'
@@ -290,6 +300,43 @@ begin
       'Un client nu poate citi conturile platformei'::text,
       'OK'::text,
       'respins: ' || SQLERRM;
+  end;
+
+  -- Și lista proprietarilor PLATFORMEI (`platform_owners`). E tabela trecută
+  -- dinadins în excepția de la punctul 3 (n-are `site_id`), așa că aici i se
+  -- apără scutirea: semănăm un proprietar, îl citim ca un CLIENT conectat, și
+  -- dovedim că nu-l vede. Totul într-o sub-tranzacție anulată (`V0RBK`), deci nu
+  -- rămâne niciun proprietar de probă — vezi CONVENTII, §„O probă care scrie nu
+  -- pune la loc — se anulează".
+  --
+  -- Trece în DOUĂ feluri, fiindcă amândouă înseamnă „clientul nu vede nimic":
+  -- refuzat din drepturi (cum e pe banc, unde revocarea prinde), SAU zero rânduri
+  -- din RLS fără politică (cum ar fi în producție dacă revocarea de drept n-ar
+  -- prinde). Pică doar dacă un rând chiar iese la iveală.
+  begin
+    insert into public.platform_owners (user_id, email)
+    values (user_a, 'proba-izolare@exemplu.ro');
+
+    perform set_config('role', 'authenticated', true);
+    perform set_config('request.jwt.claims',
+      json_build_object('sub', user_a, 'role', 'authenticated')::text, true);
+
+    begin
+      execute 'select count(*) from public.platform_owners' into randuri;
+    exception when others then
+      randuri := -1;  -- refuzat din drepturi: nici măcar n-are voie să întrebe
+    end;
+
+    perform set_config('role', 'postgres', true);
+    raise sqlstate 'V0RBK';
+  exception when sqlstate 'V0RBK' then
+    perform set_config('role', 'postgres', true);
+    return query select
+      'Un client nu poate citi proprietarii platformei'::text,
+      case when randuri <= 0 then 'OK' else 'PICAT' end::text,
+      case when randuri < 0 then 'respins din drepturi, deși există un proprietar'
+           when randuri = 0 then 'nu vede niciun rând (RLS fără politică), deși există unul'
+           else format('a citit %s proprietari — SCURGERE', randuri) end::text;
   end;
 
   -- --------------------------------------------------------------------------
@@ -820,6 +867,9 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('coloana', 'public.pages.status', 'text not null implicit ''draft''::text', '—')
 ,  ('coloana', 'public.pages.title', 'text not null', '—')
 ,  ('coloana', 'public.pages.updated_at', 'timestamp with time zone not null implicit now()', '—')
+,  ('coloana', 'public.platform_owners.created_at', 'timestamp with time zone not null implicit now()', '—')
+,  ('coloana', 'public.platform_owners.email', 'text poate fi gol', '—')
+,  ('coloana', 'public.platform_owners.user_id', 'uuid not null', '—')
 ,  ('coloana', 'public.services.content', 'text not null implicit ''''::text', '—')
 ,  ('coloana', 'public.services.cover_upload_id', 'uuid poate fi gol', '—')
 ,  ('coloana', 'public.services.created_at', 'timestamp with time zone not null implicit now()', '—')
@@ -906,6 +956,8 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('constrangere', 'public.pages.pages_site_id_fkey', 'FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE', '—')
 ,  ('constrangere', 'public.pages.pages_site_id_slug_key', 'UNIQUE (site_id, slug)', '—')
 ,  ('constrangere', 'public.pages.pages_status_check', 'CHECK ((status = ANY (ARRAY[''draft''::text, ''published''::text, ''unpublished''::text])))', '—')
+,  ('constrangere', 'public.platform_owners.platform_owners_pkey', 'PRIMARY KEY (user_id)', '—')
+,  ('constrangere', 'public.platform_owners.platform_owners_user_id_fkey', 'FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE', '—')
 ,  ('constrangere', 'public.services.services_cover_upload_id_fkey', 'FOREIGN KEY (cover_upload_id) REFERENCES uploads(id) ON DELETE SET NULL', '20260825120000_init_schema.sql')
 ,  ('constrangere', 'public.services.services_pkey', 'PRIMARY KEY (id)', '—')
 ,  ('constrangere', 'public.services.services_site_id_fkey', 'FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE', '—')
@@ -940,6 +992,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('drept', 'public.newsletter_subscribers', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
 ,  ('drept', 'public.page_views_daily', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
 ,  ('drept', 'public.pages', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
+,  ('drept', 'public.platform_owners', 'service_role=arwdDxt', '—')
 ,  ('drept', 'public.services', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
 ,  ('drept', 'public.site_content', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
 ,  ('drept', 'public.site_settings', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
@@ -992,6 +1045,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('tabel', 'public.newsletter_subscribers', 'rls pornit', '—')
 ,  ('tabel', 'public.page_views_daily', 'rls pornit', '—')
 ,  ('tabel', 'public.pages', 'rls pornit', '—')
+,  ('tabel', 'public.platform_owners', 'rls pornit', '—')
 ,  ('tabel', 'public.services', 'rls pornit', '—')
 ,  ('tabel', 'public.site_content', 'rls pornit', '—')
 ,  ('tabel', 'public.site_settings', 'rls pornit', '—')
@@ -1029,7 +1083,7 @@ from diferente d
 
 union all
 
-select 'formă', 'toate cele 247 de lucruri din schemă', 'OK',
+select 'formă', 'toate cele 254 de lucruri din schemă', 'OK',
   'baza reală are exact ce scriu migrările'
 where not exists (select 1 from diferente)
 
@@ -1059,7 +1113,7 @@ from (
     'niciuna — altfel n-ar citi-o nimeni',
     coalesce(string_agg(s.domain || '/' || p.slug, ', ' order by s.domain), '')
   from public.pages p join public.sites s on s.id = p.site_id
-  where p.slug in ('admin', 'api', 'blog', 'dashboard', 'favicon.ico', 'imagini', 'login', 'nepublicat', 'opengraph-image', 'programare', 'proba-vanzari', 'robots.txt', 'servicii', 'site-unavailable', 'sitemap.xml')
+  where p.slug in ('admin', 'api', 'blog', 'dashboard', 'favicon.ico', 'imagini', 'login', 'nepublicat', 'opengraph-image', 'programare', 'proba-vanzari', 'proprietar', 'robots.txt', 'servicii', 'site-unavailable', 'sitemap.xml')
 
   union all
   select 'Fișierele stau în dosarul cabinetului lor', count(*),

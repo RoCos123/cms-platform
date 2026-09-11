@@ -16,7 +16,7 @@
  */
 
 /** Rădăcinile rutelor care nu sunt niciodată pagini ale clientului. */
-const RADACINI_PROPRII = ["/dashboard", "/admin", "/site-unavailable"] as const;
+const RADACINI_PROPRII = ["/dashboard", "/admin", "/site-unavailable", "/proprietar"] as const;
 
 function esteSauSub(cale: string, radacina: string): boolean {
   return cale === radacina || cale.startsWith(`${radacina}/`);
@@ -30,6 +30,18 @@ export function estePanou(cale: string): boolean {
 /** Ecranul de conectare. Exact, nu ca prefix. */
 export function esteConectare(cale: string): boolean {
   return cale === "/login";
+}
+
+/**
+ * Ecranele panoului de proprietar (tu, peste toate site-urile). Ca la `estePanou`,
+ * pe segmente: `/proprietarul-meu` NU e printre ele, deci rămâne o adresă pe care
+ * un client și-ar putea-o face.
+ *
+ * Proxy-ul scoate calea asta din rezolvarea de tenant (nu e a niciunui site);
+ * paznicul real e `verificaProprietar` din `src/lib/proprietar.ts`.
+ */
+export function estePanouProprietar(cale: string): boolean {
+  return esteSauSub(cale, "/proprietar");
 }
 
 /**

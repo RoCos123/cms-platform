@@ -33,7 +33,7 @@
 -- coloanele alăturate, care arată amândouă textele. Rândurile „LIPSEȘTE" și „ÎN
 -- PLUS" nu au ambiguitatea asta.
 --
--- 247 lucruri verificate: tabele, coloane, constrângeri, indecși, politici
+-- 254 lucruri verificate: tabele, coloane, constrângeri, indecși, politici
 -- RLS, funcții (cu drepturile lor de execuție), declanșatori, drepturi pe tabel
 -- și pe coloană, și steagul de public al depozitului de fișiere.
 -- ============================================================================
@@ -284,6 +284,9 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('coloana', 'public.pages.status', 'text not null implicit ''draft''::text', '—')
 ,  ('coloana', 'public.pages.title', 'text not null', '—')
 ,  ('coloana', 'public.pages.updated_at', 'timestamp with time zone not null implicit now()', '—')
+,  ('coloana', 'public.platform_owners.created_at', 'timestamp with time zone not null implicit now()', '—')
+,  ('coloana', 'public.platform_owners.email', 'text poate fi gol', '—')
+,  ('coloana', 'public.platform_owners.user_id', 'uuid not null', '—')
 ,  ('coloana', 'public.services.content', 'text not null implicit ''''::text', '—')
 ,  ('coloana', 'public.services.cover_upload_id', 'uuid poate fi gol', '—')
 ,  ('coloana', 'public.services.created_at', 'timestamp with time zone not null implicit now()', '—')
@@ -370,6 +373,8 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('constrangere', 'public.pages.pages_site_id_fkey', 'FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE', '—')
 ,  ('constrangere', 'public.pages.pages_site_id_slug_key', 'UNIQUE (site_id, slug)', '—')
 ,  ('constrangere', 'public.pages.pages_status_check', 'CHECK ((status = ANY (ARRAY[''draft''::text, ''published''::text, ''unpublished''::text])))', '—')
+,  ('constrangere', 'public.platform_owners.platform_owners_pkey', 'PRIMARY KEY (user_id)', '—')
+,  ('constrangere', 'public.platform_owners.platform_owners_user_id_fkey', 'FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE', '—')
 ,  ('constrangere', 'public.services.services_cover_upload_id_fkey', 'FOREIGN KEY (cover_upload_id) REFERENCES uploads(id) ON DELETE SET NULL', '20260825120000_init_schema.sql')
 ,  ('constrangere', 'public.services.services_pkey', 'PRIMARY KEY (id)', '—')
 ,  ('constrangere', 'public.services.services_site_id_fkey', 'FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE', '—')
@@ -404,6 +409,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('drept', 'public.newsletter_subscribers', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
 ,  ('drept', 'public.page_views_daily', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
 ,  ('drept', 'public.pages', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
+,  ('drept', 'public.platform_owners', 'service_role=arwdDxt', '—')
 ,  ('drept', 'public.services', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
 ,  ('drept', 'public.site_content', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
 ,  ('drept', 'public.site_settings', 'anon=arwdDxt authenticated=arwdDxt service_role=arwdDxt', '—')
@@ -456,6 +462,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('tabel', 'public.newsletter_subscribers', 'rls pornit', '—')
 ,  ('tabel', 'public.page_views_daily', 'rls pornit', '—')
 ,  ('tabel', 'public.pages', 'rls pornit', '—')
+,  ('tabel', 'public.platform_owners', 'rls pornit', '—')
 ,  ('tabel', 'public.services', 'rls pornit', '—')
 ,  ('tabel', 'public.site_content', 'rls pornit', '—')
 ,  ('tabel', 'public.site_settings', 'rls pornit', '—')
