@@ -14,6 +14,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { EditorSectiune } from "./editor";
 import { rescrieAdresele } from "@/lib/imagini";
 import { adresaImaginii } from "@/lib/imagini-adrese";
+import { construiesteDestinatii } from "@/lib/destinatii";
 
 export default async function EditorSectiunePage({
   params,
@@ -62,7 +63,14 @@ export default async function EditorSectiunePage({
     );
   }
 
-  const [{ data: site }, articole, servicii, { data: setari }] = await Promise.all([
+  const [
+    { data: site },
+    articole,
+    servicii,
+    { data: setari },
+    { data: sectiuniVizibile },
+    { data: paginiPublicate },
+  ] = await Promise.all([
     supabase.from("sites").select(`template, ${COLOANE_MODULE}`).eq("id", session.siteId).single(),
     // Previzualizarea „Articolelor recente” arată articole adevărate, nu
     // exemple: altfel clientul n-ar avea cum să vadă că secțiunea dispare
@@ -72,7 +80,21 @@ export default async function EditorSectiunePage({
     // vizitator — inclusiv atunci când asta înseamnă „nimic încă”.
     serviciiPublicate(session.siteId),
     supabase.from("site_settings").select("pagini").eq("site_id", session.siteId).maybeSingle(),
+    // Unde poate duce un buton: secțiunile VIZIBILE (au ancoră pe pagină) și
+    // paginile publicate. Doar așa butonul nu ajunge la un loc inexistent.
+    supabase.from("site_content").select("key").eq("site_id", session.siteId).eq("visible", true),
+    supabase
+      .from("pages")
+      .select("slug, title")
+      .eq("site_id", session.siteId)
+      .eq("status", "published")
+      .order("position", { ascending: true }),
   ]);
+
+  const destinatii = construiesteDestinatii(
+    (sectiuniVizibile ?? []).map((rand) => rand.key as string),
+    (paginiPublicate ?? []).map((rand) => ({ slug: rand.slug as string, titlu: rand.title as string })),
+  );
 
   // Aceleași ore ca pe site: previzualizarea secțiunii de programare trebuie să
   // arate exact ce vede un vizitator — inclusiv că se stinge fără ore libere.
@@ -95,6 +117,7 @@ export default async function EditorSectiunePage({
       servicii={servicii}
       paginaServiciiActiva={paginaEsteActiva((setari?.pagini ?? {}) as Pagini, "servicii")}
       oreProgramare={oreProgramare}
+      destinatii={destinatii}
     />
   );
 }

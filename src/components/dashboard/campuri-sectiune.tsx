@@ -1,12 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useBibliotecaImagini } from "@/components/dashboard/biblioteca-imagini";
 import { pozitioneazaImagine } from "@/app/dashboard/imagini/actions";
-import { TextAreaField, TextField } from "@/components/ui/field";
+import { SelectField, TextAreaField, TextField } from "@/components/ui/field";
 import { ImageField, type ImageValue } from "@/components/ui/image-field";
 import { RepeaterList } from "@/components/ui/repeater-list";
 import { SlugField } from "@/components/ui/slug-field";
 import type { CampSchema } from "@/lib/sectiuni";
+import type { Destinatie } from "@/lib/destinatii";
 import { cn } from "@/lib/cn";
 import { blocuriText, numaraCuvinte, opresteLaLimita } from "@/lib/blocuri-text";
 import { formateazaNumar, numara } from "@/lib/numerale";
@@ -28,6 +30,7 @@ export function CampuriSectiune({
   valoare,
   onChange,
   erori,
+  destinatii = [],
   prefix = "",
 }: {
   campuri: CampSchema[];
@@ -35,6 +38,12 @@ export function CampuriSectiune({
   onChange: (valoare: ValoareEditor) => void;
   /** Erorile întregii secțiuni, cu cheia = drumul până la câmp. */
   erori: Record<string, string>;
+  /**
+   * Unde poate duce un buton: secțiunile de pe pagină și paginile site-ului.
+   * Gol în afara editorului de secțiuni (galeria de componente) — atunci câmpul
+   * de link rămâne o casetă liberă, ca înainte.
+   */
+  destinatii?: Destinatie[];
   /** Drumul până aici, pentru căutarea erorilor. Gol la nivelul de sus. */
   prefix?: string;
 }) {
@@ -120,40 +129,18 @@ export function CampuriSectiune({
               />
             );
 
-          case "link": {
-            const link = (valoare[camp.cheie] ?? {}) as { text?: string; href?: string };
+          case "link":
             return (
-              <Grup key={camp.cheie} eticheta={camp.eticheta} hint={camp.hint}>
-                {/*
-                  Unul sub altul, mereu. Două coloane ar fi încăput la nivelul de
-                  sus, dar nu și în interiorul unei liste — iar `sm:` se uită la
-                  fereastră, nu la lățimea reală a locului în care stă câmpul,
-                  deci ar fi rupt eticheta „Textul de pe buton" pe două rânduri.
-                */}
-                <div className="space-y-4">
-                  <TextField
-                    label="Textul de pe buton"
-                    value={link.text ?? ""}
-                    onChange={(event) =>
-                      seteaza(camp.cheie, { ...link, text: event.target.value })
-                    }
-                  />
-                  <TextField
-                    label="Unde duce"
-                    hint="Ex.: /contact sau #contact"
-                    error={erori[`${drum}.href`]}
-                    value={link.href ?? ""}
-                    onChange={(event) =>
-                      seteaza(camp.cheie, { ...link, href: event.target.value })
-                    }
-                  />
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Lasă textul gol dacă nu vrei buton.
-                </p>
-              </Grup>
+              <CampLink
+                key={camp.cheie}
+                eticheta={camp.eticheta}
+                hint={camp.hint}
+                link={(valoare[camp.cheie] ?? {}) as { text?: string; href?: string }}
+                eroareHref={erori[`${drum}.href`]}
+                destinatii={destinatii}
+                onChange={(nou) => seteaza(camp.cheie, nou)}
+              />
             );
-          }
 
           case "imagine": {
             const stocata = valoare[camp.cheie] as Partial<ImageValue> | null;
@@ -258,6 +245,7 @@ export function CampuriSectiune({
                       campuri={camp.campuri}
                       valoare={element}
                       erori={erori}
+                      destinatii={destinatii}
                       prefix={`${drum}.${index}`}
                       onChange={(nou) =>
                         seteaza(
@@ -421,6 +409,104 @@ function ContorCuvinte({ text, limita }: { text: string; limita: number }) {
         {ramase <= 0 ? `Ai ajuns la limita de ${numara(limita, "cuvânt", "cuvinte")}.` : ""}
       </span>
     </>
+  );
+}
+
+/**
+ * Câmpul unui buton: textul de pe el și UNDE DUCE.
+ *
+ * „Unde duce" era o casetă liberă, cu exemplul „/contact" — iar `/contact` nu e o
+ * pagină, ci o secțiune la care se ajunge cu `#contact`. Cine urma exemplul
+ * ajungea la o pagină inexistentă. Acum alege dintr-o listă cu locurile care
+ * CHIAR există pe site-ul lui (secțiuni, pagini); „O altă adresă" rămâne, pentru
+ * un link în afară. Fără listă (în afara editorului de secțiuni) rămâne caseta
+ * liberă, ca înainte.
+ */
+function CampLink({
+  eticheta,
+  hint,
+  link,
+  eroareHref,
+  destinatii,
+  onChange,
+}: {
+  eticheta: string;
+  hint?: string;
+  link: { text?: string; href?: string };
+  eroareHref?: string;
+  destinatii: Destinatie[];
+  onChange: (link: { text?: string; href?: string }) => void;
+}) {
+  const href = link.href ?? "";
+  const potrivita = destinatii.find((destinatie) => destinatie.href === href);
+
+  // „Altă adresă" se ține minte separat de href: cine alege „altă adresă" și n-a
+  // scris încă nimic tot trebuie să vadă caseta — un href gol singur n-ar spune
+  // dacă e „încă nimic ales" sau „altă adresă, deocamdată goală".
+  const [altaAdresa, setAltaAdresa] = useState(potrivita === undefined && href !== "");
+
+  const faraLista = destinatii.length === 0;
+  const modText = faraLista || altaAdresa || (href !== "" && potrivita === undefined);
+  const valSelect = potrivita ? potrivita.href : modText ? "__alta__" : "";
+
+  return (
+    <Grup eticheta={eticheta} hint={hint}>
+      <div className="space-y-4">
+        <TextField
+          label="Textul de pe buton"
+          value={link.text ?? ""}
+          onChange={(event) => onChange({ ...link, text: event.target.value })}
+        />
+
+        {faraLista ? (
+          <TextField
+            label="Unde duce"
+            hint="O adresă din site (începe cu / sau #) ori un link întreg (https://…)."
+            error={eroareHref}
+            value={href}
+            onChange={(event) => onChange({ ...link, href: event.target.value })}
+          />
+        ) : (
+          <>
+            <SelectField
+              label="Unde duce"
+              hint="Alege un loc de pe site — butonul nu mai poate ajunge la o pagină care nu există."
+              value={valSelect}
+              onChange={(event) => {
+                const ales = event.target.value;
+                if (ales === "__alta__") {
+                  setAltaAdresa(true);
+                  // Golim o destinație aleasă înainte: omul vrea să scrie altceva.
+                  onChange({ ...link, href: potrivita ? "" : href });
+                } else {
+                  setAltaAdresa(false);
+                  onChange({ ...link, href: ales });
+                }
+              }}
+            >
+              <option value="">— alege —</option>
+              {destinatii.map((destinatie) => (
+                <option key={destinatie.href} value={destinatie.href}>
+                  {destinatie.eticheta}
+                </option>
+              ))}
+              <option value="__alta__">O altă adresă (alt site)</option>
+            </SelectField>
+
+            {modText && (
+              <TextField
+                label="Adresa"
+                hint="Un link întreg (https://…) sau o pagină din site (/tarife)."
+                error={eroareHref}
+                value={href}
+                onChange={(event) => onChange({ ...link, href: event.target.value })}
+              />
+            )}
+          </>
+        )}
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">Lasă textul gol dacă nu vrei buton.</p>
+    </Grup>
   );
 }
 

@@ -12,6 +12,7 @@ import type { ArticolListat } from "@/lib/blog";
 import type { Serviciu } from "@/lib/servicii";
 import type { SectionTone, Template } from "@/lib/templates";
 import type { MetaSectiune } from "@/lib/sectiuni";
+import type { Destinatie } from "@/lib/destinatii";
 import { catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 import { salveazaSectiune } from "../actions";
 
@@ -26,6 +27,7 @@ export function EditorSectiune({
   servicii,
   paginaServiciiActiva,
   oreProgramare,
+  destinatii,
 }: {
   id: string;
   meta: MetaSectiune;
@@ -43,6 +45,8 @@ export function EditorSectiune({
   servicii: Serviciu[];
   paginaServiciiActiva: boolean;
   oreProgramare: OreDePrimaPagina;
+  /** Unde poate duce un buton din secțiune: alte secțiuni de pe pagină, pagini. */
+  destinatii: Destinatie[];
 }) {
   const [valoare, setValoare] = useState(valoareInitiala);
   const [referinta, setReferinta] = useState(valoareInitiala);
@@ -120,6 +124,7 @@ export function EditorSectiune({
           valoare={valoare}
           onChange={setValoare}
           erori={erori}
+          destinatii={destinatii}
         />
 
         <PanouPrevizualizare
