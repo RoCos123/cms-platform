@@ -114,6 +114,68 @@ Plățile cu cardul (Netopia — vezi capitolul lui), categoriile de blog, și s
 din panou pentru secțiunile aprinse dar goale (proprietarul a amânat reparația
 pe 8 sept., după ce i-am arătat costul).
 
+## Panoul de proprietar + clonarea (11 sept. 2026)
+
+Construite și livrate (PR #3, #4). La `/proprietar`, un cont de proprietar
+(tabela `platform_owners`, semănată cu SQL) vede toate site-urile și intră în
+oricare (impersonare prin `generateLink` → `verifyOtp`, consumat pe host-ul
+site-ului, fiindcă acolo se scrie cookie-ul). „Client nou" din panou face contul
+(`admin.createUser`) + provizionează (`creeaza_client`) SAU clonează un site
+existent pe alt șablon (`cloneaza_site` — copie exactă a rândurilor cu coloane
+citite din catalog; pozele pe NULL, datele vizitatorilor necopiate, blogul
+remapat; probată rând cu rând pe banc). Adresa: `<host>/proprietar`, pe orice
+host de platformă. Ambele funcții revocate de la `public` + `anon` +
+`authenticated`.
+
+Notă găsită clonând: pozele „se copiază" fiindcă adresa lor se semnează la
+randare din id-ul din conținut (`rescrieAdresele`), fără verificare de
+apartenență — iar clona copiază id-urile. Verificat că NU e o scurgere între
+clienți reali: un client nu poate ENUMERA id-urile altuia (anon nu citește
+nimic, `authenticated` e scopat pe site), deci nu poate obține id-ul unei poze
+private. Singurul rezidual e re-afișarea unei poze DEJA publice (hotlink), nu o
+scurgere. De întărit opțional (nu urgent): respinge id-uri de poză străine chiar
+la salvarea secțiunii — dar e fix mecanismul pe care se sprijină clonele.
+
+---
+
+## De modificat pe șabloane (11 sept. 2026) — din documentul proprietarului
+
+Proprietarul a trimis o listă cu șapte lucruri. Fiindcă șabloanele împart
+aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
+
+1. **Repoziționarea pozelor la încărcare** (punct focal) — poza să poată fi
+   trasă în ramă (ca pe Facebook), să nu iasă tăiată sus/jos. De confirmat cu
+   proprietarul: pe toate pozele din secțiuni, nu doar hero.
+2. **Link în butonul de la Pachete** — butonul să ducă spre un program/curs.
+3. **Video în secțiunea Apariții (`logos`)** — acum doar link; de adăugat
+   încorporare video cu buton de play (model: Renata Iancu).
+4. **Fișiere de descărcat** — depozit pentru documente (fișe Word/PDF) pe care
+   pacienții să le descarce. CEA MAI MARE: depozitul de acum ține doar poze
+   (bucket `media`, tipuri imagine); cere tip nou de fișier + rută de descărcare
+   + UI, cu izolarea gândită ca la poze.
+5. **Contact pe WhatsApp** — GATA. Bulă verde fixă în dreapta-jos, iconița ȘI
+   culoarea ORIGINALE (`#25D366`, glifa albă WhatsApp), aceeași pe toate
+   șabloanele — singurul loc din site-ul public care NU ia culorile șablonului,
+   fiindcă asta a cerut proprietarul. Câmp `whatsapp` în Setări →
+   `site_settings.brand`; numărul, scris cum vrea clientul, e normalizat la
+   `wa.me` (`src/lib/whatsapp.ts`, probat în `e2e/whatsapp.proba.mjs`);
+   componenta `src/components/site/bula-whatsapp.tsx`, montată în
+   `cadru-site.tsx` (urcată deasupra barei de administrare pentru proprietarul
+   logat). Gol → butonul nu apare. Verificat vizual la 1200px și 390px.
+6. **Bug: butonul de la Pachete** — setat spre Contact, dar pe site duce la o
+   pagină inexistentă. De reparat.
+7. **Aliniere text/poză la „Despre mine" (`aboutTeaser`)** — textul din dreapta
+   să fie în dreptul pozei (acum stă sus, lângă titlu, iar poza e jos).
+
+Notă de arhitectură (întrebarea proprietarului): o cerere de client schimbă
+TOATE șabloanele doar dacă atinge o componentă comună la nivel de STRUCTURĂ.
+Conținut → doar site-ul lui. Piele (culori/font) → doar șablonul lui. Funcție
+nouă → disponibilă la toți, dar apare doar unde e folosită. O aranjare cerută de
+UNUL se face ca `variant` (mecanism deja construit, nefolosit), nu ca rescriere.
+Regula de business: se vând funcții și opțiuni, nu personalizări per client.
+
+---
+
 ## Decizii confirmate
 
 - **Stack:** Next.js App Router (RSC + Server Actions, **nu REST**), Supabase (Postgres + Auth + Storage + RLS), Tailwind, TypeScript, Vercel. Confirmat din trafic: originalul nu face niciun apel `/api/` — totul server-rendered + Server Actions.
