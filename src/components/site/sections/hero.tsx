@@ -1,4 +1,5 @@
 import type { AsezareHero, SectionTone } from "@/lib/templates";
+import type { PunctFocal } from "@/lib/punct-focal";
 import { Section, SectionEyebrow } from "@/components/site/section";
 import { SectionImage } from "@/components/site/section-image";
 
@@ -16,7 +17,7 @@ export type HeroData = {
   butonPrincipal?: { text: string; href: string };
   butonSecundar?: { text: string; href: string };
   /** Aceeași formă ca la încărcare (`ImageValue`). Lipsă = secțiune doar text. */
-  imagine?: { url: string; altText?: string };
+  imagine?: { url: string; altText?: string; pozitie?: PunctFocal };
 };
 
 /**
@@ -185,6 +186,7 @@ export function Hero({
       alt={poza.altText ?? ""}
       aspectRatio="1 / 1"
       sizes={titluLat ? "(max-width: 860px) 100vw, 47vw" : "(max-width: 860px) 100vw, 45vw"}
+      pozitie={poza.pozitie}
       priority
     />
   );

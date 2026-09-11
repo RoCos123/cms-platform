@@ -162,6 +162,10 @@ export function CampuriSectiune({
                     uploadId: stocata.uploadId ?? "",
                     url: stocata.url,
                     altText: stocata.altText ?? "",
+                    // Punctul focal se păstrează la dus-întorsul prin formular:
+                    // fără el, reconstrucția de aici l-ar șterge la prima
+                    // deschidere a secțiunii, iar poza s-ar recentra singură.
+                    pozitie: stocata.pozitie,
                   }
                 : null;
 
@@ -173,6 +177,9 @@ export function CampuriSectiune({
                 error={eroare}
                 value={imagine}
                 onChange={(noua) => seteaza(camp.cheie, noua)}
+                // Toate pozele de secțiune se afișează tăiate (`object-fit:
+                // cover`), deci toate au nevoie de punct focal.
+                cuPunctFocal
                 // Aceeași poză a cabinetului se pune în mai multe secțiuni. Fără
                 // butonul ăsta ar fi trebuit încărcată din nou de fiecare dată,
                 // iar biblioteca s-ar fi umplut de copii ale aceluiași fișier —

@@ -8,6 +8,8 @@
  * deci constantele și tipurile nu pot locui în `src/app/actions/upload.ts`.
  */
 
+import type { PunctFocal } from "@/lib/punct-focal";
+
 /**
  * Un singur bucket pentru toate site-urile, cu prefix `site_id/` (decizii-faza-0
  * §4). Numele stă aici, nu în acțiunea de încărcare: îl citesc și încărcarea, și
@@ -39,6 +41,11 @@ export type ImageValue = {
   uploadId: string;
   url: string;
   altText: string;
+  /**
+   * Ce parte a pozei să rămână în cadru când e tăiată (`object-fit: cover`).
+   * Lipsă = centru, adică purtarea de dinainte. Vezi `@/lib/punct-focal`.
+   */
+  pozitie?: PunctFocal;
 };
 
 export type UploadImageResult =

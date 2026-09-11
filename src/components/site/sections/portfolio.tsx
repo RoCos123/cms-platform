@@ -1,4 +1,5 @@
 import type { SectionTone } from "@/lib/templates";
+import type { PunctFocal } from "@/lib/punct-focal";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
@@ -17,7 +18,7 @@ export type PortfolioData = {
     detalii?: string[];
     buton?: { text: string; href: string };
     /** Aceeași formă ca la încărcare (`ImageValue`): `altText`, nu `alt`. */
-    imagine?: { url: string; altText?: string };
+    imagine?: { url: string; altText?: string; pozitie?: PunctFocal };
   }[];
 };
 
@@ -92,6 +93,7 @@ export function Portfolio({ data, tone }: { data: PortfolioData; tone?: SectionT
                 alt={element.imagine.altText ?? ""}
                 aspectRatio="3 / 2"
                 sizes="(max-width: 720px) 100vw, 560px"
+                pozitie={element.imagine.pozitie}
               />
             )}
 

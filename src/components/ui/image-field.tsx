@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
 import { InlineError } from "@/components/ui/feedback";
 import { cn } from "@/lib/cn";
+import { SelectorPunctFocal } from "@/components/ui/punct-focal-field";
+import { normalizeazaPunctFocal } from "@/lib/punct-focal";
 import {
   ACCEPTED_IMAGE_LABEL,
   IMAGE_INPUT_ACCEPT,
@@ -46,6 +48,13 @@ export type ImageFieldProps = {
   onPickFromLibrary?: (alege: (image: ImageValue) => void) => void;
   /** Eroare venită din validarea formularului părinte, ex. la salvare. */
   error?: string;
+  /**
+   * Arată alegerea punctului focal (pe ce parte a pozei se centrează când e
+   * tăiată pe site). Opțional fiindcă nu toate câmpurile de imagine se
+   * randează cu tăiere — iar unde punctul n-ar avea unde să fie salvat, un
+   * control care nu face nimic ar deruta.
+   */
+  cuPunctFocal?: boolean;
   className?: string;
 };
 
@@ -91,6 +100,7 @@ export function ImageField({
   required,
   onPickFromLibrary,
   error,
+  cuPunctFocal,
   className,
 }: ImageFieldProps) {
   const labelId = useId();
@@ -370,6 +380,21 @@ export function ImageField({
                 <img src={value.url} alt="" className="absolute inset-0 h-full w-full object-contain" />
               )}
             </div>
+
+            {cuPunctFocal && (
+              <div className="space-y-1.5">
+                <p className="text-sm font-medium text-foreground">Punct focal</p>
+                <p className="text-xs text-muted-foreground">
+                  Trage cerculețul peste ce vrei să rămână mereu în cadru — de obicei fața. Pe
+                  unele forme, site-ul taie poza pe margini; locul ăsta stă mereu vizibil.
+                </p>
+                <SelectorPunctFocal
+                  src={value.url}
+                  value={normalizeazaPunctFocal(value.pozitie)}
+                  onChange={(pozitie) => onChange({ ...value, pozitie })}
+                />
+              </div>
+            )}
 
             <TextField
               label="Text alternativ"

@@ -143,9 +143,19 @@ la salvarea secțiunii — dar e fix mecanismul pe care se sprijină clonele.
 Proprietarul a trimis o listă cu șapte lucruri. Fiindcă șabloanele împart
 aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
 
-1. **Repoziționarea pozelor la încărcare** (punct focal) — poza să poată fi
-   trasă în ramă (ca pe Facebook), să nu iasă tăiată sus/jos. De confirmat cu
-   proprietarul: pe toate pozele din secțiuni, nu doar hero.
+1. **Repoziționarea pozelor la încărcare** (punct focal) — GATA. În loc de „tras
+   în ramă" (care ar fi mințit: aceeași poză se taie la forme diferite pe
+   secțiuni diferite), clientul pune un PUNCT focal pe poză — pe ce vrea să
+   rămână mereu în cadru, de obicei fața — și-l vede aplicat pe exemple de
+   tăiere live. Un punct ales o dată e valabil pe toate formele. Logica pură în
+   `src/lib/punct-focal.ts` (procente 0–100, clamp defensiv, `object-position`;
+   probată în `e2e/punct-focal.proba.mjs`); `pozitie?` adăugat la `ImageValue`,
+   trece prin dus-întorsul de editare fără să fie șters; `SectionImage` îl aplică
+   pe toate cele patru secțiuni cu poză (hero, aboutTeaser, portfolio, logos);
+   selectorul din panou (trage cu mausul sau săgeți) în
+   `src/components/ui/punct-focal-field.tsx`. Fără punct ales → centru, exact ca
+   înainte. RĂMÂNE pentru mai târziu: coperta articolelor de blog (alt mecanism,
+   `cover_upload_id`, nu obiectul de imagine), dacă proprietarul o cere.
 2. **Link în butonul de la Pachete** — butonul să ducă spre un program/curs.
 3. **Video în secțiunea Apariții (`logos`)** — acum doar link; de adăugat
    încorporare video cu buton de play (model: Renata Iancu).
