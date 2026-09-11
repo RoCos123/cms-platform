@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { TextAreaField } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
+import { RepozitionareImagine } from "@/components/ui/repozitionare-imagine";
 import {
   MAXIM_DESCRIERE_IMAGINE,
   descrieFolosirile,
@@ -14,7 +14,8 @@ import {
   formateazaMarimea,
   type ImagineBiblioteca,
 } from "@/lib/imagini";
-import { salveazaDescriereaImaginii, stergeImaginea } from "./actions";
+import { normalizeazaPunctFocal, type PunctFocal } from "@/lib/punct-focal";
+import { pozitioneazaImagine, salveazaDescriereaImaginii, stergeImaginea } from "./actions";
 
 /**
  * Detaliile imaginii alese: ce e, unde e pusă, cum se descrie și cum se șterge.
@@ -60,11 +61,28 @@ function Detalii({
   onSters: () => void;
 }) {
   const [descriere, setDescriere] = useState(imagine.descriere);
+  const [pozitie, setPozitie] = useState<PunctFocal>(normalizeazaPunctFocal(imagine.pozitie));
   const [eroare, setEroare] = useState<string | null>(null);
   const [eroareStergere, setEroareStergere] = useState<string | null>(null);
   const [deSters, setDeSters] = useState(false);
   const [seSalveaza, porneste] = useTransition();
+  const [, pornestePozitia] = useTransition();
   const { show } = useToast();
+
+  /** Se salvează când dai drumul, nu la fiecare pixel: poziția e a pozei, deci
+   *  se scrie și în toate locurile de pe site unde e pusă. */
+  function salveazaPozitia(nou: PunctFocal) {
+    pornestePozitia(async () => {
+      const rezultat = await pozitioneazaImagine(imagine.id, nou.x, nou.y).catch(() => null);
+
+      if (!rezultat || !rezultat.ok) {
+        show(rezultat && !rezultat.ok ? rezultat.mesaj : "Nu am putut salva poziția.", "danger");
+        return;
+      }
+
+      show(locuri.length > 0 ? "Poziția a fost salvată, și pe site." : "Poziția a fost salvată.", "success");
+    });
+  }
 
   const modificat = descriere.trim() !== imagine.descriere.trim();
   const incarcataLa = formateazaData(imagine.incarcataLa);
@@ -138,14 +156,16 @@ function Detalii({
       aria-label="Detaliile imaginii alese"
       className="space-y-4 rounded-base border border-border bg-surface p-5"
     >
-      <div className="relative aspect-video overflow-hidden rounded-base border border-border bg-surface-muted">
-        <Image
+      <div className="space-y-1.5">
+        <RepozitionareImagine
           src={imagine.url}
-          alt={imagine.descriere}
-          fill
-          sizes="(max-width: 1024px) 90vw, 280px"
-          className="object-contain"
+          value={pozitie}
+          onChange={setPozitie}
+          onCommit={salveazaPozitia}
         />
+        <p className="text-xs text-muted-foreground">
+          Trage poza ca s-o poziționezi. Se salvează pe poză și apare la fel peste tot unde e pusă.
+        </p>
       </div>
 
       <div className="space-y-1">

@@ -11,7 +11,7 @@
 --   comportament — chiar se încearcă: un client care caută datele altuia, un
 --                  vizitator anonim care scrie, o funcție a platformei chemată
 --                  de cine nu trebuie. Astea nu se pot deduce din schemă.
---   formă        — cele 256 de lucruri din schemă, față de migrări.
+--   formă        — cele 259 de lucruri din schemă, față de migrări.
 --   date         — ce nu poate opri nicio schemă, dar strică site-ul cuiva.
 --
 -- CE SCHIMBĂ. Aproape nimic, și nimic ce rămâne: `search_path`-ul sesiunii, o
@@ -915,6 +915,8 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('coloana', 'public.uploads.alt_text', 'text poate fi gol', '—')
 ,  ('coloana', 'public.uploads.created_at', 'timestamp with time zone not null implicit now()', '—')
 ,  ('coloana', 'public.uploads.filename', 'text not null', '—')
+,  ('coloana', 'public.uploads.focal_x', 'smallint poate fi gol', '—')
+,  ('coloana', 'public.uploads.focal_y', 'smallint poate fi gol', '—')
 ,  ('coloana', 'public.uploads.height', 'integer poate fi gol', '—')
 ,  ('coloana', 'public.uploads.id', 'uuid not null implicit gen_random_uuid()', '—')
 ,  ('coloana', 'public.uploads.mime_type', 'text not null', '—')
@@ -972,6 +974,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('constrangere', 'public.sites.sites_domain_key', 'UNIQUE (domain)', '—')
 ,  ('constrangere', 'public.sites.sites_pkey', 'PRIMARY KEY (id)', '—')
 ,  ('constrangere', 'public.sites.sites_template_check', 'CHECK ((template = ANY (ARRAY[''caldura''::text, ''liniste''::text, ''lumina''::text, ''apropiere''::text, ''claritate''::text])))', '20260908090000_sablonul_claritate.sql')
+,  ('constrangere', 'public.uploads.uploads_focal_pereche_in_interval', 'CHECK ((((focal_x IS NULL) AND (focal_y IS NULL)) OR (((focal_x >= 0) AND (focal_x <= 100)) AND ((focal_y >= 0) AND (focal_y <= 100)))))', '20260911140000_pozitie_imagini.sql')
 ,  ('constrangere', 'public.uploads.uploads_pkey', 'PRIMARY KEY (id)', '—')
 ,  ('constrangere', 'public.uploads.uploads_site_id_fkey', 'FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE', '—')
 ,  ('constrangere', 'public.users.users_id_fkey', 'FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE', '—')
@@ -1085,7 +1088,7 @@ from diferente d
 
 union all
 
-select 'formă', 'toate cele 256 de lucruri din schemă', 'OK',
+select 'formă', 'toate cele 259 de lucruri din schemă', 'OK',
   'baza reală are exact ce scriu migrările'
 where not exists (select 1 from diferente)
 

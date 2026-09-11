@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   PUNCT_FOCAL_IMPLICIT,
+  dupaTragere,
   normalizeazaPunctFocal,
   pozitiaImaginii,
 } from "@/lib/punct-focal";
@@ -40,4 +41,34 @@ test("pozitiaImaginii dă un object-position gata de pus în stil", () => {
   assert.equal(pozitiaImaginii({ x: 20, y: 80 }), "20% 80%");
   // O valoare stricată nu produce CSS stricat: se întoarce la centru.
   assert.equal(pozitiaImaginii({ x: 9999, y: "sus" }), "50% 50%");
+});
+
+test("tras de imagine: pe axa cu surplus, procentul se mișcă invers deplasării", () => {
+  // Imaginea iese cu 200px pe orizontală. Trasă 100px la dreapta, de la centru,
+  // dezvelește stânga: 50 − (100/200)·100 = 0.
+  assert.deepEqual(
+    dupaTragere({ x: 50, y: 50 }, { dx: 100, dy: 0, surplusX: 200, surplusY: 0 }),
+    { x: 0, y: 50 },
+  );
+  // Trasă la stânga, spre dreapta imaginii: 50 + 50 = 100.
+  assert.deepEqual(
+    dupaTragere({ x: 50, y: 50 }, { dx: -100, dy: 0, surplusX: 200, surplusY: 0 }),
+    { x: 100, y: 50 },
+  );
+});
+
+test("fără surplus pe o axă, procentul de pe ea nu se clintește", () => {
+  // Imaginea încape fix pe ambele axe: n-ai ce repoziționa, oricât ai trage.
+  assert.deepEqual(
+    dupaTragere({ x: 30, y: 70 }, { dx: 80, dy: 80, surplusX: 0, surplusY: 0 }),
+    { x: 30, y: 70 },
+  );
+});
+
+test("tragerea se oprește la margini (0–100)", () => {
+  // 50 − (80/100)·100 = −30 → adus la 0.
+  assert.deepEqual(
+    dupaTragere({ x: 50, y: 50 }, { dx: 0, dy: 80, surplusX: 0, surplusY: 100 }),
+    { x: 50, y: 0 },
+  );
 });

@@ -13,6 +13,7 @@
 
 import { metaSectiune } from "@/lib/sectiuni";
 import { cereDe } from "@/lib/numerale";
+import type { PunctFocal } from "@/lib/punct-focal";
 
 /**
  * Cât poate fi de lungă descrierea unei imagini.
@@ -41,6 +42,8 @@ export type ImagineBiblioteca = {
   marimeOcteti: number;
   latime: number | null;
   inaltime: number | null;
+  /** Poziția aleasă a pozei (punctul care rămâne în cadru). Lipsă = centru. */
+  pozitie?: PunctFocal;
   /** Dată ISO; se formatează abia la afișare, în fusul cititorului. */
   incarcataLa: string;
   folosiri: FolosireImagine[];

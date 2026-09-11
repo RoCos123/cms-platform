@@ -20,6 +20,19 @@ const GENERIC_UPLOAD_ERROR =
   "Nu am putut încărca imaginea. Mai încearcă o dată; dacă nu merge nici acum, verifică legătura la internet.";
 
 /**
+ * O coordonată a poziției pozei (0–100), venită din `formData`. Ca orice de pe
+ * rețea, nu e garantat un număr întreg în interval — orice altceva devine `null`
+ * (poziție necunoscută = centru), niciodată o valoare care ar cădea constrângerea
+ * din bază.
+ */
+function procentPozitie(brut: FormDataEntryValue | null): number | null {
+  if (typeof brut !== "string" || brut === "") return null;
+  const numar = Number(brut);
+  if (!Number.isInteger(numar) || numar < 0 || numar > 100) return null;
+  return numar;
+}
+
+/**
  * Încărcarea unei imagini în bucketul `media`, sub prefixul propriului site.
  *
  * `siteId` vine EXCLUSIV din sesiune (`verifySession`), niciodată din `formData`:
@@ -70,6 +83,14 @@ export async function uploadImage(formData: FormData): Promise<UploadImageResult
   const rawAltText = formData.get("altText");
   const altText = typeof rawAltText === "string" ? rawAltText.trim() : "";
 
+  // Poziția aleasă la încărcare (trasă în ramă, ca la Facebook). Constrângerea
+  // din bază le cere împreună: dacă lipsește una, o lăsăm pe amândouă goale, adică
+  // centru — poziția implicită.
+  const px = procentPozitie(formData.get("focal_x"));
+  const py = procentPozitie(formData.get("focal_y"));
+  const focalX = px !== null && py !== null ? px : null;
+  const focalY = px !== null && py !== null ? py : null;
+
   const { data: upload, error: insertError } = await supabase
     .from("uploads")
     .insert({
@@ -81,6 +102,8 @@ export async function uploadImage(formData: FormData): Promise<UploadImageResult
       width: parsePixelDimension(formData.get("width")),
       height: parsePixelDimension(formData.get("height")),
       alt_text: altText || null,
+      focal_x: focalX,
+      focal_y: focalY,
     })
     .select("id")
     // Fără tipuri generate din schemă, clientul Supabase întoarce `any` — iar
@@ -99,5 +122,13 @@ export async function uploadImage(formData: FormData): Promise<UploadImageResult
   // nicăieri, iar legarea ei de o secțiune trece prin salvarea acelei secțiuni.
   revalidatePath("/dashboard", "layout");
 
-  return { ok: true, image: { uploadId: upload.id, url: adresaImaginii(upload.id), altText } };
+  return {
+    ok: true,
+    image: {
+      uploadId: upload.id,
+      url: adresaImaginii(upload.id),
+      altText,
+      ...(focalX !== null && focalY !== null ? { pozitie: { x: focalX, y: focalY } } : {}),
+    },
+  };
 }
