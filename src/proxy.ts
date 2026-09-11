@@ -4,7 +4,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { resolveTenant, isPlatformHost } from "@/lib/tenant";
 import { seServesteNepublicat } from "@/lib/lansare";
-import { estePanou, esteConectare } from "@/lib/rute";
+import { estePanou, esteConectare, estePanouProprietar } from "@/lib/rute";
 
 /**
  * Fallback de rezolvare a tenantului pentru host-uri care nu aparțin niciunui
@@ -76,6 +76,20 @@ export async function proxy(request: NextRequest) {
   // pe `request`, iar o copie luată înainte ar trimite mai departe token-ul deja
   // rotit — Server Components ar vedea o sesiune invalidă și ar deconecta userul.
   const requestHeaders = new Headers(request.headers);
+
+  /*
+   * Panoul de proprietar (tu, peste toate site-urile) nu e al niciunui tenant.
+   * Îl scoatem din rezolvarea de tenant ÎNAINTE de a o porni: altfel, pe adresa
+   * brută a platformei (un `*.vercel.app` neînregistrat), `resolveTenant` n-ar
+   * găsi nimic și ar rescrie la „site indisponibil", iar panoul n-ar fi de
+   * atins. Session-ul s-a reîmprospătat deja mai sus (`getUser`), deci `respond`
+   * duce cookie-urile mai departe. Cine are voie aici se verifică în rutele
+   * lui (`verificaProprietar`), nu aici — proxy-ul doar le lasă să treacă, fără
+   * antet de tenant.
+   */
+  if (estePanouProprietar(request.nextUrl.pathname)) {
+    return respond(NextResponse.next({ request: { headers: requestHeaders } }));
+  }
 
   // Rolul `anon` nu mai are acces la `sites` (migrarea de întărire RLS), deci
   // rezolvarea tenantului se face cu cheia secretă, server-side.
