@@ -150,6 +150,29 @@ body {
 }
 
 /*
+ * Butonul de WhatsApp. Culoarea și glifa sunt fixe în componentă (marca
+ * WhatsApp, nu șablonul); aici stau doar lucrurile pe care un atribut `style`
+ * nu le poate ține: trecerea la apăsare și ascunderea la tipărire.
+ *
+ * `transition` pe transformare, nu pe umbră singură: la hover se ridică puțin,
+ * ca orice buton pe care merită să apeși. Pe hârtie n-are ce căuta.
+ */
+.bula-whatsapp {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bula-whatsapp:hover {
+  transform: scale(1.06);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+@media print {
+  .bula-whatsapp {
+    display: none !important;
+  }
+}
+
+/*
  * Pe telefon adresa de email nu încape lângă cele două butoane — bara ar ieși
  * din ecran. Emailul e o comoditate (contează doar dacă cineva are două
  * conturi), butoanele sunt scopul barei, deci el pleacă primul.

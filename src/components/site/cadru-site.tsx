@@ -14,6 +14,7 @@ import { templateFontStyle } from "@/lib/templates/fonturi";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { AdminBar } from "@/components/site/admin-bar";
+import { BulaWhatsApp } from "@/components/site/bula-whatsapp";
 
 /**
  * Cadrul oricărei pagini publice: fonturile șablonului, antetul, subsolul și
@@ -134,6 +135,12 @@ export async function CadruSite({
             retele: linkurileSociale(social),
           }}
         />
+
+        {/*
+          Bula urcă deasupra barei de administrare doar când bara e prezentă —
+          adică pentru proprietarul logat. Vizitatorul o vede jos în colț.
+        */}
+        <BulaWhatsApp numar={brand.whatsapp} ridicata={sesiune !== null} />
 
         {sesiune && <AdminBar email={sesiune.email} linkEditare={linkEditare} />}
       </div>

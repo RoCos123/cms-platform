@@ -58,6 +58,13 @@ export const CAMPURI_CABINET: CampSchema[] = [
     hint: "Apare în antet și în subsol, ca număr pe care se poate apăsa.",
     max: 40,
   },
+  {
+    tip: "text",
+    cheie: "whatsapp",
+    eticheta: "WhatsApp",
+    hint: "Numărul tău de WhatsApp. Apare ca un buton verde, fix în colțul din dreapta-jos, pe care vizitatorul apasă și-ți scrie direct. Lasă gol dacă nu vrei butonul. Scrie-l cum vrei — „0722…” sau „+40 722…”, îl aranjăm noi.",
+    max: 40,
+  },
   { tip: "email", cheie: "email", eticheta: "Adresa de email", max: 200 },
   { tip: "text", cheie: "adresa", eticheta: "Adresa cabinetului", max: 200 },
   {
@@ -158,6 +165,7 @@ export type Brand = {
   numeleTau?: string;
   subtitlu?: string;
   telefon?: string;
+  whatsapp?: string;
   email?: string;
   adresa?: string;
   acreditare?: string;
