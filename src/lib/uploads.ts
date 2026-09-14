@@ -173,3 +173,72 @@ export function parsePixelDimension(raw: FormDataEntryValue | null): number | nu
 
   return value;
 }
+
+// ----------------------------------------------------------------------------
+// Documente (fișe, formulare) — pentru descărcare, nu pentru afișare.
+//
+// Stau în ACELAȘI depozit și tabel ca pozele (bucketul `media` n-a avut niciodată
+// restricție de tip, iar `uploads.mime_type` acceptă orice text — verificat în
+// migrarea `init_schema`). Ce le deosebește de poze e tipul: un document nu se
+// arată într-o ramă, ci se descarcă. Deci nu au dimensiuni, nici punct focal.
+// ----------------------------------------------------------------------------
+
+export const ACCEPTED_DOCUMENT_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+] as const;
+
+/** 10 MB: o fișă cu poze sau un formular scanat trece, dar nu lăsăm un fișier uriaș. */
+export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
+
+export const ACCEPTED_DOCUMENT_LABEL = "PDF sau Word";
+export const MAX_DOCUMENT_SIZE_LABEL = "10 MB";
+
+/** Pentru `accept` pe `<input type="file">`: tipuri ȘI extensii (unele browsere raportează .docx greșit). */
+export const DOCUMENT_INPUT_ACCEPT = [...ACCEPTED_DOCUMENT_TYPES, ".pdf", ".doc", ".docx"].join(",");
+
+/** Documentul așa cum îl vede formularul: referința, adresa de descărcare, numele. */
+export type DocumentValue = {
+  uploadId: string;
+  url: string;
+  filename: string;
+  marimeOcteti: number;
+};
+
+export type UploadDocumentResult =
+  | { ok: true; document: DocumentValue }
+  | { ok: false; error: string };
+
+/**
+ * E un document încărcabil? Întâi după tip (sursa de adevăr), dar și după
+ * extensie: unele browsere raportează un .docx ca `application/octet-stream` sau
+ * gol. Riscul e mic — fișierul se DESCARCĂ, nu se execută, și se servește cu
+ * „attachment" + `nosniff`, deci nici măcar nu e interpretat de browser.
+ */
+export function esteDocumentAcceptat(file: ImageCandidate): boolean {
+  if ((ACCEPTED_DOCUMENT_TYPES as readonly string[]).includes(file.type)) return true;
+  return /\.(pdf|docx?)$/i.test(file.name);
+}
+
+/** Un mime_type stocat aparține unui document? (Pentru a separa pozele de fișiere în bibliotecă.) */
+export function esteMimeDocument(mimeType: string | null | undefined): boolean {
+  return typeof mimeType === "string" && !mimeType.startsWith("image/");
+}
+
+/** Mesajul de arătat, sau `null` dacă documentul e bun. Spune și ce are de făcut mai departe. */
+export function describeDocumentProblem(file: ImageCandidate): string | null {
+  if (!file.name || file.size === 0) {
+    return "Fișierul pare gol. Alege altul sau mai încearcă o dată.";
+  }
+
+  if (!esteDocumentAcceptat(file)) {
+    return `Fișierul acesta nu e un document pe care îl putem folosi. Acceptăm ${ACCEPTED_DOCUMENT_LABEL}.`;
+  }
+
+  if (file.size > MAX_DOCUMENT_BYTES) {
+    return `Documentul are ${formatMegabytes(file.size)} MB, iar limita e ${MAX_DOCUMENT_SIZE_LABEL}. Alege o variantă mai mică.`;
+  }
+
+  return null;
+}

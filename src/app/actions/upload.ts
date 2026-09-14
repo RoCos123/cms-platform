@@ -3,13 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
-import { adresaImaginii } from "@/lib/imagini-adrese";
+import { adresaImaginii, adresaFisierului } from "@/lib/imagini-adrese";
 import {
   BUCKET_MEDIA,
   buildStorageFileName,
   describeImageProblem,
+  describeDocumentProblem,
   parsePixelDimension,
   type UploadImageResult,
+  type UploadDocumentResult,
 } from "@/lib/uploads";
 
 /**
@@ -129,6 +131,81 @@ export async function uploadImage(formData: FormData): Promise<UploadImageResult
       url: adresaImaginii(upload.id),
       altText,
       ...(focalX !== null && focalY !== null ? { pozitie: { x: focalX, y: focalY } } : {}),
+    },
+  };
+}
+
+const GENERIC_DOCUMENT_ERROR =
+  "Nu am putut încărca documentul. Mai încearcă o dată; dacă nu merge nici acum, verifică legătura la internet.";
+
+/**
+ * Încărcarea unui DOCUMENT (PDF/Word) în bibliotecă, sub prefixul propriului site.
+ *
+ * Geamăn cu `uploadImage`, aceleași granițe (site-ul din sesiune, nu din formular;
+ * validare pe server ca singura care contează). Diferă doar prin ce ține un
+ * document: fără dimensiuni în pixeli, fără punct focal, fără text alternativ —
+ * un fișier se descarcă, nu se așază într-o ramă.
+ */
+export async function uploadDocument(formData: FormData): Promise<UploadDocumentResult> {
+  const { siteId } = await verifySession();
+
+  const file = formData.get("file");
+  if (!(file instanceof File)) {
+    return { ok: false, error: "Nu am primit niciun fișier. Alege un document și încearcă din nou." };
+  }
+
+  const problem = describeDocumentProblem({ name: file.name, type: file.type, size: file.size });
+  if (problem) {
+    return { ok: false, error: problem };
+  }
+
+  const supabase = await createClient();
+
+  const storagePath = `${siteId}/${crypto.randomUUID()}-${buildStorageFileName(file.name)}`;
+  const contentType = file.type || "application/octet-stream";
+
+  const { error: storageError } = await supabase.storage.from(BUCKET_MEDIA).upload(storagePath, file, {
+    contentType,
+    cacheControl: "31536000",
+    upsert: false,
+  });
+
+  if (storageError) {
+    return { ok: false, error: GENERIC_DOCUMENT_ERROR };
+  }
+
+  const { data: upload, error: insertError } = await supabase
+    .from("uploads")
+    .insert({
+      site_id: siteId,
+      storage_path: storagePath,
+      filename: file.name,
+      mime_type: contentType,
+      size_bytes: file.size,
+      // Un document n-are dimensiuni, nici punct focal.
+      width: null,
+      height: null,
+      alt_text: null,
+      focal_x: null,
+      focal_y: null,
+    })
+    .select("id")
+    .single<{ id: string }>();
+
+  if (insertError || !upload) {
+    await supabase.storage.from(BUCKET_MEDIA).remove([storagePath]);
+    return { ok: false, error: GENERIC_DOCUMENT_ERROR };
+  }
+
+  revalidatePath("/dashboard", "layout");
+
+  return {
+    ok: true,
+    document: {
+      uploadId: upload.id,
+      url: adresaFisierului(upload.id),
+      filename: file.name,
+      marimeOcteti: file.size,
     },
   };
 }
