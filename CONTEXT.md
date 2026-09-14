@@ -219,9 +219,12 @@ aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
      (perechea lui `rescrieAdresele`, recunoaște `fisierId`, nu `uploadId`, ca
      ruta de fișier și cea de poză să nu se calce), chemată pe site și în editor.
    - Probat vizual: biblioteca (listă + gol) și pachetul cu butoane de descărcare.
-   - DATORIE mică rămasă: ștergerea unui document deja legat la un material nu
-     curăță referința (butonul ar da 404) — `stergeImaginea` scanează după
-     `uploadId`, nu `fisierId`. De prins la o tură viitoare.
+   - Ștergerea curăță și butoanele: `stergeImaginea` scoate încărcarea din
+     secțiuni fie ca poză (`uploadId`), fie ca material (`fisierId`), prin
+     `scoateIncarcarea` (`imagini.ts`, cu `rescrieFisierul` — perechea lui
+     `rescrieImaginea`). Fișierul dispare de pe buton, textul butonului rămâne
+     (poți realege). Probat în `e2e/materiale.proba.mjs`. Deci un buton nu mai
+     rămâne legat de un fișier șters (prins de proprietar).
 5. **Contact pe WhatsApp** — GATA. Bulă verde fixă în dreapta-jos, iconița ȘI
    culoarea ORIGINALE (`#25D366`, glifa albă WhatsApp), aceeași pe toate
    șabloanele — singurul loc din site-ul public care NU ia culorile șablonului,
