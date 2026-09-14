@@ -199,7 +199,7 @@ aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
    singură. Ambele scoase (lista `videouri` și steagul `doarYouTube`): un link
    non-YouTube nu mai e eroare, e pur și simplu un articol.
 4. **Fișiere de descărcat** — GATA. Documentele (PDF/Word) stau în bibliotecă,
-   lângă poze; la fiecare pachet din „Pachete și materiale" pui o listă de butoane
+   lângă poze; la fiecare program din „Programe și materiale" pui o listă de butoane
    „Descarcă", fiecare legat de un document. SURPRIZĂ: n-a trebuit nici migrare,
    nici setare Supabase — bucketul `media` n-a avut niciodată restricție de tip,
    iar `uploads.mime_type` acceptă orice text; „doar poze" era doar în cod. Deci
@@ -211,14 +211,20 @@ aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
    - Bibliotecă: `imaginileBibliotecii` filtrează acum DOAR pozele (după mime),
      nou `documenteleBibliotecii`; `documente.tsx` (încărcare + listă + ștergere)
      pe ecranul „Bibliotecă" (fost „Imagini", redenumit fiindcă ține și fișiere).
-   - Materiale: câmp `materiale` (listă) pe pachet, fiecare = text + câmp nou
+   - Materiale: câmp `materiale` (listă) pe program, fiecare = text + câmp nou
      `tip: "document"` (dropdown din documentele bibliotecii — `CampDocument`,
-     threadat ca `destinatii`); randate în `pricing.tsx` ca butoane de descărcare;
+     threadat ca `destinatii`); randate în `portfolio.tsx` ca butoane de descărcare;
      text gol → „Descarcă materialul".
+     - A stat întâi pe „Pachete" (m-am luat după cum numise proprietarul
+       secțiunea); mutat la „Programe și materiale" la cererea lui — acolo, unde
+       numele conține chiar „materiale", e locul firesc. Funcțiile de
+       curățare/re-semnare recunosc materialul după `fisierId`, nu după secțiune,
+       deci mutarea a fost doar câmp (`sectiuni.ts`) + randare (`pricing.tsx` →
+       `portfolio.tsx`), nimic de atins la ștergere.
    - Adresa se re-semnează la randare din `fisierId` cu `rescrieAdreseleFisiere`
      (perechea lui `rescrieAdresele`, recunoaște `fisierId`, nu `uploadId`, ca
      ruta de fișier și cea de poză să nu se calce), chemată pe site și în editor.
-   - Probat vizual: biblioteca (listă + gol) și pachetul cu butoane de descărcare.
+   - Probat vizual: biblioteca (listă + gol) și programul cu butoane de descărcare.
    - Ștergerea curăță și butoanele: `stergeImaginea` scoate încărcarea din
      secțiuni fie ca poză (`uploadId`), fie ca material (`fisierId`), prin
      `scoateIncarcarea` (`imagini.ts`, cu `rescrieFisierul` — perechea lui
