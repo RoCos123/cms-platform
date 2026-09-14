@@ -79,9 +79,12 @@ export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: Sect
           display: "grid",
           gap: "clamp(32px, 5vw, 72px)",
           gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          // Poza și textul se ancorează sus, fiecare pe înălțimea lui — nu întinse
-          // una să o ajungă pe cealaltă.
-          alignItems: "start",
+          // Textul stă centrat pe verticală față de poză: cu puțin text, e fix la
+          // mijlocul pozei; pe măsură ce se scrie mai mult, se întinde în sus și în
+          // jos deopotrivă, până marginea lui de sus ajunge la marginea de sus a
+          // pozei (cerut de proprietar). Pe telefon e o coloană, deci alinierea
+          // n-are efect — se stivuiește la fel.
+          alignItems: "center",
           marginTop: "clamp(32px, 4vw, 48px)",
         }}
       >
