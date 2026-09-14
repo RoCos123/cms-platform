@@ -173,6 +173,29 @@ body {
 }
 
 /*
+ * Butonul de play al unui video încorporat. Cercul și triunghiul stau în
+ * componentă (`redare-video.tsx`); aici doar lucrurile pe care `style` nu le
+ * ține: creșterea la hover și conturul la focus din tastatură.
+ *
+ * `transition` pe cerc, nu pe tot butonul: ce se ridică la apăsare e pastila
+ * albă, nu afișul de sub ea.
+ */
+.redare-video-cerc {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.redare-video:hover .redare-video-cerc,
+.redare-video:focus-visible .redare-video-cerc {
+  transform: translate(-50%, -50%) scale(1.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.34);
+}
+
+.redare-video:focus-visible {
+  outline: 2px solid var(--t-accent);
+  outline-offset: 3px;
+}
+
+/*
  * Pe telefon adresa de email nu încape lângă cele două butoane — bara ar ieși
  * din ecran. Emailul e o comoditate (contează doar dacă cineva are două
  * conturi), butoanele sunt scopul barei, deci el pleacă primul.

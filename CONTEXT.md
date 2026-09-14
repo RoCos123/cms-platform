@@ -176,8 +176,22 @@ aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
    `e2e/destinatii.proba.mjs`); adusă în editor prin `page.tsx` → `editor.tsx` →
    `CampuriSectiune` (`CampLink`). O adresă veche stricată apare ca „altă adresă",
    ca s-o poți repara alegând din listă.
-3. **Video în secțiunea Apariții (`logos`)** — acum doar link; de adăugat
-   încorporare video cu buton de play (model: Renata Iancu).
+3. **Video în secțiunea Apariții (`logos`)** — GATA. O grilă de videouri
+   YouTube (2-3 pe rând, `auto-fit`, 1 pe telefon), fiecare cu buton de play; la
+   clic se încarcă player-ul, nu înainte (facadă: fără iframe-uri YouTube la
+   fiecare încărcare de pagină, ar fi de trei ori pe o grilă de trei). Cerut „ca
+   la Renata Iancu" — dar proprietarul a cerut apoi MAI MULTE pe un rând, nu
+   unul singur ca la ea. Link-ul se traduce în id cu `src/lib/video.ts` (orice
+   formă: `watch?v=`, `youtu.be/`, `/embed/`, `/shorts/`; probat în
+   `e2e/video.proba.mjs`); încorporare pe `youtube-nocookie` (fără cookie-uri
+   până la play, mai blând cu GDPR). Componenta de client:
+   `src/components/site/redare-video.tsx`. Afiș propriu (opțional) sau cel
+   automat de pe YouTube (`hqdefault`, tăiat „cover" ca să nu aibă benzi).
+   Câmp nou `videouri` în secțiunea `logos` (`sectiuni.ts`), pe tipuri de câmp
+   existente (`adresa`, `text`, `imagine`), deci fără schimbări în editor.
+   Antetul rămâne la stânga ca restul site-ului (la Renata e centrat, dar aia e
+   pielea șablonului ei; de oferit centrarea dacă o cere). Probat vizual: 3 pe
+   rând pe lat, 1 pe telefon, clic → player cu adresa corectă.
 4. **Fișiere de descărcat** — depozit pentru documente (fișe Word/PDF) pe care
    pacienții să le descarce. CEA MAI MARE: depozitul de acum ține doar poze
    (bucket `media`, tipuri imagine); cere tip nou de fișier + rută de descărcare

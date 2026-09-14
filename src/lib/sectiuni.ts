@@ -308,6 +308,27 @@ const LISTA: MetaSectiune[] = [
       INTRO,
       {
         tip: "lista",
+        cheie: "videouri",
+        eticheta: "Videouri",
+        etichetaElement: "video",
+        rezumatDin: "titlu",
+        max: 9,
+        hint: "Linkuri de la YouTube; apar în grilă, 2-3 pe rând, cu buton de play. O apariție TV se vede cel mai bine pornind-o pe loc, nu ca link în altă parte.",
+        campuri: [
+          {
+            tip: "adresa",
+            cheie: "video",
+            eticheta: "Link YouTube",
+            obligatoriu: true,
+            hint: "Adresa clipului de pe YouTube — din bara de adrese sau de la butonul „Distribuie”.",
+            max: 300,
+          },
+          { tip: "text", cheie: "titlu", eticheta: "Titlu scurt (sub video)", max: 120 },
+          { tip: "imagine", cheie: "poster", eticheta: "Imaginea de dinainte de play (opțional)" },
+        ],
+      },
+      {
+        tip: "lista",
         cheie: "aparitii",
         eticheta: "Apariții",
         etichetaElement: "apariție",
