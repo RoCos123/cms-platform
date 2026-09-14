@@ -195,8 +195,16 @@ aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
    exemplul „/contact" din câmpul de link, care e o pagină inexistentă (contactul
    e secțiunea `#contact`). Lista de destinații nu mai lasă butonul să nimerească
    un loc care nu există.
-7. **Aliniere text/poză la „Despre mine" (`aboutTeaser`)** — textul din dreapta
-   să fie în dreptul pozei (acum stă sus, lângă titlu, iar poza e jos).
+7. **Aliniere text/poză la „Despre mine" (`aboutTeaser`)** — GATA. Înainte,
+   titlul locuia în coloana din stânga, peste poză, iar textul din dreapta
+   pornea din capul de sus — adică în dreptul TITLULUI, nu al pozei, care
+   rămânea jos, singură. Acum antetul (eyebrow + titlu) e pe TOATĂ lățimea,
+   deasupra, iar sub el poza și textul sunt două coloane ancorate de sus
+   (`alignItems: start`): textul pornește în dreptul pozei. Aceeași grilă
+   responsivă ca înainte (`auto-fit`, fără media queries); pe telefon se
+   stivuiește titlu → poză → text, exact ca până acum. Schimbare într-o
+   componentă comună (`about-teaser.tsx`, randată de `render-sections.tsx`),
+   deci apare pe toate cinci șabloanele. Probat vizual la 1200px și 390px.
 
 Notă de arhitectură (întrebarea proprietarului): o cerere de client schimbă
 TOATE șabloanele doar dacă atinge o componentă comună la nivel de STRUCTURĂ.

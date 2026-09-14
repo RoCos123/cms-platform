@@ -44,47 +44,63 @@ export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: Sect
 
   return (
     <Section tone={tone} id="despre">
-      <div style={{ display: "grid", gap: "clamp(32px, 5vw, 72px)", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
-        <div>
-          {data.eyebrow && <SectionEyebrow>{data.eyebrow}</SectionEyebrow>}
-          <h2
-            style={{
-              margin: 0,
-              fontSize: "clamp(32px, 4.4vw, 54px)",
-              lineHeight: 1.08,
-              letterSpacing: "-0.025em",
-              fontWeight: 700,
-              textWrap: "balance",
-            }}
-          >
-            {data.titlu}
-            {data.titluAccent && (
-              <>
-                {" "}
-                <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
-                  {data.titluAccent}
-                </span>
-              </>
-            )}
-          </h2>
+      {/*
+        Antetul stă pe TOATĂ lățimea, deasupra celor două coloane. Înainte,
+        titlul locuia în coloana din stânga, peste poză, așa că textul din
+        dreapta pornea din capul de sus — adică în dreptul TITLULUI — iar poza
+        rămânea jos, singură. Proprietarul a cerut ca textul să fie în dreptul
+        POZEI: scos aici, titlul nu mai împinge textul în sus, iar sub el poza și
+        textul pornesc de la același nivel.
+      */}
+      {data.eyebrow && <SectionEyebrow>{data.eyebrow}</SectionEyebrow>}
+      <h2
+        style={{
+          margin: 0,
+          fontSize: "clamp(32px, 4.4vw, 54px)",
+          lineHeight: 1.08,
+          letterSpacing: "-0.025em",
+          fontWeight: 700,
+          textWrap: "balance",
+        }}
+      >
+        {data.titlu}
+        {data.titluAccent && (
+          <>
+            {" "}
+            <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
+              {data.titluAccent}
+            </span>
+          </>
+        )}
+      </h2>
 
-          {/*
-            Sub titlu, în coloana care altfel rămâne goală pe ecran lat. Verticală,
-            fiindcă locul ăsta cere de obicei un portret — iar dacă i se dă o poză
-            lată, o taie pe margini, nu o turtește.
-          */}
-          {poza && (
-            <div style={{ marginTop: "36px", maxWidth: "380px" }}>
-              <SectionImage
-                src={poza.url}
-                alt={poza.altText ?? ""}
-                aspectRatio="4 / 5"
-                sizes="(max-width: 720px) 100vw, 380px"
-                pozitie={poza.pozitie}
-              />
-            </div>
-          )}
-        </div>
+      <div
+        style={{
+          display: "grid",
+          gap: "clamp(32px, 5vw, 72px)",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          // Poza și textul se ancorează sus, fiecare pe înălțimea lui — nu întinse
+          // una să o ajungă pe cealaltă.
+          alignItems: "start",
+          marginTop: "clamp(32px, 4vw, 48px)",
+        }}
+      >
+        {/*
+          Rama e verticală fiindcă locul cere de obicei un portret — o poză lată
+          se taie pe margini (`object-fit: cover`), nu se turtește. Fără poză,
+          coloana lipsește cu totul și textul umple singur lățimea.
+        */}
+        {poza && (
+          <div style={{ maxWidth: "380px" }}>
+            <SectionImage
+              src={poza.url}
+              alt={poza.altText ?? ""}
+              aspectRatio="4 / 5"
+              sizes="(max-width: 720px) 100vw, 380px"
+              pozitie={poza.pozitie}
+            />
+          </div>
+        )}
 
         <div>
           {paragrafe.map((paragraf, i) => (
