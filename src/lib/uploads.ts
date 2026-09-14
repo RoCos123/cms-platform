@@ -210,6 +210,13 @@ export type UploadDocumentResult =
   | { ok: true; document: DocumentValue }
   | { ok: false; error: string };
 
+/** Un document ca opțiune în alegătorul de materiale din editor (dropdown). */
+export type OptiuneDocument = {
+  id: string;
+  numeFisier: string;
+  url: string;
+};
+
 /**
  * E un document încărcabil? Întâi după tip (sursa de adevăr), dar și după
  * extensie: unele browsere raportează un .docx ca `application/octet-stream` sau

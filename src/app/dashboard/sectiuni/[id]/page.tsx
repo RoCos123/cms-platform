@@ -12,9 +12,10 @@ import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
 import { oreDeAratatPePrimaPagina } from "@/lib/programari-publice";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { EditorSectiune } from "./editor";
-import { rescrieAdresele } from "@/lib/imagini";
-import { adresaImaginii } from "@/lib/imagini-adrese";
+import { rescrieAdresele, rescrieAdreseleFisiere } from "@/lib/imagini";
+import { adresaImaginii, adresaFisierului } from "@/lib/imagini-adrese";
 import { construiesteDestinatii } from "@/lib/destinatii";
+import { documenteleBibliotecii } from "@/lib/imagini-panou";
 
 export default async function EditorSectiunePage({
   params,
@@ -38,8 +39,12 @@ export default async function EditorSectiunePage({
   if (!rand) notFound();
 
   // Aceeași rescriere ca pe site (src/app/page.tsx): previzualizarea din editor
-  // trebuie să arate poza pe adresa ei de acum, nu pe cea veche din JSON.
-  const continut = rescrieAdresele(rand.data, adresaImaginii);
+  // trebuie să arate poza — și materialul — pe adresa lor de acum, nu pe cea
+  // veche din JSON.
+  const continut = rescrieAdreseleFisiere(
+    rescrieAdresele(rand.data, adresaImaginii),
+    adresaFisierului,
+  );
 
   const meta = metaSectiune(rand.key as string);
 
@@ -96,6 +101,9 @@ export default async function EditorSectiunePage({
     (paginiPublicate ?? []).map((rand) => ({ slug: rand.slug as string, titlu: rand.title as string })),
   );
 
+  // Documentele din bibliotecă, pentru alegătorul de materiale de sub un pachet.
+  const documente = await documenteleBibliotecii(session.siteId);
+
   // Aceleași ore ca pe site: previzualizarea secțiunii de programare trebuie să
   // arate exact ce vede un vizitator — inclusiv că se stinge fără ore libere.
   const oreProgramare = await oreDeAratatPePrimaPagina(
@@ -118,6 +126,7 @@ export default async function EditorSectiunePage({
       paginaServiciiActiva={paginaEsteActiva((setari?.pagini ?? {}) as Pagini, "servicii")}
       oreProgramare={oreProgramare}
       destinatii={destinatii}
+      documente={documente}
     />
   );
 }

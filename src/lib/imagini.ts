@@ -65,6 +65,43 @@ function esteImagine(valoare: unknown): valoare is Record<string, unknown> {
   return esteObiect(valoare) && typeof valoare.uploadId === "string" && valoare.uploadId !== "";
 }
 
+/** Recunoaștem un material după `fisierId` — aceeași idee ca la imagini, altă cheie. */
+function esteFisier(valoare: unknown): valoare is Record<string, unknown> {
+  return esteObiect(valoare) && typeof valoare.fisierId === "string" && valoare.fisierId !== "";
+}
+
+/**
+ * Rescrie adresa de descărcare a fiecărui material dintr-un conținut, derivată
+ * din `fisierId`.
+ *
+ * Perechea lui `rescrieAdresele`, dar pentru documente: ruta e `/fisiere/…`, nu
+ * `/imagini/…`, iar recunoașterea se face după `fisierId`, nu `uploadId`, tocmai
+ * ca cele două să nu se calce (un material și o poză n-ar trebui să ajungă pe
+ * aceeași rută). Se cheamă alături de `rescrieAdresele`, la randare.
+ */
+export function rescrieAdreseleFisiere(
+  valoare: unknown,
+  adresa: (fisierId: string) => string,
+): unknown {
+  if (esteFisier(valoare)) {
+    return { ...valoare, url: adresa(valoare.fisierId as string) };
+  }
+
+  if (Array.isArray(valoare)) {
+    return valoare.map((element) => rescrieAdreseleFisiere(element, adresa));
+  }
+
+  if (esteObiect(valoare)) {
+    const rezultat: Record<string, unknown> = {};
+    for (const [cheie, camp] of Object.entries(valoare)) {
+      rezultat[cheie] = rescrieAdreseleFisiere(camp, adresa);
+    }
+    return rezultat;
+  }
+
+  return valoare;
+}
+
 /** Toate imaginile dintr-un conținut de secțiune, oricât de adânc ar sta. */
 export function idurileImaginilor(valoare: unknown, gasite = new Set<string>()): Set<string> {
   if (esteImagine(valoare)) {

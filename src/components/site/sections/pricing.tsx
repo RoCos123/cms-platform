@@ -16,6 +16,12 @@ export type PricingData = {
     include?: string[];
     /** Scrisă = pachetul iese în față. Goală la restul. */
     eticheta?: string;
+    /**
+     * Materiale de descărcat — fiecare un buton legat de un document din
+     * bibliotecă. `url`-ul se re-semnează la randare din `fisierId`
+     * (`rescrieAdreseleFisiere`).
+     */
+    materiale?: { text?: string; fisier?: { fisierId?: string; url?: string } }[];
     buton?: { text: string; href: string };
   }[];
   nota?: string;
@@ -175,6 +181,50 @@ export function Pricing({ data, tone }: { data: PricingData; tone?: SectionTone 
                       <span>{rand}</span>
                     </li>
                   ))}
+                </ul>
+              )}
+
+              {pachet.materiale && pachet.materiale.some((material) => material.fisier?.url) && (
+                <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: "10px" }}>
+                  {pachet.materiale.map((material, j) => {
+                    const url = material.fisier?.url;
+                    if (!url) return null;
+
+                    return (
+                      <li key={j}>
+                        {/* Fișierul e la noi, servit cu „attachment" — `download`
+                            e doar o intenție în plus pentru browser. */}
+                        <a
+                          href={url}
+                          download
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            fontSize: "15px",
+                            fontWeight: 600,
+                            color: "var(--s-accent)",
+                            textDecoration: "none",
+                          }}
+                        >
+                          <svg
+                            aria-hidden
+                            width="18"
+                            height="18"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            style={{ flexShrink: 0 }}
+                          >
+                            <path d="M12 3v11m0 0l4-4m-4 4l-4-4" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M5 21h14" strokeLinecap="round" />
+                          </svg>
+                          {material.text?.trim() || "Descarcă materialul"}
+                        </a>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
 
