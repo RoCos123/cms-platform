@@ -12,6 +12,11 @@ export async function signOutProprietar() {
   redirect("/proprietar/login");
 }
 
+/** Ce află apelantul: ori adresa de deschis, ori de ce n-a mers. */
+export type RezultatIntrare =
+  | { ok: true; url: string }
+  | { ok: false; eroare: "neautentificat" | "lipsa-site" | "fara-cont" | "link" };
+
 /**
  * „Intră în panoul acestui site" — partea delicată.
  *
@@ -26,13 +31,18 @@ export async function signOutProprietar() {
  * Server Action e un POST pe ruta lui, iar o mutare a ei l-ar putea scoate tăcut
  * de sub proxy (ghidul Next, „Execution order"). `generateLink` pe un cont
  * arbitrar e o putere mare — deci se verifică lângă ea, nu departe.
+ *
+ * ÎNTOARCE adresa, nu mai face `redirect`. Motivul e cererea proprietarului:
+ * apăsând „Intră", panoul cu toate site-urile îi era înlocuit în aceeași filă și
+ * îl pierdea. Acum butonul (client) deschide ținta într-o filă nouă și lasă
+ * lista deschisă în cea veche. Tokenul se generează tot aici, DUPĂ paznic — pe
+ * client ajunge doar adresa gata făcută, aceeași care mergea și prin redirect.
  */
-export async function intraInPanou(formData: FormData) {
+export async function intraInPanou(siteId: string): Promise<RezultatIntrare> {
   const proprietar = await getProprietarOptional();
-  if (!proprietar) redirect("/proprietar/login");
+  if (!proprietar) return { ok: false, eroare: "neautentificat" };
 
-  const siteId = String(formData.get("siteId") ?? "");
-  if (!siteId) redirect("/proprietar?eroare=lipsa-site");
+  if (!siteId) return { ok: false, eroare: "lipsa-site" };
 
   const service = createServiceClient();
 
@@ -48,10 +58,10 @@ export async function intraInPanou(formData: FormData) {
     .eq("site_id", siteId)
     .maybeSingle();
 
+  // Un site fără cont legat n-are panou în care să intri. Îi spunem, nu-l
+  // lăsăm să apese într-un gol.
   if (!site?.domain || !cont?.email) {
-    // Un site fără cont legat n-are panou în care să intri. Îi spunem, nu-l
-    // lăsăm să apese într-un gol.
-    redirect("/proprietar?eroare=fara-cont");
+    return { ok: false, eroare: "fara-cont" };
   }
 
   // Generat, NU trimis pe email: `generateLink` doar întoarce dovada.
@@ -63,11 +73,11 @@ export async function intraInPanou(formData: FormData) {
   const tokenHash = link?.properties?.hashed_token;
   if (error || !tokenHash) {
     console.error("[proprietar] generateLink:", error?.message);
-    redirect("/proprietar?eroare=link");
+    return { ok: false, eroare: "link" };
   }
 
   // Consumat pe host-ul site-ului țintă, unde se poate scrie cookie-ul lui.
   const tinta = new URL("/proprietar/intra", `https://${site.domain}`);
   tinta.searchParams.set("token_hash", tokenHash);
-  redirect(tinta.toString());
+  return { ok: true, url: tinta.toString() };
 }
