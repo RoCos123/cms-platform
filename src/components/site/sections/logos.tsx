@@ -3,12 +3,26 @@ import type { PunctFocal } from "@/lib/punct-focal";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
+import { RedareVideo } from "@/components/site/redare-video";
+import { idYouTube, embedYouTube, posterYouTube } from "@/lib/video";
 
 export type LogosData = {
   eyebrow?: string;
   titlu: string;
   titluAccent?: string;
   intro?: string;
+  /**
+   * Videouri de la YouTube, așezate în grilă (2-3 pe rând), fiecare cu buton de
+   * play. Cerute de proprietar („ca la Renata Iancu"), dar mai multe, nu unul.
+   */
+  videouri?: {
+    /** Link YouTube, în orice formă (`watch?v=`, `youtu.be/`, `/embed/`…). */
+    video: string;
+    /** Un titlu scurt sub video (opțional). */
+    titlu?: string;
+    /** Afiș propriu; gol → se ia automat de pe YouTube. */
+    poster?: { url: string; altText?: string; pozitie?: PunctFocal };
+  }[];
   aparitii: {
     /** Unde a apărut: „Digi24", „Podcast Vorbim deschis". */
     sursa: string;
@@ -32,11 +46,13 @@ export type LogosData = {
  * externă.
  *
  * Nu e o listă de link-uri seci, ci carduri: în șablon fiecare apariție are
- * imagine și context, fiindcă rolul secțiunii e încrederea, nu navigarea.
+ * imagine și context, fiindcă rolul secțiunii e încrederea, nu navigarea. Peste
+ * carduri, o grilă de videouri încorporate: o apariție TV se vede cel mai bine
+ * pornind-o pe loc, nu ca link către alt site.
  */
 export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
   /*
-    Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
+    Listele lipsesc cu totul pe un site abia provizionat: `creeaza_client` pune
     toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
     un site nepublicat nu se vede oricum, iar clientul stinge ce nu-i trebuie).
     Fără `?? []`, prima pagină a fiecărui client nou cădea cu 500.
@@ -45,6 +61,7 @@ export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
     mele" și „Pachete": un titlu urmat de nimic arată a site stricat.
   */
   const aparitii = data.aparitii ?? [];
+  const videouri = data.videouri ?? [];
   /*
     Titlul singur e de ajuns ca să se vadă secțiunea, chiar fără nimic sub el.
 
@@ -56,10 +73,7 @@ export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
     Fără titlu ȘI fără conținut, tot nu se randează nimic: aia e secțiunea pe
     care clientul a golit-o dinadins.
   */
-  if (aparitii.length === 0 && !data.titlu?.trim()) return null;
-
-  // Fără apariții, secțiunea dispare — la fel ca la articole: un titlu urmat de
-  // gol arată a site stricat.
+  if (aparitii.length === 0 && videouri.length === 0 && !data.titlu?.trim()) return null;
 
   return (
     <Section tone={tone} id="aparitii">
@@ -70,88 +84,140 @@ export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
         intro={data.intro}
       />
 
-      <ul
-        style={{
-          listStyle: "none",
-          margin: "52px 0 0",
-          padding: 0,
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "24px",
-        }}
-      >
-        {aparitii.map((aparitie, i) => {
-          const meta = [aparitie.tip, aparitie.data].filter(Boolean).join(" · ");
+      {/* Grila de videouri: 2-3 pe un rând lat, 1 pe telefon (`auto-fit`, fără
+          media queries). Un link stricat sau non-YouTube se sare, nu dărâmă. */}
+      {videouri.length > 0 && (
+        <ul
+          style={{
+            listStyle: "none",
+            margin: "52px 0 0",
+            padding: 0,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "24px",
+          }}
+        >
+          {videouri.map((v, i) => {
+            const id = idYouTube(v.video);
+            if (!id) return null;
+            const poster = v.poster?.url ? v.poster : null;
 
-          return (
-            <li key={`${aparitie.sursa}-${i}`}>
-              <Continut href={aparitie.href}>
-                {aparitie.imagine && (
+            return (
+              <li key={`${v.video}-${i}`}>
+                <RedareVideo embedUrl={embedYouTube(id)} titlu={v.titlu || data.titlu || "Video"}>
                   <SectionImage
-                    src={aparitie.imagine.url}
-                    alt={aparitie.imagine.altText ?? ""}
+                    src={poster ? poster.url : posterYouTube(id)}
+                    alt={poster?.altText ?? ""}
                     aspectRatio="16 / 9"
-                    sizes="(max-width: 720px) 100vw, 560px"
-                    pozitie={aparitie.imagine.pozitie}
+                    sizes="(max-width: 720px) 100vw, 380px"
+                    pozitie={poster?.pozitie}
                   />
-                )}
-
-                <div style={{ padding: "28px", display: "flex", flexDirection: "column", gap: "10px", flex: 1 }}>
-                  {meta && (
-                    <span
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: 600,
-                        letterSpacing: "0.12em",
-                        textTransform: "uppercase",
-                        color: "var(--t-accent)",
-                      }}
-                    >
-                      {meta}
-                    </span>
-                  )}
-
-                  <h3 style={{ margin: 0, fontSize: "21px", lineHeight: 1.3, fontWeight: 600, textWrap: "pretty" }}>
-                    {aparitie.titlu}
-                  </h3>
-
-                  <p style={{ margin: 0, fontSize: "15px", fontWeight: 600, color: "var(--t-text-secundar)" }}>
-                    {aparitie.sursa}
+                </RedareVideo>
+                {v.titlu && (
+                  <p
+                    style={{
+                      margin: "14px 0 0",
+                      fontSize: "16px",
+                      fontWeight: 600,
+                      lineHeight: 1.4,
+                      color: "var(--s-text-secundar)",
+                      textWrap: "pretty",
+                    }}
+                  >
+                    {v.titlu}
                   </p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
-                  {aparitie.descriere && (
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "16px",
-                        lineHeight: 1.7,
-                        color: "var(--t-text-secundar)",
-                        textWrap: "pretty",
-                      }}
-                    >
-                      {aparitie.descriere}
+      {/* Cardurile de apariții în presă. Fără ele, secțiunea poate fi doar video. */}
+      {aparitii.length > 0 && (
+        <ul
+          style={{
+            listStyle: "none",
+            margin: "52px 0 0",
+            padding: 0,
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+            gap: "24px",
+          }}
+        >
+          {aparitii.map((aparitie, i) => {
+            const meta = [aparitie.tip, aparitie.data].filter(Boolean).join(" · ");
+
+            return (
+              <li key={`${aparitie.sursa}-${i}`}>
+                <Continut href={aparitie.href}>
+                  {aparitie.imagine && (
+                    <SectionImage
+                      src={aparitie.imagine.url}
+                      alt={aparitie.imagine.altText ?? ""}
+                      aspectRatio="16 / 9"
+                      sizes="(max-width: 720px) 100vw, 560px"
+                      pozitie={aparitie.imagine.pozitie}
+                    />
+                  )}
+
+                  <div style={{ padding: "28px", display: "flex", flexDirection: "column", gap: "10px", flex: 1 }}>
+                    {meta && (
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          fontWeight: 600,
+                          letterSpacing: "0.12em",
+                          textTransform: "uppercase",
+                          color: "var(--t-accent)",
+                        }}
+                      >
+                        {meta}
+                      </span>
+                    )}
+
+                    <h3 style={{ margin: 0, fontSize: "21px", lineHeight: 1.3, fontWeight: 600, textWrap: "pretty" }}>
+                      {aparitie.titlu}
+                    </h3>
+
+                    <p style={{ margin: 0, fontSize: "15px", fontWeight: 600, color: "var(--t-text-secundar)" }}>
+                      {aparitie.sursa}
                     </p>
-                  )}
 
-                  {aparitie.href && (
-                    <span
-                      style={{
-                        marginTop: "auto",
-                        paddingTop: "10px",
-                        fontSize: "15px",
-                        fontWeight: 600,
-                        color: "var(--t-accent)",
-                      }}
-                    >
-                      Vezi materialul →
-                    </span>
-                  )}
-                </div>
-              </Continut>
-            </li>
-          );
-        })}
-      </ul>
+                    {aparitie.descriere && (
+                      <p
+                        style={{
+                          margin: 0,
+                          fontSize: "16px",
+                          lineHeight: 1.7,
+                          color: "var(--t-text-secundar)",
+                          textWrap: "pretty",
+                        }}
+                      >
+                        {aparitie.descriere}
+                      </p>
+                    )}
+
+                    {aparitie.href && (
+                      <span
+                        style={{
+                          marginTop: "auto",
+                          paddingTop: "10px",
+                          fontSize: "15px",
+                          fontWeight: 600,
+                          color: "var(--t-accent)",
+                        }}
+                      >
+                        Vezi materialul →
+                      </span>
+                    )}
+                  </div>
+                </Continut>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </Section>
   );
 }
