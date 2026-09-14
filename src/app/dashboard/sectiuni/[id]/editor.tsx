@@ -49,7 +49,7 @@ export function EditorSectiune({
   oreProgramare: OreDePrimaPagina;
   /** Unde poate duce un buton din secțiune: alte secțiuni de pe pagină, pagini. */
   destinatii: Destinatie[];
-  /** Documentele din bibliotecă, pentru materialele de sub un pachet. */
+  /** Documentele din bibliotecă, pentru materialele de sub un program. */
   documente: OptiuneDocument[];
 }) {
   const [valoare, setValoare] = useState(valoareInitiala);

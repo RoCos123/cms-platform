@@ -101,7 +101,7 @@ export default async function EditorSectiunePage({
     (paginiPublicate ?? []).map((rand) => ({ slug: rand.slug as string, titlu: rand.title as string })),
   );
 
-  // Documentele din bibliotecă, pentru alegătorul de materiale de sub un pachet.
+  // Documentele din bibliotecă, pentru alegătorul de materiale de sub un program.
   const documente = await documenteleBibliotecii(session.siteId);
 
   // Aceleași ore ca pe site: previzualizarea secțiunii de programare trebuie să

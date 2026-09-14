@@ -47,9 +47,9 @@ export default async function ImaginiPage() {
           <h2 className="text-xl font-semibold text-foreground">Documente</h2>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             Fișe, formulare, acorduri — PDF sau Word, pe care pacienții le pot descărca.
-            Ca să pui unul pe site, leagă-l de un buton „Descarcă” la un pachet, în{" "}
+            Ca să pui unul pe site, leagă-l de un buton „Descarcă” la un program, în{" "}
             <Link href="/dashboard/sectiuni" className="underline hover:text-foreground">
-              „Pachete și materiale”
+              „Programe și materiale”
             </Link>
             .
           </p>
