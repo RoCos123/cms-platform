@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { idYouTube, embedYouTube, posterYouTube } from "@/lib/video";
+import { valideaza } from "@/lib/sectiuni-editare";
 
 /**
  * Proba traducătorului de link YouTube. `pnpm test:logica`.
@@ -53,4 +54,25 @@ test("ce nu e YouTube sau e gol → null (videoul nu se arată)", () => {
 test("adresa de încorporare și afișul se construiesc din id", () => {
   assert.equal(embedYouTube(ID), `https://www.youtube-nocookie.com/embed/${ID}?autoplay=1&rel=0`);
   assert.equal(posterYouTube(ID), `https://i.ytimg.com/vi/${ID}/hqdefault.jpg`);
+});
+
+test("un câmp „doar YouTube” respinge un link care nu-i YouTube", () => {
+  // Regula s-a născut dintr-un link de Bing lipit în câmpul de video: era un URL
+  // valid, trecea, se salva, dar pe site nu apărea niciun video, iar clientul
+  // n-avea niciun semn de ce. Acum câmpul îi spune.
+  const camp = {
+    tip: "adresa",
+    cheie: "video",
+    eticheta: "Link YouTube",
+    obligatoriu: true,
+    doarYouTube: true,
+    max: 300,
+  };
+
+  const eBing = valideaza({ video: "https://www.bing.com/videos/riverview" }, [camp]);
+  assert.match(eBing.video ?? "", /YouTube/);
+
+  // Un link YouTube adevărat trece fără eroare.
+  const eYouTube = valideaza({ video: `https://www.youtube.com/watch?v=${ID}` }, [camp]);
+  assert.equal(eYouTube.video, undefined);
 });

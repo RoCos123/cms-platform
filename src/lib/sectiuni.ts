@@ -46,6 +46,14 @@ export type CampSchema =
        * profilul e găzduit chiar pe domeniul cabinetului.
        */
       doarExtern?: boolean;
+      /**
+       * Cere un link de YouTube (recunoscut de `idYouTube`). Fără asta, un link
+       * de la Bing sau de la o căutare trece drept „adresă validă", se salvează,
+       * dar pe site nu apare niciun video — iar clientul n-are cum să-și dea
+       * seama de ce (lecție trăită). Cu asta, câmpul îi spune pe loc că nu-i link
+       * YouTube.
+       */
+      doarYouTube?: boolean;
     })
   /**
    * Partea din adresă care identifică elementul („consiliere-parentala”).
@@ -320,7 +328,8 @@ const LISTA: MetaSectiune[] = [
             cheie: "video",
             eticheta: "Link YouTube",
             obligatoriu: true,
-            hint: "Adresa clipului de pe YouTube — din bara de adrese sau de la butonul „Distribuie”.",
+            doarYouTube: true,
+            hint: "Adresa clipului de pe YouTube — din bara de adrese sau de la butonul „Distribuie”. Trebuie să conțină youtube.com sau youtu.be.",
             max: 300,
           },
           { tip: "text", cheie: "titlu", eticheta: "Titlu scurt (sub video)", max: 120 },
