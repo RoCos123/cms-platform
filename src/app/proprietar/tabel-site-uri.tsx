@@ -1,4 +1,4 @@
-import { intraInPanou } from "./actions";
+import { ButonIntra } from "./buton-intra";
 
 /** Un rând din lista de site-uri, gata de arătat — datele deja pregătite în pagină. */
 export type RandSite = {
@@ -83,17 +83,7 @@ export function TabelSiteuri({ randuri }: { randuri: RandSite[] }) {
                 {site.programari ? "Pornite" : "—"}
               </td>
               <td className="px-4 py-3 text-right">
-                <form action={intraInPanou}>
-                  <input type="hidden" name="siteId" value={site.id} />
-                  <button
-                    type="submit"
-                    disabled={!site.email}
-                    title={site.email ? undefined : "Site fără cont legat"}
-                    className="rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
-                  >
-                    Intră în panou
-                  </button>
-                </form>
+                <ButonIntra siteId={site.id} faraCont={!site.email} />
               </td>
             </tr>
           ))}
