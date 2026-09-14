@@ -2,7 +2,6 @@ import type { CampSchema } from "@/lib/sectiuni";
 import { numaraCuvinte } from "@/lib/blocuri-text";
 import { numara } from "@/lib/numerale";
 import { esteEmailValid } from "@/lib/formulare";
-import { idYouTube } from "@/lib/video";
 
 /**
  * Traducerea între cum arată o secțiune în baza de date și cum îi trebuie
@@ -35,9 +34,6 @@ const MESAJ_ADRESA_EXTERNA =
 
 const MESAJ_ADRESA =
   "Nu pare o adresă. Începe cu / pentru o pagină din site, cu # pentru un loc din pagina asta, sau cu https:// pentru un site din afară.";
-
-const MESAJ_YOUTUBE =
-  "Nu pare un link de YouTube. Copiază adresa direct de pe YouTube — din bara browserului sau de la butonul „Distribuie” — și trebuie să conțină youtube.com sau youtu.be.";
 
 /**
  * O adresă către care poate duce un link.
@@ -271,11 +267,6 @@ export function valideaza(
       // vreo eroare — ar rămâne pur și simplu invizibilă, iar clientul ar reciti
       // adresa de zece ori întrebându-se ce a greșit.
       erori[drum] = `Adresa „${text}” e folosită deja de site. Alege alta.`;
-    } else if (camp.tip === "adresa" && camp.doarYouTube && text !== "" && idYouTube(text) === null) {
-      // Un link de la Bing sau de la o căutare trece de `esteAdresaValida` (e un
-      // URL bun), dar `idYouTube` nu-l recunoaște, deci pe site n-ar apărea niciun
-      // video. Aici i se spune, în loc să dispară în tăcere.
-      erori[drum] = MESAJ_YOUTUBE;
     } else if (camp.tip === "adresa" && camp.doarExtern && !esteAdresaExterna(text)) {
       erori[drum] = MESAJ_ADRESA_EXTERNA;
     } else if (camp.tip === "adresa" && !camp.doarExtern && !esteAdresaValida(text)) {

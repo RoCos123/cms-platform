@@ -176,27 +176,28 @@ aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
    `e2e/destinatii.proba.mjs`); adusă în editor prin `page.tsx` → `editor.tsx` →
    `CampuriSectiune` (`CampLink`). O adresă veche stricată apare ca „altă adresă",
    ca s-o poți repara alegând din listă.
-3. **Video în secțiunea Apariții (`logos`)** — GATA. O grilă de videouri
-   YouTube (2-3 pe rând, `auto-fit`, 1 pe telefon), fiecare cu buton de play; la
+3. **Video în secțiunea Apariții (`logos`)** — GATA, refăcut de câteva ori până
+   la forma cerută. FORMA FINALĂ: o SINGURĂ listă „Apariții", cu recunoaștere
+   AUTOMATĂ. Fiecare apariție are un câmp de link (`href`); dacă e link de
+   YouTube, apariția se REDĂ pe loc (card cu buton de play), altfel rămâne card
+   cu „Vezi materialul →" (articol, podcast), iar fără link e doar card cu text.
+   Clientul nu alege între liste și nu bifează nimic — pune un link, secțiunea
+   își dă seama singură. Grilă `auto-fit` (2-3 pe rând pe lat, 1 pe telefon); la
    clic se încarcă player-ul, nu înainte (facadă: fără iframe-uri YouTube la
-   fiecare încărcare de pagină, ar fi de trei ori pe o grilă de trei). Cerut „ca
-   la Renata Iancu" — dar proprietarul a cerut apoi MAI MULTE pe un rând, nu
-   unul singur ca la ea. Link-ul se traduce în id cu `src/lib/video.ts` (orice
-   formă: `watch?v=`, `youtu.be/`, `/embed/`, `/shorts/`; probat în
+   fiecare încărcare). Link-ul → id cu `src/lib/video.ts` (orice formă:
+   `watch?v=`, `youtu.be/`, `/embed/`, `/shorts/`; probat în
    `e2e/video.proba.mjs`); încorporare pe `youtube-nocookie` (fără cookie-uri
-   până la play, mai blând cu GDPR). Componenta de client:
-   `src/components/site/redare-video.tsx`. Afiș propriu (opțional) sau cel
-   automat de pe YouTube (`hqdefault`, tăiat „cover" ca să nu aibă benzi).
-   Câmp nou `videouri` în secțiunea `logos` (`sectiuni.ts`), pe tipuri de câmp
-   existente (`adresa`, `text`, `imagine`), deci fără schimbări în editor.
-   Antetul rămâne la stânga ca restul site-ului (la Renata e centrat, dar aia e
-   pielea șablonului ei; de oferit centrarea dacă o cere). Probat vizual: 3 pe
-   rând pe lat, 1 pe telefon, clic → player cu adresa corectă.
-   CORECȚIE (trăită cu proprietarul): a lipit un link de Bing în câmpul de
-   video; era URL valid, trecea, se salva, dar pe site nu apărea nimic — un
-   `idYouTube` nerecunoscut se sărea în tăcere. Acum câmpul e `doarYouTube`
-   (steag nou pe `adresa`), deci `valideaza` din `sectiuni-editare.ts` dă eroare
-   vizibilă la salvare pe orice link care nu-i YouTube, în loc să dispară mut.
+   până la play). Componenta de client: `src/components/site/redare-video.tsx`
+   (prop `rotunjit`, ca să nu-și dubleze colțurile în card). Afiș: poza
+   apariției sau, în lipsă, cel automat de pe YouTube (`hqdefault`, tăiat
+   „cover"). Fără câmpuri noi în editor — se folosește `href`-ul apariției.
+   DRUMUL până aici (lecție despre cât rău fac două cutii): întâi un video
+   „vedetă" (ca la Renata), apoi o listă `videouri` SEPARATĂ de „Apariții", apoi
+   un `doarYouTube` care dădea eroare la salvare pe linkuri non-YouTube (un Bing
+   lipit dispărea mut). Proprietarul s-a încurcat de fiecare dată cu două liste
+   („în care o pun?"); ce ceruse, de fapt, era o singură listă care recunoaște
+   singură. Ambele scoase (lista `videouri` și steagul `doarYouTube`): un link
+   non-YouTube nu mai e eroare, e pur și simplu un articol.
 4. **Fișiere de descărcat** — depozit pentru documente (fișe Word/PDF) pe care
    pacienții să le descarce. CEA MAI MARE: depozitul de acum ține doar poze
    (bucket `media`, tipuri imagine); cere tip nou de fișier + rută de descărcare

@@ -18,12 +18,19 @@ import { useState, type ReactNode } from "react";
 export function RedareVideo({
   embedUrl,
   titlu,
+  rotunjit = true,
   children,
 }: {
   /** Adresa de încorporare (`embedYouTube`). */
   embedUrl: string;
   /** Pentru cititoarele de ecran și titlul player-ului: „Redă videoul: {titlu}". */
   titlu: string;
+  /**
+   * Colțuri rotunjite proprii. Într-un card care are deja `overflow: hidden` și
+   * colțuri rotunjite (o apariție), rama trebuie dreaptă — cardul îi rotunjește
+   * colțurile de sus, iar cele de jos stau lipite de textul de dedesubt.
+   */
+  rotunjit?: boolean;
   /** Afișul (poza) de dinainte de play, care umple rama 16:9. */
   children: ReactNode;
 }) {
@@ -33,7 +40,7 @@ export function RedareVideo({
     position: "relative",
     aspectRatio: "16 / 9",
     overflow: "hidden",
-    borderRadius: "var(--t-raza)",
+    borderRadius: rotunjit ? "var(--t-raza)" : "0",
     background: "color-mix(in oklab, currentColor 8%, transparent)",
   };
 
