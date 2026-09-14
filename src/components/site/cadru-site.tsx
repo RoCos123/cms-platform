@@ -108,6 +108,13 @@ export async function CadruSite({
           color: "var(--t-text)",
           fontFamily: "var(--t-font-principal)",
           minHeight: "100%",
+          // Un șir lung fără spații (un „hhhhh…" scris în panou, un link, un
+          // email) n-are unde să se rupă, așa că ar ieși din chenar în loc să
+          // coboare pe rândul următor. `overflow-wrap` se moștenește, deci pus
+          // aici, pe rădăcina site-ului public, apără TOT textul din toate
+          // secțiunile, nu doar unul. `break-word` rupe doar cuvintele care
+          // altfel ar depăși rândul — textul normal se comportă neschimbat.
+          overflowWrap: "break-word",
         }}
       >
         <SiteHeader
