@@ -192,6 +192,11 @@ aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
    Antetul rămâne la stânga ca restul site-ului (la Renata e centrat, dar aia e
    pielea șablonului ei; de oferit centrarea dacă o cere). Probat vizual: 3 pe
    rând pe lat, 1 pe telefon, clic → player cu adresa corectă.
+   CORECȚIE (trăită cu proprietarul): a lipit un link de Bing în câmpul de
+   video; era URL valid, trecea, se salva, dar pe site nu apărea nimic — un
+   `idYouTube` nerecunoscut se sărea în tăcere. Acum câmpul e `doarYouTube`
+   (steag nou pe `adresa`), deci `valideaza` din `sectiuni-editare.ts` dă eroare
+   vizibilă la salvare pe orice link care nu-i YouTube, în loc să dispară mut.
 4. **Fișiere de descărcat** — depozit pentru documente (fișe Word/PDF) pe care
    pacienții să le descarce. CEA MAI MARE: depozitul de acum ține doar poze
    (bucket `media`, tipuri imagine); cere tip nou de fișier + rută de descărcare
