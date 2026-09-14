@@ -11,18 +11,6 @@ export type LogosData = {
   titlu: string;
   titluAccent?: string;
   intro?: string;
-  /**
-   * Videouri de la YouTube, așezate în grilă (2-3 pe rând), fiecare cu buton de
-   * play. Cerute de proprietar („ca la Renata Iancu"), dar mai multe, nu unul.
-   */
-  videouri?: {
-    /** Link YouTube, în orice formă (`watch?v=`, `youtu.be/`, `/embed/`…). */
-    video: string;
-    /** Un titlu scurt sub video (opțional). */
-    titlu?: string;
-    /** Afiș propriu; gol → se ia automat de pe YouTube. */
-    poster?: { url: string; altText?: string; pozitie?: PunctFocal };
-  }[];
   aparitii: {
     /** Unde a apărut: „Digi24", „Podcast Vorbim deschis". */
     sursa: string;
@@ -31,6 +19,11 @@ export type LogosData = {
     /** „Emisiune TV", „Podcast", „Interviu" — se afișează ca etichetă mică. */
     tip?: string;
     data?: string;
+    /**
+     * Linkul apariției. O singură casetă, recunoscută automat: dacă e un link de
+     * YouTube, apariția apare ca VIDEO cu buton de play (se redă pe loc); orice
+     * alt link rămâne „Vezi materialul →", care duce în altă parte.
+     */
     href?: string;
     /** Aceeași formă ca la încărcare (`ImageValue`): `altText`, nu `alt`. */
     imagine?: { url: string; altText?: string; pozitie?: PunctFocal };
@@ -45,14 +38,16 @@ export type LogosData = {
  * există (vezi design/sabloane/README.md). Aici e scopul original: recunoaștere
  * externă.
  *
- * Nu e o listă de link-uri seci, ci carduri: în șablon fiecare apariție are
- * imagine și context, fiindcă rolul secțiunii e încrederea, nu navigarea. Peste
- * carduri, o grilă de videouri încorporate: o apariție TV se vede cel mai bine
- * pornind-o pe loc, nu ca link către alt site.
+ * Nu e o listă de link-uri seci, ci carduri: fiecare apariție are imagine și
+ * context, fiindcă rolul secțiunii e încrederea, nu navigarea. O singură listă,
+ * cu un singur câmp de link: dacă linkul e de la YouTube, apariția se REDĂ pe
+ * loc (o apariție TV se vede cel mai bine pornind-o, nu ca link în altă parte);
+ * altfel, rămâne un card cu „Vezi materialul →". Clientul nu alege între liste
+ * și nu bifează nimic — pune un link, iar secțiunea își dă seama singură.
  */
 export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
   /*
-    Listele lipsesc cu totul pe un site abia provizionat: `creeaza_client` pune
+    Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
     toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
     un site nepublicat nu se vede oricum, iar clientul stinge ce nu-i trebuie).
     Fără `?? []`, prima pagină a fiecărui client nou cădea cu 500.
@@ -61,7 +56,6 @@ export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
     mele" și „Pachete": un titlu urmat de nimic arată a site stricat.
   */
   const aparitii = data.aparitii ?? [];
-  const videouri = data.videouri ?? [];
   /*
     Titlul singur e de ajuns ca să se vadă secțiunea, chiar fără nimic sub el.
 
@@ -73,7 +67,7 @@ export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
     Fără titlu ȘI fără conținut, tot nu se randează nimic: aia e secțiunea pe
     care clientul a golit-o dinadins.
   */
-  if (aparitii.length === 0 && videouri.length === 0 && !data.titlu?.trim()) return null;
+  if (aparitii.length === 0 && !data.titlu?.trim()) return null;
 
   return (
     <Section tone={tone} id="aparitii">
@@ -84,56 +78,6 @@ export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
         intro={data.intro}
       />
 
-      {/* Grila de videouri: 2-3 pe un rând lat, 1 pe telefon (`auto-fit`, fără
-          media queries). Un link stricat sau non-YouTube se sare, nu dărâmă. */}
-      {videouri.length > 0 && (
-        <ul
-          style={{
-            listStyle: "none",
-            margin: "52px 0 0",
-            padding: 0,
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: "24px",
-          }}
-        >
-          {videouri.map((v, i) => {
-            const id = idYouTube(v.video);
-            if (!id) return null;
-            const poster = v.poster?.url ? v.poster : null;
-
-            return (
-              <li key={`${v.video}-${i}`}>
-                <RedareVideo embedUrl={embedYouTube(id)} titlu={v.titlu || data.titlu || "Video"}>
-                  <SectionImage
-                    src={poster ? poster.url : posterYouTube(id)}
-                    alt={poster?.altText ?? ""}
-                    aspectRatio="16 / 9"
-                    sizes="(max-width: 720px) 100vw, 380px"
-                    pozitie={poster?.pozitie}
-                  />
-                </RedareVideo>
-                {v.titlu && (
-                  <p
-                    style={{
-                      margin: "14px 0 0",
-                      fontSize: "16px",
-                      fontWeight: 600,
-                      lineHeight: 1.4,
-                      color: "var(--s-text-secundar)",
-                      textWrap: "pretty",
-                    }}
-                  >
-                    {v.titlu}
-                  </p>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
-
-      {/* Cardurile de apariții în presă. Fără ele, secțiunea poate fi doar video. */}
       {aparitii.length > 0 && (
         <ul
           style={{
@@ -147,18 +91,35 @@ export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
         >
           {aparitii.map((aparitie, i) => {
             const meta = [aparitie.tip, aparitie.data].filter(Boolean).join(" · ");
+            // Recunoașterea automată: un link de YouTube face apariția video.
+            const idVideo = idYouTube(aparitie.href);
+            const poza = aparitie.imagine?.url ? aparitie.imagine : null;
 
             return (
               <li key={`${aparitie.sursa}-${i}`}>
-                <Continut href={aparitie.href}>
-                  {aparitie.imagine && (
-                    <SectionImage
-                      src={aparitie.imagine.url}
-                      alt={aparitie.imagine.altText ?? ""}
-                      aspectRatio="16 / 9"
-                      sizes="(max-width: 720px) 100vw, 560px"
-                      pozitie={aparitie.imagine.pozitie}
-                    />
+                {/* Cardul e link doar când NU e video: un buton de play nu poate
+                    sta într-un `<a>` (interactiv în interactiv). */}
+                <Continut href={idVideo ? undefined : aparitie.href}>
+                  {idVideo ? (
+                    <RedareVideo embedUrl={embedYouTube(idVideo)} titlu={aparitie.titlu} rotunjit={false}>
+                      <SectionImage
+                        src={poza ? poza.url : posterYouTube(idVideo)}
+                        alt={poza?.altText ?? ""}
+                        aspectRatio="16 / 9"
+                        sizes="(max-width: 720px) 100vw, 560px"
+                        pozitie={poza?.pozitie}
+                      />
+                    </RedareVideo>
+                  ) : (
+                    poza && (
+                      <SectionImage
+                        src={poza.url}
+                        alt={poza.altText ?? ""}
+                        aspectRatio="16 / 9"
+                        sizes="(max-width: 720px) 100vw, 560px"
+                        pozitie={poza.pozitie}
+                      />
+                    )
                   )}
 
                   <div style={{ padding: "28px", display: "flex", flexDirection: "column", gap: "10px", flex: 1 }}>
@@ -198,7 +159,9 @@ export function Logos({ data, tone }: { data: LogosData; tone?: SectionTone }) {
                       </p>
                     )}
 
-                    {aparitie.href && (
+                    {/* „Vezi materialul" doar la cele care NU-s video: videoul se
+                        redă pe loc, n-are unde să te trimită. */}
+                    {aparitie.href && !idVideo && (
                       <span
                         style={{
                           marginTop: "auto",

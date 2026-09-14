@@ -46,14 +46,6 @@ export type CampSchema =
        * profilul e găzduit chiar pe domeniul cabinetului.
        */
       doarExtern?: boolean;
-      /**
-       * Cere un link de YouTube (recunoscut de `idYouTube`). Fără asta, un link
-       * de la Bing sau de la o căutare trece drept „adresă validă", se salvează,
-       * dar pe site nu apare niciun video — iar clientul n-are cum să-și dea
-       * seama de ce (lecție trăită). Cu asta, câmpul îi spune pe loc că nu-i link
-       * YouTube.
-       */
-      doarYouTube?: boolean;
     })
   /**
    * Partea din adresă care identifică elementul („consiliere-parentala”).
@@ -316,28 +308,6 @@ const LISTA: MetaSectiune[] = [
       INTRO,
       {
         tip: "lista",
-        cheie: "videouri",
-        eticheta: "Videouri",
-        etichetaElement: "video",
-        rezumatDin: "titlu",
-        max: 9,
-        hint: "Linkuri de la YouTube; apar în grilă, 2-3 pe rând, cu buton de play. O apariție TV se vede cel mai bine pornind-o pe loc, nu ca link în altă parte.",
-        campuri: [
-          {
-            tip: "adresa",
-            cheie: "video",
-            eticheta: "Link YouTube",
-            obligatoriu: true,
-            doarYouTube: true,
-            hint: "Adresa clipului de pe YouTube — din bara de adrese sau de la butonul „Distribuie”. Trebuie să conțină youtube.com sau youtu.be.",
-            max: 300,
-          },
-          { tip: "text", cheie: "titlu", eticheta: "Titlu scurt (sub video)", max: 120 },
-          { tip: "imagine", cheie: "poster", eticheta: "Imaginea de dinainte de play (opțional)" },
-        ],
-      },
-      {
-        tip: "lista",
         cheie: "aparitii",
         eticheta: "Apariții",
         etichetaElement: "apariție",
@@ -362,7 +332,13 @@ const LISTA: MetaSectiune[] = [
           { tip: "text", cheie: "titlu", eticheta: "Titlul discuției", obligatoriu: true, max: 140 },
           { tip: "textLung", cheie: "descriere", eticheta: "Despre ce a fost", randuri: 2, max: 300 },
           { tip: "text", cheie: "data", eticheta: "Când", hint: "Ex.: martie 2026", max: 40 },
-          { tip: "adresa", cheie: "href", eticheta: "Adresa materialului", max: 300 },
+          {
+            tip: "adresa",
+            cheie: "href",
+            eticheta: "Link (video sau articol)",
+            hint: "Un link de la YouTube face apariția video, cu buton de play. Orice alt link (articol, podcast, pagina emisiunii) rămâne „Vezi materialul →”.",
+            max: 300,
+          },
           { tip: "imagine", cheie: "imagine", eticheta: "Imagine" },
         ],
       },
