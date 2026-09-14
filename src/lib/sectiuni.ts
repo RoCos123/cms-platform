@@ -97,6 +97,12 @@ export type CampSchema =
   | (CampComun & { tip: "link" })
   /** În JSON: `{ url, altText, uploadId? }` — aceeași formă ca la încărcare. */
   | (CampComun & { tip: "imagine" })
+  /**
+   * Un document de descărcat, ales din bibliotecă. În JSON: `{ fisierId, url }`
+   * — `fisierId` e sursa de adevăr, `url` se re-semnează la randare
+   * (`rescrieAdreseleFisiere`), exact ca la imagini.
+   */
+  | (CampComun & { tip: "document" })
   /** Listă de rânduri de text simplu (paragrafe, detalii). */
   | (CampComun & { tip: "listaText"; etichetaElement: string; max?: number })
   /** Listă de elemente cu mai multe câmpuri fiecare (servicii, pași, mărturii). */
@@ -422,6 +428,25 @@ const LISTA: MetaSectiune[] = [
             eticheta: "Etichetă (scoate pachetul în față)",
             hint: "Ex.: Cel mai ales. Lasă gol la restul, altfel nu mai iese niciunul în evidență.",
             max: 24,
+          },
+          {
+            tip: "lista",
+            cheie: "materiale",
+            eticheta: "Materiale de descărcat",
+            etichetaElement: "material",
+            rezumatDin: "text",
+            max: 8,
+            hint: "Fișe, formulare, acorduri — fiecare cu butonul lui de descărcare. Încarcă-le întâi în Bibliotecă → Documente.",
+            campuri: [
+              {
+                tip: "text",
+                cheie: "text",
+                eticheta: "Textul butonului",
+                hint: "Ex.: Descarcă fișa de exerciții. Gol → „Descarcă materialul”.",
+                max: 60,
+              },
+              { tip: "document", cheie: "fisier", eticheta: "Documentul" },
+            ],
           },
           { tip: "link", cheie: "buton", eticheta: "Buton" },
         ],

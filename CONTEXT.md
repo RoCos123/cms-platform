@@ -198,10 +198,33 @@ aceleași componente, fiecare se face O DATĂ și apare pe toate cinci.
    („în care o pun?"); ce ceruse, de fapt, era o singură listă care recunoaște
    singură. Ambele scoase (lista `videouri` și steagul `doarYouTube`): un link
    non-YouTube nu mai e eroare, e pur și simplu un articol.
-4. **Fișiere de descărcat** — depozit pentru documente (fișe Word/PDF) pe care
-   pacienții să le descarce. CEA MAI MARE: depozitul de acum ține doar poze
-   (bucket `media`, tipuri imagine); cere tip nou de fișier + rută de descărcare
-   + UI, cu izolarea gândită ca la poze.
+4. **Fișiere de descărcat** — GATA. Documentele (PDF/Word) stau în bibliotecă,
+   lângă poze; la fiecare pachet din „Pachete și materiale" pui o listă de butoane
+   „Descarcă", fiecare legat de un document. SURPRIZĂ: n-a trebuit nici migrare,
+   nici setare Supabase — bucketul `media` n-a avut niciodată restricție de tip,
+   iar `uploads.mime_type` acceptă orice text; „doar poze" era doar în cod. Deci
+   totul e cod.
+   - Instalația: validare în `lib/uploads.ts`; adresă de descărcare semnată
+     `adresaFisierului` (aceeași cheie ca la poze) pe ruta
+     `/fisiere/[id]/[semnatura]`, servită cu „attachment" + numele original;
+     `uploadDocument` în `actions/upload.ts`.
+   - Bibliotecă: `imaginileBibliotecii` filtrează acum DOAR pozele (după mime),
+     nou `documenteleBibliotecii`; `documente.tsx` (încărcare + listă + ștergere)
+     pe ecranul „Bibliotecă" (fost „Imagini", redenumit fiindcă ține și fișiere).
+   - Materiale: câmp `materiale` (listă) pe pachet, fiecare = text + câmp nou
+     `tip: "document"` (dropdown din documentele bibliotecii — `CampDocument`,
+     threadat ca `destinatii`); randate în `pricing.tsx` ca butoane de descărcare;
+     text gol → „Descarcă materialul".
+   - Adresa se re-semnează la randare din `fisierId` cu `rescrieAdreseleFisiere`
+     (perechea lui `rescrieAdresele`, recunoaște `fisierId`, nu `uploadId`, ca
+     ruta de fișier și cea de poză să nu se calce), chemată pe site și în editor.
+   - Probat vizual: biblioteca (listă + gol) și pachetul cu butoane de descărcare.
+   - Ștergerea curăță și butoanele: `stergeImaginea` scoate încărcarea din
+     secțiuni fie ca poză (`uploadId`), fie ca material (`fisierId`), prin
+     `scoateIncarcarea` (`imagini.ts`, cu `rescrieFisierul` — perechea lui
+     `rescrieImaginea`). Fișierul dispare de pe buton, textul butonului rămâne
+     (poți realege). Probat în `e2e/materiale.proba.mjs`. Deci un buton nu mai
+     rămâne legat de un fișier șters (prins de proprietar).
 5. **Contact pe WhatsApp** — GATA. Bulă verde fixă în dreapta-jos, iconița ȘI
    culoarea ORIGINALE (`#25D366`, glifa albă WhatsApp), aceeași pe toate
    șabloanele — singurul loc din site-ul public care NU ia culorile șablonului,

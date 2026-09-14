@@ -17,8 +17,8 @@ import {
   type Intrebare,
 } from "@/lib/date-structurate";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
-import { rescrieAdresele } from "@/lib/imagini";
-import { adresaImaginii } from "@/lib/imagini-adrese";
+import { rescrieAdresele, rescrieAdreseleFisiere } from "@/lib/imagini";
+import { adresaImaginii, adresaFisierului } from "@/lib/imagini-adrese";
 import { CadruSite } from "@/components/site/cadru-site";
 import { DateStructurate } from "@/components/site/date-structurate";
 
@@ -88,7 +88,7 @@ export default async function PublicHomePage() {
    */
   const sections = ((rows ?? []) as unknown as SectionRow[]).map((rand) => ({
     ...rand,
-    data: rescrieAdresele(rand.data, adresaImaginii),
+    data: rescrieAdreseleFisiere(rescrieAdresele(rand.data, adresaImaginii), adresaFisierului),
   }));
 
   /**

@@ -65,6 +65,43 @@ function esteImagine(valoare: unknown): valoare is Record<string, unknown> {
   return esteObiect(valoare) && typeof valoare.uploadId === "string" && valoare.uploadId !== "";
 }
 
+/** Recunoaștem un material după `fisierId` — aceeași idee ca la imagini, altă cheie. */
+function esteFisier(valoare: unknown): valoare is Record<string, unknown> {
+  return esteObiect(valoare) && typeof valoare.fisierId === "string" && valoare.fisierId !== "";
+}
+
+/**
+ * Rescrie adresa de descărcare a fiecărui material dintr-un conținut, derivată
+ * din `fisierId`.
+ *
+ * Perechea lui `rescrieAdresele`, dar pentru documente: ruta e `/fisiere/…`, nu
+ * `/imagini/…`, iar recunoașterea se face după `fisierId`, nu `uploadId`, tocmai
+ * ca cele două să nu se calce (un material și o poză n-ar trebui să ajungă pe
+ * aceeași rută). Se cheamă alături de `rescrieAdresele`, la randare.
+ */
+export function rescrieAdreseleFisiere(
+  valoare: unknown,
+  adresa: (fisierId: string) => string,
+): unknown {
+  if (esteFisier(valoare)) {
+    return { ...valoare, url: adresa(valoare.fisierId as string) };
+  }
+
+  if (Array.isArray(valoare)) {
+    return valoare.map((element) => rescrieAdreseleFisiere(element, adresa));
+  }
+
+  if (esteObiect(valoare)) {
+    const rezultat: Record<string, unknown> = {};
+    for (const [cheie, camp] of Object.entries(valoare)) {
+      rezultat[cheie] = rescrieAdreseleFisiere(camp, adresa);
+    }
+    return rezultat;
+  }
+
+  return valoare;
+}
+
 /** Toate imaginile dintr-un conținut de secțiune, oricât de adânc ar sta. */
 export function idurileImaginilor(valoare: unknown, gasite = new Set<string>()): Set<string> {
   if (esteImagine(valoare)) {
@@ -189,6 +226,76 @@ export function rescrieImaginea(
 
   const noua = mergi(valoare);
   return { valoare: schimbat ? noua : valoare, schimbat };
+}
+
+/**
+ * Perechea lui `rescrieImaginea`, dar pentru MATERIALE: găsește obiectele de
+ * material după `fisierId` și le trece prin `inlocuitor`. La ștergere,
+ * `inlocuitor` întoarce `undefined`, deci referința dispare — altfel un buton ar
+ * rămâne legat de un fișier care nu mai există și ar da eroare la descărcare.
+ *
+ * Scoaterea câmpului `fisier` lasă materialul fără document (nu se mai randează
+ * niciun buton pentru el), nu șterge tot rândul: intenția clientului — textul
+ * butonului — rămâne, ca să poată doar realege documentul.
+ */
+export function rescrieFisierul(
+  valoare: unknown,
+  fisierId: string,
+  inlocuitor: (fisier: Record<string, unknown>) => Record<string, unknown> | undefined,
+): { valoare: unknown; schimbat: boolean } {
+  let schimbat = false;
+
+  function mergi(nod: unknown): unknown {
+    if (Array.isArray(nod)) {
+      const rezultat: unknown[] = [];
+      for (const element of nod) {
+        if (esteFisier(element) && element.fisierId === fisierId) {
+          const nou = inlocuitor(element);
+          schimbat = true;
+          if (nou !== undefined) rezultat.push(nou);
+          continue;
+        }
+        rezultat.push(mergi(element));
+      }
+      return rezultat;
+    }
+
+    if (esteObiect(nod)) {
+      const rezultat: Record<string, unknown> = {};
+      for (const [cheie, camp] of Object.entries(nod)) {
+        if (esteFisier(camp) && camp.fisierId === fisierId) {
+          const nou = inlocuitor(camp);
+          schimbat = true;
+          if (nou !== undefined) rezultat[cheie] = nou;
+          continue;
+        }
+        rezultat[cheie] = mergi(camp);
+      }
+      return rezultat;
+    }
+
+    return nod;
+  }
+
+  const noua = mergi(valoare);
+  return { valoare: schimbat ? noua : valoare, schimbat };
+}
+
+/**
+ * Scoate o încărcare din conținutul unei secțiuni, la ștergere — fie că e folosită
+ * ca POZĂ (`uploadId`), fie ca MATERIAL (`fisierId`). Un id e ori una, ori alta,
+ * deci una dintre treceri nu găsește nimic; amândouă sunt sigure.
+ */
+export function scoateIncarcarea(
+  valoare: unknown,
+  id: string,
+): { valoare: unknown; schimbat: boolean } {
+  const dupaImagini = rescrieImaginea(valoare, id, () => undefined);
+  const dupaFisiere = rescrieFisierul(dupaImagini.valoare, id, () => undefined);
+  return {
+    valoare: dupaFisiere.valoare,
+    schimbat: dupaImagini.schimbat || dupaFisiere.schimbat,
+  };
 }
 
 /**

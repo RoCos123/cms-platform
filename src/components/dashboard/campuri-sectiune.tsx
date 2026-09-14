@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useBibliotecaImagini } from "@/components/dashboard/biblioteca-imagini";
 import { pozitioneazaImagine } from "@/app/dashboard/imagini/actions";
 import { SelectField, TextAreaField, TextField } from "@/components/ui/field";
@@ -9,6 +10,7 @@ import { RepeaterList } from "@/components/ui/repeater-list";
 import { SlugField } from "@/components/ui/slug-field";
 import type { CampSchema } from "@/lib/sectiuni";
 import type { Destinatie } from "@/lib/destinatii";
+import type { OptiuneDocument } from "@/lib/uploads";
 import { cn } from "@/lib/cn";
 import { blocuriText, numaraCuvinte, opresteLaLimita } from "@/lib/blocuri-text";
 import { formateazaNumar, numara } from "@/lib/numerale";
@@ -31,6 +33,7 @@ export function CampuriSectiune({
   onChange,
   erori,
   destinatii = [],
+  documente = [],
   prefix = "",
 }: {
   campuri: CampSchema[];
@@ -44,6 +47,8 @@ export function CampuriSectiune({
    * de link rămâne o casetă liberă, ca înainte.
    */
   destinatii?: Destinatie[];
+  /** Documentele din bibliotecă, pentru alegătorul de materiale. Gol în afara editorului. */
+  documente?: OptiuneDocument[];
   /** Drumul până aici, pentru căutarea erorilor. Gol la nivelul de sus. */
   prefix?: string;
 }) {
@@ -185,6 +190,18 @@ export function CampuriSectiune({
             );
           }
 
+          case "document":
+            return (
+              <CampDocument
+                key={camp.cheie}
+                eticheta={camp.eticheta}
+                hint={camp.hint}
+                valoare={(valoare[camp.cheie] ?? {}) as { fisierId?: string; url?: string }}
+                documente={documente}
+                onChange={(nou) => seteaza(camp.cheie, nou)}
+              />
+            );
+
           case "slug":
             return (
               <SlugField
@@ -246,6 +263,7 @@ export function CampuriSectiune({
                       valoare={element}
                       erori={erori}
                       destinatii={destinatii}
+                      documente={documente}
                       prefix={`${drum}.${index}`}
                       onChange={(nou) =>
                         seteaza(
@@ -506,6 +524,72 @@ function CampLink({
         )}
       </div>
       <p className="mt-2 text-xs text-muted-foreground">Lasă textul gol dacă nu vrei buton.</p>
+    </Grup>
+  );
+}
+
+/**
+ * Alegătorul unui material: care document din bibliotecă descarcă butonul.
+ *
+ * O listă cu documentele deja încărcate — nu o casetă de adresă, fiindcă
+ * fișierul e la noi, nu în afară. Alegerea ține minte și `url`-ul de descărcare
+ * (semnat), pe lângă `fisierId`; la randare, `url`-ul se re-semnează oricum din
+ * `fisierId`, dar cel din câmp face ca previzualizarea să meargă pe loc.
+ *
+ * Fără niciun document încă (sau în afara panoului) → un îndemn spre bibliotecă,
+ * nu un dropdown gol care nu spune ce lipsește.
+ */
+function CampDocument({
+  eticheta,
+  hint,
+  valoare,
+  documente,
+  onChange,
+}: {
+  eticheta: string;
+  hint?: string;
+  valoare: { fisierId?: string; url?: string };
+  documente: OptiuneDocument[];
+  onChange: (valoare: { fisierId?: string; url?: string }) => void;
+}) {
+  const fisierId = valoare.fisierId ?? "";
+  const gasit = documente.some((doc) => doc.id === fisierId);
+
+  if (documente.length === 0) {
+    return (
+      <Grup eticheta={eticheta} hint={hint}>
+        <p className="text-sm text-muted-foreground">
+          N-ai încă niciun document.{" "}
+          <Link href="/dashboard/imagini" className="underline hover:text-foreground">
+            Încarcă unul în Bibliotecă
+          </Link>
+          , apoi îl poți alege aici.
+        </p>
+      </Grup>
+    );
+  }
+
+  return (
+    <Grup eticheta={eticheta} hint={hint}>
+      <SelectField
+        label="Documentul de descărcat"
+        value={fisierId}
+        onChange={(event) => {
+          const ales = event.target.value;
+          const doc = documente.find((d) => d.id === ales);
+          onChange(doc ? { fisierId: doc.id, url: doc.url } : {});
+        }}
+      >
+        <option value="">— alege un document —</option>
+        {documente.map((doc) => (
+          <option key={doc.id} value={doc.id}>
+            {doc.numeFisier}
+          </option>
+        ))}
+        {/* Un document ales înainte și șters între timp: îl arătăm ca opțiune
+            „ruptă", ca omul să vadă că trebuie reales, nu să dispară tăcut. */}
+        {fisierId !== "" && !gasit && <option value={fisierId}>(document lipsă — alege altul)</option>}
+      </SelectField>
     </Grup>
   );
 }

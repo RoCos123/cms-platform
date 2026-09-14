@@ -114,7 +114,8 @@ export function catreEditor(brut: unknown, campuri: CampSchema[]): ValoareEditor
         rezultat[camp.cheie] = { text: String(link.text ?? ""), href: String(link.href ?? "") };
         break;
       }
-      case "imagine": {
+      case "imagine":
+      case "document": {
         rezultat[camp.cheie] = esteObiect(valoare) ? valoare : null;
         break;
       }
@@ -168,7 +169,8 @@ export function catreStocare(valoare: ValoareEditor, campuri: CampSchema[]): Rec
         if (text !== "") rezultat[camp.cheie] = { text, href };
         break;
       }
-      case "imagine": {
+      case "imagine":
+      case "document": {
         if (esteObiect(brut) && typeof brut.url === "string" && brut.url !== "") {
           rezultat[camp.cheie] = brut;
         }
@@ -240,7 +242,7 @@ export function valideaza(
       continue;
     }
 
-    if (camp.tip === "imagine" || camp.tip === "numar") continue;
+    if (camp.tip === "imagine" || camp.tip === "document" || camp.tip === "numar") continue;
 
     const text = String(brut ?? "").trim();
 

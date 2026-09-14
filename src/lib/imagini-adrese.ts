@@ -103,3 +103,15 @@ function cheia(): string {
 export function adresaImaginii(uploadId: string): string {
   return `/imagini/${uploadId}/${semneaza(cheia(), uploadId)}`;
 }
+
+/**
+ * Adresa de DESCĂRCARE a unui document (PDF/Word) din bibliotecă.
+ *
+ * Aceeași semnătură ca la imagini (numai serverul nostru o poate produce, deci
+ * un cabinet nu ajunge la fișierele altuia), dar altă rută: `/fisiere/…`, care
+ * servește fișierul cu „attachment" — se descarcă, nu se deschide în filă.
+ * Relativă, ca și la imagini, ca să rămână validă indiferent de domeniu.
+ */
+export function adresaFisierului(uploadId: string): string {
+  return `/fisiere/${uploadId}/${semneaza(cheia(), uploadId)}`;
+}

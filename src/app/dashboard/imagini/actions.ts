@@ -5,7 +5,7 @@ import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
 import { BUCKET_MEDIA } from "@/lib/uploads";
-import { MAXIM_DESCRIERE_IMAGINE, rescrieImaginea, type RandSectiune } from "@/lib/imagini";
+import { MAXIM_DESCRIERE_IMAGINE, rescrieImaginea, scoateIncarcarea, type RandSectiune } from "@/lib/imagini";
 import { normalizeazaPunctFocal } from "@/lib/punct-focal";
 
 export type RezultatImagine = { ok: true } | { ok: false; mesaj: string };
@@ -44,8 +44,7 @@ type ClientSupabase = Awaited<ReturnType<typeof createClient>>;
 async function rescrieInSectiuni(
   supabase: ClientSupabase,
   siteId: string,
-  uploadId: string,
-  inlocuitor: (imagine: Record<string, unknown>) => Record<string, unknown> | undefined,
+  transforma: (data: unknown) => { valoare: unknown; schimbat: boolean },
 ): Promise<boolean> {
   const { data: sectiuni, error } = await supabase
     .from("site_content")
@@ -53,12 +52,12 @@ async function rescrieInSectiuni(
     .eq("site_id", siteId);
 
   if (error) {
-    console.error("Citirea secțiunilor pentru rescrierea imaginii a eșuat:", error);
+    console.error("Citirea secțiunilor pentru rescriere a eșuat:", error);
     return false;
   }
 
   const deScris = ((sectiuni ?? []) as RandSectiune[])
-    .map((rand) => ({ id: rand.id, ...rescrieImaginea(rand.data, uploadId, inlocuitor) }))
+    .map((rand) => ({ id: rand.id, ...transforma(rand.data) }))
     // Rândurile neatinse nu se rescriu: altfel fiecare salvare ar mișca
     // `updated_at` pe toate secțiunile site-ului și jurnalul ar deveni ilizibil.
     .filter((rand) => rand.schimbat);
@@ -132,10 +131,9 @@ export async function salveazaDescriereaImaginii(
     return { ok: false, mesaj: "Nu am putut salva descrierea. Mai încearcă o dată." };
   }
 
-  const propagat = await rescrieInSectiuni(supabase, session.siteId, uploadId, (imagine) => ({
-    ...imagine,
-    altText: curata,
-  }));
+  const propagat = await rescrieInSectiuni(supabase, session.siteId, (data) =>
+    rescrieImaginea(data, uploadId, (imagine) => ({ ...imagine, altText: curata })),
+  );
 
   if (!propagat) {
     return {
@@ -206,10 +204,9 @@ export async function pozitioneazaImagine(
     return { ok: false, mesaj: "Nu am putut salva poziția. Mai încearcă o dată." };
   }
 
-  const propagat = await rescrieInSectiuni(supabase, session.siteId, uploadId, (imagine) => ({
-    ...imagine,
-    pozitie: punct,
-  }));
+  const propagat = await rescrieInSectiuni(supabase, session.siteId, (data) =>
+    rescrieImaginea(data, uploadId, (imagine) => ({ ...imagine, pozitie: punct })),
+  );
 
   if (!propagat) {
     return {
@@ -267,7 +264,11 @@ export async function stergeImaginea(uploadId: string): Promise<RezultatImagine>
     return { ok: false, mesaj: "Imaginea nu mai există. Probabil a fost ștearsă deja." };
   }
 
-  const scoasa = await rescrieInSectiuni(supabase, session.siteId, uploadId, () => undefined);
+  // Scoate încărcarea din secțiuni fie că e poză, fie material (buton de
+  // descărcare): altfel un buton ar rămâne legat de un fișier șters.
+  const scoasa = await rescrieInSectiuni(supabase, session.siteId, (data) =>
+    scoateIncarcarea(data, uploadId),
+  );
 
   if (!scoasa) {
     return {
