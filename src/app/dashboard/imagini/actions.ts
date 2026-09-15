@@ -5,10 +5,29 @@ import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
 import { BUCKET_MEDIA } from "@/lib/uploads";
-import { MAXIM_DESCRIERE_IMAGINE, rescrieImaginea, scoateIncarcarea, type RandSectiune } from "@/lib/imagini";
+import {
+  MAXIM_DESCRIERE_IMAGINE,
+  rescrieImaginea,
+  scoateIncarcarea,
+  type ImagineBiblioteca,
+  type RandSectiune,
+} from "@/lib/imagini";
+import { imaginileBibliotecii } from "@/lib/imagini-panou";
 import { normalizeazaPunctFocal } from "@/lib/punct-focal";
 
 export type RezultatImagine = { ok: true } | { ok: false; mesaj: string };
+
+/**
+ * Lista bibliotecii, adusă la CERERE — când se deschide fereastra „Alege din
+ * bibliotecă", nu în layout-ul panoului. Înainte se citea o dată pe fiecare
+ * pagină din dashboard (Mesaje, Programări, Setări...), deși alegătorul se
+ * deschide rar; la mii de imagini era cost degeaba pe fiecare navigare.
+ * (Findingul F09 din audit.)
+ */
+export async function incarcaBibliotecaImagini(): Promise<ImagineBiblioteca[]> {
+  const session = await verifySession();
+  return imaginileBibliotecii(session.siteId);
+}
 
 const TIPAR_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

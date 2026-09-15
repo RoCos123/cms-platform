@@ -35,6 +35,12 @@ export type MediaLibraryProps = {
   onSelect: (upload: MediaUpload) => void;
   /** Lipsește când utilizatorul curent doar alege imagini, fără drept de ștergere. */
   onDelete?: (upload: MediaUpload) => void | Promise<void>;
+  /**
+   * Lista se aduce la deschidere (nu mai stă în layout — findingul F09), deci
+   * prima deschidere are o clipă de așteptare. Fără steagul ăsta, ecranul gol de
+   * atunci s-ar citi ca „n-ai nicio imagine", exact înainte să apară toate.
+   */
+  loading?: boolean;
 };
 
 const KILOBYTE = 1024;
@@ -119,6 +125,7 @@ export function MediaLibrary({
   uploads,
   onSelect,
   onDelete,
+  loading = false,
 }: MediaLibraryProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -421,7 +428,13 @@ export function MediaLibrary({
               )}
 
               <div className="min-h-0 flex-1 overflow-y-auto">
-                {!hasUploads && (
+                {!hasUploads && loading && (
+                  <p className="flex h-full items-center justify-center py-10 text-center text-sm text-muted-foreground">
+                    Se încarcă biblioteca…
+                  </p>
+                )}
+
+                {!hasUploads && !loading && (
                   <EmptyState
                     title="Nicio imagine încărcată încă."
                     description="Imaginile pe care le încarci în paginile site-ului ajung aici și le poți refolosi oricând."
