@@ -71,6 +71,44 @@ funcții ce puteau fi chemate de oricine deschidea site-ul. Verificat într-o
 sesiune separată, după: amândouă au doar `postgres` și `service_role`. Povestea
 întreagă în §„Verificarea că baza reală are ce scriu migrările".
 
+### Izolarea între clienți: cum o testezi înainte de lansare (și capcana care sperie degeaba)
+
+15 sept. 2026, prins de proprietar. Un document încărcat „într-un site" apărea în
+bibliotecile „tuturor" — a părut scurgere de date, dar NU era. Izolarea reală e
+dublă și verificată: aplicația filtrează fiecare citire pe `site_id`, iar RLS-ul
+din Postgres o impune (`uploads` etc.: `site_id = current_site_id()`). Un fișier
+al unui client nu poate ajunge la altul.
+
+Ce s-a întâmplat de fapt: mai multe „site-uri" se rezolvau, la RUNTIME, la
+ACELAȘI site. Se întâmplă când:
+- e setat `DEV_TENANT_DOMAIN` (pinuiește orice `*.vercel.app` la un singur site —
+  vezi avertismentul din `proxy.ts`; **a NU se seta pe Production cu clienți
+  reali**, și schimbarea cere redeploy + e per-mediu); SAU
+- domeniile clonelor (ex. `lumina.vercel.app`) nu sunt de fapt rutate în Vercel
+  către proiect, așa că accesezi mereu prin singura adresă care merge, iar aia se
+  rezolvă la un singur site.
+
+**Cum îți dai seama pe loc:** în panou, sus-stânga, scrie numele + adresa
+site-ului pe care ești CU ADEVĂRAT. Dacă „două site-uri" arată același nume/adresă
+acolo, e un singur site — nu o scurgere.
+
+**Testul corect de izolare, înainte de lansare:**
+1. Două site-uri pe două host-uri DISTINCTE și RUTATE (domenii reale, ori
+   configurate corect în Vercel — nu doar scrise în `sites.domain`).
+2. `DEV_TENANT_DOMAIN` scos din toate mediile (redeploy după).
+3. Încarci un document/o poză pe site-ul A. Pe site-ul B, în bibliotecă, NU
+   trebuie să apară — și invers.
+4. `supabase/verificare-izolare.sql` probează deja izolarea pe bază; ține-o ca
+   regression test.
+
+**Bug REAL, separat, de reparat înainte de lansare:** `cloneaza_site` copiază
+secțiunile (`site_content`) verbatim, cu tot cu referințele la poze (`uploadId`)
+și documente (`fisierId`) din interior — deci un site CLONAT afișează fișierele
+site-ului-sursă (adresa se semnează după id, nu după site). Fișierele nu se
+dublează, dar referințele se împart. De reparat: la clonare, curăță referințele
+la fișiere din conținut (ca la coperți, deja puse pe NULL). Nu e o scurgere per
+vizitator (RLS intact), dar la clonarea unui client real i-ar arăta pozele altuia.
+
 ### Ce blochează ARĂTAREA produsului
 
 Site-ul de vânzări e gata, dar nepublicat, pe o adresă temporară care nu se
