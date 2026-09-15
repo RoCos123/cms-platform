@@ -26,11 +26,18 @@ const NUME_SABLON: Record<string, string> = {
  * probat vizual cu date inventate, fără Supabase (mediul de dezvoltare nu ajunge
  * la el) — iar ce se probează e chiar ce se randează, nu o copie.
  */
-export function TabelSiteuri({ randuri }: { randuri: RandSite[] }) {
+export function TabelSiteuri({
+  randuri,
+  mesajGol = "Încă niciun site. Primul se face din Supabase, cu SQL-ul de provizionare.",
+}: {
+  randuri: RandSite[];
+  /** Ce arătăm când lista e goală. Diferă între „n-ai niciun site" și „căutarea n-a găsit nimic". */
+  mesajGol?: string;
+}) {
   if (randuri.length === 0) {
     return (
       <p className="rounded-lg border border-dashed border-zinc-300 p-8 text-center text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-        Încă niciun site. Primul se face din Supabase, cu SQL-ul de provizionare.
+        {mesajGol}
       </p>
     );
   }

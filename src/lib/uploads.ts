@@ -189,11 +189,19 @@ export const ACCEPTED_DOCUMENT_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ] as const;
 
-/** 10 MB: o fișă cu poze sau un formular scanat trece, dar nu lăsăm un fișier uriaș. */
-export const MAX_DOCUMENT_BYTES = 10 * 1024 * 1024;
+/**
+ * 5 MB: o fișă sau un formular PDF trece lejer, dar limita e legată de ceva mai
+ * puțin vizibil — `serverActions.bodySizeLimit` din `next.config.ts` (6 MB).
+ * `uploadDocument` e un Server Action, deci fișierul trece întâi prin plafonul
+ * ăluia; un document acceptat aici (dar peste 6 MB) ar fi respins de framework
+ * ÎNAINTE de verificarea noastră, cu o eroare pe care omul n-o înțelege. Ținem
+ * limita sub plafon, cu spațiu pentru overhead-ul cererii. Dacă vreodată crește,
+ * crește ȘI `bodySizeLimit`, altfel se rupe tăcut. (Prins într-un audit.)
+ */
+export const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024;
 
 export const ACCEPTED_DOCUMENT_LABEL = "PDF sau Word";
-export const MAX_DOCUMENT_SIZE_LABEL = "10 MB";
+export const MAX_DOCUMENT_SIZE_LABEL = "5 MB";
 
 /** Pentru `accept` pe `<input type="file">`: tipuri ȘI extensii (unele browsere raportează .docx greșit). */
 export const DOCUMENT_INPUT_ACCEPT = [...ACCEPTED_DOCUMENT_TYPES, ".pdf", ".doc", ".docx"].join(",");
