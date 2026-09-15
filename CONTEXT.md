@@ -101,13 +101,18 @@ acolo, e un singur site — nu o scurgere.
 4. `supabase/verificare-izolare.sql` probează deja izolarea pe bază; ține-o ca
    regression test.
 
-**Bug REAL, separat, de reparat înainte de lansare:** `cloneaza_site` copiază
+**Bug REAL, separat — REPARAT pe 15 sept. 2026** (migrarea
+`20260915120000_curata_incarcarile_la_clonare.sql`): `cloneaza_site` copia
 secțiunile (`site_content`) verbatim, cu tot cu referințele la poze (`uploadId`)
-și documente (`fisierId`) din interior — deci un site CLONAT afișează fișierele
+și documente (`fisierId`) din interior — deci un site CLONAT afișa fișierele
 site-ului-sursă (adresa se semnează după id, nu după site). Fișierele nu se
-dublează, dar referințele se împart. De reparat: la clonare, curăță referințele
-la fișiere din conținut (ca la coperți, deja puse pe NULL). Nu e o scurgere per
-vizitator (RLS intact), dar la clonarea unui client real i-ar arăta pozele altuia.
+dublau, dar referințele se împărțeau. Nu era o scurgere per vizitator (RLS
+intact), dar la clonarea unui client real i-ar fi arătat pozele altuia. Acum, la
+clonare, `data` trece prin `_curata_incarcarile`, care scoate obiectele de fișier
+din conținut (ca la coperți, deja puse pe NULL) și lasă restul neatins. Bancul
+(`proba-locala.sh`) clonează un site cu poze și materiale și verifică: pe clonă
+nu rămâne niciun `uploadId`/`fisierId`, textul butoanelor rămâne, iar sursa nu se
+atinge.
 
 ### Ce blochează ARĂTAREA produsului
 

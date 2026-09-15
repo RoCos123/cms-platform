@@ -179,6 +179,89 @@ select
 from public.sites s where s.domain = 'proba3.ro';
 SQL
 
+# ---------------------------------------------------------------------------
+# Clonarea nu duce mai departe fișierele sursei.
+#
+# `cloneaza_site` copiază `site_content`, dar `data` trece prin
+# `_curata_incarcarile`: obiectele de imagine (`uploadId`) și de material
+# (`fisierId`) din conținut trebuie să DISPARĂ pe clonă — altfel clona ar afișa
+# pozele și documentele sursei (adresa se semnează după id, nu după site).
+# Restul conținutului rămâne, iar sursa nu se atinge. Prins pe 15 sept. 2026,
+# înainte de a clona un client real.
+# ---------------------------------------------------------------------------
+echo
+echo "→ clonez un site cu poze și materiale în conținut, verific că nu trec"
+ruleaza <<'SQL'
+do $$
+declare s uuid; u uuid;
+begin
+  insert into public.sites (name, domain, template)
+    values ('Sursă de clonat', 'sursa-clonare.ro', 'caldura') returning id into s;
+  insert into auth.users (email) values ('sursa-clonare@exemplu.ro') returning id into u;
+  insert into public.users (id, site_id, email) values (u, s, 'sursa-clonare@exemplu.ro');
+
+  -- hero cu o poză; portofoliu cu un material îngropat adânc; o secțiune doar text.
+  insert into public.site_content (site_id, key, position, data) values
+    (s, 'hero', 10, jsonb_build_object(
+      'titlu', 'Bine ați venit',
+      'imagine', jsonb_build_object(
+        'uploadId', '11111111-1111-1111-1111-111111111111',
+        'url', '/imagini/veche', 'altText', 'Cabinet'))),
+    (s, 'portofoliu', 20, jsonb_build_object(
+      'titlu', 'Programe și materiale',
+      'elemente', jsonb_build_array(jsonb_build_object(
+        'titlu', 'Program A',
+        'materiale', jsonb_build_array(jsonb_build_object(
+          'text', 'Descarcă ghidul',
+          'fisier', jsonb_build_object(
+            'fisierId', '22222222-2222-2222-2222-222222222222',
+            'url', '/fisiere/vechi'))))))),
+    (s, 'text', 30, jsonb_build_object('titlu', 'Doar text', 'paragraf', 'Fără fișiere.'));
+
+  insert into auth.users (email) values ('clona@exemplu.ro');
+  perform public.cloneaza_site('sursa-clonare.ro', 'clona.ro', 'Clona de probă', 'clona@exemplu.ro', 'liniste');
+end;
+$$;
+
+-- Verdictul, cu RAISE la picat, ca ON_ERROR_STOP să oprească bancul.
+do $$
+declare
+  v_sursa uuid; v_clona uuid;
+  n_sursa int; n_clona int; n_ref int; n_text int; n_ref_sursa int;
+begin
+  select id into v_sursa from public.sites where domain = 'sursa-clonare.ro';
+  select id into v_clona from public.sites where domain = 'clona.ro';
+
+  select count(*) into n_sursa from public.site_content where site_id = v_sursa;
+  select count(*) into n_clona from public.site_content where site_id = v_clona;
+  if n_clona <> n_sursa then
+    raise exception 'Clona are % secțiuni, sursa are % — curățarea nu are voie să piardă secțiuni.', n_clona, n_sursa;
+  end if;
+
+  select count(*) into n_ref from public.site_content
+    where site_id = v_clona and (data::text like '%uploadId%' or data::text like '%fisierId%');
+  if n_ref <> 0 then
+    raise exception 'Clona are încă % secțiuni cu referințe la fișierele sursei (uploadId/fisierId).', n_ref;
+  end if;
+
+  -- Conținutul care NU e fișier trebuie să rămână: textul butonului de material.
+  select count(*) into n_text from public.site_content
+    where site_id = v_clona and data::text like '%Descarcă ghidul%';
+  if n_text = 0 then
+    raise exception 'Curățarea a scos și textul materialului, nu doar fișierul — a mers prea departe.';
+  end if;
+
+  -- Sursa rămâne cu referințele ei: clonarea citește, nu mută.
+  select count(*) into n_ref_sursa from public.site_content
+    where site_id = v_sursa and (data::text like '%uploadId%' or data::text like '%fisierId%');
+  if n_ref_sursa = 0 then
+    raise exception 'Sursa și-a pierdut referințele la fișiere — clonarea nu are voie să atingă sursa.';
+  end if;
+end;
+$$;
+SQL
+echo "   poze și materiale: rămân pe sursă, nu ajung pe clonă"
+
 echo "→ verificarea de izolare"
 psql -h "$SOCK" -U postgres -d postgres -f "$RADACINA/supabase/verificare-izolare.sql" | tail -n +2
 
