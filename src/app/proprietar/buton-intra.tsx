@@ -38,7 +38,7 @@ export function ButonIntra({
       fila.document.write(
         `<!doctype html><meta charset="utf-8"><title>Se deschide panoul…</title>` +
           `<body style="margin:0;font:16px/1.5 system-ui,sans-serif;color:#3f3f46;padding:2.5rem">` +
-          `Se deschide panoul cabinetului…`,
+          `Se deschide panoul site-ului…`,
       );
       fila.document.close();
     }

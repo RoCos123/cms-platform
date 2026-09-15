@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
-import { imaginileBibliotecii } from "@/lib/imagini-panou";
 import { BibliotecaImagini } from "@/components/dashboard/biblioteca-imagini";
 import { CadruPanou } from "@/components/dashboard/cadru-panou";
 import { SidebarNav } from "@/components/sidebar-nav";
@@ -21,7 +20,6 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     { data: site },
     { count: mesajeNecitite },
     { count: programariDeRaspuns },
-    imagini,
   ] = await Promise.all([
     supabase.from("sites").select("name, domain").eq("id", session.siteId).single(),
     // Numărul de lângă „Mesaje" din meniu. Fără el, un mesaj primit ar fi
@@ -43,11 +41,6 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       .eq("site_id", session.siteId)
       .eq("status", "ceruta")
       .gte("starts_at", new Date().toISOString()),
-    // Fereastra „Alege din bibliotecă" trebuie să fie la îndemână din orice
-    // formular cu imagini, deci lista se citește o dată aici, nu de fiecare
-    // ecran în parte. `imaginileBibliotecii` e memorată pe cerere: ecranul
-    // Imagini o cere și el, fără o a doua interogare.
-    imaginileBibliotecii(session.siteId),
   ]);
 
   return (
@@ -86,7 +79,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
           </>
         }
       >
-        <BibliotecaImagini imagini={imagini}>{children}</BibliotecaImagini>
+        <BibliotecaImagini>{children}</BibliotecaImagini>
       </CadruPanou>
     </ToastProvider>
   );

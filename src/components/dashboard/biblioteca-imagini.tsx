@@ -1,7 +1,16 @@
 "use client";
 
-import { createContext, useContext, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { MediaLibrary, type MediaUpload } from "@/components/ui/media-library";
+import { incarcaBibliotecaImagini } from "@/app/dashboard/imagini/actions";
 import type { ImagineBiblioteca } from "@/lib/imagini";
 import type { ImageValue } from "@/lib/uploads";
 
@@ -25,21 +34,22 @@ export function useBibliotecaImagini(): Biblioteca | null {
 /**
  * O singură fereastră de alegere pentru tot panoul.
  *
- * Stă în aranjamentul panoului, nu în fiecare ecran cu formular, din două
- * motive. Întâi, lista de imagini se citește o dată pe cerere, nu de fiecare
- * câmp în parte. Apoi, formularul secțiunilor se cheamă pe el însuși pentru
- * listele dinăuntru — un câmp de imagine poate fi la al treilea nivel de
- * adâncime, iar trecerea unei funcții „deschide" prin toate nivelurile ar fi
- * însemnat props de care nimic de pe drum n-are nevoie.
+ * Stă în aranjamentul panoului, nu în fiecare ecran cu formular, fiindcă
+ * formularul secțiunilor se cheamă pe el însuși pentru listele dinăuntru — un
+ * câmp de imagine poate fi la al treilea nivel de adâncime, iar trecerea unei
+ * funcții „deschide" prin toate nivelurile ar fi însemnat props de care nimic de
+ * pe drum n-are nevoie.
+ *
+ * DAR lista de imagini se aduce abia la DESCHIDEREA ferestrei, nu în layout.
+ * Înainte se citea o dată pe fiecare pagină din dashboard, chiar pe Mesaje sau
+ * Setări, unde nu se alege nicio imagine; la mii de as-turi era cost degeaba pe
+ * fiecare navigare (findingul F09). O ținem minte între deschideri și o
+ * reîmprospătăm în fundal, ca a doua deschidere să n-aibă clipa de așteptare.
  */
-export function BibliotecaImagini({
-  imagini,
-  children,
-}: {
-  imagini: ImagineBiblioteca[];
-  children: ReactNode;
-}) {
+export function BibliotecaImagini({ children }: { children: ReactNode }) {
   const [deschisa, setDeschisa] = useState(false);
+  const [imagini, setImagini] = useState<ImagineBiblioteca[] | null>(null);
+  const [incarca, setIncarca] = useState(false);
   /**
    * Ce câmp așteaptă răspunsul. `useRef`, nu `useState`: se schimbă odată cu
    * deschiderea ferestrei și nu are ce randa, deci o stare ar fi cerut o
@@ -47,19 +57,34 @@ export function BibliotecaImagini({
    */
   const laAlegere = useRef<((imagine: ImageValue) => void) | null>(null);
 
+  const reincarca = useCallback(async () => {
+    setIncarca(true);
+    try {
+      setImagini(await incarcaBibliotecaImagini());
+    } catch {
+      // Un eșec (rețea căzută, sesiune expirată) nu trebuie să lase butonul mort:
+      // lista rămâne cum era (poate goală, poate cea de data trecută), iar
+      // fereastra arată ori imaginile vechi, ori starea de gol. Se reîncearcă la
+      // următoarea deschidere.
+    } finally {
+      setIncarca(false);
+    }
+  }, []);
+
   const biblioteca = useMemo<Biblioteca>(
     () => ({
       deschide(callback) {
         laAlegere.current = callback;
         setDeschisa(true);
+        void reincarca();
       },
     }),
-    [],
+    [reincarca],
   );
 
   const incarcari = useMemo<MediaUpload[]>(
     () =>
-      imagini.map((imagine) => ({
+      (imagini ?? []).map((imagine) => ({
         id: imagine.id,
         url: imagine.url,
         filename: imagine.numeFisier,
@@ -85,6 +110,7 @@ export function BibliotecaImagini({
       */}
       <MediaLibrary
         open={deschisa}
+        loading={incarca}
         onClose={() => {
           setDeschisa(false);
           laAlegere.current = null;
@@ -94,7 +120,7 @@ export function BibliotecaImagini({
           // Poziția aleasă a pozei vine cu ea din bibliotecă, ca la o poză pusă
           // într-o nouă secțiune să pornească de unde a lăsat-o clientul, nu de
           // la centru.
-          const originala = imagini.find((imagine) => imagine.id === aleasa.id);
+          const originala = (imagini ?? []).find((imagine) => imagine.id === aleasa.id);
           laAlegere.current?.({
             uploadId: aleasa.id,
             url: aleasa.url,
