@@ -33,11 +33,14 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       /**
-       * Validarea noastră acceptă imagini de până la 5 MB, dar limita implicită
-       * a corpului unui Server Action e 1 MB: fără linia asta, orice fotografie
-       * făcută cu telefonul ar fi respinsă de runtime cu o excepție, nu de
-       * `describeImageProblem` cu un mesaj omenesc. Marja de 1 MB acoperă
-       * overhead-ul `multipart/form-data` (delimitatori, anteturi de parte).
+       * Validarea noastră acceptă imagini ȘI documente de până la 5 MB
+       * (`MAX_IMAGE_BYTES`, `MAX_DOCUMENT_BYTES` din `lib/uploads.ts`), dar limita
+       * implicită a corpului unui Server Action e 1 MB: fără linia asta, orice
+       * fotografie făcută cu telefonul ar fi respinsă de runtime cu o excepție,
+       * nu de `describeImageProblem`/`describeDocumentProblem` cu un mesaj omenesc.
+       * Marja de 1 MB acoperă overhead-ul `multipart/form-data` (delimitatori,
+       * anteturi de parte). Plafonul ăsta trebuie să rămână peste cea mai mare
+       * limită de upload; dacă vreuna crește, crește și el.
        */
       bodySizeLimit: "6mb",
     },
