@@ -32,10 +32,14 @@ export const getTenant = cache(async () => {
  * `getUser()` întoarce `null` fără să iasă în rețea, iar interogarea următoare
  * nici nu se mai face.
  *
- * ATENȚIE la memorare: citirea cookie-urilor scoate ruta din randarea statică,
- * deci pagina publică rămâne dinamică. Dacă cineva adaugă vreodată `revalidate`
- * sau cache public pe pagina principală, bara de administrare ar putea ajunge
- * în răspunsul servit vizitatorilor. Nu adăuga cache fără să muți întâi bara.
+ * ATENȚIE la memorare: citirea cookie-urilor scoate din randarea statică orice
+ * componentă care o cheamă. De-aceea bara de administrare și numărarea vizitelor
+ * au fost mutate în frunze proprii — `BaraAdmin` și `NumaratorVizite` — care își
+ * citesc singure sesiunea, în afara cadrului comun (Pasul 1 din cache-ul pe
+ * tenant). Cadrul și funcțiile de conținut țin acum doar de `siteId`, deci se pot
+ * memora. Când se adaugă cache (Pasul 2), memorează FUNCȚIILE de conținut după
+ * `siteId`, nu pagina întreagă: aceste frunze trebuie să rămână dinamice, altfel
+ * bara (sau emailul) ar ajunge în răspunsul servit tuturor.
  */
 export const getSesiuneOptionala = cache(async () => {
   const supabase = await createClient();

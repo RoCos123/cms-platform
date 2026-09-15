@@ -1,24 +1,22 @@
 import type { ReactNode } from "react";
-import { getSesiuneOptionala, getTenant } from "@/lib/dal";
+import { getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
 import { articolePublicate } from "@/lib/blog-public";
 import { linkurilePaginilor } from "@/lib/pagini-publice";
-import { after } from "next/server";
 import { linkurileSociale, paginaEsteActiva } from "@/lib/setari";
 import { moduleleSiteului } from "@/lib/module";
 import { seePotFaceProgramari } from "@/lib/programari-publice";
-import { numaraAfisarea } from "@/lib/vizite-numarare";
-import { headers } from "next/headers";
 import { getTemplate, templateStyle } from "@/lib/templates";
 import { templateFontStyle } from "@/lib/templates/fonturi";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
-import { AdminBar } from "@/components/site/admin-bar";
-import { BulaWhatsApp } from "@/components/site/bula-whatsapp";
+import { BaraAdmin } from "@/components/site/bara-admin";
+import { NumaratorVizite } from "@/components/site/numarator-vizite";
 
 /**
- * Cadrul oricărei pagini publice: fonturile șablonului, antetul, subsolul și
- * bara de administrare.
+ * Cadrul oricărei pagini publice: fonturile șablonului, antetul, subsolul și,
+ * ca frunze proprii dependente de vizitator, bara de administrare și numărarea
+ * vizitelor (`BaraAdmin`, `NumaratorVizite`).
  *
  * Scris o dată. Copiat în fiecare pagină, ar fi însemnat că un link nou în
  * meniu se adaugă în patru locuri — iar al patrulea se uită. Exact așa a apărut
@@ -39,13 +37,14 @@ export async function CadruSite({
 }) {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, brand, pagini, social }, articole, linkuriPagini, sesiune] = await Promise.all([
+  // Doar citiri funcție de `siteId` — nimic dependent de vizitator. Sesiunea (bara
+  // de administrare) și numărarea vizitelor stau în frunze proprii, `BaraAdmin` și
+  // `NumaratorVizite`, ca acest cadru să poată fi memorat între cereri fără riscul
+  // de a servi bara unui proprietar altui vizitator. (Pasul 1 din cache-ul pe tenant.)
+  const [{ site, brand, pagini, social }, articole, linkuriPagini] = await Promise.all([
     identitateaSiteului(siteId),
     articolePublicate(siteId),
     linkurilePaginilor(siteId),
-    // Pentru un vizitator obișnuit se rezolvă instantaneu cu `null`, fără nicio
-    // cerere: fără cookie de sesiune n-are ce verifica.
-    getSesiuneOptionala(),
   ]);
 
   const template = getTemplate(site?.template);
@@ -75,28 +74,6 @@ export async function CadruSite({
     inAntet.push({ text: "Programare", href: "/programare" });
   }
   const inSubsol = linkuriPagini.filter((pagina) => pagina.loc === "footer").map(catreLink);
-
-  /**
-   * Numărarea traficului stă aici fiindcă aici trec TOATE paginile publice și
-   * numai ele: o adresă inexistentă face `notFound()` înainte să ajungă la
-   * cadru, iar previzualizarea din panou folosește direct antetul și subsolul,
-   * nu cadrul.
-   *
-   * `after()` o mută după ce răspunsul a plecat — vizitatorul nu așteaptă
-   * niciodată după statistici.
-   *
-   * Antetele se citesc AICI, nu înăuntrul lui `after()`: acolo cererea nu mai
-   * poate fi atinsă, iar Next aruncă și pagina cade cu 500. Vezi explicația
-   * lungă din `numaraAfisarea`.
-   */
-  const antete = await headers();
-  const dateVizita = {
-    siteId,
-    cale: antete.get("x-cale") ?? "",
-    userAgent: antete.get("user-agent"),
-    eProprietarul: sesiune !== null,
-  };
-  after(() => numaraAfisarea(dateVizita));
 
   return (
     <>
@@ -144,12 +121,14 @@ export async function CadruSite({
         />
 
         {/*
-          Bula urcă deasupra barei de administrare doar când bara e prezentă —
-          adică pentru proprietarul logat. Vizitatorul o vede jos în colț.
+          Cele două frunze dependente de vizitator, surori ale conținutului de mai
+          sus (care ține doar de `siteId`): bara de administrare + bula (`BaraAdmin`)
+          și numărarea vizitei (`NumaratorVizite`, invizibilă). Vezi comentariul de
+          la Promise.all.
         */}
-        <BulaWhatsApp numar={brand.whatsapp} ridicata={sesiune !== null} />
+        <BaraAdmin numar={brand.whatsapp} linkEditare={linkEditare} />
 
-        {sesiune && <AdminBar email={sesiune.email} linkEditare={linkEditare} />}
+        <NumaratorVizite siteId={siteId} />
       </div>
     </>
   );
