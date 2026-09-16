@@ -8,6 +8,8 @@ import { moduleleSiteului } from "@/lib/module";
 import { seePotFaceProgramari } from "@/lib/programari-publice";
 import { getTemplate, templateStyle } from "@/lib/templates";
 import { templateFontStyle } from "@/lib/templates/fonturi";
+import { adresaImaginii } from "@/lib/imagini-adrese";
+import { coloaneleSubsolului } from "@/lib/subsol";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { BaraAdmin } from "@/components/site/bara-admin";
@@ -75,6 +77,16 @@ export async function CadruSite({
   }
   const inSubsol = linkuriPagini.filter((pagina) => pagina.loc === "footer").map(catreLink);
 
+  // Subsolul: logoul semnat din id (adresa poate expira), plus coloanele de
+  // servicii și cabinet, umplute din ce e publicat — vezi `coloaneleSubsolului`.
+  const logoSubsol = brand.logo?.uploadId
+    ? { url: adresaImaginii(brand.logo.uploadId), altText: brand.logo.altText }
+    : undefined;
+  const { servicii: coloanaServicii, cabinet: coloanaCabinet } = await coloaneleSubsolului(siteId, {
+    paginaServiciiActiva: paginaEsteActiva(pagini, "servicii"),
+    areBlog,
+  });
+
   return (
     <>
       <div
@@ -110,12 +122,16 @@ export async function CadruSite({
         <SiteFooter
           data={{
             nume,
+            logo: logoSubsol,
+            subtitlu: brand.subtitlu,
             descriere: brand.descriereSubsol,
             telefon: brand.telefon,
             email: brand.email,
             adresa: brand.adresa,
             acreditare: brand.acreditare,
-            linkuri: inSubsol,
+            servicii: coloanaServicii,
+            cabinet: coloanaCabinet,
+            legal: inSubsol.map((link) => ({ eticheta: link.text, href: link.href })),
             retele: linkurileSociale(social),
           }}
         />
