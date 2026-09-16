@@ -10,6 +10,7 @@ export function ContactForm({
   siteKey,
   furnizorCaptcha,
   temaCaptcha,
+  nota,
   textAcord,
   linkConfidentialitate,
   mesajSucces,
@@ -18,6 +19,8 @@ export function ContactForm({
   siteKey: string | null;
   furnizorCaptcha: string | null;
   temaCaptcha: "light" | "dark";
+  /** Un rând mic deasupra formularului (ex.: „Răspund personal în 24 de ore"). */
+  nota?: string;
   textAcord: string;
   /** Lipsă = pagina nu există încă, deci textul rămâne fără link. */
   linkConfidentialitate?: string;
@@ -28,6 +31,12 @@ export function ContactForm({
 
   return (
     <form action={actiune} style={{ display: "flex", flexDirection: "column", gap: "18px" }} noValidate>
+      {nota?.trim() && (
+        <p style={{ margin: 0, fontSize: "15px", lineHeight: 1.6, color: "var(--s-text-secundar)" }}>
+          {nota}
+        </p>
+      )}
+
       {stare.status !== "initial" && stare.mesaj && (
         <MesajFormular status={stare.status}>
           {stare.status === "succes" ? (mesajSucces ?? stare.mesaj) : stare.mesaj}
@@ -47,20 +56,11 @@ export function ContactForm({
       />
 
       {/*
-        Telefonul e cerut, emailul nu — pe dos față de cum era.
-        „Lasă-mi numele și numărul, te sun" e felul în care lucrează un cabinet
-        mic, iar cine preferă să i se scrie lasă și adresa.
+        Numai email, fără telefon (16 sept. 2026, la cererea proprietarului).
+        Cu telefonul scos, emailul rămâne singurul canal prin care cabinetul
+        poate răspunde — deci devine obligatoriu (era opțional). Câmpul de mesaj
+        rămâne scos oricum, din motivul GDPR de pe 28 aug. (vezi mai jos).
       */}
-      <Camp
-        id="contact-telefon"
-        name="telefon"
-        eticheta="Telefon"
-        autoComplete="tel"
-        maxLength={40}
-        eroare={stare.erori?.telefon}
-        valoare={stare.valori?.telefon}
-      />
-
       <Camp
         id="contact-email"
         name="email"
@@ -68,7 +68,6 @@ export function ContactForm({
         eticheta="Adresa de email"
         autoComplete="email"
         maxLength={LIMITE.email}
-        obligatoriu={false}
         eroare={stare.erori?.email}
         valoare={stare.valori?.email}
       />

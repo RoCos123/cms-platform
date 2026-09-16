@@ -683,6 +683,13 @@ const LISTA: MetaSectiune[] = [
       },
       { tip: "text", cheie: "textButon", eticheta: "Textul butonului", max: 40 },
       {
+        tip: "text",
+        cheie: "notaFormular",
+        eticheta: "Rând mic deasupra formularului",
+        hint: "Opțional. O reasigurare scurtă lângă formular. Ex.: Răspund personal în maxim 24 de ore.",
+        max: 120,
+      },
+      {
         tip: "textLung",
         cheie: "textAcord",
         eticheta: "Textul de lângă bifa de acord",

@@ -18,6 +18,8 @@ export type ContactData = {
    */
   detalii?: { eticheta: string; valoare: string }[];
   textButon?: string;
+  /** Un rând mic deasupra formularului. Ex.: „Răspund personal în maxim 24 de ore." */
+  notaFormular?: string;
   textAcord?: string;
   linkConfidentialitate?: string;
   /** Ce citește omul după trimitere. Clientul îl poate scrie cu vocea lui. */
@@ -50,7 +52,7 @@ function adresaDedusa(valoare: string | undefined): string | null {
 }
 
 const ACORD_IMPLICIT =
-  "Sunt de acord să fiu contactat la datele lăsate aici. Am citit";
+  "Sunt de acord cu prelucrarea datelor personale. Am citit";
 
 /**
  * „Contact" — formularul prin care ajunge un mesaj la cabinet.
@@ -147,12 +149,15 @@ export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: 
           siteKey={siteKey}
           furnizorCaptcha={furnizorCaptcha}
           temaCaptcha={tone === "inchis" ? "dark" : "light"}
+          nota={data.notaFormular}
           textAcord={data.textAcord ?? ACORD_IMPLICIT}
           // Fără valoare implicită: `/confidentialitate` nu există încă, iar un
           // link către o pagină inexistentă e mai rău decât lipsa lui.
           linkConfidentialitate={data.linkConfidentialitate}
           mesajSucces={data.mesajSucces}
-          textButon={data.textButon ?? "Sună-mă"}
+          // „Trimite", nu „Sună-mă": telefonul a fost scos, formularul trimite
+          // acum numele și emailul, nu deschide un apel.
+          textButon={data.textButon ?? "Trimite"}
         />
       </div>
     </Section>
