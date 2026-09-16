@@ -301,6 +301,15 @@ const LISTA: MetaSectiune[] = [
     ],
   },
   {
+    cheie: "bandaServicii",
+    nume: "Bandă cu servicii",
+    descriere: "O fâșie îngustă care derulează numele serviciilor tale.",
+    repetabila: false,
+    continutDinAltaParte:
+      "Banda arată numele serviciilor tale, unul după altul, mișcându-se lin. Nu scrii nimic aici — numele vin din Servicii, din meniu. O pornești sau o oprești din lista de secțiuni.",
+    campuri: [],
+  },
+  {
     cheie: "howItWorks",
     nume: "Cum decurge colaborarea",
     descriere: "Pașii de la primul mesaj la ședințele propriu-zise.",

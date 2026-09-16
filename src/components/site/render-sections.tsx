@@ -4,6 +4,7 @@ import type { Serviciu } from "@/lib/servicii";
 import { Hero, type HeroData } from "./sections/hero";
 import { Quote, type QuoteData } from "./sections/quote";
 import { Features, type FeaturesData } from "./sections/features";
+import { BandaServicii } from "./sections/banda-servicii";
 import { AboutTeaser, type AboutTeaserData } from "./sections/about-teaser";
 import { HowItWorks, type HowItWorksData } from "./sections/how-it-works";
 import { Testimonials, type TestimonialsData } from "./sections/testimonials";
@@ -100,6 +101,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       tone={row.tone}
     />
   ),
+  bandaServicii: (row, ctx) => <BandaServicii servicii={ctx.servicii} tone={row.tone} />,
   aboutTeaser: (row) => <AboutTeaser data={row.data as AboutTeaserData} tone={row.tone} />,
   howItWorks: (row) => <HowItWorks data={row.data as HowItWorksData} tone={row.tone} />,
   testimonials: (row) => <Testimonials data={row.data as TestimonialsData} tone={row.tone} />,

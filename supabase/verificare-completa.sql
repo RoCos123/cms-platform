@@ -1009,11 +1009,11 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('functie', 'public._este_referinta_fisier(p jsonb)', 'cuprins 7ce178130631 | security invoker | drepturi nimeni din cei trei', '20260915120000_curata_incarcarile_la_clonare.sql')
 ,  ('functie', 'public.adauga_sectiunea_programare()', 'cuprins 934ddbb41d43 | security definer | drepturi oricine=X anon=X authenticated=X service_role=X', '20260827160000_sectiunea_programare.sql')
 ,  ('functie', 'public.cloneaza_site(p_sursa_domeniu text, p_tinta_domeniu text, p_tinta_nume text, p_tinta_email text, p_tinta_sablon text)', 'cuprins 500f60fbc4ee | security definer | drepturi service_role=X', '20260915120000_curata_incarcarile_la_clonare.sql')
-,  ('functie', 'public.creeaza_client(p_domeniu text, p_nume text, p_email text, p_sablon text, p_cu_programari boolean)', 'cuprins 19f3b7bace5a | security definer | drepturi service_role=X', '20260915120000_curata_incarcarile_la_clonare.sql')
+,  ('functie', 'public.creeaza_client(p_domeniu text, p_nume text, p_email text, p_sablon text, p_cu_programari boolean)', 'cuprins cb436da77182 | security definer | drepturi service_role=X', '20260916120000_banda_servicii.sql')
 ,  ('functie', 'public.current_site_id()', 'cuprins 9e5a0c2f19f2 | security definer | drepturi oricine=X anon=X authenticated=X service_role=X', '20260901090000_depozit_privat.sql')
 ,  ('functie', 'public.inregistreaza_afisarea(p_site_id uuid, p_zi date, p_cale text)', 'cuprins ebd86d2bfbca | security definer | drepturi service_role=X', '20260909100000_drepturi_de_executie.sql')
 ,  ('functie', 'public.set_updated_at()', 'cuprins 0ba6f773f96d | security invoker | drepturi oricine=X anon=X authenticated=X service_role=X', '20260827160000_sectiunea_programare.sql')
-,  ('functie', 'public.textul_de_pornire(p_cheie text, p_nume text)', 'cuprins e6065fa56836 | security invoker | drepturi oricine=X anon=X authenticated=X service_role=X', '20260908170000_schelet_la_provizionare.sql')
+,  ('functie', 'public.textul_de_pornire(p_cheie text, p_nume text)', 'cuprins 51efa44ba382 | security invoker | drepturi oricine=X anon=X authenticated=X service_role=X', '20260916120000_banda_servicii.sql')
 ,  ('index', 'public.appointments.appointments_ora_ocupata_idx', 'CREATE UNIQUE INDEX appointments_ora_ocupata_idx ON public.appointments USING btree (site_id, starts_at) WHERE (status = ANY (ARRAY[''ceruta''::text, ''confirmata''::text]))', '20260827140000_programari.sql')
 ,  ('index', 'public.appointments.appointments_site_id_idx', 'CREATE INDEX appointments_site_id_idx ON public.appointments USING btree (site_id)', '20260825120000_init_schema.sql')
 ,  ('index', 'public.appointments.appointments_site_starts_idx', 'CREATE INDEX appointments_site_starts_idx ON public.appointments USING btree (site_id, starts_at)', '20260827140000_programari.sql')
@@ -1167,7 +1167,7 @@ from (
     'toate cheile sunt în registru',
     coalesce(string_agg(s.domain || ' · ' || c.key, ', ' order by s.domain), '')
   from public.site_content c join public.sites s on s.id = c.site_id
-  where c.key not in ('aboutTeaser', 'contact', 'faq', 'features', 'hero', 'howItWorks', 'latestPosts', 'logos', 'newsletter', 'portfolio', 'pricing', 'programare', 'quote', 'testimonials')
+  where c.key not in ('aboutTeaser', 'bandaServicii', 'contact', 'faq', 'features', 'hero', 'howItWorks', 'latestPosts', 'logos', 'newsletter', 'portfolio', 'pricing', 'programare', 'quote', 'testimonials')
 
   union all
   select 'Nicio poză din secțiuni nu arată spre un fișier inexistent', count(*),
