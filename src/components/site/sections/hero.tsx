@@ -181,14 +181,26 @@ export function Hero({
     mărime decât îi trebuie.
   */
   const imagine = (
-    <SectionImage
-      src={poza.url}
-      alt={poza.altText ?? ""}
-      aspectRatio="1 / 1"
-      sizes={titluLat ? "(max-width: 860px) 100vw, 47vw" : "(max-width: 860px) 100vw, 45vw"}
-      pozitie={poza.pozitie}
-      priority
-    />
+    <div
+      style={{
+        // Poza rotunjită, cu arcadă în cap pe așezarea cu poza lângă titlu (cerut
+        // pe 16 sept. 2026, după modelul șablonului mov). Pe titlul lat (Căldură)
+        // rămâne o rotunjire blândă, ca să nu se bată cu poza lată de acolo.
+        borderRadius: titluLat
+          ? "var(--t-raza)"
+          : "clamp(64px, 13vw, 190px) clamp(64px, 13vw, 190px) var(--t-raza) var(--t-raza)",
+        overflow: "hidden",
+      }}
+    >
+      <SectionImage
+        src={poza.url}
+        alt={poza.altText ?? ""}
+        aspectRatio="1 / 1"
+        sizes={titluLat ? "(max-width: 860px) 100vw, 47vw" : "(max-width: 860px) 100vw, 45vw"}
+        pozitie={poza.pozitie}
+        priority
+      />
+    </div>
   );
 
   if (titluLat) {
