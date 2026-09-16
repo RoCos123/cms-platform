@@ -72,6 +72,14 @@ export function FormularSetari({
 
   const text = (cheie: string) => String(cabinet[cheie] ?? "").trim() || undefined;
 
+  // Logoul e o imagine, nu un text: în editor stă ca obiect cu adresa deja
+  // semnată (`url`), nu ca un șir. De aceea nu trece prin `text()` de mai sus —
+  // îl citim ca obiect și-l dăm subsolului doar dacă are chiar o adresă.
+  const logoStocat = cabinet.logo as { url?: string; altText?: string } | undefined;
+  const logoSubsol = logoStocat?.url
+    ? { url: logoStocat.url, altText: logoStocat.altText }
+    : undefined;
+
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 pb-24 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)] lg:gap-8">
       <div className="space-y-6">
@@ -147,7 +155,7 @@ export function FormularSetari({
         template={template}
         cheie={JSON.stringify({ cabinet, social })}
         titlu="Antetul și subsolul, pe orice pagină"
-        nota="Se actualizează pe măsură ce scrii. Modificările ajung pe site abia după ce apeși Salvează."
+        nota="Se actualizează pe măsură ce scrii. Coloanele Servicii și Cabinet se umplu singure din serviciile și secțiunile site-ului — aici le arătăm cu câteva exemple, doar ca să se vadă așezarea. Modificările ajung pe site abia după ce apeși Salvează."
       >
         <SiteHeader
           data={{
@@ -174,11 +182,15 @@ export function FormularSetari({
         <SiteFooter
           data={{
             nume: text("nume") ?? domeniu,
+            logo: logoSubsol,
+            subtitlu: text("subtitlu"),
             descriere: text("descriereSubsol"),
             telefon: text("telefon"),
             email: text("email"),
             adresa: text("adresa"),
             acreditare: text("acreditare"),
+            servicii: SERVICII_EXEMPLU,
+            cabinet: CABINET_EXEMPLU,
             retele: linkurileSociale(social as Social),
           }}
         />
@@ -200,6 +212,25 @@ export function FormularSetari({
     </div>
   );
 }
+
+/*
+ * Coloanele Servicii și Cabinet ale subsolului nu se scriu din setări — pe site
+ * se umplu singure din serviciile publicate și din secțiunile vizibile. Aici,
+ * în previzualizare, n-avem de unde le lua, așa că punem câteva exemple, doar
+ * ca omul să vadă că subsolul are patru coloane, nu două. Adresele sunt „#":
+ * previzualizarea nu navighează nicăieri.
+ */
+const SERVICII_EXEMPLU = [
+  { eticheta: "Toate serviciile", href: "#" },
+  { eticheta: "Terapie individuală", href: "#" },
+  { eticheta: "Terapie de cuplu", href: "#" },
+];
+
+const CABINET_EXEMPLU = [
+  { eticheta: "Despre mine", href: "#" },
+  { eticheta: "Blog", href: "#" },
+  { eticheta: "Contact", href: "#" },
+];
 
 /**
  * Cum arată rezultatul în Google. Nu e o randare exactă — Google rescrie

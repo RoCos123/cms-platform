@@ -52,6 +52,12 @@ export const CAMPURI_CABINET: CampSchema[] = [
     max: 80,
   },
   {
+    tip: "imagine",
+    cheie: "logo",
+    eticheta: "Logo",
+    hint: "Opțional. Apare în subsolul site-ului, lângă nume. Merge cel mai bine unul pe fundal transparent (PNG). Fără el, apare doar numele.",
+  },
+  {
     tip: "text",
     cheie: "telefon",
     eticheta: "Telefon",
@@ -157,6 +163,13 @@ export const CAMPURI_SOCIAL: CampSchema[] = [
     doarExtern: true,
     max: 200,
   },
+  {
+    tip: "adresa",
+    cheie: "tiktok",
+    eticheta: "TikTok",
+    doarExtern: true,
+    max: 200,
+  },
 ];
 
 /** Ce citește site-ul public din `site_settings.brand`. */
@@ -164,6 +177,11 @@ export type Brand = {
   /** Numele psihologului ca om, separat de numele legal al cabinetului. */
   numeleTau?: string;
   subtitlu?: string;
+  /**
+   * Logoul, ca orice imagine din panou: `uploadId` e sursa de adevăr, `url` se
+   * re-semnează la citire (adresa poate expira). Lipsă = subsolul arată doar numele.
+   */
+  logo?: { uploadId?: string; url?: string; altText?: string };
   telefon?: string;
   whatsapp?: string;
   email?: string;
@@ -183,6 +201,7 @@ export type Social = {
   instagram?: string;
   linkedin?: string;
   youtube?: string;
+  tiktok?: string;
 };
 
 /** Numele rețelelor, în ordinea în care apar în subsol. */
@@ -191,6 +210,7 @@ const RETELE: { cheie: keyof Social; nume: string }[] = [
   { cheie: "instagram", nume: "Instagram" },
   { cheie: "linkedin", nume: "LinkedIn" },
   { cheie: "youtube", nume: "YouTube" },
+  { cheie: "tiktok", nume: "TikTok" },
 ];
 
 export type LinkSocial = { nume: string; adresa: string };

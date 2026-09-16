@@ -324,6 +324,17 @@ Toate livrate:
 5. **Poze la servicii** — copertă opțională per serviciu, ca la blog
    (`cover_upload_id`), pe cartonaș și pe pagina serviciului.
 
+**Follow-on, aceeași zi — subsolul, tot după Renata.** Subsolul era o singură
+bandă (nume + contact + linkuri sociale ca text). Acum are patru coloane:
+identitatea (logo opțional + nume + subtitlu + descriere + rețele ca iconițe
+rotunde), „Servicii", „Cabinet" și contactul, cu o bară de jos (© + nume +
+pagini legale + acreditare). Coloanele Servicii și Cabinet **nu se scriu de
+mână** — se umplu singure din serviciile publicate și din secțiunile vizibile
+(`src/lib/subsol.ts`). Logoul e câmp nou în **Setări** (`brand.logo`), nu o
+secțiune de panou (decizie: subsolul e cadru, nu conținut de pagină — stă lângă
+celelalte date ale cabinetului); TikTok s-a adăugat la rețele. Ambele sunt chei
+noi în JSONB — **cod, fără migrare**; un site fără logo arată doar numele.
+
 **Culorile: nu era nimic de reparat.** Proprietarul a măsurat un mov „spălăcit"
 (`#957cb4`/`#b7b7db`) și a crezut că e al nostru. Erau POZELE-placeholder mov din
 capturile mele de probă, nu tema. Movul real al șablonului Lumină e `#5E2976` —
