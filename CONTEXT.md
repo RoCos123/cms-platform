@@ -305,6 +305,44 @@ nouă → disponibilă la toți, dar apare doar unde e folosită. O aranjare cer
 UNUL se face ca `variant` (mecanism deja construit, nefolosit), nu ca rescriere.
 Regula de business: se vând funcții și opțiuni, nu personalizări per client.
 
+## De modificat pe șabloane (16 sept. 2026) — al doilea document al proprietarului
+
+Cinci cereri, din capturi de pe `renataiancu.ro` (șablonul-model, mov pe lavandă).
+Toate livrate:
+
+1. **Contact fără telefon.** Formularul cere acum Nume + Email (emailul devenit
+   OBLIGATORIU, fiindcă rămâne singurul canal de răspuns; dedup-ul s-a mutat pe
+   email). Câmpul de mesaj **NU** s-a pus la loc — rămâne scos din motivul GDPR
+   de pe 28 aug. (adună date de sănătate), confirmat de proprietar. Plus un rând
+   editabil deasupra formularului („Răspund personal în maxim 24 de ore").
+2. **Poză rotunjită în hero** — arcadă în cap pe așezarea cu poza lângă titlu
+   (Lumină & co.), rotunjire blândă pe Căldură.
+3. **Bandă cu servicii** — secțiune nouă, pornit/oprit din lista de secțiuni;
+   derulează numele serviciilor. La clienți noi vine vizibilă, la cei existenți
+   ascunsă (backfill). Vezi migrarea `20260916120000_banda_servicii.sql`.
+4. **Etichete** sub „Despre mine" (text mare + mărunt), pe toate șabloanele.
+5. **Poze la servicii** — copertă opțională per serviciu, ca la blog
+   (`cover_upload_id`), pe cartonaș și pe pagina serviciului.
+
+**Culorile: nu era nimic de reparat.** Proprietarul a măsurat un mov „spălăcit"
+(`#957cb4`/`#b7b7db`) și a crezut că e al nostru. Erau POZELE-placeholder mov din
+capturile mele de probă, nu tema. Movul real al șablonului Lumină e `#5E2976` —
+fix movul Renatei de pe bandă (dovedit citind culoarea randată a butonului și a
+etichetelor). Lecția pentru mine: la probe vizuale, placeholder GRI, nu colorat.
+
+### ⚠️ Două migrări de rulat pe baza reală înainte să conteze
+
+Se rulează de mână (SQL Editor), ca orice migrare aici. Până atunci, producția
+n-are aceste schimbări de bază:
+
+- `20260915120000_curata_incarcarile_la_clonare.sql` — fixul de clonare (nu mai
+  duce pozele sursei pe clonă).
+- `20260916120000_banda_servicii.sql` — banda ca secțiune + backfill la site-urile
+  existente (ca să apară în lista de secțiuni și s-o poată porni).
+
+Restul schimbărilor (contact, hero, etichete, poze la servicii) sunt doar cod —
+se văd la următorul deploy, fără migrare.
+
 ## Panoul pe telefon (11 sept. 2026)
 
 Cerut de proprietar. Meniul din stânga era fix, 256px, mereu la vedere — pe un
