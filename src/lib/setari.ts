@@ -56,6 +56,7 @@ export const CAMPURI_CABINET: CampSchema[] = [
     cheie: "logo",
     eticheta: "Logo",
     hint: "Opțional. Apare sus în antet și jos în subsol, lângă nume. Merge cel mai bine un semn mic pe fundal transparent (PNG), care se vede și pe fundal deschis, și pe cel închis. Fără el, apare inițiala și numele.",
+    dimensiuni: "Recomandat: circa 400 × 150 px (lat) sau ~250 × 250 px (pătrat).",
   },
   {
     tip: "text",
