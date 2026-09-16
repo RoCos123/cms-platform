@@ -223,6 +223,32 @@ const LISTA: MetaSectiune[] = [
         max: 240,
       },
       {
+        tip: "lista",
+        cheie: "etichete",
+        eticheta: "Repere scurte",
+        etichetaElement: "reper",
+        rezumatDin: "mare",
+        max: 4,
+        hint: "Câteva repere sub text, unul lângă altul, ca +5 / ani de experiență sau Atestat / liberă practică. Fără ele, nu apare nimic.",
+        campuri: [
+          {
+            tip: "text",
+            cheie: "mare",
+            eticheta: "Textul mare",
+            obligatoriu: true,
+            hint: "Cifra sau cuvântul scos în față. Ex.: +5, Atestat, Online.",
+            max: 24,
+          },
+          {
+            tip: "text",
+            cheie: "mic",
+            eticheta: "Sub el, mărunt",
+            hint: "Ex.: ani de experiență, de liberă practică, & fizic.",
+            max: 60,
+          },
+        ],
+      },
+      {
         tip: "imagine",
         cheie: "imagine",
         eticheta: "Poza ta",

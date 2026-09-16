@@ -11,6 +11,11 @@ export type AboutTeaserData = {
   paragrafe: string[];
   /** O propoziție scoasă în evidență, în serif italic — tiparul din șabloane. */
   fraza?: string;
+  /**
+   * Repere scurte, sub text: un cuvânt mare (serif, accent) și o descriere mică.
+   * Ex.: „+5 / ani de experiență", „Atestat / liberă practică". Lipsă → nu apare.
+   */
+  etichete?: { mare: string; mic?: string }[];
   buton?: { text: string; href: string };
   /** Aceeași formă ca la încărcare (`ImageValue`). De obicei portretul. */
   imagine?: { url: string; altText?: string; pozitie?: PunctFocal };
@@ -156,6 +161,59 @@ export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: Sect
             >
               {data.buton.text}
             </a>
+          )}
+
+          {/*
+            Reperele scurte, sub text: „+5 / ani de experiență" etc. Un rând care
+            se rupe singur pe telefon (`auto-fit`). Cifra/cuvântul mare stă în
+            serif-ul accentului, ca titlurile — dar DREPT, nu înclinat: e un reper
+            de citit dintr-o privire, nu o frază.
+
+            Chenarul de sus vine din `currentColor`, nu din `--s-chenar`: acela nu
+            e printre variabilele puse de `Section` (CONVENTII, „Verificare
+            vizuală"), iar pe tonul închis un chenar de card ar fi fost invizibil.
+          */}
+          {data.etichete?.some((e) => e?.mare?.trim()) && (
+            <dl
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+                gap: "24px",
+                margin: "40px 0 0",
+                paddingTop: "28px",
+                borderTop: "1px solid color-mix(in oklab, currentColor 15%, transparent)",
+              }}
+            >
+              {data.etichete
+                .filter((e) => e?.mare?.trim())
+                .map((eticheta, i) => (
+                  <div key={i}>
+                    <dt
+                      style={{
+                        fontFamily: "var(--t-font-secundar)",
+                        fontSize: "clamp(28px, 3vw, 38px)",
+                        lineHeight: 1,
+                        color: "var(--s-accent)",
+                      }}
+                    >
+                      {eticheta.mare}
+                    </dt>
+                    {eticheta.mic?.trim() && (
+                      <dd
+                        style={{
+                          margin: "8px 0 0",
+                          fontSize: "14px",
+                          lineHeight: 1.5,
+                          color: "var(--s-text-secundar)",
+                          textWrap: "pretty",
+                        }}
+                      >
+                        {eticheta.mic}
+                      </dd>
+                    )}
+                  </div>
+                ))}
+            </dl>
           )}
         </div>
       </div>
