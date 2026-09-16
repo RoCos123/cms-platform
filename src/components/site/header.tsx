@@ -5,6 +5,8 @@ export type SiteHeaderData = {
   nume: string;
   /** Rândul mic de sub nume („PSIHOLOG CLINICIAN"). */
   subtitlu?: string;
+  /** Logoul, dacă are unul. Adresa e deja semnată de cine construiește datele. */
+  logo?: { url: string; altText?: string };
   /** Inițiala din medalion, când nu există logo încărcat. */
   initiala?: string;
   linkuri?: LinkAntet[];
@@ -114,24 +116,43 @@ export function SiteHeader({ data }: { data: SiteHeaderData }) {
           // se taie el.
           style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: 0, textDecoration: "none", color: "inherit" }}
         >
-          <span
-            aria-hidden
-            className="antet-medalion"
-            style={{
-              width: "38px",
-              height: "38px",
-              borderRadius: "999px",
-              background: "var(--t-accent)",
-              color: "var(--t-accent-text)",
-              display: "grid",
-              placeItems: "center",
-              fontFamily: "var(--t-font-secundar)",
-              fontSize: "19px",
-              flexShrink: 0,
-            }}
-          >
-            {initiala}
-          </span>
+          {data.logo?.url ? (
+            // Logo încărcat: ia locul medalionului cu inițiala. Înălțime fixă,
+            // lățime liberă (orice formă). `alt=""` — numele scris chiar alături
+            // e deja citit de cititorul de ecran, n-are rost și din poză.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={data.logo.url}
+              alt=""
+              style={{
+                display: "block",
+                height: "40px",
+                width: "auto",
+                maxWidth: "160px",
+                objectFit: "contain",
+                flexShrink: 0,
+              }}
+            />
+          ) : (
+            <span
+              aria-hidden
+              className="antet-medalion"
+              style={{
+                width: "38px",
+                height: "38px",
+                borderRadius: "999px",
+                background: "var(--t-accent)",
+                color: "var(--t-accent-text)",
+                display: "grid",
+                placeItems: "center",
+                fontFamily: "var(--t-font-secundar)",
+                fontSize: "19px",
+                flexShrink: 0,
+              }}
+            >
+              {initiala}
+            </span>
+          )}
           <span style={{ display: "flex", flexDirection: "column", lineHeight: 1.15, minWidth: 0 }}>
             <span className="antet-nume">{data.nume}</span>
             {data.subtitlu && <span className="antet-subtitlu">{data.subtitlu}</span>}

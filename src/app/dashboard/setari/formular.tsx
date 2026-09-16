@@ -74,9 +74,9 @@ export function FormularSetari({
 
   // Logoul e o imagine, nu un text: în editor stă ca obiect cu adresa deja
   // semnată (`url`), nu ca un șir. De aceea nu trece prin `text()` de mai sus —
-  // îl citim ca obiect și-l dăm subsolului doar dacă are chiar o adresă.
+  // îl citim ca obiect și-l dăm antetului și subsolului doar dacă are o adresă.
   const logoStocat = cabinet.logo as { url?: string; altText?: string } | undefined;
-  const logoSubsol = logoStocat?.url
+  const logoSemnat = logoStocat?.url
     ? { url: logoStocat.url, altText: logoStocat.altText }
     : undefined;
 
@@ -161,6 +161,7 @@ export function FormularSetari({
           data={{
             nume: text("nume") ?? domeniu,
             subtitlu: text("subtitlu"),
+            logo: logoSemnat,
             telefon: text("telefon"),
           }}
         />
@@ -182,7 +183,7 @@ export function FormularSetari({
         <SiteFooter
           data={{
             nume: text("nume") ?? domeniu,
-            logo: logoSubsol,
+            logo: logoSemnat,
             subtitlu: text("subtitlu"),
             descriere: text("descriereSubsol"),
             telefon: text("telefon"),

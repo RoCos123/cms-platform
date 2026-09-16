@@ -77,9 +77,10 @@ export async function CadruSite({
   }
   const inSubsol = linkuriPagini.filter((pagina) => pagina.loc === "footer").map(catreLink);
 
-  // Subsolul: logoul semnat din id (adresa poate expira), plus coloanele de
-  // servicii și cabinet, umplute din ce e publicat — vezi `coloaneleSubsolului`.
-  const logoSubsol = brand.logo?.uploadId
+  // Logoul semnat din id (adresa poate expira), folosit și în antet, și în
+  // subsol. Plus coloanele de servicii și cabinet ale subsolului, umplute din ce
+  // e publicat — vezi `coloaneleSubsolului`.
+  const logoSemnat = brand.logo?.uploadId
     ? { url: adresaImaginii(brand.logo.uploadId), altText: brand.logo.altText }
     : undefined;
   const { servicii: coloanaServicii, cabinet: coloanaCabinet } = await coloaneleSubsolului(siteId, {
@@ -110,6 +111,7 @@ export async function CadruSite({
           data={{
             nume,
             subtitlu: brand.subtitlu,
+            logo: logoSemnat,
             telefon: brand.telefon,
             paginaServicii: paginaEsteActiva(pagini, "servicii"),
             blog: areBlog ? "pagina" : null,
@@ -122,7 +124,7 @@ export async function CadruSite({
         <SiteFooter
           data={{
             nume,
-            logo: logoSubsol,
+            logo: logoSemnat,
             subtitlu: brand.subtitlu,
             descriere: brand.descriereSubsol,
             telefon: brand.telefon,

@@ -98,10 +98,12 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
             {data.logo?.url && (
               // Logo simplu, nu prin optimizator: are înălțime fixă și lățime
               // liberă (orice formă), iar `next/image` cere dimensiuni știute.
+              // `alt=""` — numele scris dedesubt e deja citit de cititorul de
+              // ecran, n-are rost și din poză.
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={data.logo.url}
-                alt={data.logo.altText || data.nume}
+                alt=""
                 style={{
                   display: "block",
                   height: "clamp(38px, 4.5vw, 52px)",
