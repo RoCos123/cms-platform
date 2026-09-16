@@ -32,6 +32,13 @@ export function EditorServiciu({
   const modificat = JSON.stringify(valoare) !== JSON.stringify(referinta);
   const date = catreStocare(valoare, CAMPURI_SERVICIU);
 
+  // Coperta, ca s-o arate previzualizarea: câmpul de imagine o ține ca
+  // `{ uploadId, url, altText }`, iar blocul de serviciu cere doar adresa.
+  const copertaPreview = (() => {
+    const c = date.coperta as { url?: unknown } | null | undefined;
+    return typeof c?.url === "string" && c.url ? { url: c.url } : null;
+  })();
+
   async function salveaza() {
     const gasite = valideaza(valoare, CAMPURI_SERVICIU);
     setErori(gasite);
@@ -96,6 +103,7 @@ export function EditorServiciu({
                 descriereCompleta: String(date.content ?? ""),
                 pret: String(date.price_label ?? "") || null,
                 durata: String(date.duration_label ?? "") || null,
+                coperta: copertaPreview,
               }}
             />
           </Section>

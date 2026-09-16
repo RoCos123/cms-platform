@@ -2,6 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 import { createServiceClient } from "@/lib/supabase/admin";
+import { adresaImaginii } from "@/lib/imagini-adrese";
 import type { Serviciu } from "@/lib/servicii";
 
 /**
@@ -15,7 +16,7 @@ export const serviciiPublicate = cache(async (siteId: string): Promise<Serviciu[
 
   const { data, error } = await service
     .from("services")
-    .select("id, slug, title, excerpt, content, price_label, duration_label")
+    .select("id, slug, title, excerpt, content, price_label, duration_label, cover_upload_id")
     .eq("site_id", siteId)
     .eq("status", "published")
     .order("position", { ascending: true });
@@ -27,13 +28,21 @@ export const serviciiPublicate = cache(async (siteId: string): Promise<Serviciu[
     return [];
   }
 
-  return (data ?? []).map((rand) => ({
-    id: rand.id as string,
-    slug: rand.slug as string,
-    titlu: rand.title as string,
-    descriereScurta: (rand.excerpt as string) ?? "",
-    descriereCompleta: (rand.content as string) ?? "",
-    pret: rand.price_label as string | null,
-    durata: rand.duration_label as string | null,
-  }));
+  return (data ?? []).map((rand) => {
+    // Adresa pozei se semnează din id, ca la coperțile de blog. `cover_upload_id`
+    // e mereu al acestui site: clonarea îl pune pe NULL, iar salvarea îl scrie
+    // doar din biblioteca proprie. Lipsă → serviciul rămâne fără poză.
+    const coverId = rand.cover_upload_id as string | null;
+
+    return {
+      id: rand.id as string,
+      slug: rand.slug as string,
+      titlu: rand.title as string,
+      descriereScurta: (rand.excerpt as string) ?? "",
+      descriereCompleta: (rand.content as string) ?? "",
+      pret: rand.price_label as string | null,
+      durata: rand.duration_label as string | null,
+      coperta: coverId ? { url: adresaImaginii(coverId) } : null,
+    };
+  });
 });

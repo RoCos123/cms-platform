@@ -17,7 +17,8 @@ import { readFileSync } from "node:fs";
  * o observă, cum s-a întâmplat deja o dată.
  */
 
-const SQL = "supabase/migrations/20260908170000_schelet_la_provizionare.sql";
+// Cea mai recentă definiție a `textul_de_pornire` (o reface migrarea benzii).
+const SQL = "supabase/migrations/20260916120000_banda_servicii.sql";
 
 test("fiecare secțiune din registru primește text de pornire", () => {
   const registru = readFileSync("src/components/site/render-sections.tsx", "utf8");

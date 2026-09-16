@@ -15,6 +15,21 @@ export type RezultatServiciu =
 const MAXIM_SERVICII = 40;
 
 /**
+ * Coperta stă în bază ca `cover_upload_id` (o referință), dar formularul o dă ca
+ * imagine (`{ uploadId, url, altText }`). Aici scoatem doar id-ul.
+ *
+ * Serviciile n-au coloană de text alternativ (spre deosebire de articole):
+ * poza cartonașului e ilustrativă, iar numele serviciului, chiar lângă ea, spune
+ * ce e — deci se randează ca decor (`alt=""`), nu se cere o descriere în plus.
+ */
+function coloanaCoperta(valoare: unknown): { cover_upload_id: string | null } {
+  const coperta = valoare as { uploadId?: unknown } | null | undefined;
+  const uploadId =
+    typeof coperta?.uploadId === "string" && coperta.uploadId ? coperta.uploadId : null;
+  return { cover_upload_id: uploadId };
+}
+
+/**
  * Serviciile stau în tabelul lor, nu în conținutul unei secțiuni.
  *
  * Așa, cartonașul de pe prima pagină și pagina de servicii citesc din același
@@ -100,11 +115,16 @@ export async function salveazaServiciu(
   // ajungă.
   const curat = catreStocare(catreEditor(valori, CAMPURI_SERVICIU), CAMPURI_SERVICIU);
 
+  // Coperta se traduce în coloana ei; restul câmpurilor sunt deja coloane. Fără
+  // scoaterea asta, `update` ar primi o cheie `coperta` inexistentă și ar pica.
+  const { coperta, ...coloane } = curat;
+
   // Rezumatul de pe cartonaș se scoate din descriere, nu se scrie de mână.
   // Coloana `excerpt` rămâne (cartonașul citea din ea), dar acum o umplem noi.
   const curatCuRezumat = {
-    ...curat,
-    excerpt: rezumatServiciu(String(curat.content ?? "")),
+    ...coloane,
+    ...coloanaCoperta(coperta),
+    excerpt: rezumatServiciu(String(coloane.content ?? "")),
   };
 
   const { error } = await supabase

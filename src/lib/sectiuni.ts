@@ -223,6 +223,32 @@ const LISTA: MetaSectiune[] = [
         max: 240,
       },
       {
+        tip: "lista",
+        cheie: "etichete",
+        eticheta: "Repere scurte",
+        etichetaElement: "reper",
+        rezumatDin: "mare",
+        max: 4,
+        hint: "Câteva repere sub text, unul lângă altul, ca +5 / ani de experiență sau Atestat / liberă practică. Fără ele, nu apare nimic.",
+        campuri: [
+          {
+            tip: "text",
+            cheie: "mare",
+            eticheta: "Textul mare",
+            obligatoriu: true,
+            hint: "Cifra sau cuvântul scos în față. Ex.: +5, Atestat, Online.",
+            max: 24,
+          },
+          {
+            tip: "text",
+            cheie: "mic",
+            eticheta: "Sub el, mărunt",
+            hint: "Ex.: ani de experiență, de liberă practică, & fizic.",
+            max: 60,
+          },
+        ],
+      },
+      {
         tip: "imagine",
         cheie: "imagine",
         eticheta: "Poza ta",
@@ -273,6 +299,15 @@ const LISTA: MetaSectiune[] = [
         hint: "Lasă gol ca să le arăți pe toate. Cu pagina de servicii oprită, se arată oricum toate — altfel restul n-ar mai apărea nicăieri.",
       },
     ],
+  },
+  {
+    cheie: "bandaServicii",
+    nume: "Bandă cu servicii",
+    descriere: "O fâșie îngustă care derulează numele serviciilor tale.",
+    repetabila: false,
+    continutDinAltaParte:
+      "Banda arată numele serviciilor tale, unul după altul, mișcându-se lin. Nu scrii nimic aici — numele vin din Servicii, din meniu. O pornești sau o oprești din lista de secțiuni.",
+    campuri: [],
   },
   {
     cheie: "howItWorks",
@@ -682,6 +717,13 @@ const LISTA: MetaSectiune[] = [
         ],
       },
       { tip: "text", cheie: "textButon", eticheta: "Textul butonului", max: 40 },
+      {
+        tip: "text",
+        cheie: "notaFormular",
+        eticheta: "Rând mic deasupra formularului",
+        hint: "Opțional. O reasigurare scurtă lângă formular. Ex.: Răspund personal în maxim 24 de ore.",
+        max: 120,
+      },
       {
         tip: "textLung",
         cheie: "textAcord",

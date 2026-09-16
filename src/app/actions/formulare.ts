@@ -52,21 +52,21 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
 
   const nume = citesteText(formData, "nume", LIMITE.nume);
   const email = citesteText(formData, "email", LIMITE.email);
-  const telefon = citesteText(formData, "telefon", 40);
   const acord = formData.get("acord") === "da";
-  const valori = { nume, email, telefon };
+  const valori = { nume, email };
 
   const erori: Record<string, string> = {};
 
   if (nume.length < 2) erori.nume = "Te rugăm să scrii numele tău.";
   /*
-   * Telefonul e cerut, emailul e în plus. Formularul nu mai are câmp de mesaj
-   * (vezi migrarea `contact_fara_mesaj`), deci telefonul e singura cale sigură
-   * prin care cabinetul poate răspunde — aceeași regulă ca la formularul scurt
-   * de programare.
+   * Emailul e obligatoriu de pe 16 sept. 2026: câmpul de telefon a fost scos, iar
+   * formularul n-are câmp de mesaj (migrarea `contact_fara_mesaj`), deci emailul
+   * rămâne singura cale prin care cabinetul poate răspunde. Se cere ÎNTÂI să
+   * existe, apoi să aibă formă — altfel un email gol ar pica pe „nu pare
+   * complet", mesaj derutant când de fapt lipsește cu totul.
    */
-  if (!telefon) erori.telefon = "Lasă un număr de telefon, ca să poți fi sunat.";
-  if (email && !esteEmailValid(email)) erori.email = "Adresa de email nu pare completă.";
+  if (!email) erori.email = "Lasă o adresă de email, ca să poți fi contactat.";
+  else if (!esteEmailValid(email)) erori.email = "Adresa de email nu pare completă.";
   // Consimțământul e obligatoriu prin GDPR și trebuie să fie o acțiune, nu o
   // bifă pusă din start — de asta se verifică aici, nu doar prin `required`.
   if (!acord) erori.acord = "Avem nevoie de acordul tău ca să îți putem răspunde.";
@@ -85,12 +85,12 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
     const tabel = await tenantTable("contact_messages");
 
     const de_cand = new Date(Date.now() - FEREASTRA_DUBLARE_MS).toISOString();
-    // Dublarea se caută pe TELEFON, nu pe email: emailul e acum opțional, iar
-    // o căutare pe șir gol ar fi găsit orice altă cerere fără email din ultimul
-    // minut și ar fi aruncat-o în tăcere pe a doua persoană.
+    // Dublarea se caută pe EMAIL: e din nou obligatoriu (telefonul a fost scos),
+    // deci nu se caută niciodată pe șir gol — două cereri fără cheie ar fi părut
+    // dublu-click una alteia, iar a doua persoană ar fi fost aruncată în tăcere.
     const { data: recent } = await tabel
       .select("id")
-      .eq("phone", telefon)
+      .eq("email", email)
       .gte("created_at", de_cand)
       .limit(1);
 
@@ -117,10 +117,10 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
 
     const { error } = await tabel.insert({
       name: nume,
-      phone: telefon,
-      // `null`, nu șir gol: emailul lipsă și emailul gol sunt lucruri diferite,
-      // iar în panou „" ar fi devenit un link `mailto:` care nu duce nicăieri.
-      email: email || null,
+      // Telefonul a fost scos din formular (16 sept. 2026); coloana rămâne, cu
+      // numerele primite până acum, dar cererile noi nu mai au ce număr scrie.
+      phone: null,
+      email,
       // Nu se mai adună. Coloana rămâne, cu mesajele primite până acum.
       message: null,
       consent: acord,
