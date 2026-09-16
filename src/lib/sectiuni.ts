@@ -96,7 +96,17 @@ export type CampSchema =
   /** Pereche text + adresă. În JSON: `{ text, href }`. */
   | (CampComun & { tip: "link" })
   /** În JSON: `{ url, altText, uploadId? }` — aceeași formă ca la încărcare. */
-  | (CampComun & { tip: "imagine" })
+  | (CampComun & {
+      tip: "imagine";
+      /**
+       * Dimensiunile recomandate, arătate CHIAR în zona de încărcare, înainte ca
+       * omul să pună poza — ca să știe ce fișier să caute, nu să afle după ce a
+       * încărcat ceva prea mic sau de altă formă. Se pune doar unde forma chiar
+       * contează (logoul); la o poză obișnuită, care se taie oricum în ramă,
+       * n-ar ajuta cu nimic.
+       */
+      dimensiuni?: string;
+    })
   /**
    * Un document de descărcat, ales din bibliotecă. În JSON: `{ fisierId, url }`
    * — `fisierId` e sursa de adevăr, `url` se re-semnează la randare

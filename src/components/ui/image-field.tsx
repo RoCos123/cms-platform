@@ -33,6 +33,12 @@ export type ImageFieldProps = {
   onChange: (value: ImageValue | null) => void;
   label: string;
   hint?: ReactNode;
+  /**
+   * Dimensiunile recomandate, arătate în zona de încărcare goală, sub formatele
+   * acceptate — ca omul să știe ce fișier să caute înainte să încarce. Apare
+   * doar unde e dată (logo); la o poză obișnuită lipsește, ca până acum.
+   */
+  dimensiuni?: ReactNode;
   required?: boolean;
   /**
    * Deschide biblioteca media, dându-i ce să facă cu imaginea aleasă.
@@ -102,6 +108,7 @@ export function ImageField({
   onChange,
   label,
   hint,
+  dimensiuni,
   required,
   onPickFromLibrary,
   error,
@@ -482,6 +489,7 @@ export function ImageField({
               <p className="text-xs text-muted-foreground">
                 {ACCEPTED_IMAGE_LABEL} · cel mult {MAX_IMAGE_SIZE_LABEL}
               </p>
+              {dimensiuni && <p className="text-xs text-muted-foreground">{dimensiuni}</p>}
             </div>
 
             {libraryButton}

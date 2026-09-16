@@ -167,6 +167,7 @@ export function CampuriSectiune({
                 key={camp.cheie}
                 label={camp.eticheta}
                 hint={camp.hint}
+                dimensiuni={camp.dimensiuni}
                 error={eroare}
                 value={imagine}
                 onChange={(noua) => seteaza(camp.cheie, noua)}
