@@ -66,6 +66,12 @@ export const CAMPURI_SERVICIU: CampSchema[] = [
     hint: "Ex.: 50 de minute.",
     max: 80,
   },
+  {
+    tip: "imagine",
+    cheie: "coperta",
+    eticheta: "Poză",
+    hint: "Opțională. Apare pe cartonașul serviciului și sus pe pagina lui. Fără ea, cartonașul arată ca înainte, doar cu text.",
+  },
 ];
 
 /** Un serviciu, așa cum îl citește site-ul public. */
@@ -77,6 +83,11 @@ export type Serviciu = {
   descriereCompleta: string;
   pret?: string | null;
   durata?: string | null;
+  /**
+   * Poza serviciului, dacă are una. Adresa e semnată din `cover_upload_id` la
+   * citire (ca la coperțile de blog); lipsă = cartonașul rămâne doar text.
+   */
+  coperta?: { url: string } | null;
 };
 
 /**

@@ -2,6 +2,7 @@ import type { SectionTone } from "@/lib/templates";
 import type { Serviciu } from "@/lib/servicii";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
+import { SectionImage } from "@/components/site/section-image";
 
 export type FeaturesData = {
   eyebrow?: string;
@@ -114,7 +115,10 @@ export function Features({
                 card care pare apăsabil și nu face nimic e mai rău decât unul
                 simplu.
               */}
-              <Card link={paginaDetaliata ? `/servicii#${serviciu.slug}` : undefined}>
+              <Card
+                link={paginaDetaliata ? `/servicii#${serviciu.slug}` : undefined}
+                cover={serviciu.coperta}
+              >
                 <h3 style={{ margin: 0, fontSize: "21px", fontWeight: 600, textWrap: "pretty" }}>
                   {serviciu.titlu}
                 </h3>
@@ -270,26 +274,55 @@ function Linie({
 /**
  * Cardul unui serviciu. Link doar când există unde să ducă — un `<a>` fără
  * `href` nu e focusabil și e anunțat ca link stricat de cititoarele de ecran.
+ *
+ * Cu poză, cardul o poartă lată în cap (`overflow: hidden` o taie la colțurile
+ * rotunjite), iar textul stă într-un strat cu marginile lui dedesubt. Fără poză,
+ * arată exact ca înainte — un card doar cu text.
  */
-function Card({ link, children }: { link?: string; children: React.ReactNode }) {
+function Card({
+  link,
+  cover,
+  children,
+}: {
+  link?: string;
+  cover?: { url: string } | null;
+  children: React.ReactNode;
+}) {
   const stil: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",
-    gap: "12px",
     height: "100%",
     background: "var(--t-fundal-nuantat)",
     border: "1px solid var(--t-chenar)",
     borderRadius: "var(--t-raza)",
-    padding: "32px",
+    overflow: "hidden",
     color: "var(--t-text)",
     textDecoration: "none",
   };
 
-  if (!link) return <div style={stil}>{children}</div>;
+  const continut = (
+    <>
+      {cover && (
+        <SectionImage
+          src={cover.url}
+          // Decor: numele serviciului, chiar sub poză, spune ce e — deci poza nu
+          // repetă informația pentru cititoarele de ecran.
+          alt=""
+          aspectRatio="3 / 2"
+          sizes="(max-width: 720px) 100vw, (max-width: 1040px) 50vw, 33vw"
+        />
+      )}
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "32px", flex: 1 }}>
+        {children}
+      </div>
+    </>
+  );
+
+  if (!link) return <div style={stil}>{continut}</div>;
 
   return (
     <a href={link} style={stil}>
-      {children}
+      {continut}
     </a>
   );
 }

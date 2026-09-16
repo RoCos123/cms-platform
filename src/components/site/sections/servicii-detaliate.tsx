@@ -2,6 +2,7 @@ import type { SectionTone } from "@/lib/templates";
 import type { Serviciu } from "@/lib/servicii";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
+import { SectionImage } from "@/components/site/section-image";
 import { CorpText } from "@/components/site/corp-text";
 
 /**
@@ -72,6 +73,24 @@ export function BlocServiciu({ serviciu, primul = true }: { serviciu: Serviciu; 
         scrollMarginTop: "96px",
       }}
     >
+      {serviciu.coperta && (
+        <div
+          style={{
+            borderRadius: "var(--t-raza)",
+            overflow: "hidden",
+            marginBottom: "clamp(24px, 3.5vw, 40px)",
+          }}
+        >
+          <SectionImage
+            src={serviciu.coperta.url}
+            // Decor: titlul serviciului, chiar dedesubt, spune ce e.
+            alt=""
+            aspectRatio="16 / 7"
+            sizes="(max-width: 960px) 100vw, 900px"
+          />
+        </div>
+      )}
+
       <div
         style={{
           display: "grid",
