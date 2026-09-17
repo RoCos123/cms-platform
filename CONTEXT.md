@@ -44,7 +44,7 @@ prin CI. Primul site a fost făcut cu ea cap la cap, pe 8 sept.
 | 2 | **Email tranzacțional** | proprietar (hotărârea), apoi cod | zile |
 | 3 | ~~Resetarea parolei~~ — **făcută** (cod, 10 sept.), pe punte | proprietar: 3 setări Supabase | minute |
 | 4 | **Backup / PITR verificat în Supabase** | proprietar | minute |
-| 5 | **Cele două chei hCaptcha** | proprietar | minute |
+| 5 | ~~Cele două chei hCaptcha~~ — **făcut** (17 sept.) | proprietar | ✓ |
 | 6 | **Videoclipul de instructaj** | proprietar, ULTIMUL | ore |
 
 **1 are cel mai lung timp de așteptare din toată lista.** Se începe primul,
@@ -63,6 +63,11 @@ săptămână, asta e o problemă reală, nu o comoditate.
 de zeci de ori în prima lună, iar înainte, când își uita parola, singura cale era
 un telefon la proprietar și o intrare manuală în Supabase. Codul e gata; rămân
 trei setări în tabloul Supabase, minute, făcute de proprietar.
+
+**5 e făcută (17 sept.).** Cheile hCaptcha sunt în Vercel (sitekey public + secret
+marcat „Sensitive"), iar caseta apare pe toate formularele publice, în engleză
+(la cererea proprietarului). Codul era gata dinainte — `src/lib/captcha.ts` +
+`src/components/site/captcha.tsx`; lipseau doar cheile, puse acum de proprietar.
 
 **6 se filmează ultimul**, dinadins: se învechește la fiecare schimbare de ecran.
 
