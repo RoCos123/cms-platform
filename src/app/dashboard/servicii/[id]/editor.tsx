@@ -6,6 +6,7 @@ import { SaveBar } from "@/components/ui/save-bar";
 import { useToast } from "@/components/ui/toast";
 import { CampuriSectiune } from "@/components/dashboard/campuri-sectiune";
 import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare";
+import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { BlocServiciu } from "@/components/site/sections/servicii-detaliate";
 import { Section } from "@/components/site/section";
 import type { Template } from "@/lib/templates";
@@ -17,10 +18,13 @@ export function EditorServiciu({
   id,
   valoareInitiala,
   template,
+  hrefPeSite,
 }: {
   id: string;
   valoareInitiala: ValoareEditor;
   template: Template;
+  /** Adresa serviciului pe site, calculată din starea salvată. `null` la ciornă. */
+  hrefPeSite?: string | null;
 }) {
   const [valoare, setValoare] = useState(valoareInitiala);
   const [referinta, setReferinta] = useState(valoareInitiala);
@@ -66,17 +70,22 @@ export function EditorServiciu({
 
   return (
     <div className="pb-24">
-      <div className="mb-6">
-        <Link href="/dashboard/servicii" className="text-sm text-muted-foreground underline">
-          ← Toate serviciile
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-foreground">
-          {String(valoare.title ?? "") || "Serviciu"}
-        </h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-          Se vede pe pagina de servicii, iar pe cartonașul din prima pagină apar numele și
-          primul rând al descrierii.
-        </p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <Link href="/dashboard/servicii" className="text-sm text-muted-foreground underline">
+            ← Toate serviciile
+          </Link>
+          <h1 className="mt-2 text-2xl font-semibold text-foreground">
+            {String(valoare.title ?? "") || "Serviciu"}
+          </h1>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+            Se vede pe pagina de servicii, iar pe cartonașul din prima pagină apar numele și
+            primul rând al descrierii.
+          </p>
+        </div>
+
+        {/* Doar când serviciul e publicat (altfel n-are ce vedea pe site). */}
+        {hrefPeSite && <LinkVeziPeSite href={hrefPeSite} eticheta="Vezi serviciul pe site" />}
       </div>
 
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)] lg:gap-8">

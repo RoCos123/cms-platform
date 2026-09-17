@@ -14,7 +14,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { EditorSectiune } from "./editor";
 import { rescrieAdresele, rescrieAdreseleFisiere } from "@/lib/imagini";
 import { adresaImaginii, adresaFisierului } from "@/lib/imagini-adrese";
-import { construiesteDestinatii } from "@/lib/destinatii";
+import { construiesteDestinatii, ANCORE_SECTIUNI } from "@/lib/destinatii";
 import { documenteleBibliotecii } from "@/lib/imagini-panou";
 
 export default async function EditorSectiunePage({
@@ -111,10 +111,17 @@ export default async function EditorSectiunePage({
     moduleleSiteului(site).programari,
   );
 
+  // Secțiunile trăiesc toate pe prima pagină; butonul sare la ancora ei, dacă
+  // are una. `/#…`, nu `#…`: din editor adresa nu e prima pagină, deci un `#`
+  // simplu n-ar duce nicăieri (vezi `coloaneleSubsolului`).
+  const ancora = ANCORE_SECTIUNI[rand.key as string]?.ancora;
+  const hrefPeSite = ancora ? `/#${ancora}` : "/";
+
   return (
     <EditorSectiune
       id={id}
       meta={meta}
+      hrefPeSite={hrefPeSite}
       tone={(rand.tone as SectionTone) ?? "deschis"}
       variant={rand.variant as string | null}
       valoareInitiala={catreEditor(continut, meta.campuri)}
