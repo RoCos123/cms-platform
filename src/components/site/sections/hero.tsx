@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { AsezareHero, SectionTone } from "@/lib/templates";
 import type { PunctFocal } from "@/lib/punct-focal";
 import { Section, SectionEyebrow } from "@/components/site/section";
@@ -18,6 +19,11 @@ export type HeroData = {
   butonSecundar?: { text: string; href: string };
   /** Aceeași formă ca la încărcare (`ImageValue`). Lipsă = secțiune doar text. */
   imagine?: { url: string; altText?: string; pozitie?: PunctFocal };
+  /**
+   * Buline mici care plutesc peste poză („Răspund în / sub 24h"). Cel mult două,
+   * opționale. Fără poză nu apar — n-au peste ce sta.
+   */
+  bulinePoza?: { emoji?: string; mic?: string; mare: string }[];
 };
 
 /**
@@ -34,10 +40,13 @@ export function Hero({
   data,
   tone,
   asezare = "textPozaDreapta",
+  faraArcada,
 }: {
   data: HeroData;
   tone?: SectionTone;
   asezare?: AsezareHero;
+  /** Poza fără arcadă în cap — dreptunghi rotunjit simplu (doar „Apropiere"). */
+  faraArcada?: boolean;
 }) {
   /*
     Fără un titlu, secțiunea nu se randează deloc.
@@ -180,26 +189,38 @@ export function Hero({
     aici nu strică nimic vizibil, dar face browserul să descarce o poză de altă
     mărime decât îi trebuie.
   */
+  // Bulinele care plutesc peste poză — doar cele cu rândul mare scris. Cel mult
+  // două: una sus-dreapta, una jos-stânga, ca la modelul prietenos.
+  const buline = (data.bulinePoza ?? []).filter((b) => b?.mare?.trim()).slice(0, 2);
+
   const imagine = (
-    <div
-      style={{
-        // Poza rotunjită, cu arcadă în cap pe așezarea cu poza lângă titlu (cerut
-        // pe 16 sept. 2026, după modelul șablonului mov). Pe titlul lat (Căldură)
-        // rămâne o rotunjire blândă, ca să nu se bată cu poza lată de acolo.
-        borderRadius: titluLat
-          ? "var(--t-raza)"
-          : "clamp(64px, 13vw, 190px) clamp(64px, 13vw, 190px) var(--t-raza) var(--t-raza)",
-        overflow: "hidden",
-      }}
-    >
-      <SectionImage
-        src={poza.url}
-        alt={poza.altText ?? ""}
-        aspectRatio="1 / 1"
-        sizes={titluLat ? "(max-width: 860px) 100vw, 47vw" : "(max-width: 860px) 100vw, 45vw"}
-        pozitie={poza.pozitie}
-        priority
-      />
+    <div style={{ position: "relative" }}>
+      <div
+        style={{
+          // Poza rotunjită, cu arcadă în cap pe așezarea cu poza lângă titlu (cerut
+          // pe 16 sept. 2026, după modelul șablonului mov). Pe titlul lat (Căldură)
+          // rămâne o rotunjire blândă, ca să nu se bată cu poza lată de acolo. Pe
+          // „Apropiere" (`faraArcada`) e un dreptunghi rotunjit simplu — sursa lui
+          // n-are arcadă.
+          borderRadius:
+            titluLat || faraArcada
+              ? "var(--t-raza)"
+              : "clamp(64px, 13vw, 190px) clamp(64px, 13vw, 190px) var(--t-raza) var(--t-raza)",
+          overflow: "hidden",
+        }}
+      >
+        <SectionImage
+          src={poza.url}
+          alt={poza.altText ?? ""}
+          aspectRatio="1 / 1"
+          sizes={titluLat ? "(max-width: 860px) 100vw, 47vw" : "(max-width: 860px) 100vw, 45vw"}
+          pozitie={poza.pozitie}
+          priority
+        />
+      </div>
+
+      {buline[0] && <Bulina bulina={buline[0]} pozitie={{ top: "26px", right: "-10px" }} />}
+      {buline[1] && <Bulina bulina={buline[1]} pozitie={{ bottom: "30px", left: "-10px" }} />}
     </div>
   );
 
@@ -261,5 +282,76 @@ export function Hero({
         {imagine}
       </div>
     </Section>
+  );
+}
+
+/**
+ * O bulină care plutește peste poză: emoji într-un cerc, un rând mic deasupra și
+ * unul mare dedesubt. Tiparul prietenos din șablonul-sursă.
+ *
+ * Culorile vin din nivelul ȘABLONULUI (`--t-…`), nu al secțiunii (`--s-…`):
+ * fundalul bulinei e mereu crem-deschis, deci și textul trebuie să rămână închis
+ * oricare ar fi tonul secțiunii. Cu `--s-text`, pe un hero pe ton închis ar fi
+ * ieșit text deschis pe bulină deschisă — nevăzut.
+ */
+function Bulina({
+  bulina,
+  pozitie,
+}: {
+  bulina: { emoji?: string; mic?: string; mare: string };
+  pozitie: CSSProperties;
+}) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        ...pozitie,
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "10px",
+        maxWidth: "min(240px, 66%)",
+        padding: "10px 18px 10px 12px",
+        borderRadius: "999px",
+        background: "var(--t-fundal-nuantat)",
+        border: "1px solid var(--t-chenar)",
+        boxShadow: "0 16px 36px -16px rgba(0, 0, 0, 0.45)",
+      }}
+    >
+      {bulina.emoji?.trim() && (
+        <span
+          aria-hidden
+          style={{
+            display: "grid",
+            placeItems: "center",
+            width: "36px",
+            height: "36px",
+            flexShrink: 0,
+            borderRadius: "999px",
+            background: "color-mix(in oklab, var(--t-accent) 22%, transparent)",
+            fontSize: "17px",
+          }}
+        >
+          {bulina.emoji}
+        </span>
+      )}
+      <span style={{ minWidth: 0, lineHeight: 1.25 }}>
+        {bulina.mic?.trim() && (
+          <span style={{ display: "block", fontSize: "12px", color: "var(--t-text-secundar)" }}>
+            {bulina.mic}
+          </span>
+        )}
+        <span
+          style={{
+            display: "block",
+            fontSize: "14px",
+            fontWeight: 700,
+            color: "var(--t-text)",
+            textWrap: "pretty",
+          }}
+        >
+          {bulina.mare}
+        </span>
+      </span>
+    </div>
   );
 }
