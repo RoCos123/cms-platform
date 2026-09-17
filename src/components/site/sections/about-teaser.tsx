@@ -25,11 +25,14 @@ export function AboutTeaser({
   data,
   tone,
   pozaRotunda,
+  pozaStivuita,
 }: {
   data: AboutTeaserData;
   tone?: SectionTone;
   /** Poza în cerc, nu ramă verticală. Hotărât de șablon (doar „Claritate"). */
   pozaRotunda?: boolean;
+  /** Poza peste un card colorat decalat („stivuită"). Doar „Apropiere". */
+  pozaStivuita?: boolean;
 }) {
   /*
     Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
@@ -112,23 +115,48 @@ export function AboutTeaser({
         */}
         {poza && (
           <div
-            style={
-              pozaRotunda
-                ? { maxWidth: "340px", borderRadius: "50%", overflow: "hidden" }
-                : { maxWidth: "380px" }
-            }
+            style={{
+              position: pozaStivuita ? "relative" : undefined,
+              maxWidth: pozaRotunda ? "340px" : "380px",
+            }}
           >
-            <SectionImage
-              src={poza.url}
-              alt={poza.altText ?? ""}
-              aspectRatio={pozaRotunda ? "1 / 1" : "4 / 5"}
-              sizes={
-                pozaRotunda
-                  ? "(max-width: 720px) 100vw, 340px"
-                  : "(max-width: 720px) 100vw, 380px"
-              }
-              pozitie={poza.pozitie}
-            />
+            {/*
+              Cardul verde decalat din spate: „poza lipită peste un carton",
+              semnătura lui Apropiere. Culoarea e verdele deschis al accentului
+              (`--t-accent-pe-inchis`), singura nuanță de salvie din paletă care
+              stă bine pe crem; se randează doar pe apropiere.
+            */}
+            {pozaStivuita && (
+              <div
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  transform: "translate(-16px, 18px) rotate(-2.5deg)",
+                  borderRadius: "var(--t-raza)",
+                  background: "var(--t-accent-pe-inchis)",
+                }}
+              />
+            )}
+            <div
+              style={{
+                position: pozaStivuita ? "relative" : undefined,
+                borderRadius: pozaRotunda ? "50%" : pozaStivuita ? "var(--t-raza)" : undefined,
+                overflow: pozaRotunda || pozaStivuita ? "hidden" : undefined,
+              }}
+            >
+              <SectionImage
+                src={poza.url}
+                alt={poza.altText ?? ""}
+                aspectRatio={pozaRotunda ? "1 / 1" : "4 / 5"}
+                sizes={
+                  pozaRotunda
+                    ? "(max-width: 720px) 100vw, 340px"
+                    : "(max-width: 720px) 100vw, 380px"
+                }
+                pozitie={poza.pozitie}
+              />
+            </div>
           </div>
         )}
 

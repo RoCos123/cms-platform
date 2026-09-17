@@ -60,5 +60,7 @@ export const apropiere: Template = {
     spatiereSectiune: "clamp(64px, 8vw, 110px)",
   },
 
-  asezari: { hero: "textPozaDreapta" },
+  // Poza din „Despre mine" stă peste un card verde decalat, ca la sursă —
+  // „poza lipită peste un carton". Doar aici; celelalte au poza simplă.
+  asezari: { hero: "textPozaDreapta", desprePozaStivuita: true },
 };

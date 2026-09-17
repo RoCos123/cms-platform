@@ -105,6 +105,11 @@ export type TemplateAsezari = {
    * Lipsă → dreptunghi, ca înainte.
    */
   desprePozaRotunda?: boolean;
+  /**
+   * Poza din „Despre mine" așezată peste un card colorat decalat („stivuită"),
+   * tiparul jucăuș din „Apropiere". Doar acolo — restul rămân cu poza simplă.
+   */
+  desprePozaStivuita?: boolean;
 };
 
 export type TemplateShape = {
