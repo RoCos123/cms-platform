@@ -146,7 +146,10 @@ export function Caseta({
         widgetId = api.render(container.current, {
           sitekey: siteKey,
           theme: tema,
-          [furnizor.campLimba]: "ro",
+          // Engleză dinadins, deși site-ul e în română: proprietarul a ales „I am
+          // human" în locul „Eu sunt om" — i se pare mai îngrijit. E singurul text
+          // din casetă pe care îl putem influența; restul îl scrie furnizorul.
+          [furnizor.campLimba]: "en",
         });
       })
       .catch(() => {
