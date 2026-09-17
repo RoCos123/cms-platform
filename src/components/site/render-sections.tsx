@@ -102,7 +102,13 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
     />
   ),
   bandaServicii: (row, ctx) => <BandaServicii servicii={ctx.servicii} tone={row.tone} />,
-  aboutTeaser: (row) => <AboutTeaser data={row.data as AboutTeaserData} tone={row.tone} />,
+  aboutTeaser: (row, ctx) => (
+    <AboutTeaser
+      data={row.data as AboutTeaserData}
+      tone={row.tone}
+      pozaRotunda={ctx.asezari.desprePozaRotunda}
+    />
+  ),
   howItWorks: (row) => <HowItWorks data={row.data as HowItWorksData} tone={row.tone} />,
   testimonials: (row) => <Testimonials data={row.data as TestimonialsData} tone={row.tone} />,
   pricing: (row) => <Pricing data={row.data as PricingData} tone={row.tone} />,
