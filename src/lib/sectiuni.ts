@@ -247,7 +247,7 @@ const LISTA: MetaSectiune[] = [
             eticheta: "Textul mare",
             obligatoriu: true,
             hint: "Cifra sau cuvântul scos în față. Ex.: +5, Atestat, Online.",
-            max: 24,
+            max: 40,
           },
           {
             tip: "text",
