@@ -14,6 +14,7 @@ import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { BaraAdmin } from "@/components/site/bara-admin";
 import { NumaratorVizite } from "@/components/site/numarator-vizite";
+import { TranzitieLogo } from "@/components/site/tranzitie-logo";
 
 /**
  * Cadrul oricărei pagini publice: fonturile șablonului, antetul, subsolul și,
@@ -147,6 +148,11 @@ export async function CadruSite({
         <BaraAdmin numar={brand.whatsapp} linkEditare={linkEditare} />
 
         <NumaratorVizite siteId={siteId} />
+
+        {/* Clipa cu logoul la trecerea dintre pagini. Frunză proprie de client,
+            ca și cele de mai sus — nu ține de `siteId`, ci de navigarea din
+            browser. Fără logo încărcat, nu apare deloc. */}
+        <TranzitieLogo logoUrl={logoSemnat?.url} />
       </div>
     </>
   );
