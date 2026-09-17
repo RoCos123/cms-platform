@@ -4,8 +4,14 @@ import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { ProgramareRapida } from "./programare-rapida";
 
-/** O zi cu orele ei libere, gata scrisă pentru afișare. */
-export type ZiCuOreScrise = { zi: string; scris: string; ore: string[] };
+/**
+ * O zi cu orele ei libere, gata scrisă pentru afișare.
+ *
+ * `nume` (Luni) și `dataScurta` (12 mai) sunt scrise separat de `scris`
+ * („12 mai 2026") pentru capul coloanei din grila de programări a șablonului
+ * „Apropiere"; calendarul obișnuit folosește doar `scris`.
+ */
+export type ZiCuOreScrise = { zi: string; scris: string; nume: string; dataScurta: string; ore: string[] };
 
 /**
  * Zilele libere și aceleași zile aranjate ca un calendar.
@@ -43,11 +49,17 @@ export function Programare({
   zile,
   luni,
   tone = "deschis",
+  saptamana,
 }: {
   data: ProgramareData;
   zile: ZiCuOreScrise[];
   luni: LunaCalendar[];
   tone?: SectionTone;
+  /**
+   * Grila pe zile a modelului prietenos, în loc de calendarul lunar. Doar
+   * „Apropiere" — restul șabloanelor rămân pe calendar.
+   */
+  saptamana?: boolean;
 }) {
   // Titlul singur o face vizibilă — vezi explicația din `features.tsx`.
   if (zile.length === 0 && !data.titlu?.trim()) return null;
@@ -62,10 +74,12 @@ export function Programare({
         maxWidthTitlu="11em"
       />
 
-      <div style={{ marginTop: "clamp(32px, 4vw, 48px)", maxWidth: "46em" }}>
+      {/* Grila pe zile are nevoie de mai multă lățime decât calendarul îngust. */}
+      <div style={{ marginTop: "clamp(32px, 4vw, 48px)", maxWidth: saptamana ? "62em" : "46em" }}>
         <ProgramareRapida
           zile={zile}
           luni={luni}
+          saptamana={saptamana}
           textButon={data.textButon}
           siteKey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY || null}
           furnizorCaptcha={process.env.NEXT_PUBLIC_CAPTCHA_FURNIZOR || null}
