@@ -6,6 +6,7 @@ import { SaveBar } from "@/components/ui/save-bar";
 import { useToast } from "@/components/ui/toast";
 import { CampuriSectiune } from "@/components/dashboard/campuri-sectiune";
 import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare";
+import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import type { OreDePrimaPagina } from "@/components/site/sections/programare";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
 import type { ArticolListat } from "@/lib/blog";
@@ -20,6 +21,7 @@ import { salveazaSectiune } from "../actions";
 export function EditorSectiune({
   id,
   meta,
+  hrefPeSite,
   tone,
   variant,
   valoareInitiala,
@@ -33,6 +35,8 @@ export function EditorSectiune({
 }: {
   id: string;
   meta: MetaSectiune;
+  /** Adresa secțiunii pe site: ancora ei de pe prima pagină, ori prima pagină. */
+  hrefPeSite: string;
   tone: SectionTone;
   /**
    * Așezarea aleasă pentru rândul ăsta. Trebuie să ajungă până aici, altfel
@@ -100,18 +104,22 @@ export function EditorSectiune({
 
   return (
     <div className="pb-24">
-      <div className="mb-6">
-        <Link href="/dashboard/sectiuni" className="text-sm text-muted-foreground underline">
-          ← Toate secțiunile
-        </Link>
-        <h1 className="mt-2 text-2xl font-semibold text-foreground">{meta.nume}</h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{meta.descriere}</p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <Link href="/dashboard/sectiuni" className="text-sm text-muted-foreground underline">
+            ← Toate secțiunile
+          </Link>
+          <h1 className="mt-2 text-2xl font-semibold text-foreground">{meta.nume}</h1>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{meta.descriere}</p>
 
-        {meta.continutDinAltaParte && (
-          <p className="mt-3 max-w-2xl rounded-base border border-border bg-surface p-3 text-sm text-muted-foreground">
-            {meta.continutDinAltaParte}
-          </p>
-        )}
+          {meta.continutDinAltaParte && (
+            <p className="mt-3 max-w-2xl rounded-base border border-border bg-surface p-3 text-sm text-muted-foreground">
+              {meta.continutDinAltaParte}
+            </p>
+          )}
+        </div>
+
+        <LinkVeziPeSite href={hrefPeSite} eticheta="Vezi pagina pe site" />
       </div>
 
       {/*
