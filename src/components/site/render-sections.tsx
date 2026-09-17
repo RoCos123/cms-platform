@@ -89,7 +89,12 @@ export type SectionContext = {
  */
 const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNode> = {
   hero: (row, ctx) => (
-    <Hero data={row.data as HeroData} tone={row.tone} asezare={ctx.asezari.hero} />
+    <Hero
+      data={row.data as HeroData}
+      tone={row.tone}
+      asezare={ctx.asezari.hero}
+      faraArcada={ctx.asezari.heroFaraArcada}
+    />
   ),
   quote: (row) => <Quote data={row.data as QuoteData} tone={row.tone} />,
   features: (row, ctx) => (

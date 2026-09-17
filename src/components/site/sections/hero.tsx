@@ -40,10 +40,13 @@ export function Hero({
   data,
   tone,
   asezare = "textPozaDreapta",
+  faraArcada,
 }: {
   data: HeroData;
   tone?: SectionTone;
   asezare?: AsezareHero;
+  /** Poza fără arcadă în cap — dreptunghi rotunjit simplu (doar „Apropiere"). */
+  faraArcada?: boolean;
 }) {
   /*
     Fără un titlu, secțiunea nu se randează deloc.
@@ -196,10 +199,13 @@ export function Hero({
         style={{
           // Poza rotunjită, cu arcadă în cap pe așezarea cu poza lângă titlu (cerut
           // pe 16 sept. 2026, după modelul șablonului mov). Pe titlul lat (Căldură)
-          // rămâne o rotunjire blândă, ca să nu se bată cu poza lată de acolo.
-          borderRadius: titluLat
-            ? "var(--t-raza)"
-            : "clamp(64px, 13vw, 190px) clamp(64px, 13vw, 190px) var(--t-raza) var(--t-raza)",
+          // rămâne o rotunjire blândă, ca să nu se bată cu poza lată de acolo. Pe
+          // „Apropiere" (`faraArcada`) e un dreptunghi rotunjit simplu — sursa lui
+          // n-are arcadă.
+          borderRadius:
+            titluLat || faraArcada
+              ? "var(--t-raza)"
+              : "clamp(64px, 13vw, 190px) clamp(64px, 13vw, 190px) var(--t-raza) var(--t-raza)",
           overflow: "hidden",
         }}
       >

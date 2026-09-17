@@ -110,6 +110,12 @@ export type TemplateAsezari = {
    * tiparul jucăuș din „Apropiere". Doar acolo — restul rămân cu poza simplă.
    */
   desprePozaStivuita?: boolean;
+  /**
+   * Poza din prima secțiune fără arcada din cap — un dreptunghi rotunjit simplu.
+   * Doar „Apropiere" (după model); celelalte cu poza lângă titlu păstrează
+   * arcada cerută pe 16 sept.
+   */
+  heroFaraArcada?: boolean;
 };
 
 export type TemplateShape = {

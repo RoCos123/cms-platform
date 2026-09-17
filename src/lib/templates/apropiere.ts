@@ -61,6 +61,7 @@ export const apropiere: Template = {
   },
 
   // Poza din „Despre mine" stă peste un card verde decalat, ca la sursă —
-  // „poza lipită peste un carton". Doar aici; celelalte au poza simplă.
-  asezari: { hero: "textPozaDreapta", desprePozaStivuita: true },
+  // „poza lipită peste un carton". Iar poza din hero e un dreptunghi rotunjit
+  // simplu, fără arcadă (sursa n-are arcadă). Doar aici.
+  asezari: { hero: "textPozaDreapta", desprePozaStivuita: true, heroFaraArcada: true },
 };
