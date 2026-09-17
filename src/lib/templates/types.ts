@@ -37,6 +37,13 @@ export type TemplatePalette = {
    * pașilor și ghilimelele mari de pe benzile închise ies sub pragul WCAG.
    */
   accentPeInchis: string;
+  /**
+   * Accentul CALD — piersica din „Apropiere". Un al doilea accent, pe lângă
+   * verde: sursa prietenoasă trage o dungă piersică sub cuvântul scris de mână
+   * din titlu. Verdele (`accent`) n-ar merge acolo — ar fi două verzuri lipite.
+   * Opțional: doar „Apropiere" îl are; fără el, sublinierea cade pe `accent`.
+   */
+  accentCald?: string;
   /** Culoarea erorilor de formular, pe fundal deschis și pe fundal închis. */
   eroare: string;
   eroarePeInchis: string;
@@ -116,6 +123,12 @@ export type TemplateAsezari = {
    * arcada cerută pe 16 sept.
    */
   heroFaraArcada?: boolean;
+  /**
+   * Cuvântul scris de mână din titlul primei secțiuni are o subliniere piersică
+   * trasă pe sub el, ca la modelul prietenos. Doar „Apropiere" — la celelalte
+   * accentul e serif înclinat, iar o dungă piersică sub el ar arăta lipită.
+   */
+  heroAccentSubliniat?: boolean;
 };
 
 export type TemplateShape = {
