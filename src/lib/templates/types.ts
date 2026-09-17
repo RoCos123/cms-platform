@@ -99,6 +99,12 @@ export type AsezareHero = "titluLat" | "textPozaDreapta";
 
 export type TemplateAsezari = {
   hero: AsezareHero;
+  /**
+   * Poza din „Despre mine" tăiată în cerc, nu în ramă verticală. Doar
+   * „Claritate" o cere — restul șabloanelor păstrează portretul dreptunghiular.
+   * Lipsă → dreptunghi, ca înainte.
+   */
+  desprePozaRotunda?: boolean;
 };
 
 export type TemplateShape = {

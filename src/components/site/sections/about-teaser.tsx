@@ -21,7 +21,16 @@ export type AboutTeaserData = {
   imagine?: { url: string; altText?: string; pozitie?: PunctFocal };
 };
 
-export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: SectionTone }) {
+export function AboutTeaser({
+  data,
+  tone,
+  pozaRotunda,
+}: {
+  data: AboutTeaserData;
+  tone?: SectionTone;
+  /** Poza în cerc, nu ramă verticală. Hotărât de șablon (doar „Claritate"). */
+  pozaRotunda?: boolean;
+}) {
   /*
     Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
     toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
@@ -95,16 +104,29 @@ export function AboutTeaser({ data, tone }: { data: AboutTeaserData; tone?: Sect
       >
         {/*
           Rama e verticală fiindcă locul cere de obicei un portret — o poză lată
-          se taie pe margini (`object-fit: cover`), nu se turtește. Fără poză,
-          coloana lipsește cu totul și textul umple singur lățimea.
+          se taie pe margini (`object-fit: cover`), nu se turtește. Pe „Claritate"
+          (`pozaRotunda`) e un cerc: un pătrat tăiat la 50%. Atunci punctul focal
+          al pozei contează de două ori, ca fața să rămână în cerc — se reglează
+          din panou, trăgând de poză. Fără poză, coloana lipsește cu totul și
+          textul umple singur lățimea.
         */}
         {poza && (
-          <div style={{ maxWidth: "380px" }}>
+          <div
+            style={
+              pozaRotunda
+                ? { maxWidth: "340px", borderRadius: "50%", overflow: "hidden" }
+                : { maxWidth: "380px" }
+            }
+          >
             <SectionImage
               src={poza.url}
               alt={poza.altText ?? ""}
-              aspectRatio="4 / 5"
-              sizes="(max-width: 720px) 100vw, 380px"
+              aspectRatio={pozaRotunda ? "1 / 1" : "4 / 5"}
+              sizes={
+                pozaRotunda
+                  ? "(max-width: 720px) 100vw, 340px"
+                  : "(max-width: 720px) 100vw, 380px"
+              }
               pozitie={poza.pozitie}
             />
           </div>

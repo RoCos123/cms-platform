@@ -81,5 +81,8 @@ export const claritate: Template = {
   // Titlul pe toată lățimea: pe o pagină care vinde ceva, propoziția de sus e
   // marfa. Împărțită pe două coloane cu o poză alături, se citește ca o
   // ilustrație lângă un text; lată, se citește ca o afirmație.
-  asezari: { hero: "titluLat" },
+  // Poza din „Despre mine" în cerc, doar aici: pe un șablon curat, cu alb
+  // adevărat, cercul e mai prietenos decât o ramă tăiată drept. Restul
+  // șabloanelor păstrează dreptunghiul.
+  asezari: { hero: "titluLat", desprePozaRotunda: true },
 };
