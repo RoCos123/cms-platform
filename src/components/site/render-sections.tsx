@@ -132,6 +132,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       zile={ctx.oreProgramare.zile}
       luni={ctx.oreProgramare.luni}
       tone={row.tone}
+      saptamana={ctx.asezari.programareSaptamana}
     />
   ),
   newsletter: (row) => <Newsletter data={row.data as NewsletterData} tone={row.tone} />,

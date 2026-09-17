@@ -31,6 +31,11 @@ const ZI_SCURTA = new Intl.DateTimeFormat("ro-RO", {
   month: "short",
 });
 
+const ZI_NUME = new Intl.DateTimeFormat("ro-RO", {
+  timeZone: FUSUL,
+  weekday: "long",
+});
+
 const LUNA = new Intl.DateTimeFormat("ro-RO", {
   timeZone: FUSUL,
   month: "long",
@@ -56,6 +61,16 @@ export function ziuaScrisa(moment: Date): string {
 /** „27 aug.” — pentru etichetele înghesuite de sub un grafic. */
 export function ziuaScurta(moment: Date): string {
   return ZI_SCURTA.format(moment);
+}
+
+/**
+ * „Luni”, „Marți” — numai numele zilei, pentru capul unei coloane de zi din
+ * grila de programări. Litera mare se pune de mână, ca la lună: în română ziua
+ * se scrie cu literă mică, dar aici e un titlu de coloană.
+ */
+export function ziuaNume(moment: Date): string {
+  const nume = ZI_NUME.format(moment);
+  return nume.charAt(0).toUpperCase() + nume.slice(1);
 }
 
 /**

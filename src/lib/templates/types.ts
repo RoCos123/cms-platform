@@ -129,6 +129,12 @@ export type TemplateAsezari = {
    * accentul e serif înclinat, iar o dungă piersică sub el ar arăta lipită.
    */
   heroAccentSubliniat?: boolean;
+  /**
+   * Secțiunea de programări arată săptămâna pe coloane (o zi = o coloană, cu
+   * orele ei ca butoane) plus un card de rezumat, ca la modelul prietenos, în
+   * loc de calendarul lunar. Doar „Apropiere"; restul rămân pe calendar.
+   */
+  programareSaptamana?: boolean;
 };
 
 export type TemplateShape = {

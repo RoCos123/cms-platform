@@ -3,7 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { citesteProgramul, oreLibere, primesteProgramari, type Program, type ZiCuOre } from "@/lib/programari";
-import { lunaScrisa, momentLa, ziuaScrisa } from "@/lib/zile";
+import { lunaScrisa, momentLa, ziuaNume, ziuaScrisa, ziuaScurta } from "@/lib/zile";
 import { luniDeAles } from "@/lib/calendar";
 import type { OreDePrimaPagina } from "@/components/site/sections/programare";
 
@@ -96,12 +96,19 @@ export async function oreDeAratatPePrimaPagina(
   if (!areModulul) return NIMIC;
 
   try {
-    const zile = (await oreDeOferit(siteId)).map((zi) => ({
-      ...zi,
+    const zile = (await oreDeOferit(siteId)).map((zi) => {
       // Ora 12, nu miezul nopții: o zi scrisă pornind de la 00:00 UTC poate
       // cădea cu o zi mai devreme pe fusul României.
-      scris: ziuaScrisa(momentLa(zi.zi, "12:00")),
-    }));
+      const moment = momentLa(zi.zi, "12:00");
+      return {
+        ...zi,
+        scris: ziuaScrisa(moment),
+        // Numele zilei și data scurtă, tot aici pe server (același motiv de fus):
+        // capul coloanei din grila de programări a șablonului „Apropiere".
+        nume: ziuaNume(moment),
+        dataScurta: ziuaScurta(moment),
+      };
+    });
 
     // Lunile se socotesc odată cu zilele, nu în componentă: sunt derivate din
     // ele, iar două calcule separate ar putea ajunge să nu mai fie de acord.
