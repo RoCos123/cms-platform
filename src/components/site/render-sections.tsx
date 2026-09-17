@@ -94,6 +94,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       tone={row.tone}
       asezare={ctx.asezari.hero}
       faraArcada={ctx.asezari.heroFaraArcada}
+      accentSubliniat={ctx.asezari.heroAccentSubliniat}
     />
   ),
   quote: (row) => <Quote data={row.data as QuoteData} tone={row.tone} />,

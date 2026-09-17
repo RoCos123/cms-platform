@@ -60,6 +60,9 @@ export function templateStyle(template: Template): CSSProperties {
     "--t-accent": p.accent,
     "--t-accent-text": p.accentText,
     "--t-accent-pe-inchis": p.accentPeInchis,
+    // Doar „Apropiere" îl pune; la restul rămâne nedefinit, iar sublinierea
+    // care-l folosește cade pe `--t-accent` prin `var(--t-accent-cald, …)`.
+    "--t-accent-cald": p.accentCald,
     "--t-eroare": p.eroare,
     "--t-eroare-pe-inchis": p.eroarePeInchis,
     "--t-chenar": p.chenar,

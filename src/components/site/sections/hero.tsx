@@ -41,12 +41,15 @@ export function Hero({
   tone,
   asezare = "textPozaDreapta",
   faraArcada,
+  accentSubliniat,
 }: {
   data: HeroData;
   tone?: SectionTone;
   asezare?: AsezareHero;
   /** Poza fără arcadă în cap — dreptunghi rotunjit simplu (doar „Apropiere"). */
   faraArcada?: boolean;
+  /** Cuvântul-accent are o dungă piersică pe sub el (doar „Apropiere"). */
+  accentSubliniat?: boolean;
 }) {
   /*
     Fără un titlu, secțiunea nu se randează deloc.
@@ -90,6 +93,19 @@ export function Hero({
                 fontStyle: "var(--t-stil-accent)",
                 fontWeight: 300,
                 letterSpacing: "-0.01em",
+                // Dunga piersică trasă pe sub cuvântul scris de mână, ca la
+                // modelul prietenos. E un fundal, nu `text-decoration`: așa
+                // controlez grosimea și cât de jos stă, iar `padding-bottom`
+                // întinde doar dunga, nu urcă rândul. Culoarea cade pe verde pe
+                // șabloanele fără piersică — dar steagul se aprinde doar unde e.
+                ...(accentSubliniat && {
+                  backgroundImage:
+                    "linear-gradient(var(--t-accent-cald, var(--t-accent)), var(--t-accent-cald, var(--t-accent)))",
+                  backgroundRepeat: "no-repeat",
+                  backgroundSize: "100% 0.14em",
+                  backgroundPosition: "left bottom",
+                  paddingBottom: "0.12em",
+                }),
               }}
             >
               {data.titluAccent}
