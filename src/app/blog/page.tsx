@@ -5,6 +5,7 @@ import { identitateaSiteului } from "@/lib/site-public";
 import { articolePublicate } from "@/lib/blog-public";
 import { paginaEsteActiva } from "@/lib/setari";
 import { tenantTable } from "@/lib/supabase/admin";
+import { getTemplate } from "@/lib/templates";
 import { CadruSite } from "@/components/site/cadru-site";
 import { ListaArticole } from "@/components/site/sections/lista-articole";
 
@@ -44,13 +45,17 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PaginaBlog() {
   const { siteId } = await getTenant();
 
-  const [{ pagini }, antet, articole] = await Promise.all([
+  const [{ pagini, site }, antet, articole] = await Promise.all([
     identitateaSiteului(siteId),
     antetulPaginii(),
     articolePublicate(siteId),
   ]);
 
   if (!paginaEsteActiva(pagini, "blog")) notFound();
+
+  // Aceleași carduri prietenoase ca în secțiunea de pe prima pagină, ca omul care
+  // trece de la „Articole recente" pe pagina întreagă să nu simtă alt site.
+  const template = getTemplate(site?.template);
 
   return (
     <CadruSite linkEditare="/dashboard/blog">
@@ -59,6 +64,7 @@ export default async function PaginaBlog() {
         titlu={antet.titlu}
         titluAccent={antet.titluAccent}
         articole={articole}
+        friendly={template.asezari.blogFriendly}
       />
     </CadruSite>
   );

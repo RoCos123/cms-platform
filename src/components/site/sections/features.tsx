@@ -315,7 +315,7 @@ function ServiciiFriendly({
             ? "var(--t-accent-pe-inchis)"
             : accent === "piersica"
               ? "var(--t-accent-cald)"
-              : "var(--t-fundal-nuantat)";
+              : "var(--t-suprafata, var(--t-fundal-nuantat))";
         const chenar =
           accent === "salvie"
             ? "var(--t-accent)"

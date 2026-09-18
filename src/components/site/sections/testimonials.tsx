@@ -119,7 +119,7 @@ export function Testimonials({
                 style={{
                   padding: "28px",
                   borderRadius: "var(--t-raza)",
-                  background: featured ? "var(--t-accent-pe-inchis)" : "var(--t-fundal-nuantat)",
+                  background: featured ? "var(--t-accent-pe-inchis)" : "var(--t-suprafata, var(--t-fundal-nuantat))",
                   border: `1px solid ${featured ? "var(--t-accent)" : "var(--t-chenar)"}`,
                   color: "var(--t-text)",
                   display: "flex",
