@@ -266,6 +266,14 @@ const LISTA: MetaSectiune[] = [
         max: 240,
       },
       {
+        tip: "listaText",
+        cheie: "teme",
+        eticheta: "Domenii / teme",
+        etichetaElement: "temă",
+        hint: "Etichete scurte cu ce lucrezi: Traumă, Anxietate, Cupluri, Somatic Experiencing. Apar sub text, ca niște etichete, pe șablonul Apropiere. Fără ele, nu apar.",
+        max: 6,
+      },
+      {
         tip: "lista",
         cheie: "etichete",
         eticheta: "Repere scurte",

@@ -76,6 +76,7 @@ export const apropiere: Template = {
   asezari: {
     hero: "textPozaDreapta",
     desprePozaStivuita: true,
+    despreFriendly: true,
     heroFaraArcada: true,
     heroTitluFriendly: true,
     programareSaptamana: true,
