@@ -173,37 +173,15 @@ test("orice altceva se aruncă, nu se salvează", () => {
  */
 const EMAIL_OK = (e) => e.includes("@") && e.includes(".");
 
-test("pe pagina întreagă se cere emailul, telefonul e în plus", () => {
-  assert.deepEqual(eroriDeContact(true, "ana@exemplu.ro", "", EMAIL_OK), {});
-  assert.deepEqual(Object.keys(eroriDeContact(true, "", "0722000000", EMAIL_OK)), ["email"]);
+test("se cere emailul, la fel pe amândouă formularele", () => {
+  // De la 18 sept. 2026 nu mai cerem telefon nicăieri: singura cale de răspuns
+  // e emailul, iar regula e aceeași pe prima pagină și pe pagina întreagă.
+  assert.deepEqual(eroriDeContact("ana@exemplu.ro", EMAIL_OK), {});
+  assert.deepEqual(Object.keys(eroriDeContact("", EMAIL_OK)), ["email"]);
 });
 
-test("în secțiunea de pe prima pagină se cere telefonul", () => {
-  // Fără câmp de email, telefonul e singura cale de răspuns.
-  assert.deepEqual(eroriDeContact(false, "", "0722000000", EMAIL_OK), {});
-  assert.deepEqual(Object.keys(eroriDeContact(false, "", "", EMAIL_OK)), ["telefon"]);
-});
-
-test("nicio cerere nu pleacă fără vreo cale de răspuns", () => {
-  // Miezul: amândouă formularele, cu totul gol, trebuie să se plângă.
-  assert.ok(Object.keys(eroriDeContact(true, "", "", EMAIL_OK)).length > 0);
-  assert.ok(Object.keys(eroriDeContact(false, "", "", EMAIL_OK)).length > 0);
-});
-
-test("un email scris greșit rămâne greșit și unde nu era cerut", () => {
-  assert.deepEqual(Object.keys(eroriDeContact(true, "ana la exemplu", "", EMAIL_OK)), ["email"]);
-  // O cerere scrisă de mână poate trimite un email chiar fără câmp în formular.
-  assert.deepEqual(
-    Object.keys(eroriDeContact(false, "ana la exemplu", "0722000000", EMAIL_OK)),
-    ["email"],
-  );
-});
-
-test("câmpul gol și câmpul lipsă sunt lucruri diferite", () => {
-  // Același email gol: cerut într-un caz, nu și în celălalt. Dacă regula s-ar
-  // uita la valoare în loc de prezența câmpului, astea două ar fi identice.
-  assert.deepEqual(Object.keys(eroriDeContact(true, "", "0722000000", EMAIL_OK)), ["email"]);
-  assert.deepEqual(eroriDeContact(false, "", "0722000000", EMAIL_OK), {});
+test("un email scris greșit e prins", () => {
+  assert.deepEqual(Object.keys(eroriDeContact("ana la exemplu", EMAIL_OK)), ["email"]);
 });
 
 /**

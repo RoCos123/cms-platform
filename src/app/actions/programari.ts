@@ -56,7 +56,6 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
 
   const nume = citesteText(formData, "nume", LIMITE.nume);
   const email = citesteText(formData, "email", LIMITE.email);
-  const telefon = citesteText(formData, "telefon", 40);
   // Lista are două intrări; orice altceva vine dintr-o cerere scrisă de mână,
   // nu de la cineva care apasă. Se aruncă în tăcere, nu se respinge: câmpul e
   // opțional, iar o pagină rămasă deschisă peste o schimbare de listă n-are de
@@ -64,17 +63,11 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
   const motiv = motivValid(citesteText(formData, "motiv", 120));
   const zi = citesteText(formData, "zi", 10);
   const ora = citesteText(formData, "ora", 5);
-  const valori = { nume, email, telefon, motiv: motiv ?? "", zi, ora };
+  const valori = { nume, email, motiv: motiv ?? "", zi, ora };
 
-  // Regula de contact stă în `src/lib/programari.ts`, cu motivul scris acolo:
-  // fiecare cerere pleacă cu măcar o cale prin care psihologul poate răspunde,
-  // dar CARE e cerută depinde de formularul care a trimis-o.
-  const erori: Record<string, string> = eroriDeContact(
-    formData.has("email"),
-    email,
-    telefon,
-    esteEmailValid,
-  );
+  // Telefonul nu se mai cere nicăieri (18 sept. 2026): ambele formulare trimit
+  // email, deci emailul e singura cale cerută, la fel peste tot.
+  const erori: Record<string, string> = eroriDeContact(email, esteEmailValid);
 
   if (!nume) erori.nume = "Scrie-ți numele, ca să știe cine vine.";
   if (!zi || !ora) erori.ora = "Alege o oră din listă.";
@@ -114,12 +107,13 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
 
   const [{ count: ultimaOra }, { count: inAsteptare }] = await Promise.all([
     tabel.select("id", { head: true, count: "exact" }).gte("created_at", acumOOra),
-    // Doar cererile VII: una refuzată sau anulată nu mai ține nimic blocat,
-    // deci n-are de ce să-l oprească pe om să ceară din nou.
-    telefon
+    // Per-persoană, acum după adresa de email (înainte după telefon, pe care nu-l
+    // mai cerem). Doar cererile VII: una refuzată sau anulată nu mai ține nimic
+    // blocat, deci n-are de ce să-l oprească pe om să ceară din nou.
+    email
       ? tabel
           .select("id", { head: true, count: "exact" })
-          .eq("phone", telefon)
+          .eq("email", email)
           .eq("status", "ceruta")
       : Promise.resolve({ count: 0 }),
   ]);
@@ -131,10 +125,11 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
 
   const { error } = await tabel.insert({
     name: nume,
-    // `null`, nu șir gol: formularul scurt de pe prima pagină n-are câmp de
-    // email, iar „" în panou ar fi devenit un link `mailto:` gol.
+    // `null`, nu șir gol: „" în panou ar fi devenit un link `mailto:` gol.
     email: email || null,
-    phone: telefon || null,
+    // Telefonul nu se mai cere (18 sept. 2026); coloana rămâne pentru cererile
+    // vechi, dar cererile noi intră fără el.
+    phone: null,
     // Coloana și-a păstrat numele din vremea când câmpul era „Pentru ce” și se
     // umplea din serviciile cabinetului. O redenumire ar fi cerut încă o migrare
     // rulată de mână, pentru zero câștig la client; traducerea se face aici și

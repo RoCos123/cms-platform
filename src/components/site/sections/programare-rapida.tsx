@@ -163,19 +163,20 @@ export function ProgramareRapida({
           />
 
           {/*
-            Cerut, nu opțional: aici nu există câmp de email, deci telefonul e
-            singura cale prin care psihologul poate răspunde. Fără el, cererea
-            ar bloca o oră fără să lase pe nimeni de sunat. Serverul cere același
-            lucru (`eroriDeContact`), ca eticheta să nu mintă.
+            Emailul, nu telefonul (hotărât 18 sept. 2026): pe tot site-ul nu mai
+            cerem număr de telefon. Emailul rămâne singura cale prin care
+            psihologul poate răspunde, deci e cerut — serverul cere același lucru
+            (`eroriDeContact`), ca eticheta să nu mintă.
           */}
           <Camp
-            id="prog-rapid-telefon"
-            name="telefon"
-            eticheta="Telefon"
-            autoComplete="tel"
-            maxLength={40}
-            eroare={stare.erori?.telefon}
-            valoare={stare.valori?.telefon}
+            id="prog-rapid-email"
+            name="email"
+            tip="email"
+            eticheta="Adresa de email"
+            autoComplete="email"
+            maxLength={LIMITE.email}
+            eroare={stare.erori?.email}
+            valoare={stare.valori?.email}
           />
 
           <p style={{ margin: 0, fontSize: "14px", lineHeight: 1.6, color: "var(--s-text-secundar)" }}>
