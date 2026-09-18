@@ -127,7 +127,9 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       friendly={ctx.asezari.testimonialeFriendly}
     />
   ),
-  pricing: (row) => <Pricing data={row.data as PricingData} tone={row.tone} />,
+  pricing: (row, ctx) => (
+    <Pricing data={row.data as PricingData} tone={row.tone} friendly={ctx.asezari.pricingFriendly} />
+  ),
   faq: (row) => <Faq data={row.data as FaqData} tone={row.tone} />,
   latestPosts: (row, ctx) => (
     <LatestPosts

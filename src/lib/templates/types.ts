@@ -176,6 +176,13 @@ export type TemplateAsezari = {
    * umbră blândă și „Citește mai departe →". Doar „Apropiere".
    */
   blogFriendly?: boolean;
+  /**
+   * Cardurile de „Pachete" pe fundal alb, cu culorile șablonului („ca la
+   * servicii"): cel evidențiat cu chenar și buton verde, restul albe. Culorile
+   * vin din nivelul șablonului (`--t-…`), deci rămân deschise pe orice ton. Doar
+   * „Apropiere".
+   */
+  pricingFriendly?: boolean;
 };
 
 export type TemplateShape = {

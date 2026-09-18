@@ -36,7 +36,20 @@ export type PricingData = {
  * secțiunea pune cinci variabile `--s-`, iar una inventată cade tăcut în „fără
  * culoare". S-a întâmplat de trei ori.
  */
-export function Pricing({ data, tone }: { data: PricingData; tone?: SectionTone }) {
+export function Pricing({
+  data,
+  tone,
+  friendly,
+}: {
+  data: PricingData;
+  tone?: SectionTone;
+  /**
+   * Cardurile pe fundal alb, cu culorile șablonului („ca la servicii"): cardul
+   * evidențiat cu chenar și buton verde, restul albe. Doar „Apropiere". Culorile
+   * vin din nivelul șablonului (`--t-…`), deci rămân deschise pe orice ton.
+   */
+  friendly?: boolean;
+}) {
   const pachete = data.pachete ?? [];
   if (pachete.length === 0) return null;
 
@@ -63,6 +76,26 @@ export function Pricing({ data, tone }: { data: PricingData; tone?: SectionTone 
         {pachete.map((pachet, i) => {
           const inFata = Boolean(pachet.eticheta?.trim());
 
+          // La „Apropiere" (`friendly`) cardul e alb, cu culorile șablonului
+          // (`--t-…`), deci lizibil pe orice ton; la rest rămâne așezat pe fundalul
+          // secțiunii (`--s-…`), ca înainte. Cel evidențiat: chenar și buton verde.
+          const cardFundal = friendly
+            ? "var(--t-suprafata, var(--t-fundal-nuantat))"
+            : inFata
+              ? "color-mix(in oklab, var(--s-accent) 7%, transparent)"
+              : "transparent";
+          const cardChenar = friendly
+            ? inFata
+              ? "2px solid var(--t-accent)"
+              : "1px solid var(--t-chenar)"
+            : inFata
+              ? "2px solid var(--s-accent)"
+              : "1px solid color-mix(in oklab, currentColor 18%, transparent)";
+          const textSecundar = friendly ? "var(--t-text-secundar)" : "var(--s-text-secundar)";
+          const bifa = friendly ? "var(--t-accent)" : "var(--s-accent)";
+          const butonFundal = friendly ? "var(--t-accent)" : "var(--s-buton-fundal)";
+          const butonText = friendly ? "var(--t-accent-text)" : "var(--s-buton-text)";
+
           return (
             <div
               key={`${pachet.nume}-${i}`}
@@ -73,12 +106,9 @@ export function Pricing({ data, tone }: { data: PricingData; tone?: SectionTone 
                 height: "100%",
                 padding: "clamp(20px, 2.4vw, 28px)",
                 borderRadius: "var(--t-raza)",
-                border: inFata
-                  ? "2px solid var(--s-accent)"
-                  : "1px solid color-mix(in oklab, currentColor 18%, transparent)",
-                background: inFata
-                  ? "color-mix(in oklab, var(--s-accent) 7%, transparent)"
-                  : "transparent",
+                border: cardChenar,
+                background: cardFundal,
+                color: friendly ? "var(--t-text)" : undefined,
               }}
             >
               <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "8px 12px" }}>
@@ -98,8 +128,8 @@ export function Pricing({ data, tone }: { data: PricingData; tone?: SectionTone 
                         cele patru tonuri.
                       */
                       borderRadius: "999px",
-                      background: "var(--s-buton-fundal)",
-                      color: "var(--s-buton-text)",
+                      background: butonFundal,
+                      color: butonText,
                       padding: "3px 10px",
                       fontSize: "12px",
                       fontWeight: 600,
@@ -125,14 +155,14 @@ export function Pricing({ data, tone }: { data: PricingData; tone?: SectionTone 
                   {pachet.pret}
                 </p>
                 {pachet.subPret && (
-                  <p style={{ margin: "4px 0 0", fontSize: "14px", color: "var(--s-text-secundar)" }}>
+                  <p style={{ margin: "4px 0 0", fontSize: "14px", color: textSecundar }}>
                     {pachet.subPret}
                   </p>
                 )}
               </div>
 
               {pachet.descriere && (
-                <p style={{ margin: 0, fontSize: "15px", lineHeight: 1.6, color: "var(--s-text-secundar)" }}>
+                <p style={{ margin: 0, fontSize: "15px", lineHeight: 1.6, color: textSecundar }}>
                   {pachet.descriere}
                 </p>
               )}
@@ -161,7 +191,7 @@ export function Pricing({ data, tone }: { data: PricingData; tone?: SectionTone 
                         viewBox="0 0 20 20"
                         width="18"
                         height="18"
-                        style={{ marginTop: "3px", flexShrink: 0, color: "var(--s-accent)" }}
+                        style={{ marginTop: "3px", flexShrink: 0, color: bifa }}
                       >
                         <path
                           d="M4 10.5l4 4 8-9"
@@ -192,8 +222,8 @@ export function Pricing({ data, tone }: { data: PricingData; tone?: SectionTone 
                     justifyContent: "center",
                     borderRadius: "var(--t-raza-buton)",
                     padding: "0 20px",
-                    background: inFata ? "var(--s-buton-fundal)" : "transparent",
-                    color: inFata ? "var(--s-buton-text)" : "currentColor",
+                    background: inFata ? butonFundal : "transparent",
+                    color: inFata ? butonText : "currentColor",
                     border: inFata ? "none" : "1px solid currentColor",
                     fontSize: "15px",
                     fontWeight: 600,
