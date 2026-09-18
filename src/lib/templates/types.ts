@@ -171,6 +171,11 @@ export type TemplateAsezari = {
    * „Apropiere".
    */
   serviciiFriendly?: boolean;
+  /**
+   * Cardurile de blog în stilul prietenos: titlu apăsat, data scrisă normal, o
+   * umbră blândă și „Citește mai departe →". Doar „Apropiere".
+   */
+  blogFriendly?: boolean;
 };
 
 export type TemplateShape = {

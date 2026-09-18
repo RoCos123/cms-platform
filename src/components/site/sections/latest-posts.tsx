@@ -30,6 +30,7 @@ export function LatestPosts({
   data,
   articole,
   tone,
+  friendly,
 }: {
   data: LatestPostsData;
   /**
@@ -38,6 +39,8 @@ export function LatestPosts({
    */
   articole: ArticolListat[];
   tone?: SectionTone;
+  /** Cardurile de blog în stilul prietenos. Doar „Apropiere". */
+  friendly?: boolean;
 }) {
   // Fără articole publicate, secțiunea nu se randează deloc: un titlu „Articole
   // recente" urmat de nimic arată a site stricat, nu a site nou.
@@ -90,7 +93,7 @@ export function LatestPosts({
         }
       />
 
-      <GrilaArticole articole={afisate} />
+      <GrilaArticole articole={afisate} friendly={friendly} />
     </Section>
   );
 }

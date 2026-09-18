@@ -9,7 +9,7 @@ import { formateazaDataArticolului, type ArticolListat } from "@/lib/blog";
  * fi ajuns diferite — iar cititorul care trece de pe prima pagină pe blog ar fi
  * simțit că a nimerit pe alt site.
  */
-export function CardArticol({ articol }: { articol: ArticolListat }) {
+export function CardArticol({ articol, friendly }: { articol: ArticolListat; friendly?: boolean }) {
   const data = formateazaDataArticolului(articol.publicatLa);
 
   return (
@@ -25,6 +25,9 @@ export function CardArticol({ articol }: { articol: ArticolListat }) {
         background: "var(--t-fundal-nuantat)",
         color: "var(--t-text)",
         textDecoration: "none",
+        // Cardul prietenos plutește ușor peste fundal, ca la sursă; celelalte
+        // șabloane rămân cu cardul plat de dinainte.
+        ...(friendly ? { boxShadow: "0 18px 42px -26px rgba(61, 53, 39, 0.45)" } : {}),
       }}
     >
       {articol.coperta && (
@@ -58,9 +61,11 @@ export function CardArticol({ articol }: { articol: ArticolListat }) {
         {data && (
           <span
             style={{
-              fontSize: "12px",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
+              // La modelul prietenos data e scrisă normal, mărunt; la rest rămâne
+              // în majuscule răsfirate, ca înainte.
+              fontSize: "13px",
+              letterSpacing: friendly ? "0" : "0.1em",
+              textTransform: friendly ? "none" : "uppercase",
               color: "var(--t-text-secundar)",
             }}
           >
@@ -68,7 +73,7 @@ export function CardArticol({ articol }: { articol: ArticolListat }) {
           </span>
         )}
 
-        <h3 style={{ margin: 0, fontSize: "20px", lineHeight: 1.3, fontWeight: 600, textWrap: "pretty" }}>
+        <h3 style={{ margin: 0, fontSize: "20px", lineHeight: 1.3, fontWeight: friendly ? 700 : 600, textWrap: "pretty" }}>
           {articol.titlu}
         </h3>
 
@@ -97,7 +102,7 @@ export function CardArticol({ articol }: { articol: ArticolListat }) {
             color: "var(--t-accent)",
           }}
         >
-          Citește →
+          {friendly ? "Citește mai departe →" : "Citește →"}
         </span>
       </div>
     </a>
@@ -105,7 +110,7 @@ export function CardArticol({ articol }: { articol: ArticolListat }) {
 }
 
 /** Grila în care stau cartonașele. Aceeași pe prima pagină și pe blog. */
-export function GrilaArticole({ articole }: { articole: ArticolListat[] }) {
+export function GrilaArticole({ articole, friendly }: { articole: ArticolListat[]; friendly?: boolean }) {
   return (
     <ul
       style={{
@@ -119,7 +124,7 @@ export function GrilaArticole({ articole }: { articole: ArticolListat[] }) {
     >
       {articole.map((articol) => (
         <li key={articol.slug}>
-          <CardArticol articol={articol} />
+          <CardArticol articol={articol} friendly={friendly} />
         </li>
       ))}
     </ul>

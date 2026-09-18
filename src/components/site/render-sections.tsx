@@ -130,7 +130,12 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
   pricing: (row) => <Pricing data={row.data as PricingData} tone={row.tone} />,
   faq: (row) => <Faq data={row.data as FaqData} tone={row.tone} />,
   latestPosts: (row, ctx) => (
-    <LatestPosts data={row.data as LatestPostsData} articole={ctx.articole} tone={row.tone} />
+    <LatestPosts
+      data={row.data as LatestPostsData}
+      articole={ctx.articole}
+      tone={row.tone}
+      friendly={ctx.asezari.blogFriendly}
+    />
   ),
   logos: (row) => <Logos data={row.data as LogosData} tone={row.tone} />,
   portfolio: (row) => <Portfolio data={row.data as PortfolioData} tone={row.tone} />,
