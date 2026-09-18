@@ -144,6 +144,11 @@ export type TemplateAsezari = {
    */
   heroTitluFriendly?: boolean;
   /**
+   * Pete blurate (salvie + piersică) în spatele primei secțiuni, semnătura
+   * prietenoasă a sursei. Doar „Apropiere".
+   */
+  heroBlob?: boolean;
+  /**
    * Secțiunea de programări arată săptămâna pe coloane (o zi = o coloană, cu
    * orele ei ca butoane) plus un card de rezumat, ca la modelul prietenos, în
    * loc de calendarul lunar. Doar „Apropiere"; restul rămân pe calendar.

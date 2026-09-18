@@ -77,11 +77,19 @@ export function Section({
   id,
   children,
   className,
+  decor,
 }: {
   tone?: SectionTone;
   id?: string;
   children: ReactNode;
   className?: string;
+  /**
+   * Ornament pus PE FUNDALUL secțiunii, în spatele conținutului — petele blurate
+   * din spatele hero-ului la „Apropiere". Când există, secțiunea taie ce iese pe
+   * margini (`overflow: hidden`), ca o pată trasă în afara cadrului să nu apară
+   * derulare orizontală, iar conținutul urcă deasupra lui (`z-index`).
+   */
+  decor?: ReactNode;
 }) {
   return (
     <section
@@ -96,9 +104,18 @@ export function Section({
         ["--s-buton-fundal" as string]: BUTON_FUNDAL[tone],
         ["--s-buton-text" as string]: BUTON_TEXT[tone],
         paddingBlock: "var(--t-spatiere)",
+        ...(decor ? { position: "relative", overflow: "hidden", isolation: "isolate" } : {}),
       }}
     >
-      <div style={{ maxWidth: "1180px", margin: "0 auto", paddingInline: "clamp(20px, 5vw, 64px)" }}>
+      {decor}
+      <div
+        style={{
+          maxWidth: "1180px",
+          margin: "0 auto",
+          paddingInline: "clamp(20px, 5vw, 64px)",
+          ...(decor ? { position: "relative", zIndex: 1 } : {}),
+        }}
+      >
         {children}
       </div>
     </section>

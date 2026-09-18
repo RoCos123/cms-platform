@@ -42,6 +42,7 @@ export function Hero({
   asezare = "textPozaDreapta",
   faraArcada,
   titluFriendly,
+  blob,
 }: {
   data: HeroData;
   tone?: SectionTone;
@@ -54,6 +55,12 @@ export function Hero({
    * coada scrisă de mână (`titluAccent`) e verde, nu subliniată.
    */
   titluFriendly?: boolean;
+  /**
+   * Pete blurate în spatele hero-ului (o salvie și o piersică), semnătura
+   * prietenoasă a sursei. Doar „Apropiere". Secțiunea taie ce iese pe margini,
+   * deci nu apare derulare orizontală.
+   */
+  blob?: boolean;
 }) {
   /*
     Fără un titlu, secțiunea nu se randează deloc.
@@ -73,6 +80,44 @@ export function Hero({
   const cuvinte = data.titlu.trim().split(/\s+/);
   const ultimulCuvant = titluFriendly ? cuvinte.pop() ?? "" : "";
   const inceputulTitlului = cuvinte.join(" ");
+
+  // Petele blurate din spatele hero-ului, doar pe „Apropiere". Culorile vin din
+  // șablon: salvia deschisă și piersica. `Section` le pune sub conținut și taie
+  // ce iese pe margini.
+  const decorBlob = blob ? (
+    <>
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "-60px",
+          left: "-120px",
+          width: "460px",
+          height: "460px",
+          borderRadius: "50%",
+          background: "var(--t-accent-pe-inchis)",
+          filter: "blur(72px)",
+          opacity: 0.5,
+          pointerEvents: "none",
+        }}
+      />
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "80px",
+          right: "-110px",
+          width: "360px",
+          height: "360px",
+          borderRadius: "50%",
+          background: "var(--t-accent-cald)",
+          filter: "blur(72px)",
+          opacity: 0.42,
+          pointerEvents: "none",
+        }}
+      />
+    </>
+  ) : undefined;
 
   const titlu = (
     <>
@@ -212,7 +257,7 @@ export function Hero({
   // Fără poză n-are ce împărți: amândouă așezările sunt același text lat.
   if (!poza) {
     return (
-      <Section tone={tone}>
+      <Section tone={tone} decor={decorBlob}>
         {titlu}
         {restul}
       </Section>
@@ -266,7 +311,7 @@ export function Hero({
 
   if (titluLat) {
     return (
-      <Section tone={tone}>
+      <Section tone={tone} decor={decorBlob}>
         {titlu}
 
         {/*
@@ -301,7 +346,7 @@ export function Hero({
   }
 
   return (
-    <Section tone={tone}>
+    <Section tone={tone} decor={decorBlob}>
       {/*
         `auto-fit` cu un minim, nu două coloane fixe: pe telefon poza trece sub
         text de la sine, fără media query — pe care un `style` inline nici nu-l
