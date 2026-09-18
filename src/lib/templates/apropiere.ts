@@ -83,5 +83,6 @@ export const apropiere: Template = {
     programareSaptamana: true,
     antetPastila: true,
     testimonialeFriendly: true,
+    serviciiFriendly: true,
   },
 };

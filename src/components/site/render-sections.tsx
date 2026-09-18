@@ -106,6 +106,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       paginaDetaliata={ctx.paginaServiciiActiva}
       variant={row.variant}
       tone={row.tone}
+      friendly={ctx.asezari.serviciiFriendly}
     />
   ),
   bandaServicii: (row, ctx) => <BandaServicii servicii={ctx.servicii} tone={row.tone} />,
