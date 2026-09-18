@@ -22,7 +22,7 @@ export function CardArticol({ articol, friendly }: { articol: ArticolListat; fri
         overflow: "hidden",
         borderRadius: "var(--t-raza)",
         border: "1px solid var(--t-chenar)",
-        background: "var(--t-fundal-nuantat)",
+        background: "var(--t-suprafata, var(--t-fundal-nuantat))",
         color: "var(--t-text)",
         textDecoration: "none",
         // Cardul prietenos plutește ușor peste fundal, ca la sursă; celelalte

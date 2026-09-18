@@ -258,7 +258,7 @@ export function AboutTeaser({
                     style={{
                       padding: "8px 16px",
                       borderRadius: "999px",
-                      background: "var(--t-fundal-nuantat)",
+                      background: "var(--t-suprafata, var(--t-fundal-nuantat))",
                       border: "1px solid var(--t-chenar)",
                       color: "var(--t-text)",
                       fontSize: "14px",
@@ -308,7 +308,7 @@ export function AboutTeaser({
                         ? {
                             padding: "18px 20px",
                             borderRadius: "16px",
-                            background: "var(--t-fundal-nuantat)",
+                            background: "var(--t-suprafata, var(--t-fundal-nuantat))",
                             border: "1px solid var(--t-chenar)",
                           }
                         : undefined

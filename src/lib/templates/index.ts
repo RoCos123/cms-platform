@@ -73,6 +73,10 @@ export function templateStyle(template: Template): CSSProperties {
     // (nu majuscule răsfirate), iar accentul scris de mână din titlurile de
     // secțiune e piersică apăsată. Vezi `SectionEyebrow` și `SectionHeading`.
     ...(friendly && {
+      // Suprafața cardurilor prietenoase: ALB, ca la sursă (`--surface: #fff`),
+      // ca să iasă în relief peste crem. Fără el, cardul era tot crem și abia se
+      // vedea pe fundalul paginii. Doar aici; celelalte cad pe crem prin fallback.
+      "--t-suprafata": "#ffffff",
       "--t-eticheta-fundal": p.fundalNuantat,
       "--t-eticheta-chenar": p.chenar,
       "--t-eticheta-padding": "6px 14px",

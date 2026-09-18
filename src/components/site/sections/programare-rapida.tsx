@@ -342,7 +342,7 @@ function SaptamanaGrila({
 }
 
 const stilCard: CSSProperties = {
-  background: "var(--t-fundal-nuantat)",
+  background: "var(--t-suprafata, var(--t-fundal-nuantat))",
   border: "1px solid var(--t-chenar)",
   borderRadius: "var(--t-raza)",
   padding: "clamp(18px, 3vw, 30px)",
@@ -397,7 +397,7 @@ function stilSlot(ales: boolean): CSSProperties {
     // Slotul are aceeași culoare ca fundalul cardului — se ține doar în chenar,
     // ca la sursă. Ales = plin pe culoarea textului (maro-închis), cu scris crem.
     border: ales ? "2px solid var(--t-text)" : "2px solid var(--t-chenar)",
-    background: ales ? "var(--t-text)" : "var(--t-fundal-nuantat)",
+    background: ales ? "var(--t-text)" : "var(--t-suprafata, var(--t-fundal-nuantat))",
     color: ales ? "var(--t-fundal-nuantat)" : "var(--t-text)",
     font: "inherit",
     fontSize: "13px",
