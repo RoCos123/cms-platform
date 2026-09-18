@@ -114,6 +114,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       tone={row.tone}
       pozaRotunda={ctx.asezari.desprePozaRotunda}
       pozaStivuita={ctx.asezari.desprePozaStivuita}
+      friendly={ctx.asezari.despreFriendly}
     />
   ),
   howItWorks: (row) => <HowItWorks data={row.data as HowItWorksData} tone={row.tone} />,

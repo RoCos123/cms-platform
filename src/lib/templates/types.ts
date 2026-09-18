@@ -125,6 +125,13 @@ export type TemplateAsezari = {
    */
   desprePozaStivuita?: boolean;
   /**
+   * Tratamentul prietenos pentru „Despre mine": domeniile apar ca etichete
+   * (pastile de text, fără iconițe), iar reperele scurte se așază în cartonașe.
+   * Doar „Apropiere"; la restul, domeniile nu apar, iar reperele rămân un rând
+   * simplu sub o linie.
+   */
+  despreFriendly?: boolean;
+  /**
    * Poza din prima secțiune fără arcada din cap — un dreptunghi rotunjit simplu.
    * Doar „Apropiere" (după model); celelalte cu poza lângă titlu păstrează
    * arcada cerută pe 16 sept.

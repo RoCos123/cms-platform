@@ -16,6 +16,11 @@ export type AboutTeaserData = {
    * Ex.: „+5 / ani de experiență", „Atestat / liberă practică". Lipsă → nu apare.
    */
   etichete?: { mare: string; mic?: string }[];
+  /**
+   * Domeniile în care lucrezi, ca niște etichete de text („Traumă",
+   * „Anxietate"). Apar doar pe „Apropiere", sub text. Fără iconițe.
+   */
+  teme?: string[];
   buton?: { text: string; href: string };
   /** Aceeași formă ca la încărcare (`ImageValue`). De obicei portretul. */
   imagine?: { url: string; altText?: string; pozitie?: PunctFocal };
@@ -26,6 +31,7 @@ export function AboutTeaser({
   tone,
   pozaRotunda,
   pozaStivuita,
+  friendly,
 }: {
   data: AboutTeaserData;
   tone?: SectionTone;
@@ -33,6 +39,12 @@ export function AboutTeaser({
   pozaRotunda?: boolean;
   /** Poza peste un card colorat decalat („stivuită"). Doar „Apropiere". */
   pozaStivuita?: boolean;
+  /**
+   * Tratamentul prietenos: domeniile ca etichete-pastilă și reperele în
+   * cartonașe. Doar „Apropiere". Culorile lor vin din nivelul ȘABLONULUI
+   * (`--t-…`), ca să rămână deschise oricare ar fi tonul secțiunii.
+   */
+  friendly?: boolean;
 }) {
   /*
     Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
@@ -84,7 +96,16 @@ export function AboutTeaser({
         {data.titluAccent && (
           <>
             {" "}
-            <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
+            <span
+              style={{
+                fontFamily: "var(--t-font-secundar)",
+                fontStyle: "var(--t-stil-accent)",
+                // Același accent ca la celelalte titluri de secțiune: piersică
+                // apăsat pe „Apropiere", subțire în culoarea titlului la rest.
+                fontWeight: "var(--t-greutate-accent-titlu, 300)" as unknown as number,
+                color: "var(--t-accent-titlu, inherit)",
+              }}
+            >
               {data.titluAccent}
             </span>
           </>
@@ -214,36 +235,91 @@ export function AboutTeaser({
           )}
 
           {/*
+            Domeniile ca etichete-pastilă, sub text — semnătura prietenoasă, doar
+            pe „Apropiere". Fără iconițe (cerut). Pastila e mereu deschisă
+            (`--t-…`), ca bulina din hero, ca să rămână lizibilă pe orice ton.
+          */}
+          {friendly && data.teme?.some((t) => t?.trim()) && (
+            <ul
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "10px",
+                listStyle: "none",
+                margin: "32px 0 0",
+                padding: 0,
+              }}
+            >
+              {data.teme
+                .filter((t) => t?.trim())
+                .map((tema, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      padding: "8px 16px",
+                      borderRadius: "999px",
+                      background: "var(--t-fundal-nuantat)",
+                      border: "1px solid var(--t-chenar)",
+                      color: "var(--t-text)",
+                      fontSize: "14px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {tema}
+                  </li>
+                ))}
+            </ul>
+          )}
+
+          {/*
             Reperele scurte, sub text: „+5 / ani de experiență" etc. Un rând care
             se rupe singur pe telefon (`auto-fit`). Cifra/cuvântul mare stă în
             serif-ul accentului, ca titlurile — dar DREPT, nu înclinat: e un reper
             de citit dintr-o privire, nu o frază.
 
-            Chenarul de sus vine din `currentColor`, nu din `--s-chenar`: acela nu
-            e printre variabilele puse de `Section` (CONVENTII, „Verificare
-            vizuală"), iar pe tonul închis un chenar de card ar fi fost invizibil.
+            Pe „Apropiere" (`friendly`) fiecare reper stă într-un cartonaș deschis,
+            ca la sursă; culorile vin din șablon (`--t-…`), tone-independente. La
+            restul rămâne un rând sub o linie, cu culorile tonului (`--s-…`):
+            chenarul de sus din `currentColor`, fiindcă `--s-chenar` nu e printre
+            variabilele puse de `Section` și pe ton închis ar fi invizibil.
           */}
           {data.etichete?.some((e) => e?.mare?.trim()) && (
             <dl
               style={{
                 display: "grid",
                 gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-                gap: "24px",
-                margin: "40px 0 0",
-                paddingTop: "28px",
-                borderTop: "1px solid color-mix(in oklab, currentColor 15%, transparent)",
+                gap: friendly ? "14px" : "24px",
+                margin: friendly ? "20px 0 0" : "40px 0 0",
+                ...(friendly
+                  ? {}
+                  : {
+                      paddingTop: "28px",
+                      borderTop: "1px solid color-mix(in oklab, currentColor 15%, transparent)",
+                    }),
               }}
             >
               {data.etichete
                 .filter((e) => e?.mare?.trim())
                 .map((eticheta, i) => (
-                  <div key={i}>
+                  <div
+                    key={i}
+                    style={
+                      friendly
+                        ? {
+                            padding: "18px 20px",
+                            borderRadius: "16px",
+                            background: "var(--t-fundal-nuantat)",
+                            border: "1px solid var(--t-chenar)",
+                          }
+                        : undefined
+                    }
+                  >
                     <dt
                       style={{
                         fontFamily: "var(--t-font-secundar)",
                         fontSize: "clamp(28px, 3vw, 38px)",
                         lineHeight: 1,
-                        color: "var(--s-accent)",
+                        color: friendly ? "var(--t-accent)" : "var(--s-accent)",
                       }}
                     >
                       {eticheta.mare}
@@ -254,7 +330,7 @@ export function AboutTeaser({
                           margin: "8px 0 0",
                           fontSize: "14px",
                           lineHeight: 1.5,
-                          color: "var(--s-text-secundar)",
+                          color: friendly ? "var(--t-text-secundar)" : "var(--s-text-secundar)",
                           textWrap: "pretty",
                         }}
                       >
