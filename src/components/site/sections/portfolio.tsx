@@ -89,7 +89,7 @@ export function Portfolio({ data, tone }: { data: PortfolioData; tone?: SectionT
               overflow: "hidden",
               borderRadius: "var(--t-raza)",
               border: "1px solid var(--t-chenar)",
-              background: "var(--t-fundal-nuantat)",
+              background: "var(--t-suprafata, var(--t-fundal-nuantat))",
               color: "var(--t-text)",
             }}
           >
