@@ -442,6 +442,76 @@ Claritate a derutat degeaba.
 (Căldură, Liniște, Lumină, Claritate) rămân neatinse. Nimic nu mai e deschis din
 acest document.
 
+## De modificat pe șabloane (18 sept. 2026) — al patrulea: „Liniște" adus la referința „Dragoș Geamănă"
+
+Al patrulea document al proprietarului: un singur șablon, `liniste`, adus vizual
+la un HTML de referință (site-ul „Dragoș Geamănă — Psihoterapie București").
+Același tipar ca la Apropiere (11–18 sept.): PIELE pe un singur șablon, prin
+steaguri în `TemplateAsezari` pornite DOAR în `liniste.ts`, duse la componentă
+prin `ctx.asezari.…`. Restul șabloanelor nu se ating. **Zero migrări** — tot ce
+s-a atins e cod și fișiere de valori.
+
+**Descoperirea care a scurtat munca:** „Dragoș Geamănă" e chiar site-ul-sursă din
+care a fost măsurat Liniște. Deci paleta („Sage & Cream": crem `#F3EDE2`, salvie,
+verde-închis `#1F2A24`, salvie-deschis `#C3CFB7`) și fonturile (titluri integral
+în Cormorant Garamond, corp DM Sans) erau DEJA ale referinței. Golul a fost
+exclusiv de AȘEZARE, nu de culoare — exact lecția din al treilea document („nu
+confunda «culori potrivite» cu «așezare ca la referință»"). Accentul rămâne
+`#4C6A52`, nu `#5b7560` al referinței: al doilea pică sub pragul WCAG pe crem,
+corecție dinadins, apărată de `e2e/contrast-sabloane.proba.mjs`. Paleta n-a fost
+atinsă.
+
+**Ce s-a făcut, pe secțiuni** (fiecare un steag în `asezari`, doar pe `liniste`):
+- **Hero** — un cerc de accent (salvie) în spatele portretului, care iese pe sub
+  arcadă (`heroCercDecor`). Arcada, bulinele plutitoare (`bulinePoza`) și titlul
+  cu accent serif italic existau deja.
+- **Citat** — bandă centrată, mare, serif italic, fără ghilimeaua-ornament din
+  față (`citatCentrat`).
+- **Despre mine** — primul reper („12+ ani") scos într-un card ÎNCHIS suprapus pe
+  colțul jos-dreapta al portretului (`despreReperCard`); restul reperelor, dacă
+  mai sunt, rămân în rândul de sub text.
+- **Cum lucrez** — antet centrat și pașii în carduri albe (cifră serif + text),
+  fără iconițe (`cumLucrezCarduri`). Suprafața albă `--t-suprafata: #ffffff` e
+  acum pusă și pe Liniște (era doar pe Apropiere).
+- **Serviciile mele** — carduri-imagine cu voal întunecat peste poză, titlul și
+  descrierea pe imagine, o săgeată rotundă în colț (`serviciiImagine`); săgeata
+  doar când pagina de servicii e pornită (altfel cardul n-ar duce nicăieri). Fără
+  copertă, cardul rămâne un dreptunghi închis cu titlul.
+- **Contact** — totul într-un card ÎNCHIS rotunjit: la stânga antetul (serif,
+  crem) și formularul într-un sub-card ALB (lizibil, fiindcă își ia culorile din
+  tonul deschis „relief" pe care stă contactul), la dreapta datele cabinetului ca
+  rânduri etichetă/valoare în serif (`contactCard`). Formularul rămâne Nume +
+  Email; numărul cabinetului rămâne apăsabil.
+- **Articole** — carduri fără fundal și fără chenar, doar imaginea rotunjită (4/3)
+  și textul dedesubt, fără „Citește →" (`blogCurat`), și pe prima pagină, și pe
+  `/blog`. DINADINS lăsate afară (ca la Apropiere): pastila de categorie și „min
+  citire" — articolele n-au câmp de categorie, iar timpul de citit ar cere cărat
+  tot textul la listare. Data rămâne.
+- **Antetul** — NU s-a atins: avea deja medalionul rotund cu inițiala
+  (`--t-accent`, serif), numele + subtitlul, iar pe ne-friendly bara „lipită" cu
+  fundal translucid + blur + linie jos, adică fix `.nav.is-stuck` al referinței.
+  Singura diferență e pastila din dreapta: la referință „Programează-te", la noi
+  numărul de telefon — alegere de produs veche (telefonul e cea mai vizibilă
+  acțiune din antet).
+- **Subsolul** — lăsat pe cele patru coloane (decizia din 16 sept., structură
+  comună tuturor șabloanelor). Referința are un subsol minimal; a-l reduce doar
+  pe Liniște ar strica o hotărâre la nivel de platformă.
+
+**Ritmul închis/deschis: păstrat cel de provizionare, nu cel al referinței**
+(decis de proprietar). Referința are Servicii pe fond ÎNCHIS și „Cum lucrez" pe
+DESCHIS; seed-ul nostru (comun tuturor șabloanelor) le are INVERS. Puteam face
+tratamentele Liniște să-și impună tonul, dar proprietarul a ales să lase ritmul
+de benzi neschimbat. Deci pe Liniște: „Cum lucrez" = carduri albe pe verde-închis,
+Servicii = carduri-imagine închise pe crem. Amândouă arată bine; plasarea
+închis/deschis nu e ca la referință, dinadins.
+
+**Verificat vizual** la 1200px, cu o probă de secțiuni pe date inventate și
+placeholder-e GRI (nu colorate — lecția din 16 sept.). Tipuri, lint și cele 218
+probe de logică trec (contrastul inclus, fiindcă paleta n-a fost atinsă).
+
+**Stare:** Liniște e adus vizual la referință, cap la cap. Rămân neatinse Căldură,
+Lumină și Claritate. Nimic nu mai e deschis din acest document.
+
 ## Panoul pe telefon (11 sept. 2026)
 
 Cerut de proprietar. Meniul din stânga era fix, 256px, mereu la vedere — pe un
