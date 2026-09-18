@@ -148,6 +148,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       articole={ctx.articole}
       tone={row.tone}
       friendly={ctx.asezari.blogFriendly}
+      curat={ctx.asezari.blogCurat}
     />
   ),
   logos: (row) => <Logos data={row.data as LogosData} tone={row.tone} />,

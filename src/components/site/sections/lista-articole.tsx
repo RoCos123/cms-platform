@@ -18,6 +18,7 @@ export function ListaArticole({
   articole,
   tone = "deschis",
   friendly,
+  curat,
 }: {
   eyebrow?: string;
   titlu: string;
@@ -26,6 +27,8 @@ export function ListaArticole({
   tone?: SectionTone;
   /** Cardurile de blog în stilul prietenos. Doar „Apropiere". */
   friendly?: boolean;
+  /** Cardurile de blog fără fundal, doar imagine + text. Doar „Liniște". */
+  curat?: boolean;
 }) {
   return (
     <Section tone={tone}>
@@ -38,7 +41,7 @@ export function ListaArticole({
           Primul articol se scrie acum. Revino peste câteva zile.
         </p>
       ) : (
-        <GrilaArticole articole={articole} friendly={friendly} />
+        <GrilaArticole articole={articole} friendly={friendly} curat={curat} />
       )}
     </Section>
   );

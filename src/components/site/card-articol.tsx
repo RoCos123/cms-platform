@@ -9,7 +9,19 @@ import { formateazaDataArticolului, type ArticolListat } from "@/lib/blog";
  * fi ajuns diferite — iar cititorul care trece de pe prima pagină pe blog ar fi
  * simțit că a nimerit pe alt site.
  */
-export function CardArticol({ articol, friendly }: { articol: ArticolListat; friendly?: boolean }) {
+export function CardArticol({
+  articol,
+  friendly,
+  curat,
+}: {
+  articol: ArticolListat;
+  friendly?: boolean;
+  /**
+   * Cardul fără fundal și fără chenar — doar imaginea rotunjită și textul
+   * dedesubt, pe fundalul paginii, ca la referința „Liniște". Doar „Liniște".
+   */
+  curat?: boolean;
+}) {
   const data = formateazaDataArticolului(articol.publicatLa);
 
   return (
@@ -19,27 +31,42 @@ export function CardArticol({ articol, friendly }: { articol: ArticolListat; fri
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        overflow: "hidden",
-        borderRadius: "var(--t-raza)",
-        border: "1px solid var(--t-chenar)",
-        background: "var(--t-suprafata, var(--t-fundal-nuantat))",
         color: "var(--t-text)",
         textDecoration: "none",
-        // Cardul prietenos plutește ușor peste fundal, ca la sursă; celelalte
-        // șabloane rămân cu cardul plat de dinainte.
-        ...(friendly ? { boxShadow: "0 18px 42px -26px rgba(61, 53, 39, 0.45)" } : {}),
+        // La „Liniște" (`curat`) cardul n-are fundal, chenar ori tăietură: doar
+        // imaginea rotunjită și textul pe fundalul paginii, ca la referință.
+        ...(curat
+          ? {}
+          : {
+              overflow: "hidden",
+              borderRadius: "var(--t-raza)",
+              border: "1px solid var(--t-chenar)",
+              background: "var(--t-suprafata, var(--t-fundal-nuantat))",
+              // Cardul prietenos plutește ușor peste fundal, ca la sursă; celelalte
+              // șabloane rămân cu cardul plat de dinainte.
+              ...(friendly ? { boxShadow: "0 18px 42px -26px rgba(61, 53, 39, 0.45)" } : {}),
+            }),
       }}
     >
       {articol.coperta && (
-        <SectionImage
-          src={articol.coperta.url}
-          // Coperta e decorativă AICI: titlul de dedesubt e în același link și
-          // spune deja despre ce e articolul. Descrierea ei se citește pe pagina
-          // articolului, unde imaginea chiar poartă informație.
-          alt=""
-          aspectRatio="16 / 9"
-          sizes="(max-width: 720px) 100vw, 380px"
-        />
+        // La „curat" imaginea își poartă singură rotunjirea (cardul n-o mai taie).
+        <div
+          style={
+            curat
+              ? { borderRadius: "var(--t-raza)", overflow: "hidden", marginBottom: "22px" }
+              : undefined
+          }
+        >
+          <SectionImage
+            src={articol.coperta.url}
+            // Coperta e decorativă AICI: titlul de dedesubt e în același link și
+            // spune deja despre ce e articolul. Descrierea ei se citește pe pagina
+            // articolului, unde imaginea chiar poartă informație.
+            alt=""
+            aspectRatio="16 / 9"
+            sizes="(max-width: 720px) 100vw, 380px"
+          />
+        </div>
       )}
 
       {/*
@@ -55,7 +82,7 @@ export function CardArticol({ articol, friendly }: { articol: ArticolListat; fri
           justifyContent: articol.coperta ? undefined : "center",
           gap: "12px",
           flex: 1,
-          padding: "28px",
+          padding: curat ? 0 : "28px",
         }}
       >
         {data && (
@@ -110,7 +137,15 @@ export function CardArticol({ articol, friendly }: { articol: ArticolListat; fri
 }
 
 /** Grila în care stau cartonașele. Aceeași pe prima pagină și pe blog. */
-export function GrilaArticole({ articole, friendly }: { articole: ArticolListat[]; friendly?: boolean }) {
+export function GrilaArticole({
+  articole,
+  friendly,
+  curat,
+}: {
+  articole: ArticolListat[];
+  friendly?: boolean;
+  curat?: boolean;
+}) {
   return (
     <ul
       style={{
@@ -119,12 +154,13 @@ export function GrilaArticole({ articole, friendly }: { articole: ArticolListat[
         padding: 0,
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(min(288px, 100%), 1fr))",
-        gap: "20px",
+        // Fără card, rândul cere puțin mai mult aer între coloane.
+        gap: curat ? "40px 28px" : "20px",
       }}
     >
       {articole.map((articol) => (
         <li key={articol.slug}>
-          <CardArticol articol={articol} friendly={friendly} />
+          <CardArticol articol={articol} friendly={friendly} curat={curat} />
         </li>
       ))}
     </ul>

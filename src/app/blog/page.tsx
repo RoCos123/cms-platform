@@ -65,6 +65,7 @@ export default async function PaginaBlog() {
         titluAccent={antet.titluAccent}
         articole={articole}
         friendly={template.asezari.blogFriendly}
+        curat={template.asezari.blogCurat}
       />
     </CadruSite>
   );

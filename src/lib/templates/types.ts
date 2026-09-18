@@ -174,6 +174,12 @@ export type TemplateAsezari = {
    */
   contactCard?: boolean;
   /**
+   * Cardurile de blog fără fundal și fără chenar — doar imaginea rotunjită și
+   * textul dedesubt, pe fundalul paginii, ca la referința „Liniște". Doar
+   * „Liniște"; la restul rămâne cartonașul cu fundal.
+   */
+  blogCurat?: boolean;
+  /**
    * Tratamentul de titlu al modelului prietenos, la prima secțiune: ultimul
    * cuvânt din titlu are o dungă piersică pe dedesubt, iar coada scrisă de mână
    * e verde. Doar „Apropiere" — la celelalte titlul rămâne simplu.
