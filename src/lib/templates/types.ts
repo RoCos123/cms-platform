@@ -183,6 +183,12 @@ export type TemplateAsezari = {
    * „Apropiere".
    */
   pricingFriendly?: boolean;
+  /**
+   * Secțiunea de contact ca la modelul prietenos: antetul sus, iar dedesubt
+   * formularul într-un card alb lângă un card verde cu datele cabinetului
+   * (fiecare rând, o casetă albă). Fără iconițe. Doar „Apropiere".
+   */
+  contactFriendly?: boolean;
 };
 
 export type TemplateShape = {
