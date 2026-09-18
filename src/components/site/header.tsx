@@ -62,11 +62,19 @@ function linkuriImplicite(
  * șabloanele e cea mai vizibilă acțiune din antet, iar publicul-țintă sună mai
  * degrabă decât completează formulare.
  */
-export function SiteHeader({ data }: { data: SiteHeaderData }) {
-  const linkuri = data.linkuri?.length
+export function SiteHeader({ data, friendly }: { data: SiteHeaderData; friendly?: boolean }) {
+  const linkuriToate = data.linkuri?.length
     ? data.linkuri
     : linkuriImplicite(data.paginaServicii ?? false, data.blog ?? null, data.paginiProprii ?? []);
   const initiala = data.initiala ?? data.nume.trim().charAt(0).toUpperCase();
+
+  // Pe „Apropiere" (`friendly`), „Programare" iese din rândul de linkuri și
+  // devine butonul-CTA din dreapta, ca la modelul prietenos. La restul rămâne un
+  // link ca oricare, iar în dreapta stă numărul de telefon. CTA-ul rămâne
+  // vizibil pe orice ecran (și pe telefon), deci „Programare" e mereu la
+  // îndemână chiar dacă restul linkurilor s-au strâns în meniul-buton.
+  const cta = friendly ? linkuriToate.find((l) => l.href === "/programare") : undefined;
+  const linkuri = cta ? linkuriToate.filter((l) => l !== cta) : linkuriToate;
 
   return (
     <header
@@ -74,20 +82,26 @@ export function SiteHeader({ data }: { data: SiteHeaderData }) {
       // globals.css): un nume real de cabinet plus șase linkuri nu mai încap pe
       // un rând la 950px, oricât de bine s-ar purta fiecare în parte.
       className={linkuri.length > 5 ? "antet antet--multe-linkuri" : "antet"}
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 20,
-        background: "color-mix(in oklab, var(--t-fundal) 88%, transparent)",
-        backdropFilter: "blur(12px)",
-        borderBottom: "1px solid color-mix(in oklab, var(--t-chenar) 60%, transparent)",
-      }}
+      style={
+        friendly
+          ? // Pastila plutitoare: antetul e transparent, iar rândul de dedesubt e
+            // o pastilă cu un pic de aer deasupra și pe margini.
+            { position: "sticky", top: 0, zIndex: 20, background: "transparent", paddingTop: "12px", paddingInline: "12px" }
+          : {
+              position: "sticky",
+              top: 0,
+              zIndex: 20,
+              background: "color-mix(in oklab, var(--t-fundal) 88%, transparent)",
+              backdropFilter: "blur(12px)",
+              borderBottom: "1px solid color-mix(in oklab, var(--t-chenar) 60%, transparent)",
+            }
+      }
     >
       <div
         style={{
           maxWidth: "1180px",
           margin: "0 auto",
-          paddingInline: "clamp(16px, 5vw, 64px)",
+          paddingInline: friendly ? "clamp(16px, 3vw, 26px)" : "clamp(16px, 5vw, 64px)",
           /*
             `minHeight`, nu `height`: numărul de linkuri nu mai e fix de când
             clientul își poate pune paginile lui în meniu, deci nicio înălțime
@@ -99,7 +113,7 @@ export function SiteHeader({ data }: { data: SiteHeaderData }) {
             acolo unde totul încăpea lejer. Ce se rupe, la nevoie, sunt linkurile
             între ele — vezi `.antet-nav` în globals.css.
           */
-          minHeight: "76px",
+          minHeight: friendly ? "62px" : "76px",
           paddingBlock: "8px",
           display: "flex",
           alignItems: "center",
@@ -107,6 +121,18 @@ export function SiteHeader({ data }: { data: SiteHeaderData }) {
           gap: "16px",
           // Panoul de meniu se poziționează față de rândul ăsta.
           position: "relative",
+          // Pastila prietenoasă: colțuri rotunde, fundal translucid cu blur, un
+          // chenar subțire și o umbră caldă, ca la sursă (`--surface` translucid).
+          ...(friendly
+            ? {
+                borderRadius: "100px",
+                background: "color-mix(in oklab, var(--t-fundal-nuantat) 82%, transparent)",
+                backdropFilter: "blur(16px) saturate(140%)",
+                WebkitBackdropFilter: "blur(16px) saturate(140%)",
+                border: "1px solid var(--t-chenar)",
+                boxShadow: "0 14px 34px -20px rgba(61, 53, 39, 0.55)",
+              }
+            : {}),
         }}
       >
         <Link
@@ -161,7 +187,31 @@ export function SiteHeader({ data }: { data: SiteHeaderData }) {
 
         <HeaderNav linkuri={linkuri} />
 
-        {data.telefon && (
+        {cta ? (
+          // Butonul-CTA prietenos: pastilă închisă cu scris crem, ca la sursă
+          // („Programează →"). Rămâne vizibil pe orice ecran, deci „Programare" e
+          // mereu la un click, chiar și când restul meniului s-a strâns în buton.
+          <a
+            href={cta.href}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              flexShrink: 0,
+              height: "42px",
+              paddingInline: "clamp(16px, 3vw, 22px)",
+              borderRadius: "100px",
+              background: "var(--t-text)",
+              color: "var(--t-fundal-nuantat)",
+              fontSize: "14px",
+              fontWeight: 700,
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Programează <span aria-hidden>→</span>
+          </a>
+        ) : data.telefon ? (
           <a
             href={`tel:${data.telefon.replace(/\s/g, "")}`}
             // Eticheta stă pe link, nu într-un text ascuns lângă număr: pe ecran
@@ -191,7 +241,7 @@ export function SiteHeader({ data }: { data: SiteHeaderData }) {
               {data.telefon}
             </span>
           </a>
-        )}
+        ) : null}
       </div>
     </header>
   );

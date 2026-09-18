@@ -109,6 +109,7 @@ export async function CadruSite({
         }}
       >
         <SiteHeader
+          friendly={template.asezari.antetPastila}
           data={{
             nume,
             subtitlu: brand.subtitlu,

@@ -149,6 +149,12 @@ export type TemplateAsezari = {
    * loc de calendarul lunar. Doar „Apropiere"; restul rămân pe calendar.
    */
   programareSaptamana?: boolean;
+  /**
+   * Antetul e o pastilă care plutește (colțuri rotunde, fundal translucid), iar
+   * „Programare" devine un buton-CTA în dreapta, ca la modelul prietenos. Doar
+   * „Apropiere"; restul rămân cu bara de antet obișnuită.
+   */
+  antetPastila?: boolean;
 };
 
 export type TemplateShape = {
