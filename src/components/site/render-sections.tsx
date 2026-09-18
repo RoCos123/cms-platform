@@ -119,7 +119,13 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
     />
   ),
   howItWorks: (row) => <HowItWorks data={row.data as HowItWorksData} tone={row.tone} />,
-  testimonials: (row) => <Testimonials data={row.data as TestimonialsData} tone={row.tone} />,
+  testimonials: (row, ctx) => (
+    <Testimonials
+      data={row.data as TestimonialsData}
+      tone={row.tone}
+      friendly={ctx.asezari.testimonialeFriendly}
+    />
+  ),
   pricing: (row) => <Pricing data={row.data as PricingData} tone={row.tone} />,
   faq: (row) => <Faq data={row.data as FaqData} tone={row.tone} />,
   latestPosts: (row, ctx) => (

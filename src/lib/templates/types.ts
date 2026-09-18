@@ -160,6 +160,11 @@ export type TemplateAsezari = {
    * „Apropiere"; restul rămân cu bara de antet obișnuită.
    */
   antetPastila?: boolean;
+  /**
+   * Cardurile de testimoniale ca la modelul prietenos: stele, citat drept,
+   * avatar cu inițiale, unul verde. Doar „Apropiere".
+   */
+  testimonialeFriendly?: boolean;
 };
 
 export type TemplateShape = {
