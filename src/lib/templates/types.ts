@@ -165,6 +165,12 @@ export type TemplateAsezari = {
    * avatar cu inițiale, unul verde. Doar „Apropiere".
    */
   testimonialeFriendly?: boolean;
+  /**
+   * Cardurile de servicii ca la modelul prietenos: titlu + descriere + preț mare
+   * sub o linie punctată, unele colorate, fără poză și fără iconiță. Doar
+   * „Apropiere".
+   */
+  serviciiFriendly?: boolean;
 };
 
 export type TemplateShape = {

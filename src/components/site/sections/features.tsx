@@ -27,6 +27,7 @@ export function Features({
   paginaDetaliata,
   variant,
   tone,
+  friendly,
 }: {
   data: FeaturesData;
   servicii: Serviciu[];
@@ -35,6 +36,12 @@ export function Features({
   /** `"linie"` = banda orizontală. Orice altceva (inclusiv lipsa) = cartonașe. */
   variant?: string | null;
   tone?: SectionTone;
+  /**
+   * Cardurile de servicii ca la modelul prietenos: titlu + descriere + preț
+   * mare sub o linie punctată, unele colorate (verde/piersică), fără poză și
+   * fără iconiță. Doar „Apropiere"; restul rămân cu cardurile de dinainte.
+   */
+  friendly?: boolean;
 }) {
   // Fără niciun serviciu publicat, secțiunea nu se randează deloc: un titlu
   // „Serviciile mele" urmat de nimic arată a site stricat, nu a site nou.
@@ -93,6 +100,8 @@ export function Features({
 
       {variant === "linie" ? (
         <Linie servicii={afisate} paginaDetaliata={paginaDetaliata} />
+      ) : friendly ? (
+        <ServiciiFriendly servicii={afisate} paginaDetaliata={paginaDetaliata} />
       ) : (
         <ul
           style={{
@@ -267,6 +276,104 @@ function Linie({
           </div>
         </li>
       ))}
+    </ul>
+  );
+}
+
+/**
+ * Cardurile de servicii ale modelului prietenos: titlu, descriere, iar sub o
+ * linie punctată prețul mare. Unele carduri sunt colorate (verde/piersică),
+ * după un tipar fix — fără poză și fără iconiță (cerut). Doar „Apropiere".
+ *
+ * Culorile cardurilor vin din nivelul ȘABLONULUI (`--t-…`): rămân deschise
+ * oricare ar fi tonul secțiunii, ca la celelalte carduri prietenoase.
+ */
+function ServiciiFriendly({
+  servicii,
+  paginaDetaliata,
+}: {
+  servicii: Serviciu[];
+  paginaDetaliata: boolean;
+}) {
+  return (
+    <ul
+      style={{
+        listStyle: "none",
+        margin: "56px 0 0",
+        padding: 0,
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(288px, 100%), 1fr))",
+        gap: "20px",
+      }}
+    >
+      {servicii.map((serviciu, i) => {
+        // Tipar fix de accente, ca la sursă: al doilea card verde, al patrulea
+        // piersică, restul deschise; se repetă la fiecare patru.
+        const accent = i % 4 === 1 ? "salvie" : i % 4 === 3 ? "piersica" : "deschis";
+        const fundal =
+          accent === "salvie"
+            ? "var(--t-accent-pe-inchis)"
+            : accent === "piersica"
+              ? "var(--t-accent-cald)"
+              : "var(--t-fundal-nuantat)";
+        const chenar =
+          accent === "salvie"
+            ? "var(--t-accent)"
+            : accent === "piersica"
+              ? "var(--t-accent-cald-inchis)"
+              : "var(--t-chenar)";
+        const stil: React.CSSProperties = {
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          gap: "14px",
+          padding: "28px",
+          borderRadius: "var(--t-raza)",
+          background: fundal,
+          border: `1px solid ${chenar}`,
+          color: "var(--t-text)",
+          textDecoration: "none",
+        };
+        const continut = (
+          <>
+            <h3 style={{ margin: 0, fontSize: "21px", fontWeight: 700, textWrap: "pretty" }}>{serviciu.titlu}</h3>
+            <p style={{ margin: 0, flex: 1, fontSize: "15px", lineHeight: 1.6, color: "var(--t-text-secundar)", textWrap: "pretty" }}>
+              {serviciu.descriereScurta}
+            </p>
+            {serviciu.pret && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingTop: "16px",
+                  // Linie punctată vizibilă pe orice fundal de card (alb, salvie,
+                  // piersică): din culoarea textului, nu din `--t-chenar`.
+                  borderTop: "1px dashed color-mix(in oklab, var(--t-text) 20%, transparent)",
+                }}
+              >
+                <span style={{ fontSize: "22px", fontWeight: 800 }}>{serviciu.pret}</span>
+                {paginaDetaliata && (
+                  <span aria-hidden style={{ fontSize: "18px", color: "var(--t-accent)" }}>
+                    →
+                  </span>
+                )}
+              </div>
+            )}
+          </>
+        );
+        return (
+          <li key={serviciu.id}>
+            {paginaDetaliata ? (
+              <a href={`/servicii#${serviciu.slug}`} style={stil}>
+                {continut}
+              </a>
+            ) : (
+              <div style={stil}>{continut}</div>
+            )}
+          </li>
+        );
+      })}
     </ul>
   );
 }
