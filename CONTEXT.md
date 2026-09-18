@@ -359,6 +359,89 @@ n-are aceste schimbări de bază:
 Restul schimbărilor (contact, hero, etichete, poze la servicii) sunt doar cod —
 se văd la următorul deploy, fără migrare.
 
+## De modificat pe șabloane (17–18 sept. 2026) — al treilea document: „Apropiere" adus la referința Friendly
+
+Al treilea document al proprietarului (`Modificari_Apropiere.docx`), și primul
+care atinge UN SINGUR șablon. Referința e un HTML de probă („Friendly" — crem
+cald, verde salvie, un accent scris de mână); cererea a fost ca șablonul
+`apropiere` să arate ca el, cap la cap. Spre deosebire de documentele din 11 și
+16 sept. (care schimbau STRUCTURA unor componente comune, deci toate cinci
+șabloanele), astea sunt PIELE pe un singur șablon — vezi nota de arhitectură de
+la 11 sept. Toate livrate, fiecare bucată în PR-ul ei mic, ultimul #44.
+
+**Trei directive care rămân valabile pentru tot ce ține de Apropiere (și nu
+doar):**
+- **Fără iconițe, nicăieri.** Referința are pictograme lângă multe rânduri;
+  proprietarul le vrea scoase peste tot. Se implementează FĂRĂ ele — rămâne
+  textul (eticheta), nu se caută un înlocuitor grafic.
+- **Nu se cere telefon vizitatorului, niciunde.** Numărul PROPRIU al cabinetului,
+  afișat ca dat de contact, rămâne (e al lui, apăsabil). Ce nu se face e un CÂMP
+  care cere vizitatorului telefonul — la fel ca decizia din 16 sept. de la
+  contact, dusă peste tot.
+- **Câmpul de mesaj liber rămâne SCOS.** Referința îl are; noi nu-l punem la loc,
+  din motivul GDPR de pe 28 aug. (adună date de sănătate).
+
+**Ce s-a făcut, pe secțiuni** (fiecare doar pe `apropiere`, prin câte un steag în
+`asezari`):
+- **Hero** — pete blurate salvie+piersică în fundal (`heroBlob`), titlul cu
+  ultimul cuvânt subliniat piersică și coada scrisă de mână verde
+  (`heroTitluFriendly`), poza fără arcadă (`heroFaraArcada`).
+- **Antetul** — o pastilă care plutește, cu „Programare" ca buton în dreapta
+  (`antetPastila`).
+- **Programări rapide** — săptămâna pe coloane (o zi = o coloană, cu orele ei),
+  plus un card „Rezumat" fără emoji, în loc de calendarul lunar; pe email, nu
+  telefon (`programareSaptamana`).
+- **Despre mine** — domeniile ca etichete-pastilă și reperele în cartonașe albe;
+  poza peste un card verde decalat (`despreFriendly`, `desprePozaStivuita`).
+- **Testimoniale** — stele, avatar cu inițiale, cardul din mijloc verde
+  (`testimonialeFriendly`).
+- **Servicii** — preț mare sub o linie punctată, unele carduri colorate, fără
+  poză și fără iconiță (`serviciiFriendly`).
+- **Blog** — carduri cu titlu apăsat, dată scrisă normal, umbră blândă și
+  „Citește mai departe →", și pe prima pagină, și pe `/blog` (`blogFriendly`).
+  DINADINS lăsate afară: pastila de categorie și „min citire" — articolele n-au
+  câmp de categorie, iar timpul de citit ar fi cerut cărat tot textul la listare.
+- **Pachete** — carduri albe cu culorile șablonului, cel evidențiat cu chenar și
+  buton verde (`pricingFriendly`).
+- **Programe și materiale** — caseta de text de sub poză, albă, ca la blog (FĂRĂ
+  steag nou: conținutul folosea deja `--t-…`, deci s-a albit singur prin fallback).
+- **Contact** — antetul sus, apoi formularul într-un card alb lângă un card verde
+  cu datele cabinetului, fiecare rând o casetă albă, fără iconițe
+  (`contactFriendly`). Formularul e neschimbat ca fond (Nume + Email). „Program"
+  n-a cerut câmp nou: datele cabinetului erau deja o listă de perechi
+  etichetă/valoare, iar sugestia din panou chiar zice „Ex.: Telefon, Email,
+  Cabinet, Program".
+
+**Cum ține pe un singur șablon, fără să atingă restul.** Fiecare tratament e un
+boolean în `TemplateAsezari` (`src/lib/templates/types.ts`), pus pe `true` doar
+în `apropiere.ts`, și dus la componentă prin contextul din `render-sections.tsx`
+(`ctx.asezari.…`). Componenta desenează forma prietenoasă când steagul e pornit,
+altfel rămâne cum era — celelalte patru șabloane nu se ating. Culorile cardurilor
+vin din nivelul ȘABLONULUI (`--t-…`, ton-independent), nu din tonul secțiunii
+(`--s-…`): un card care trebuie să rămână deschis pe orice bandă își ia
+CONȚINUTUL din `--t-…` și își fixează singur `color: var(--t-text)`. „Alb pe
+Apropiere" înseamnă un `--t-suprafata: #ffffff` pus DOAR acolo (`templateStyle`);
+restul șabloanelor n-au variabila, deci cad pe crem prin
+`var(--t-suprafata, var(--t-fundal-nuantat))`. Verdele cardurilor (info-cardul de
+la contact, cardul din spatele pozei din Despre, petele din hero) e aceeași
+salvie `--t-accent-pe-inchis`, ca site-ul să pară dintr-o bucată. **Zero
+migrări** — tot ce s-a atins e cod și fișiere de valori.
+
+**Lecțiile (mai ales una).** Proprietarul a prins, la jumătatea drumului, că
+omisesem multe („de ce ai omis atât de multe chestii"). Avea dreptate: lucrasem
+REACTIV, bucată cu bucată, fără să citesc întâi referința întreagă și să fac
+inventarul — și confundasem „culori potrivite" cu „așezare ca la referință".
+Reparat citind HTML-ul de probă cap la cap și ținând o listă. Alte trei, mărunte:
+sublinierea piersică nimerise întâi cuvântul greșit (referința subliniază un
+cuvânt din titlul sans, nu accentul scris de mână); cardurile crem pe pagină crem
+abia se vedeau (de-aici `--t-suprafata` alb); iar la probele vizuale se arată
+DOAR Apropiere, nu și alt șablon „de control" nesolicitat — o captură cu
+Claritate a derutat degeaba.
+
+**Stare:** Apropiere e adus vizual la referință, cap la cap. Celelalte patru
+(Căldură, Liniște, Lumină, Claritate) rămân neatinse. Nimic nu mai e deschis din
+acest document.
+
 ## Panoul pe telefon (11 sept. 2026)
 
 Cerut de proprietar. Meniul din stânga era fix, 256px, mereu la vedere — pe un
