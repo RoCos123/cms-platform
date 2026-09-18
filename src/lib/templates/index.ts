@@ -90,13 +90,6 @@ export function templateStyle(template: Template): CSSProperties {
       "--t-accent-titlu": p.accentCaldInchis,
       "--t-greutate-accent-titlu": "700",
     }),
-    // „Liniște" folosește și el o suprafață ALBĂ pentru cardurile editoriale
-    // (stâlpii „Cum lucrez"), ca la referință, unde `--surface: #fff` iese în
-    // relief peste crem. Doar aici; restul cad pe crem prin fallback, iar
-    // componentele o citesc doar când un steag din `asezari` o cere.
-    ...(template.id === "liniste" && {
-      "--t-suprafata": "#ffffff",
-    }),
     "--t-eroare": p.eroare,
     "--t-eroare-pe-inchis": p.eroarePeInchis,
     "--t-chenar": p.chenar,

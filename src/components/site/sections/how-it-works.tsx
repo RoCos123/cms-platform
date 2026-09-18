@@ -116,13 +116,16 @@ export function HowItWorks({
               display: "flex",
               flexDirection: "column",
               gap: "14px",
-              // La „Liniște" fiecare pas stă într-un card alb (ca stâlpii din
-              // referință): suprafața e ALBĂ la nivel de șablon (`--t-suprafata`),
-              // deci rămâne deschisă oricare ar fi tonul secțiunii, iar textul își
-              // ia culorile tot din șablon (`--t-…`), nu din tonul benzii.
+              // La „Liniște" fiecare pas stă într-un card ALB (ca stâlpii din
+              // referință), oricare ar fi tonul benzii — de aici fallback-ul pe
+              // `#ffffff`, nu pe cremul nuanțat. Albul se pune DOAR aici (și la
+              // sub-cardul de formular din Contact), nu la nivel de șablon, ca să
+              // nu albească din greșeală cardurile din secțiunile nereferențiate
+              // (testimoniale, pachete, programare). Textul își ia culorile tot
+              // din șablon (`--t-…`), nu din tonul benzii.
               ...(carduri
                 ? {
-                    background: "var(--t-suprafata, var(--t-fundal-nuantat))",
+                    background: "var(--t-suprafata, #ffffff)",
                     border: "1px solid var(--t-chenar)",
                     borderRadius: "var(--t-raza)",
                     padding: "clamp(28px, 3vw, 40px)",

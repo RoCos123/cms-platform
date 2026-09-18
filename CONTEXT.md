@@ -471,8 +471,11 @@ atinsă.
   colțul jos-dreapta al portretului (`despreReperCard`); restul reperelor, dacă
   mai sunt, rămân în rândul de sub text.
 - **Cum lucrez** — antet centrat și pașii în carduri albe (cifră serif + text),
-  fără iconițe (`cumLucrezCarduri`). Suprafața albă `--t-suprafata: #ffffff` e
-  acum pusă și pe Liniște (era doar pe Apropiere).
+  fără iconițe (`cumLucrezCarduri`). Albul se pune DOAR aici și la sub-cardul de
+  formular din Contact (fallback pe `#ffffff` în componentă), NU la nivel de
+  șablon (`--t-suprafata`): altfel ar fi albit din greșeală și cardurile din
+  secțiunile nereferențiate (testimoniale, pachete, programare), care rămân pe
+  crem.
 - **Serviciile mele** — carduri-imagine cu voal întunecat peste poză, titlul și
   descrierea pe imagine, o săgeată rotundă în colț (`serviciiImagine`); săgeata
   doar când pagina de servicii e pornită (altfel cardul n-ar duce nicăieri). Fără
