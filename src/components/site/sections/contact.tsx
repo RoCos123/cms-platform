@@ -65,6 +65,7 @@ export function Contact({
   data,
   tone = "deschis",
   friendly,
+  card,
 }: {
   data: ContactData;
   tone?: SectionTone;
@@ -75,6 +76,14 @@ export function Contact({
    * șablonului (`--t-…`), deci rămân lizibile pe orice ton.
    */
   friendly?: boolean;
+  /**
+   * Tratamentul editorial al referinței „Liniște": totul într-un card ÎNCHIS
+   * rotunjit — la stânga antetul (deschis) și formularul într-un sub-card alb, la
+   * dreapta datele cabinetului ca rânduri etichetă/valoare în serif. Fără
+   * iconițe. Doar „Liniște". Cardul e mereu închis (`--t-…`), deci iese în relief
+   * pe banda deschisă „relief" pe care stă contactul.
+   */
+  card?: boolean;
 }) {
   /*
     Fără un titlu, secțiunea nu se randează deloc.
@@ -109,6 +118,146 @@ export function Contact({
       textButon={data.textButon ?? "Trimite"}
     />
   );
+
+  /*
+    „Liniște": totul într-un card ÎNCHIS rotunjit, ca la referință. La stânga
+    (coloana mai lată) antetul deschis și formularul într-un sub-card ALB, ca să
+    rămână lizibil — la fel ca la „Apropiere", fiindcă formularul își ia culorile
+    din tonul secțiunii (deschis, „relief"). La dreapta, datele cabinetului ca
+    rânduri etichetă/valoare în serif, direct pe închis. Fără iconițe. Cardul e
+    mereu închis (`--t-…`), deci iese în relief pe banda deschisă.
+  */
+  if (card) {
+    return (
+      <Section tone={tone} id="contact">
+        <div
+          style={{
+            borderRadius: "clamp(24px, 3vw, 34px)",
+            background: "var(--t-fundal-inchis)",
+            color: "var(--t-text-pe-inchis)",
+            padding: "clamp(32px, 5vw, 72px)",
+            display: "grid",
+            gap: "clamp(32px, 4vw, 64px)",
+            // Formularul (coloana lată) la stânga, datele la dreapta. Se rupe pe
+            // o coloană sub ~760px, fără media query.
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))",
+            alignItems: "start",
+          }}
+        >
+          <div>
+            {data.eyebrow?.trim() && (
+              <div
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: "var(--t-accent-pe-inchis)",
+                  marginBottom: "18px",
+                }}
+              >
+                {data.eyebrow}
+              </div>
+            )}
+            <h2
+              style={{
+                margin: 0,
+                fontSize: "clamp(30px, 4vw, 50px)",
+                lineHeight: 1.1,
+                letterSpacing: "-0.02em",
+                fontWeight: "var(--t-greutate-titlu)" as unknown as number,
+                fontFamily: "var(--t-font-titlu)",
+                color: "var(--t-text-pe-inchis)",
+                textWrap: "balance",
+              }}
+            >
+              {data.titlu}
+              {data.titluAccent && (
+                <>
+                  {" "}
+                  <span
+                    style={{
+                      fontFamily: "var(--t-font-secundar)",
+                      fontStyle: "var(--t-stil-accent)",
+                      fontWeight: 400,
+                      color: "var(--t-accent-pe-inchis)",
+                    }}
+                  >
+                    {data.titluAccent}
+                  </span>
+                </>
+              )}
+            </h2>
+
+            {/* Formularul într-un sub-card ALB, ca să rămână lizibil pe cardul închis. */}
+            <div
+              style={{
+                marginTop: "clamp(24px, 3vw, 36px)",
+                padding: "clamp(20px, 3vw, 30px)",
+                borderRadius: "var(--t-raza)",
+                background: "var(--t-suprafata, #ffffff)",
+                color: "var(--t-text)",
+              }}
+            >
+              {formular}
+            </div>
+          </div>
+
+          {detalii.length > 0 && (
+            <dl style={{ margin: 0, display: "flex", flexDirection: "column", gap: "clamp(20px, 2.4vw, 28px)" }}>
+              {detalii.map((detaliu) => {
+                const adresa = adresaDedusa(detaliu.valoare);
+
+                return (
+                  <div
+                    key={detaliu.eticheta}
+                    style={{
+                      display: "grid",
+                      gap: "6px",
+                      paddingBottom: "clamp(16px, 2vw, 22px)",
+                      borderBottom: "1px solid color-mix(in oklab, var(--t-text-pe-inchis) 14%, transparent)",
+                    }}
+                  >
+                    <dt
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        letterSpacing: "0.16em",
+                        textTransform: "uppercase",
+                        color: "var(--t-accent-pe-inchis)",
+                      }}
+                    >
+                      {detaliu.eticheta}
+                    </dt>
+                    {/* Valoarea în serif, ca la referință. `pre-line`: programul pe două rânduri rămâne pe două. */}
+                    <dd
+                      style={{
+                        margin: 0,
+                        fontFamily: "var(--t-font-secundar)",
+                        fontStyle: "var(--t-stil-accent)",
+                        fontSize: "clamp(19px, 1.8vw, 25px)",
+                        lineHeight: 1.35,
+                        color: "var(--t-text-pe-inchis)",
+                        whiteSpace: "pre-line",
+                      }}
+                    >
+                      {adresa ? (
+                        <a href={adresa} style={{ color: "inherit", textDecoration: "none" }}>
+                          {detaliu.valoare}
+                        </a>
+                      ) : (
+                        detaliu.valoare
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          )}
+        </div>
+      </Section>
+    );
+  }
 
   /*
     „Apropiere": antetul sus, pe toată lățimea, apoi două carduri egale — la

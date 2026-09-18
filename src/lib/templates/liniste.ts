@@ -69,5 +69,6 @@ export const liniste: Template = {
     despreReperCard: true,
     cumLucrezCarduri: true,
     serviciiImagine: true,
+    contactCard: true,
   },
 };
