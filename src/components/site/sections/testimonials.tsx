@@ -21,7 +21,19 @@ export type TestimonialsData = {
  * afișează ce a trecut de acea verificare; regula se aplică la editare, unde
  * poate fi impusă, nu la randare.
  */
-export function Testimonials({ data, tone }: { data: TestimonialsData; tone?: SectionTone }) {
+export function Testimonials({
+  data,
+  tone,
+  friendly,
+}: {
+  data: TestimonialsData;
+  tone?: SectionTone;
+  /**
+   * Cardurile prietenoase (stele, citat drept, avatar cu inițiale, unul verde),
+   * ca la sursă. Doar „Apropiere"; restul rămân cu cardul-citat de dinainte.
+   */
+  friendly?: boolean;
+}) {
   /*
     Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
     toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
@@ -64,7 +76,16 @@ export function Testimonials({ data, tone }: { data: TestimonialsData; tone?: Se
         {data.titluAccent && (
           <>
             {" "}
-            <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
+            <span
+              style={{
+                fontFamily: "var(--t-font-secundar)",
+                fontStyle: "var(--t-stil-accent)",
+                // Ca la celelalte titluri de secțiune: piersică apăsat pe
+                // „Apropiere", subțire în culoarea titlului la rest.
+                fontWeight: "var(--t-greutate-accent-titlu, 300)" as unknown as number,
+                color: "var(--t-accent-titlu, inherit)",
+              }}
+            >
               {data.titluAccent}
             </span>
           </>
@@ -79,39 +100,103 @@ export function Testimonials({ data, tone }: { data: TestimonialsData; tone?: Se
           gap: "20px",
         }}
       >
-        {marturii.map((marturie, i) => (
-          <figure
-            key={i}
-            style={{
-              margin: 0,
-              padding: "32px",
-              borderRadius: "var(--t-raza)",
-              background: "color-mix(in oklab, var(--t-fundal-nuantat) 80%, transparent)",
-              border: "1px solid color-mix(in oklab, var(--t-chenar) 70%, transparent)",
-              display: "flex",
-              flexDirection: "column",
-              gap: "20px",
-            }}
-          >
-            <blockquote
+        {marturii.map((marturie, i) => {
+          if (friendly) {
+            // Cardul prietenos: stele, citat drept, iar jos un avatar cu
+            // inițialele scoase din nume. Cardul din mijloc e verde. Culorile vin
+            // din șablon (`--t-…`), deci rămân deschise pe orice ton al secțiunii.
+            const featured = i === Math.floor((marturii.length - 1) / 2);
+            const initiale = marturie.autor
+              .split(/\s+/)
+              .filter(Boolean)
+              .map((cuvant) => cuvant[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase();
+            return (
+              <div
+                key={i}
+                style={{
+                  padding: "28px",
+                  borderRadius: "var(--t-raza)",
+                  background: featured ? "var(--t-accent-pe-inchis)" : "var(--t-fundal-nuantat)",
+                  border: `1px solid ${featured ? "var(--t-accent)" : "var(--t-chenar)"}`,
+                  color: "var(--t-text)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "16px",
+                }}
+              >
+                <div aria-hidden style={{ color: "var(--t-accent-cald-inchis)", letterSpacing: "3px", fontSize: "15px" }}>
+                  ★★★★★
+                </div>
+                <p style={{ margin: 0, flex: 1, fontSize: "16px", lineHeight: 1.6, textWrap: "pretty" }}>
+                  „{marturie.text}”
+                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <span
+                    aria-hidden
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "50%",
+                      flexShrink: 0,
+                      background: "var(--t-accent)",
+                      color: "var(--t-accent-text)",
+                      display: "grid",
+                      placeItems: "center",
+                      fontSize: "13px",
+                      fontWeight: 700,
+                    }}
+                  >
+                    {initiale}
+                  </span>
+                  <span style={{ minWidth: 0 }}>
+                    <span style={{ display: "block", fontWeight: 700, fontSize: "14px" }}>{marturie.autor}</span>
+                    {marturie.context && (
+                      <span style={{ display: "block", fontSize: "13px", color: "var(--t-text-secundar)" }}>
+                        {marturie.context}
+                      </span>
+                    )}
+                  </span>
+                </div>
+              </div>
+            );
+          }
+          return (
+            <figure
+              key={i}
               style={{
                 margin: 0,
-                flex: 1,
-                fontFamily: "var(--t-font-secundar)",
-                fontStyle: "var(--t-stil-accent)",
-                fontSize: "20px",
-                lineHeight: 1.5,
-                textWrap: "pretty",
+                padding: "32px",
+                borderRadius: "var(--t-raza)",
+                background: "color-mix(in oklab, var(--t-fundal-nuantat) 80%, transparent)",
+                border: "1px solid color-mix(in oklab, var(--t-chenar) 70%, transparent)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
               }}
             >
-              {marturie.text}
-            </blockquote>
-            <figcaption style={{ fontSize: "14px", color: "var(--s-text-secundar)" }}>
-              <span style={{ fontWeight: 600, color: "inherit" }}>{marturie.autor}</span>
-              {marturie.context && <span> · {marturie.context}</span>}
-            </figcaption>
-          </figure>
-        ))}
+              <blockquote
+                style={{
+                  margin: 0,
+                  flex: 1,
+                  fontFamily: "var(--t-font-secundar)",
+                  fontStyle: "var(--t-stil-accent)",
+                  fontSize: "20px",
+                  lineHeight: 1.5,
+                  textWrap: "pretty",
+                }}
+              >
+                {marturie.text}
+              </blockquote>
+              <figcaption style={{ fontSize: "14px", color: "var(--s-text-secundar)" }}>
+                <span style={{ fontWeight: 600, color: "inherit" }}>{marturie.autor}</span>
+                {marturie.context && <span> · {marturie.context}</span>}
+              </figcaption>
+            </figure>
+          );
+        })}
       </div>
     </Section>
   );
