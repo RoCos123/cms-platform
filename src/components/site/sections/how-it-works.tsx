@@ -16,7 +16,19 @@ export type HowItWorksData = {
  * mână, o reordonare a pașilor ar lăsa numerotarea desincronizată. E și motivul
  * pentru care lista e `<ol>` — aici ordinea are înțeles, spre deosebire de servicii.
  */
-export function HowItWorks({ data, tone }: { data: HowItWorksData; tone?: SectionTone }) {
+export function HowItWorks({
+  data,
+  tone,
+  carduri,
+}: {
+  data: HowItWorksData;
+  tone?: SectionTone;
+  /**
+   * Antetul centrat și pașii în carduri albe (cifră serif + text), ca stâlpii
+   * din referința „Liniște". Fără iconițe. Doar „Liniște".
+   */
+  carduri?: boolean;
+}) {
   /*
     Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
     toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
@@ -42,43 +54,50 @@ export function HowItWorks({ data, tone }: { data: HowItWorksData; tone?: Sectio
 
   return (
     <Section tone={tone} id="proces">
-      {data.eyebrow && <SectionEyebrow>{data.eyebrow}</SectionEyebrow>}
+      {/*
+        La „Liniște" (`carduri`) antetul e centrat, ca la referință; la restul
+        rămâne aliniat la stânga. Centrarea e o alegere de așezare a șablonului,
+        nu conținut, deci vine din steag, nu din date.
+      */}
+      <div style={carduri ? { textAlign: "center" } : undefined}>
+        {data.eyebrow && <SectionEyebrow>{data.eyebrow}</SectionEyebrow>}
 
-      <h2
-        style={{
-          margin: 0,
-          maxWidth: "13em",
-          fontSize: "clamp(32px, 4.4vw, 54px)",
-          lineHeight: 1.08,
-          letterSpacing: "-0.025em",
-          fontWeight: 700,
-          textWrap: "balance",
-        }}
-      >
-        {data.titlu}
-        {data.titluAccent && (
-          <>
-            {" "}
-            <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
-              {data.titluAccent}
-            </span>
-          </>
-        )}
-      </h2>
-
-      {data.intro && (
-        <p
+        <h2
           style={{
-            margin: "22px 0 0",
-            maxWidth: "36em",
-            fontSize: "17px",
-            lineHeight: 1.7,
-            color: "var(--s-text-secundar)",
+            margin: carduri ? "0 auto" : 0,
+            maxWidth: carduri ? "16em" : "13em",
+            fontSize: "clamp(32px, 4.4vw, 54px)",
+            lineHeight: 1.08,
+            letterSpacing: "-0.025em",
+            fontWeight: 700,
+            textWrap: "balance",
           }}
         >
-          {data.intro}
-        </p>
-      )}
+          {data.titlu}
+          {data.titluAccent && (
+            <>
+              {" "}
+              <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
+                {data.titluAccent}
+              </span>
+            </>
+          )}
+        </h2>
+
+        {data.intro && (
+          <p
+            style={{
+              margin: carduri ? "22px auto 0" : "22px 0 0",
+              maxWidth: "36em",
+              fontSize: "17px",
+              lineHeight: 1.7,
+              color: "var(--s-text-secundar)",
+            }}
+          >
+            {data.intro}
+          </p>
+        )}
+      </div>
 
       <ol
         style={{
@@ -87,18 +106,38 @@ export function HowItWorks({ data, tone }: { data: HowItWorksData; tone?: Sectio
           padding: 0,
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(232px, 1fr))",
-          gap: "36px 28px",
+          gap: carduri ? "24px" : "36px 28px",
         }}
       >
         {pasi.map((pas, index) => (
-          <li key={pas.titlu} style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+          <li
+            key={pas.titlu}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "14px",
+              // La „Liniște" fiecare pas stă într-un card alb (ca stâlpii din
+              // referință): suprafața e ALBĂ la nivel de șablon (`--t-suprafata`),
+              // deci rămâne deschisă oricare ar fi tonul secțiunii, iar textul își
+              // ia culorile tot din șablon (`--t-…`), nu din tonul benzii.
+              ...(carduri
+                ? {
+                    background: "var(--t-suprafata, var(--t-fundal-nuantat))",
+                    border: "1px solid var(--t-chenar)",
+                    borderRadius: "var(--t-raza)",
+                    padding: "clamp(28px, 3vw, 40px)",
+                    color: "var(--t-text)",
+                  }
+                : {}),
+            }}
+          >
             <span
               aria-hidden
               style={{
                 fontFamily: "var(--t-font-secundar)",
                 fontSize: "44px",
                 lineHeight: 1,
-                color: "var(--s-accent)",
+                color: carduri ? "var(--t-accent)" : "var(--s-accent)",
               }}
             >
               {String(index + 1).padStart(2, "0")}
@@ -109,7 +148,7 @@ export function HowItWorks({ data, tone }: { data: HowItWorksData; tone?: Sectio
                 margin: 0,
                 fontSize: "16px",
                 lineHeight: 1.7,
-                color: "var(--s-text-secundar)",
+                color: carduri ? "var(--t-text-secundar)" : "var(--s-text-secundar)",
                 textWrap: "pretty",
               }}
             >

@@ -32,6 +32,7 @@ export function AboutTeaser({
   pozaRotunda,
   pozaStivuita,
   friendly,
+  reperCard,
 }: {
   data: AboutTeaserData;
   tone?: SectionTone;
@@ -39,6 +40,12 @@ export function AboutTeaser({
   pozaRotunda?: boolean;
   /** Poza peste un card colorat decalat („stivuită"). Doar „Apropiere". */
   pozaStivuita?: boolean;
+  /**
+   * Primul reper scos într-un card ÎNCHIS suprapus în colțul de jos-dreapta al
+   * portretului („12+ / ani de experiență"), ca la referința „Liniște". Restul
+   * reperelor, dacă există, rămân în rândul de sub text. Doar „Liniște".
+   */
+  reperCard?: boolean;
   /**
    * Tratamentul prietenos: domeniile ca etichete-pastilă și reperele în
    * cartonașe. Doar „Apropiere". Culorile lor vin din nivelul ȘABLONULUI
@@ -70,6 +77,13 @@ export function AboutTeaser({
   if (paragrafe.length === 0 && !data.titlu?.trim()) return null;
 
   const poza = data.imagine?.url ? data.imagine : null;
+
+  // La „Liniște" (`reperCard`), primul reper devine un card închis suprapus pe
+  // colțul portretului; restul, dacă mai sunt, rămân în rândul de sub text. Fără
+  // poză n-are peste ce sta, deci cade în rândul obișnuit.
+  const eticheteValide = (data.etichete ?? []).filter((e) => e?.mare?.trim());
+  const reperPeImagine = reperCard && poza ? eticheteValide[0] : undefined;
+  const eticheteRand = reperPeImagine ? eticheteValide.slice(1) : eticheteValide;
 
   return (
     <Section tone={tone} id="despre">
@@ -137,7 +151,7 @@ export function AboutTeaser({
         {poza && (
           <div
             style={{
-              position: pozaStivuita ? "relative" : undefined,
+              position: pozaStivuita || reperPeImagine ? "relative" : undefined,
               maxWidth: pozaRotunda ? "340px" : "380px",
             }}
           >
@@ -178,6 +192,55 @@ export function AboutTeaser({
                 pozitie={poza.pozitie}
               />
             </div>
+
+            {/*
+              Cardul închis suprapus pe colțul de jos-dreapta al portretului, ca
+              la referința „Liniște". Culorile vin din nivelul ȘABLONULUI
+              (`--t-fundal-inchis`/`--t-text-pe-inchis`), nu din tonul secțiunii:
+              cardul e mereu închis, oricare ar fi banda pe care stă. Cifra mare e
+              în serif-ul de accent, verde-deschis (`--t-accent-pe-inchis`), ca la
+              sursă. Fără iconițe.
+            */}
+            {reperPeImagine && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: "-18px",
+                  bottom: "-24px",
+                  maxWidth: "260px",
+                  padding: "22px 26px",
+                  borderRadius: "18px",
+                  background: "var(--t-fundal-inchis)",
+                  color: "var(--t-text-pe-inchis)",
+                  boxShadow: "0 24px 50px -24px rgba(0, 0, 0, 0.5)",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "var(--t-font-secundar)",
+                    fontStyle: "var(--t-stil-accent)",
+                    fontSize: "clamp(40px, 5vw, 56px)",
+                    lineHeight: 1,
+                    color: "var(--t-accent-pe-inchis)",
+                  }}
+                >
+                  {reperPeImagine.mare}
+                </div>
+                {reperPeImagine.mic?.trim() && (
+                  <p
+                    style={{
+                      margin: "8px 0 0",
+                      fontSize: "14px",
+                      lineHeight: 1.5,
+                      color: "var(--t-text-secundar-pe-inchis)",
+                      textWrap: "pretty",
+                    }}
+                  >
+                    {reperPeImagine.mic}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -283,7 +346,7 @@ export function AboutTeaser({
             chenarul de sus din `currentColor`, fiindcă `--s-chenar` nu e printre
             variabilele puse de `Section` și pe ton închis ar fi invizibil.
           */}
-          {data.etichete?.some((e) => e?.mare?.trim()) && (
+          {eticheteRand.length > 0 && (
             <dl
               style={{
                 display: "grid",
@@ -298,8 +361,7 @@ export function AboutTeaser({
                     }),
               }}
             >
-              {data.etichete
-                .filter((e) => e?.mare?.trim())
+              {eticheteRand
                 .map((eticheta, i) => (
                   <div
                     key={i}

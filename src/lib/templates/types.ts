@@ -144,6 +144,36 @@ export type TemplateAsezari = {
    */
   heroCercDecor?: boolean;
   /**
+   * Banda de citat centrată, mare, în serif italic, fără ghilimeaua-ornament din
+   * față — respiro-ul editorial al referinței „Liniște". Doar „Liniște"; la
+   * restul citatul rămâne la stânga, cu ghilimeaua mare alături.
+   */
+  citatCentrat?: boolean;
+  /**
+   * „Cum lucrez" cu antetul centrat și pașii în carduri albe (cifră serif +
+   * text), ca stâlpii din referința „Liniște". Fără iconițe. Doar „Liniște"; la
+   * restul rămâne antetul la stânga și pașii ca un rând de coloane simple.
+   */
+  cumLucrezCarduri?: boolean;
+  /**
+   * Primul reper din „Despre mine" scos într-un card închis suprapus în colțul
+   * portretului („12+ / ani de experiență"), ca la referința „Liniște". Doar
+   * „Liniște"; la restul reperele rămân un rând sub text.
+   */
+  despreReperCard?: boolean;
+  /**
+   * „Serviciile mele" ca la referința „Liniște": carduri-imagine pe fundal
+   * închis, cu un voal întunecat peste poză, titlul pe imagine și o săgeată în
+   * colț. Doar „Liniște"; la restul rămân cartonașele de dinainte.
+   */
+  serviciiImagine?: boolean;
+  /**
+   * Secțiunea de contact învelită într-un card închis rotunjit, cu datele
+   * cabinetului ca rânduri etichetă/valoare în serif, ca la referința „Liniște".
+   * Formularul rămâne (Nume + Email). Doar „Liniște".
+   */
+  contactCard?: boolean;
+  /**
    * Tratamentul de titlu al modelului prietenos, la prima secțiune: ultimul
    * cuvânt din titlu are o dungă piersică pe dedesubt, iar coada scrisă de mână
    * e verde. Doar „Apropiere" — la celelalte titlul rămâne simplu.

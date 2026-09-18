@@ -99,7 +99,9 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       cercDecor={ctx.asezari.heroCercDecor}
     />
   ),
-  quote: (row) => <Quote data={row.data as QuoteData} tone={row.tone} />,
+  quote: (row, ctx) => (
+    <Quote data={row.data as QuoteData} tone={row.tone} centrat={ctx.asezari.citatCentrat} />
+  ),
   features: (row, ctx) => (
     <Features
       data={row.data as FeaturesData}
@@ -118,9 +120,16 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       pozaRotunda={ctx.asezari.desprePozaRotunda}
       pozaStivuita={ctx.asezari.desprePozaStivuita}
       friendly={ctx.asezari.despreFriendly}
+      reperCard={ctx.asezari.despreReperCard}
     />
   ),
-  howItWorks: (row) => <HowItWorks data={row.data as HowItWorksData} tone={row.tone} />,
+  howItWorks: (row, ctx) => (
+    <HowItWorks
+      data={row.data as HowItWorksData}
+      tone={row.tone}
+      carduri={ctx.asezari.cumLucrezCarduri}
+    />
+  ),
   testimonials: (row, ctx) => (
     <Testimonials
       data={row.data as TestimonialsData}

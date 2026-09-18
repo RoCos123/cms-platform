@@ -12,7 +12,19 @@ export type QuoteData = {
  * șabloane apare de câte două ori în aceeași pagină, o dată pe fundal deschis și
  * o dată pe închis — de aceea tonul e prop, nu valoare fixă.
  */
-export function Quote({ data, tone }: { data: QuoteData; tone?: SectionTone }) {
+export function Quote({
+  data,
+  tone,
+  centrat,
+}: {
+  data: QuoteData;
+  tone?: SectionTone;
+  /**
+   * Citatul centrat, mai mare, fără ghilimeaua-ornament din față — respiro-ul
+   * editorial al referinței „Liniște". Doar „Liniște".
+   */
+  centrat?: boolean;
+}) {
   /*
     Fără un citat, secțiunea nu se randează deloc.
 
@@ -21,6 +33,47 @@ export function Quote({ data, tone }: { data: QuoteData; tone?: SectionTone }) {
     peste tot — o secțiune fără conținut nu desenează nimic, nici măcar ornamentul.
   */
   if (!data.citat?.trim()) return null;
+
+  /*
+    Varianta centrată a referinței „Liniște": citatul mare, în mijloc, fără
+    ghilimeaua-ornament din față. E o bandă de respiro între blocuri, așa că
+    lățimea e mărginită ca rândurile să nu se întindă prea mult.
+  */
+  if (centrat) {
+    return (
+      <Section tone={tone}>
+        <figure style={{ margin: "0 auto", maxWidth: "min(1000px, 100%)", textAlign: "center" }}>
+          <blockquote
+            style={{
+              margin: 0,
+              fontFamily: "var(--t-font-secundar)",
+              fontStyle: "var(--t-stil-accent)",
+              fontWeight: 400,
+              fontSize: "clamp(30px, 4.4vw, 60px)",
+              lineHeight: 1.22,
+              letterSpacing: "-0.01em",
+              textWrap: "pretty",
+            }}
+          >
+            {data.citat}
+          </blockquote>
+          {data.autor && (
+            <figcaption
+              style={{
+                marginTop: "28px",
+                fontSize: "14px",
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "var(--s-text-secundar)",
+              }}
+            >
+              {data.autor}
+            </figcaption>
+          )}
+        </figure>
+      </Section>
+    );
+  }
 
   return (
     <Section tone={tone}>

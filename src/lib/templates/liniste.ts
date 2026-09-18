@@ -65,5 +65,8 @@ export const liniste: Template = {
   asezari: {
     hero: "textPozaDreapta",
     heroCercDecor: true,
+    citatCentrat: true,
+    despreReperCard: true,
+    cumLucrezCarduri: true,
   },
 };
