@@ -63,7 +63,8 @@ export function CardArticol({
             // spune deja despre ce e articolul. Descrierea ei se citește pe pagina
             // articolului, unde imaginea chiar poartă informație.
             alt=""
-            aspectRatio="16 / 9"
+            // La „curat" imaginea e ceva mai înaltă (4/3), ca la referință.
+            aspectRatio={curat ? "4 / 3" : "16 / 9"}
             sizes="(max-width: 720px) 100vw, 380px"
           />
         </div>
@@ -118,19 +119,26 @@ export function CardArticol({
           </p>
         )}
 
-        <span
-          style={{
-            // Lipit de jos doar când sus e o copertă care fixează începutul
-            // textului; altfel ar anula centrarea de mai sus.
-            marginTop: articol.coperta ? "auto" : undefined,
-            paddingTop: "8px",
-            fontSize: "15px",
-            fontWeight: 600,
-            color: "var(--t-accent)",
-          }}
-        >
-          {friendly ? "Citește mai departe →" : "Citește →"}
-        </span>
+        {/*
+          La „Liniște" (`curat`) nu apare niciun „Citește →": întreg cardul e
+          link, iar referința se bazează doar pe titlu și imagine, fără rând de
+          îndemn. La restul rămâne, ca înainte.
+        */}
+        {!curat && (
+          <span
+            style={{
+              // Lipit de jos doar când sus e o copertă care fixează începutul
+              // textului; altfel ar anula centrarea de mai sus.
+              marginTop: articol.coperta ? "auto" : undefined,
+              paddingTop: "8px",
+              fontSize: "15px",
+              fontWeight: 600,
+              color: "var(--t-accent)",
+            }}
+          >
+            {friendly ? "Citește mai departe →" : "Citește →"}
+          </span>
+        )}
       </div>
     </a>
   );
