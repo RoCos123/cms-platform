@@ -138,17 +138,6 @@ export function FormularProgramare({
         valoare={stare.valori?.email}
       />
 
-      <Camp
-        id="prog-telefon"
-        name="telefon"
-        eticheta="Telefon"
-        autoComplete="tel"
-        maxLength={40}
-        obligatoriu={false}
-        eroare={stare.erori?.telefon}
-        valoare={stare.valori?.telefon}
-      />
-
       {/*
         Listă închisă, nu serviciile publicate ale cabinetului: cine cere o
         primă ședință n-are de unde ști ce fel de ședință îi trebuie. „(opțional)”
