@@ -110,6 +110,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       variant={row.variant}
       tone={row.tone}
       friendly={ctx.asezari.serviciiFriendly}
+      imagine={ctx.asezari.serviciiImagine}
     />
   ),
   bandaServicii: (row, ctx) => <BandaServicii servicii={ctx.servicii} tone={row.tone} />,

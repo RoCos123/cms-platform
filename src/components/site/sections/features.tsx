@@ -28,6 +28,7 @@ export function Features({
   variant,
   tone,
   friendly,
+  imagine,
 }: {
   data: FeaturesData;
   servicii: Serviciu[];
@@ -42,6 +43,11 @@ export function Features({
    * fără iconiță. Doar „Apropiere"; restul rămân cu cardurile de dinainte.
    */
   friendly?: boolean;
+  /**
+   * Cardurile de servicii ca la referința „Liniște": carduri-imagine cu un voal
+   * întunecat peste poză, titlul pe imagine și o săgeată în colț. Doar „Liniște".
+   */
+  imagine?: boolean;
 }) {
   // Fără niciun serviciu publicat, secțiunea nu se randează deloc: un titlu
   // „Serviciile mele" urmat de nimic arată a site stricat, nu a site nou.
@@ -100,6 +106,8 @@ export function Features({
 
       {variant === "linie" ? (
         <Linie servicii={afisate} paginaDetaliata={paginaDetaliata} />
+      ) : imagine ? (
+        <ServiciiImagine servicii={afisate} paginaDetaliata={paginaDetaliata} />
       ) : friendly ? (
         <ServiciiFriendly servicii={afisate} paginaDetaliata={paginaDetaliata} />
       ) : (
@@ -362,6 +370,162 @@ function ServiciiFriendly({
             )}
           </>
         );
+        return (
+          <li key={serviciu.id}>
+            {paginaDetaliata ? (
+              <a href={`/servicii#${serviciu.slug}`} style={stil}>
+                {continut}
+              </a>
+            ) : (
+              <div style={stil}>{continut}</div>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/**
+ * Cardurile de servicii ale referinței „Liniște": carduri-imagine pe fundal
+ * închis, cu poza serviciului peste tot cardul, un voal întunecat care se
+ * îngroașă spre bază, titlul (și descrierea scurtă) peste imagine și o săgeată
+ * rotundă în colț. Fără poză, cardul rămâne un dreptunghi închis doar cu titlul —
+ * un serviciu abia scris, fără copertă, tot arată a card, nu a gol. Doar
+ * „Liniște".
+ *
+ * Culorile vin din nivelul ȘABLONULUI (`--t-…`): cardul e mereu închis, iar
+ * textul mereu deschis, oricare ar fi tonul benzii (la referință banda e închisă).
+ */
+function ServiciiImagine({
+  servicii,
+  paginaDetaliata,
+}: {
+  servicii: Serviciu[];
+  paginaDetaliata: boolean;
+}) {
+  return (
+    <ul
+      style={{
+        listStyle: "none",
+        margin: "56px 0 0",
+        padding: 0,
+        display: "grid",
+        // Minim mare (420px) ca să iasă DOUĂ coloane pe lat și una pe telefon,
+        // fără media query — cardurile-imagine sunt late, ca la referință.
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(420px, 100%), 1fr))",
+        gap: "24px",
+      }}
+    >
+      {servicii.map((serviciu) => {
+        const continut = (
+          <>
+            {serviciu.coperta && (
+              <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
+                <SectionImage
+                  src={serviciu.coperta.url}
+                  alt=""
+                  aspectRatio="5 / 4"
+                  sizes="(max-width: 860px) 100vw, 50vw"
+                />
+                {/*
+                  Voalul: transparent sus, întunecat spre bază, ca titlul alb să
+                  se citească peste orice poză. E un strat peste imagine, sub text.
+                */}
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background:
+                      "linear-gradient(180deg, rgba(15,22,18,0) 30%, rgba(15,22,18,0.55) 62%, rgba(15,22,18,0.95) 100%)",
+                  }}
+                />
+              </div>
+            )}
+
+            <div
+              style={{
+                position: "relative",
+                zIndex: 2,
+                padding: "clamp(28px, 3vw, 44px)",
+                display: "flex",
+                alignItems: "flex-end",
+                justifyContent: "space-between",
+                gap: "20px",
+              }}
+            >
+              <div style={{ minWidth: 0 }}>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: "clamp(24px, 2.4vw, 34px)",
+                    fontWeight: 600,
+                    color: "var(--t-text-pe-inchis)",
+                    textShadow: "0 2px 20px rgba(0, 0, 0, 0.45)",
+                    textWrap: "pretty",
+                  }}
+                >
+                  {serviciu.titlu}
+                </h3>
+                {serviciu.descriereScurta?.trim() && (
+                  <p
+                    style={{
+                      margin: "10px 0 0",
+                      fontSize: "15px",
+                      lineHeight: 1.55,
+                      maxWidth: "34ch",
+                      color: "color-mix(in oklab, var(--t-text-pe-inchis) 88%, transparent)",
+                      textShadow: "0 1px 10px rgba(0, 0, 0, 0.5)",
+                      textWrap: "pretty",
+                    }}
+                  >
+                    {serviciu.descriereScurta}
+                  </p>
+                )}
+              </div>
+
+              {/*
+                Săgeata rotundă, doar când cardul chiar duce undeva (pagina
+                detaliată pornită). Un cerc apăsabil pe un card care nu face nimic
+                ar minți, ca „Află mai multe" din cardurile obișnuite.
+              */}
+              {paginaDetaliata && (
+                <span
+                  aria-hidden
+                  style={{
+                    flexShrink: 0,
+                    width: "52px",
+                    height: "52px",
+                    borderRadius: "999px",
+                    display: "grid",
+                    placeItems: "center",
+                    background: "var(--t-fundal)",
+                    color: "var(--t-text)",
+                    fontSize: "18px",
+                  }}
+                >
+                  →
+                </span>
+              )}
+            </div>
+          </>
+        );
+
+        const stil: React.CSSProperties = {
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end",
+          aspectRatio: "5 / 4",
+          borderRadius: "var(--t-raza)",
+          overflow: "hidden",
+          // Fundalul de sub poză (și cardul întreg, fără poză): un închis o
+          // treaptă peste banda secțiunii, ca să se desprindă de ea.
+          background: "color-mix(in oklab, var(--t-fundal-inchis) 82%, #ffffff)",
+          textDecoration: "none",
+        };
+
         return (
           <li key={serviciu.id}>
             {paginaDetaliata ? (
