@@ -48,6 +48,11 @@ export function isTemplateId(value: string): value is TemplateId {
 export function templateStyle(template: Template): CSSProperties {
   const { paleta: p, tipografie: t, forme: f } = template;
 
+  // „Apropiere" poartă tratamentul prietenos pentru etichete și accentul de
+  // titlu. Restul șabloanelor lasă variabilele astea nedefinite, iar
+  // componentele cad pe forma de dinainte prin `var(--x, implicit)`.
+  const friendly = template.id === "apropiere";
+
   return {
     "--t-fundal": p.fundal,
     "--t-fundal-nuantat": p.fundalNuantat,
@@ -60,9 +65,27 @@ export function templateStyle(template: Template): CSSProperties {
     "--t-accent": p.accent,
     "--t-accent-text": p.accentText,
     "--t-accent-pe-inchis": p.accentPeInchis,
-    // Doar „Apropiere" îl pune; la restul rămâne nedefinit, iar sublinierea
-    // care-l folosește cade pe `--t-accent` prin `var(--t-accent-cald, …)`.
+    // Doar „Apropiere" le pune; la restul rămân nedefinite, iar componentele
+    // care le folosesc cad pe forma dinainte prin `var(--…, implicit)`.
     "--t-accent-cald": p.accentCald,
+    "--t-accent-cald-inchis": p.accentCaldInchis,
+    // Tratamentul prietenos, doar pe „Apropiere": eticheta mică e o pastilă
+    // (nu majuscule răsfirate), iar accentul scris de mână din titlurile de
+    // secțiune e piersică apăsată. Vezi `SectionEyebrow` și `SectionHeading`.
+    ...(friendly && {
+      "--t-eticheta-fundal": p.fundalNuantat,
+      "--t-eticheta-chenar": p.chenar,
+      "--t-eticheta-padding": "6px 14px",
+      "--t-eticheta-raza": "100px",
+      "--t-eticheta-transform": "none",
+      "--t-eticheta-spatiere": "0.02em",
+      // Pastila e mereu deschisă, deci textul ei trebuie să rămână verde-închis
+      // oricare ar fi tonul secțiunii — nu `--s-accent`, care pe ton închis ar
+      // da verde-deschis pe pastilă deschisă. Aceeași grijă ca la bulina din hero.
+      "--t-eticheta-culoare": p.accent,
+      "--t-accent-titlu": p.accentCaldInchis,
+      "--t-greutate-accent-titlu": "700",
+    }),
     "--t-eroare": p.eroare,
     "--t-eroare-pe-inchis": p.eroarePeInchis,
     "--t-chenar": p.chenar,

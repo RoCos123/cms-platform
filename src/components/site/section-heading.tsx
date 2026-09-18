@@ -55,7 +55,17 @@ export function SectionHeading({
           {titluAccent && (
             <>
               {" "}
-              <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
+              <span
+                style={{
+                  fontFamily: "var(--t-font-secundar)",
+                  fontStyle: "var(--t-stil-accent)",
+                  // La „Apropiere" accentul scris de mână e piersică apăsat, ca
+                  // la sursă („care", „rânduri."); la restul rămâne subțire, în
+                  // culoarea titlului.
+                  fontWeight: "var(--t-greutate-accent-titlu, 300)" as unknown as number,
+                  color: "var(--t-accent-titlu, inherit)",
+                }}
+              >
                 {titluAccent}
               </span>
             </>

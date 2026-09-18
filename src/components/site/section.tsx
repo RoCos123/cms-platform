@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { SectionTone } from "@/lib/templates";
 
 const FUNDAL: Record<SectionTone, string> = {
@@ -110,15 +110,23 @@ export function SectionEyebrow({ children }: { children: ReactNode }) {
   return (
     <p
       style={{
+        // `inline-flex`, ca fundalul (când există) să îmbrace doar textul, nu
+        // tot rândul. La „Apropiere" variabilele de mai jos o fac pastilă; la
+        // restul lipsesc, iar `var(--…, implicit)` lasă eticheta simplă de
+        // dinainte — fără fundal, cu majuscule răsfirate.
         margin: "0 0 24px",
-        display: "flex",
+        display: "inline-flex",
         alignItems: "center",
         gap: "10px",
+        padding: "var(--t-eticheta-padding, 0)",
+        background: "var(--t-eticheta-fundal, transparent)",
+        border: "1px solid var(--t-eticheta-chenar, transparent)",
+        borderRadius: "var(--t-eticheta-raza, 0)",
         fontSize: "12px",
         fontWeight: 600,
-        letterSpacing: "0.14em",
-        textTransform: "uppercase",
-        color: "var(--s-accent, var(--t-accent))",
+        letterSpacing: "var(--t-eticheta-spatiere, 0.14em)",
+        textTransform: "var(--t-eticheta-transform, uppercase)" as CSSProperties["textTransform"],
+        color: "var(--t-eticheta-culoare, var(--s-accent, var(--t-accent)))",
       }}
     >
       <span
