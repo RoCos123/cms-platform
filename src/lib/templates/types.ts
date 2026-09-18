@@ -138,6 +138,12 @@ export type TemplateAsezari = {
    */
   heroFaraArcada?: boolean;
   /**
+   * Un cerc de accent (salvie) în spatele portretului din prima secțiune, care
+   * iese pe sub arcadă — semnătura editorială a referinței „Liniște". Doar
+   * „Liniște"; la restul portretul stă singur. Fără poză nu apare.
+   */
+  heroCercDecor?: boolean;
+  /**
    * Tratamentul de titlu al modelului prietenos, la prima secțiune: ultimul
    * cuvânt din titlu are o dungă piersică pe dedesubt, iar coada scrisă de mână
    * e verde. Doar „Apropiere" — la celelalte titlul rămâne simplu.

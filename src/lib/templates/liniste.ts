@@ -57,5 +57,13 @@ export const liniste: Template = {
     spatiereSectiune: "clamp(80px, 10vw, 140px)",
   },
 
-  asezari: { hero: "textPozaDreapta" },
+  // Aduse la referința „Dragoș Geamănă" (site-ul-sursă din care a fost măsurat
+  // Liniște). Fiecare tratament e un steag pornit DOAR aici; componenta desenează
+  // forma editorială când e pornit, altfel rămâne cum era — restul șabloanelor
+  // nu se ating. Paleta și fonturile erau deja ale referinței, deci munca e
+  // exclusiv de așezare.
+  asezari: {
+    hero: "textPozaDreapta",
+    heroCercDecor: true,
+  },
 };

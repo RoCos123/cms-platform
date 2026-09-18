@@ -43,12 +43,18 @@ export function Hero({
   faraArcada,
   titluFriendly,
   blob,
+  cercDecor,
 }: {
   data: HeroData;
   tone?: SectionTone;
   asezare?: AsezareHero;
   /** Poza fără arcadă în cap — dreptunghi rotunjit simplu (doar „Apropiere"). */
   faraArcada?: boolean;
+  /**
+   * Un cerc de accent (salvie) în spatele portretului, care iese pe sub arcadă
+   * — semnătura editorială a referinței „Liniște". Doar „Liniște".
+   */
+  cercDecor?: boolean;
   /**
    * Tratamentul de titlu al modelului prietenos (doar „Apropiere"): ultimul
    * cuvânt din titlu are o dungă piersică pe dedesubt (ca „tu" la sursă), iar
@@ -280,8 +286,34 @@ export function Hero({
 
   const imagine = (
     <div style={{ position: "relative" }}>
+      {/*
+        Cercul de accent din spatele portretului, care iese pe sub arcadă la
+        stânga — semnătura editorială a referinței „Liniște". E salvia
+        (`--t-accent`), coborâtă în opacitate ca să rămână un fundal, nu o pată
+        tare. Poza stă deasupra (`zIndex: 1`); `overflow` de pe secțiune taie ce
+        iese pe margini, deci nu apare derulare orizontală.
+      */}
+      {cercDecor && (
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            left: "-38px",
+            top: "36%",
+            width: "clamp(150px, 26vw, 230px)",
+            height: "clamp(150px, 26vw, 230px)",
+            borderRadius: "50%",
+            background: "var(--t-accent)",
+            opacity: 0.5,
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+        />
+      )}
       <div
         style={{
+          position: "relative",
+          zIndex: 1,
           // Poza rotunjită, cu arcadă în cap pe așezarea cu poza lângă titlu (cerut
           // pe 16 sept. 2026, după modelul șablonului mov). Pe titlul lat (Căldură)
           // rămâne o rotunjire blândă, ca să nu se bată cu poza lată de acolo. Pe

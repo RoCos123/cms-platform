@@ -96,6 +96,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       faraArcada={ctx.asezari.heroFaraArcada}
       titluFriendly={ctx.asezari.heroTitluFriendly}
       blob={ctx.asezari.heroBlob}
+      cercDecor={ctx.asezari.heroCercDecor}
     />
   ),
   quote: (row) => <Quote data={row.data as QuoteData} tone={row.tone} />,
