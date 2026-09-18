@@ -61,7 +61,21 @@ const ACORD_IMPLICIT =
  * nu trebuie să completeze nimic, iar cine nu poate vorbi la telefon (destul de
  * des, exact motivul pentru care caută un psiholog) are unde scrie.
  */
-export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: SectionTone }) {
+export function Contact({
+  data,
+  tone = "deschis",
+  friendly,
+}: {
+  data: ContactData;
+  tone?: SectionTone;
+  /**
+   * Tratamentul prietenos: antetul sus, iar dedesubt formularul într-un card
+   * alb lângă un card verde cu datele cabinetului (fiecare rând, o casetă albă).
+   * Fără iconițe. Doar „Apropiere". Culorile cardurilor vin din nivelul
+   * șablonului (`--t-…`), deci rămân lizibile pe orice ton.
+   */
+  friendly?: boolean;
+}) {
   /*
     Fără un titlu, secțiunea nu se randează deloc.
 
@@ -78,6 +92,143 @@ export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: 
   // cele două decizii trebuie să rămână împreună (vezi src/lib/antispam.ts).
   const siteKey = process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY || null;
   const furnizorCaptcha = process.env.NEXT_PUBLIC_CAPTCHA_FURNIZOR || null;
+
+  const formular = (
+    <ContactForm
+      siteKey={siteKey}
+      furnizorCaptcha={furnizorCaptcha}
+      temaCaptcha={tone === "inchis" ? "dark" : "light"}
+      nota={data.notaFormular}
+      textAcord={data.textAcord ?? ACORD_IMPLICIT}
+      // Fără valoare implicită: `/confidentialitate` nu există încă, iar un
+      // link către o pagină inexistentă e mai rău decât lipsa lui.
+      linkConfidentialitate={data.linkConfidentialitate}
+      mesajSucces={data.mesajSucces}
+      // „Trimite", nu „Sună-mă": telefonul a fost scos, formularul trimite
+      // acum numele și emailul, nu deschide un apel.
+      textButon={data.textButon ?? "Trimite"}
+    />
+  );
+
+  /*
+    „Apropiere": antetul sus, pe toată lățimea, apoi două carduri egale — la
+    stânga formularul într-un card alb, la dreapta datele cabinetului într-un
+    card VERDE, cu fiecare rând într-o casetă albă (ca la sursă, dar fără
+    iconițe). Culorile vin din nivelul șablonului (`--t-…`) și cardurile își
+    fixează singure culoarea textului, deci rămân lizibile pe orice ton. Fără
+    date de contact, formularul umple singur lățimea (`auto-fit`).
+  */
+  if (friendly) {
+    return (
+      <Section tone={tone} id="contact">
+        <SectionHeading
+          eyebrow={data.eyebrow}
+          titlu={data.titlu}
+          titluAccent={data.titluAccent}
+          intro={data.intro}
+          maxWidthTitlu="14em"
+        />
+
+        <div
+          style={{
+            display: "grid",
+            gap: "clamp(20px, 2.4vw, 28px)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            alignItems: "stretch",
+            marginTop: "clamp(32px, 4vw, 48px)",
+          }}
+        >
+          <div
+            style={{
+              padding: "clamp(24px, 3vw, 32px)",
+              borderRadius: "var(--t-raza)",
+              border: "1px solid var(--t-chenar)",
+              background: "var(--t-suprafata, var(--t-fundal-nuantat))",
+              // Cardul e mereu alb, deci textul lui rămâne închis oricare ar fi
+              // tonul secțiunii — la fel ca celelalte carduri prietenoase.
+              color: "var(--t-text)",
+            }}
+          >
+            {formular}
+          </div>
+
+          {detalii.length > 0 && (
+            <dl
+              style={{
+                margin: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+                padding: "clamp(24px, 3vw, 32px)",
+                borderRadius: "var(--t-raza)",
+                // Verdele deschis de salvie, același cu cardul din spatele pozei
+                // din „Despre mine" și cu petele din hero — semnătura caldă a
+                // sursei. Un chenar verde ceva mai apăsat, subțiat până rămâne blând.
+                background: "var(--t-accent-pe-inchis)",
+                border: "1px solid color-mix(in oklab, var(--t-accent) 35%, transparent)",
+                color: "var(--t-text)",
+              }}
+            >
+              {detalii.map((detaliu) => {
+                const adresa = adresaDedusa(detaliu.valoare);
+
+                return (
+                  <div
+                    key={detaliu.eticheta}
+                    style={{
+                      // Casetă albă peste verde, ca la sursă. Fără iconiță:
+                      // rămâne eticheta deasupra valorii.
+                      padding: "16px 18px",
+                      borderRadius: "16px",
+                      background: "var(--t-suprafata, #ffffff)",
+                    }}
+                  >
+                    <dt
+                      style={{
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        color: "var(--t-text-secundar)",
+                      }}
+                    >
+                      {detaliu.eticheta}
+                    </dt>
+                    {/* `pre-line`: programul scris pe două rânduri rămâne pe două rânduri. */}
+                    <dd
+                      style={{
+                        margin: "4px 0 0",
+                        fontSize: "15px",
+                        fontWeight: 600,
+                        lineHeight: 1.45,
+                        whiteSpace: "pre-line",
+                      }}
+                    >
+                      {adresa ? (
+                        <a
+                          href={adresa}
+                          style={{
+                            color: "inherit",
+                            textDecoration: "underline",
+                            textDecorationColor: "color-mix(in oklab, currentColor 40%, transparent)",
+                            textUnderlineOffset: "3px",
+                          }}
+                        >
+                          {detaliu.valoare}
+                        </a>
+                      ) : (
+                        detaliu.valoare
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          )}
+        </div>
+      </Section>
+    );
+  }
 
   return (
     <Section tone={tone} id="contact">
@@ -145,20 +296,7 @@ export function Contact({ data, tone = "deschis" }: { data: ContactData; tone?: 
           )}
         </div>
 
-        <ContactForm
-          siteKey={siteKey}
-          furnizorCaptcha={furnizorCaptcha}
-          temaCaptcha={tone === "inchis" ? "dark" : "light"}
-          nota={data.notaFormular}
-          textAcord={data.textAcord ?? ACORD_IMPLICIT}
-          // Fără valoare implicită: `/confidentialitate` nu există încă, iar un
-          // link către o pagină inexistentă e mai rău decât lipsa lui.
-          linkConfidentialitate={data.linkConfidentialitate}
-          mesajSucces={data.mesajSucces}
-          // „Trimite", nu „Sună-mă": telefonul a fost scos, formularul trimite
-          // acum numele și emailul, nu deschide un apel.
-          textButon={data.textButon ?? "Trimite"}
-        />
+        {formular}
       </div>
     </Section>
   );
