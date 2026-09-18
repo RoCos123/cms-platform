@@ -41,15 +41,19 @@ export function Hero({
   tone,
   asezare = "textPozaDreapta",
   faraArcada,
-  accentSubliniat,
+  titluFriendly,
 }: {
   data: HeroData;
   tone?: SectionTone;
   asezare?: AsezareHero;
   /** Poza fără arcadă în cap — dreptunghi rotunjit simplu (doar „Apropiere"). */
   faraArcada?: boolean;
-  /** Cuvântul-accent are o dungă piersică pe sub el (doar „Apropiere"). */
-  accentSubliniat?: boolean;
+  /**
+   * Tratamentul de titlu al modelului prietenos (doar „Apropiere"): ultimul
+   * cuvânt din titlu are o dungă piersică pe dedesubt (ca „tu" la sursă), iar
+   * coada scrisă de mână (`titluAccent`) e verde, nu subliniată.
+   */
+  titluFriendly?: boolean;
 }) {
   /*
     Fără un titlu, secțiunea nu se randează deloc.
@@ -62,6 +66,13 @@ export function Hero({
 
   const poza = data.imagine?.url ? data.imagine : null;
   const titluLat = asezare === "titluLat" && poza !== null;
+
+  // La „Apropiere", dunga piersică stă sub ULTIMUL cuvânt din titlu (ca „tu" la
+  // sursă), nu sub coada scrisă de mână. Îl desprind ca să subliniez doar
+  // cuvântul, nu tot rândul; un titlu dintr-un singur cuvânt se subliniază întreg.
+  const cuvinte = data.titlu.trim().split(/\s+/);
+  const ultimulCuvant = titluFriendly ? cuvinte.pop() ?? "" : "";
+  const inceputulTitlului = cuvinte.join(" ");
 
   const titlu = (
     <>
@@ -83,7 +94,29 @@ export function Hero({
           textWrap: "balance",
         }}
       >
-        {data.titlu}
+        {titluFriendly ? (
+          <>
+            {inceputulTitlului}
+            {inceputulTitlului && " "}
+            {/* Cuvântul cu dunga piersică pe dedesubt. E un fundal, nu
+               `text-decoration`: așa controlez grosimea și cât de jos stă, iar
+               `padding-bottom` întinde doar dunga, nu urcă rândul. */}
+            <span
+              style={{
+                backgroundImage:
+                  "linear-gradient(var(--t-accent-cald), var(--t-accent-cald))",
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "100% 0.14em",
+                backgroundPosition: "left bottom",
+                paddingBottom: "0.06em",
+              }}
+            >
+              {ultimulCuvant}
+            </span>
+          </>
+        ) : (
+          data.titlu
+        )}
         {data.titluAccent && (
           <>
             <br />
@@ -91,21 +124,12 @@ export function Hero({
               style={{
                 fontFamily: "var(--t-font-secundar)",
                 fontStyle: "var(--t-stil-accent)",
-                fontWeight: 300,
+                // La „Apropiere" coada scrisă de mână e mai apăsată și verde, ca
+                // la sursă („din nou."); la restul rămâne subțire, în culoarea
+                // titlului.
+                fontWeight: titluFriendly ? 700 : 300,
                 letterSpacing: "-0.01em",
-                // Dunga piersică trasă pe sub cuvântul scris de mână, ca la
-                // modelul prietenos. E un fundal, nu `text-decoration`: așa
-                // controlez grosimea și cât de jos stă, iar `padding-bottom`
-                // întinde doar dunga, nu urcă rândul. Culoarea cade pe verde pe
-                // șabloanele fără piersică — dar steagul se aprinde doar unde e.
-                ...(accentSubliniat && {
-                  backgroundImage:
-                    "linear-gradient(var(--t-accent-cald, var(--t-accent)), var(--t-accent-cald, var(--t-accent)))",
-                  backgroundRepeat: "no-repeat",
-                  backgroundSize: "100% 0.14em",
-                  backgroundPosition: "left bottom",
-                  paddingBottom: "0.12em",
-                }),
+                color: titluFriendly ? "var(--t-accent)" : undefined,
               }}
             >
               {data.titluAccent}

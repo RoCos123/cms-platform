@@ -35,6 +35,11 @@ export const apropiere: Template = {
     // decorativă sub un cuvânt, nu text, deci n-o măsurăm la contrast ca pe
     // verde. Tocmai moliciunea ei face semnătura caldă a modelului.
     accentCald: "#F7C9B8",
+    // Aceeași piersică, dar întunecată până trece pragul de contrast: sursa
+    // scrie accentul de titlu cu `--peach-deep: #db8d72` (≈2,3:1 pe crem, sub
+    // prag), la fel de spălăcit ca verdele ei. O cobor până devine lizibilă la
+    // mărime de titlu.
+    accentCaldInchis: "#B55A38",
 
     eroare: "#B3261E",
     eroarePeInchis: "#E8877A",
@@ -72,7 +77,7 @@ export const apropiere: Template = {
     hero: "textPozaDreapta",
     desprePozaStivuita: true,
     heroFaraArcada: true,
-    heroAccentSubliniat: true,
+    heroTitluFriendly: true,
     programareSaptamana: true,
   },
 };

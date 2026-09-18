@@ -44,6 +44,13 @@ export type TemplatePalette = {
    * Opțional: doar „Apropiere" îl are; fără el, sublinierea cade pe `accent`.
    */
   accentCald?: string;
+  /**
+   * Piersica CALDĂ dar întunecată până trece la contrast — pentru accentul
+   * scris de mână din titlurile de secțiune („care", „rânduri."), care e TEXT,
+   * nu o dungă. Piersica deschisă (`accentCald`) ar fi ilizibilă pe crem la
+   * mărimea unui titlu. Aceeași corecție ca la verde. Opțional: doar „Apropiere".
+   */
+  accentCaldInchis?: string;
   /** Culoarea erorilor de formular, pe fundal deschis și pe fundal închis. */
   eroare: string;
   eroarePeInchis: string;
@@ -124,11 +131,11 @@ export type TemplateAsezari = {
    */
   heroFaraArcada?: boolean;
   /**
-   * Cuvântul scris de mână din titlul primei secțiuni are o subliniere piersică
-   * trasă pe sub el, ca la modelul prietenos. Doar „Apropiere" — la celelalte
-   * accentul e serif înclinat, iar o dungă piersică sub el ar arăta lipită.
+   * Tratamentul de titlu al modelului prietenos, la prima secțiune: ultimul
+   * cuvânt din titlu are o dungă piersică pe dedesubt, iar coada scrisă de mână
+   * e verde. Doar „Apropiere" — la celelalte titlul rămâne simplu.
    */
-  heroAccentSubliniat?: boolean;
+  heroTitluFriendly?: boolean;
   /**
    * Secțiunea de programări arată săptămâna pe coloane (o zi = o coloană, cu
    * orele ei ca butoane) plus un card de rezumat, ca la modelul prietenos, în

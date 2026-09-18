@@ -293,7 +293,7 @@ function SaptamanaGrila({
         </div>
 
         <aside style={stilSumar}>
-          <h4 style={stilSumarTitlu}>🌿 Rezumat</h4>
+          <h4 style={stilSumarTitlu}>Rezumat</h4>
           {ziAleasa && ora ? (
             <>
               <div style={stilRand}>
