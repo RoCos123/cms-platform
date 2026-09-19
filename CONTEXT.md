@@ -584,11 +584,11 @@ Tipuri, lint, cele 218 probe de logică și build-ul trec după toate corecțiil
 **Stare la 19 sept.:** toate cele cinci corecții din al cincilea document sunt
 făcute și verificate adversarial. Nimic nu mai e deschis din acest document.
 
-### Două lucruri găsite chiar de proprietar, după merge (19 sept. 2026)
+### Trei lucruri găsite chiar de proprietar, după merge (19 sept. 2026)
 
-Proprietarul s-a uitat la site-ul lui adevărat (nu la o probă) și a prins două
-lucruri pe care verificarea adversarială nu le-a acoperit, fiindcă nu erau în
-documentul al cincilea.
+Proprietarul s-a uitat la site-ul lui adevărat (nu la o probă) și a prins mai
+multe lucruri pe care verificarea adversarială nu le-a acoperit, fiindcă nu
+erau în documentul al cincilea.
 
 **1. Coperta articolului de blog nu se repoziționa niciodată.** Panoul zicea
 „Trage de poză ca s-o poziționezi", dar nu se întâmpla nimic — nici în
@@ -632,7 +632,23 @@ absent) a rămas neschimbat — bold sans-serif, exact ca la început. O schimba
 de platformă pe toate cinci șabloane, dacă se dorește vreodată, e o decizie
 separată a proprietarului, nu un efect secundar al lucrului pe un șablon.
 
-Amândouă, tipuri/lint/218 probe/build trec.
+**3. Previzualizarea din formularul de blog nu arăta repoziționarea.**
+Trasul de poză (corecția de la punctul 1) FUNCȚIONA — se salva, se vedea pe
+site — dar previzualizarea vie din dreapta formularului (`Cum arată pagina
+articolului`) rămânea neschimbată cât timp trăgeai, ca și cum poziția n-ar fi
+ajuns niciodată acolo. Cauza era în `editor.tsx`, nu în fluxul reparat la
+punctul 1: valoarea live a formularului (`date.coperta`) chiar avea
+`pozitie` la fiecare tragere, dar linia care construia obiectul trimis la
+`ArticolComplet` pentru previzualizare tăia câmpul (`{ url, altText }`, fără
+`pozitie`), deci previzualizarea primea mereu poziția implicită (centru).
+Reparat: `coperta` din `editor.tsx` păstrează și `pozitie`, trecută mai
+departe la `ArticolComplet`. Verificat cu o pagină de probă temporară care
+randează `EditorArticol` cu o poză de test (un cerc marcat STÂNGA și unul
+DREAPTA) și punct focal spre dreapta — panoul din stânga (editorul) și
+previzualizarea din dreapta arată acum ACELAȘI decupaj, „DREAPTA" vizibil în
+amândouă; înainte de reparație previzualizarea arăta centrul.
+
+Toate trei, tipuri/lint/218 probe/build trec.
 
 ## Panoul pe telefon (11 sept. 2026)
 

@@ -11,6 +11,7 @@ import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare
 import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { ArticolComplet } from "@/components/site/sections/articol-complet";
 import type { Template } from "@/lib/templates";
+import type { PunctFocal } from "@/lib/punct-focal";
 import { CAMPURI_ARTICOL } from "@/lib/blog";
 import { catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 import { comutaPublicareaArticolului, salveazaArticol } from "../actions";
@@ -39,7 +40,9 @@ export function EditorArticol({
 
   const modificat = JSON.stringify(valoare) !== JSON.stringify(referinta);
   const date = catreStocare(valoare, CAMPURI_ARTICOL);
-  const coperta = date.coperta as { url?: string; altText?: string } | undefined;
+  const coperta = date.coperta as
+    | { url?: string; altText?: string; pozitie?: PunctFocal }
+    | undefined;
   const slug = String(date.slug ?? "");
 
   async function salveaza() {
@@ -146,7 +149,9 @@ export function EditorArticol({
               extras: String(date.excerpt ?? ""),
               continut: String(date.content ?? ""),
               publicatLa,
-              coperta: coperta?.url ? { url: coperta.url, altText: coperta.altText ?? "" } : null,
+              coperta: coperta?.url
+                ? { url: coperta.url, altText: coperta.altText ?? "", pozitie: coperta.pozitie }
+                : null,
             }}
           />
         </PanouPrevizualizare>
