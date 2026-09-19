@@ -1,6 +1,6 @@
 import type { SectionTone } from "@/lib/templates";
 import type { ArticolListat } from "@/lib/blog";
-import { Section } from "@/components/site/section";
+import { Section, SectionActionButton } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { GrilaArticole } from "@/components/site/card-articol";
 
@@ -78,20 +78,27 @@ export function LatestPosts({
               printr-un portal într-un iframe. Acolo contextul de rutare e al
               PANOULUI — un `Link` ar încerca să navigheze panoul, nu site-ul, și
               ar preîncărca pagini de care previzualizarea n-are nevoie.
+
+              La „Liniște" (`curat`), butonul-pastilă cu cerc-săgeată, ca la
+              referință; la restul rămâne linkul simplu de dinainte.
             */
-            // eslint-disable-next-line @next/next/no-html-link-for-pages
-            <a
-              href="/blog"
-              style={{
-                fontSize: "15px",
-                fontWeight: 600,
-                color: "var(--s-accent)",
-                textDecoration: "none",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Toate articolele →
-            </a>
+            curat ? (
+              <SectionActionButton href="/blog">Toate articolele</SectionActionButton>
+            ) : (
+              // eslint-disable-next-line @next/next/no-html-link-for-pages
+              <a
+                href="/blog"
+                style={{
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  color: "var(--s-accent)",
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Toate articolele →
+              </a>
+            )
           ) : undefined
         }
       />
