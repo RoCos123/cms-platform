@@ -63,6 +63,9 @@ export function CardArticol({
             // spune deja despre ce e articolul. Descrierea ei se citește pe pagina
             // articolului, unde imaginea chiar poartă informație.
             alt=""
+            // Punctul focal ales la tragere — corectat 19 sept. 2026, vezi
+            // comentariul de pe `coperta` din blog.ts.
+            pozitie={articol.coperta.pozitie}
             // La „curat" imaginea e ceva mai înaltă (4/3), ca la referință.
             aspectRatio={curat ? "4 / 3" : "16 / 9"}
             sizes="(max-width: 720px) 100vw, 380px"

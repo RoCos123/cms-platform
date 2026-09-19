@@ -1,4 +1,5 @@
 import type { CampSchema } from "@/lib/sectiuni";
+import type { PunctFocal } from "@/lib/punct-focal";
 
 /**
  * Un articol de blog, așa cum îl scrie clientul și cum îl citește site-ul.
@@ -79,7 +80,15 @@ export type ArticolListat = {
   extras: string;
   /** Dată ISO; se formatează abia la afișare. `null` = încă nepublicat. */
   publicatLa: string | null;
-  coperta?: { url: string; altText: string } | null;
+  /**
+   * `pozitie` (punctul focal), la fel ca la orice altă poză tăiată. Corectat
+   * 19 sept. 2026: coperta articolului stă în bază ca `cover_upload_id`, o
+   * referință simplă, nu ca JSONB de secțiune — deci n-a fost niciodată
+   * atinsă de propagarea care rescrie poziția în `site_content` la tragere.
+   * Poziția tot se salvează pe poză (`uploads.focal_x/focal_y`), doar că
+   * nimeni n-o citea de-acolo pentru coperta unui articol. Acum se citește.
+   */
+  coperta?: { url: string; altText: string; pozitie?: PunctFocal } | null;
 };
 
 /** Articolul întreg — doar pagina lui are nevoie de asta. */

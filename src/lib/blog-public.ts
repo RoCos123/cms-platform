@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { adresaImaginii } from "@/lib/imagini-adrese";
+import { normalizeazaPunctFocal } from "@/lib/punct-focal";
 import type { Articol, ArticolListat } from "@/lib/blog";
 
 type RandListat = {
@@ -26,19 +27,22 @@ type RandArticol = RandListat & { content: string };
  * ce se rupe aici e pagina publică a unui client. Două interogări simple nu au
  * cum să surprindă pe nimeni.
  */
+type CopertaInfo = { url: string; pozitie: ReturnType<typeof normalizeazaPunctFocal> };
+
 async function coperti(
   service: ReturnType<typeof createServiceClient>,
   randuri: RandListat[],
-): Promise<Map<string, string>> {
+): Promise<Map<string, CopertaInfo>> {
   const iduri = [...new Set(randuri.map((r) => r.cover_upload_id).filter((id): id is string => Boolean(id)))];
   if (iduri.length === 0) return new Map();
 
   const { data, error } = await service
     .from("uploads")
-    // Doar `id`: adresa se derivă din el. Interogarea rămâne fiindcă spune dacă
-    // imaginea mai există — un articol a cărui copertă a fost ștearsă trebuie să
-    // se citească fără copertă, nu cu o poză ruptă.
-    .select("id")
+    // `id`: adresa se derivă din el, iar interogarea confirmă că imaginea mai
+    // există — un articol a cărui copertă a fost ștearsă trebuie să se citească
+    // fără copertă, nu cu o poză ruptă. `focal_x/focal_y`: punctul focal ales la
+    // tragere (corectat 19 sept. 2026 — până acum nu se citea deloc de aici).
+    .select("id, focal_x, focal_y")
     .in("id", iduri);
 
   if (error) {
@@ -50,13 +54,16 @@ async function coperti(
   return new Map(
     (data ?? []).map((rand) => [
       rand.id as string,
-      adresaImaginii(rand.id as string),
+      {
+        url: adresaImaginii(rand.id as string),
+        pozitie: normalizeazaPunctFocal({ x: rand.focal_x, y: rand.focal_y }),
+      },
     ]),
   );
 }
 
-function catreListat(rand: RandListat, adrese: Map<string, string>): ArticolListat {
-  const url = rand.cover_upload_id ? adrese.get(rand.cover_upload_id) : undefined;
+function catreListat(rand: RandListat, adrese: Map<string, CopertaInfo>): ArticolListat {
+  const info = rand.cover_upload_id ? adrese.get(rand.cover_upload_id) : undefined;
 
   return {
     id: rand.id,
@@ -64,7 +71,7 @@ function catreListat(rand: RandListat, adrese: Map<string, string>): ArticolList
     titlu: rand.title,
     extras: rand.excerpt ?? "",
     publicatLa: rand.published_at,
-    coperta: url ? { url, altText: rand.cover_alt ?? "" } : null,
+    coperta: info ? { url: info.url, altText: rand.cover_alt ?? "", pozitie: info.pozitie } : null,
   };
 }
 

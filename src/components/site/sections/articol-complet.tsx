@@ -81,6 +81,11 @@ export function ArticolComplet({
             <SectionImage
               src={articol.coperta.url}
               alt={articol.coperta.altText}
+              // Punctul focal ales la tragere — corectat 19 sept. 2026, vezi
+              // comentariul de pe `coperta` din blog.ts. Fără el, imaginea se
+              // tăia mereu din centru, indiferent unde trăsese clientul poza —
+              // și previzualizarea din panou n-avea cum să reflecte mișcarea.
+              pozitie={articol.coperta.pozitie}
               aspectRatio="16 / 9"
               sizes="(max-width: 760px) 100vw, 680px"
               // Prima imagine de pe pagină, deci cea după care se măsoară cât de
