@@ -52,8 +52,21 @@ export function HowItWorks({
   */
   if (pasi.length === 0 && !data.titlu?.trim()) return null;
 
+  /*
+    La „Liniște" (`carduri`), tonul benzii e mereu deschis — corectat 19 sept.
+    2026, după ce proprietarul a arătat referința pe propriul lui site: secțiunea
+    vine de la provizionare pe ton ÎNCHIS (aceeași listă pentru toate șabloanele),
+    dar la sursă stă pe crem, cu cutii albe. „Păstrează tonul actual" (decizia
+    anterioară, 18 sept.) rămâne valabilă pentru RITMUL benzilor — asta e o
+    corecție punctuală, cerută explicit pentru secțiunea asta. Se ignoră tonul
+    din rând, nu doar fundalul: `tonEfectiv` merge la `Section`, deci toate
+    culorile derivate (text, accent, text secundar) se schimbă împreună, nu doar
+    petice separate — un `--s-text` rămas pe „închis" ar fi scris crem pe crem.
+  */
+  const tonEfectiv: SectionTone = carduri ? "deschis" : (tone ?? "deschis");
+
   return (
-    <Section tone={tone} id="proces">
+    <Section tone={tonEfectiv} id="proces">
       {/*
         La „Liniște" (`carduri`) antetul e centrat, ca la referință; la restul
         rămâne aliniat la stânga. Centrarea e o alegere de așezare a șablonului,
