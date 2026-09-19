@@ -584,6 +584,44 @@ Tipuri, lint, cele 218 probe de logică și build-ul trec după toate corecțiil
 **Stare la 19 sept.:** toate cele cinci corecții din al cincilea document sunt
 făcute și verificate adversarial. Nimic nu mai e deschis din acest document.
 
+### Două lucruri găsite chiar de proprietar, după merge (19 sept. 2026)
+
+Proprietarul s-a uitat la site-ul lui adevărat (nu la o probă) și a prins două
+lucruri pe care verificarea adversarială nu le-a acoperit, fiindcă nu erau în
+documentul al cincilea.
+
+**1. Coperta articolului de blog nu se repoziționa niciodată.** Panoul zicea
+„Trage de poză ca s-o poziționezi", dar nu se întâmpla nimic — nici în
+previzualizarea vie, nici pe site. Cauza: coperta unui articol stă în bază ca
+`cover_upload_id`, o referință simplă către `uploads`, nu ca JSONB de secțiune.
+Propagarea poziției (`pozitioneazaImagine`, din 11 sept.) rescrie poziția DOAR
+în `site_content` — deci coperta unui articol n-a fost niciodată atinsă de ea.
+Poziția tot se salva corect pe poză (`uploads.focal_x/focal_y`), doar că nimeni
+n-o citea de-acolo pentru un articol. Exact golul notat la 11 sept.: „RĂMÂNE
+pentru mai târziu: coperta articolelor de blog". Reparat pe tot firul: tipul
+`ArticolListat.coperta` primește `pozitie`; `blog-public.ts` citește
+`focal_x/focal_y` la interogarea coperților; `card-articol.tsx` și
+`articol-complet.tsx` trec poziția mai departe la `SectionImage`; formularul de
+editare (`dashboard/blog/[id]/page.tsx`) citește poziția reală la încărcare, nu
+mai pornește mereu din centru. Verificat cu aceeași poză randată la două
+puncte focale diferite — cadrul se mută vizibil.
+
+**2. „Păreri" arăta altfel decât „Apariții" — fonturi diferite pe titluri
+diferite.** `SectionHeading` (fontul de titlu al șablonului) a fost extras „după
+ce tiparul s-a repetat identic în șapte secțiuni" (vezi docstring-ul lui), dar
+CINCI secțiuni scrise înainte de extragere, cu antet propriu, n-au fost aduse
+niciodată la el: `about-teaser`, `faq`, `how-it-works`, `newsletter`,
+`testimonials`. Toate cinci aveau `fontWeight: 700` fără `fontFamily` pe titlu
+— cădea pe fontul implicit (sans-serif bold) — în timp ce ACCENTUL din titlu
+(span separat) folosea deja corect fontul secundar, deci titlul ieșea cu DOUĂ
+fonturi diferite în aceeași propoziție. Corectat pe toate cinci, cu exact ce are
+deja `SectionHeading`. **Nu e specific Liniște** — cele cinci componente sunt
+comune tuturor șabloanelor, deci corecția se vede pe toate cinci (era cel mai
+vizibilă pe Liniște, unde titlurile sunt integral în serif). Verificat: toate
+titlurile randate alături, acum identice ca font.
+
+Amândouă, tipuri/lint/218 probe/build trec.
+
 ## Panoul pe telefon (11 sept. 2026)
 
 Cerut de proprietar. Meniul din stânga era fix, 256px, mereu la vedere — pe un
