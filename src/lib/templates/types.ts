@@ -180,6 +180,16 @@ export type TemplateAsezari = {
    */
   blogCurat?: boolean;
   /**
+   * Banda cu servicii discretă: fundal crem (nu accentul plin), text și steaua
+   * despărțitoare estompate — ca banda decorativă din josul hero-ului la
+   * referința „Liniște" (cuvinte în serif italic, punctate de „✦"). Fără ea,
+   * banda rămâne mereu pe accent, „ca în șablonul-model" (decizia de la 16
+   * sept.) — corectă pentru șablonul acela, greșită aici: pe fundal crem, un
+   * accent plin arată ca o bară verde fără legătură cu restul paginii. Doar
+   * „Liniște".
+   */
+  bandaServiciiDiscreta?: boolean;
+  /**
    * Tratamentul de titlu al modelului prietenos, la prima secțiune: ultimul
    * cuvânt din titlu are o dungă piersică pe dedesubt, iar coada scrisă de mână
    * e verde. Doar „Apropiere" — la celelalte titlul rămâne simplu.

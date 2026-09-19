@@ -16,9 +16,23 @@ import type { Serviciu } from "@/lib/servicii";
  * (`prefers-reduced-motion`) primește banda OPRITĂ, nu absentă.
  *
  * `tone` se primește ca la orice secțiune, dar nu-l folosește: banda e mereu pe
- * accent, ca în șablonul-model.
+ * accent, ca în șablonul-model — CU O EXCEPȚIE, `discreta`.
  */
-export function BandaServicii({ servicii }: { servicii: Serviciu[]; tone?: SectionTone }) {
+export function BandaServicii({
+  servicii,
+  discreta,
+}: {
+  servicii: Serviciu[];
+  tone?: SectionTone;
+  /**
+   * Varianta discretă a referinței „Liniște": fundal crem (nu accentul plin),
+   * cuvinte și steaua despărțitoare estompate uniform, ca banda decorativă din
+   * josul hero-ului acolo. Corectat 19 sept. 2026 — decizia „mereu pe accent"
+   * de mai sus era corectă pentru șablonul ei de origine, dar pe crem un accent
+   * plin arată ca o bară verde fără legătură cu restul paginii. Doar „Liniște".
+   */
+  discreta?: boolean;
+}) {
   const nume = servicii.map((s) => s.titlu).filter((t) => t?.trim());
   if (nume.length === 0) return null;
 
@@ -32,15 +46,19 @@ export function BandaServicii({ servicii }: { servicii: Serviciu[]; tone?: Secti
     <div
       style={{
         position: "relative",
-        background: "var(--t-accent)",
-        color: "var(--t-accent-text)",
+        background: discreta ? "var(--t-fundal)" : "var(--t-accent)",
+        color: discreta ? "var(--t-text-secundar)" : "var(--t-accent-text)",
         overflow: "hidden",
         paddingBlock: "clamp(14px, 1.7vw, 22px)",
       }}
     >
       {/* Rândul care se mișcă e decor: dublat și derulat, n-are ce citi un
           cititor de ecran în el. Numele „adevărate" stau o dată, ascunse vizual,
-          mai jos. */}
+          mai jos.
+
+          La `discreta`, opacitatea stă AICI, pe tot rândul deodată (cuvinte ȘI
+          stele), ca la referință — un singur număr, nu o dimare separată pe
+          fiecare stea, care ar fi scos-o din pas cu textul. */}
       <div
         className="banda-servicii-track"
         aria-hidden
@@ -49,6 +67,7 @@ export function BandaServicii({ servicii }: { servicii: Serviciu[]; tone?: Secti
           alignItems: "center",
           whiteSpace: "nowrap",
           willChange: "transform",
+          opacity: discreta ? 0.55 : undefined,
         }}
       >
         {track.map((titlu, i) => (
@@ -64,7 +83,15 @@ export function BandaServicii({ servicii }: { servicii: Serviciu[]; tone?: Secti
             >
               {titlu}
             </span>
-            <span style={{ opacity: 0.55, fontSize: "clamp(11px, 1.1vw, 15px)" }}>✦</span>
+            <span
+              style={{
+                color: discreta ? "var(--t-accent)" : undefined,
+                opacity: discreta ? 1 : 0.55,
+                fontSize: "clamp(11px, 1.1vw, 15px)",
+              }}
+            >
+              ✦
+            </span>
           </span>
         ))}
       </div>

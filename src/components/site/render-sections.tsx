@@ -113,7 +113,13 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       imagine={ctx.asezari.serviciiImagine}
     />
   ),
-  bandaServicii: (row, ctx) => <BandaServicii servicii={ctx.servicii} tone={row.tone} />,
+  bandaServicii: (row, ctx) => (
+    <BandaServicii
+      servicii={ctx.servicii}
+      tone={row.tone}
+      discreta={ctx.asezari.bandaServiciiDiscreta}
+    />
+  ),
   aboutTeaser: (row, ctx) => (
     <AboutTeaser
       data={row.data as AboutTeaserData}
