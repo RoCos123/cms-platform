@@ -102,7 +102,12 @@ export function AboutTeaser({
           fontSize: "clamp(32px, 4.4vw, 54px)",
           lineHeight: 1.08,
           letterSpacing: "-0.025em",
-          fontWeight: 700,
+          // Fontul de titlu al șablonului, ca la `SectionHeading` — corectat
+          // 19 sept. 2026: secțiunea asta nu trece prin `SectionHeading`
+          // (are propriul antet), deci rămăsese pe fontul implicit, diferit
+          // de restul titlurilor paginii (ex. „Apariții").
+          fontFamily: "var(--t-font-titlu)",
+          fontWeight: "var(--t-greutate-titlu)" as unknown as number,
           textWrap: "balance",
         }}
       >
