@@ -20,6 +20,7 @@ export function HowItWorks({
   data,
   tone,
   carduri,
+  titluSerif,
 }: {
   data: HowItWorksData;
   tone?: SectionTone;
@@ -28,6 +29,12 @@ export function HowItWorks({
    * din referința „Liniște". Fără iconițe. Doar „Liniște".
    */
   carduri?: boolean;
+  /**
+   * Fontul de titlu al șablonului (`--t-font-titlu`), ca la `SectionHeading`.
+   * Pornit DOAR pe „Liniește" (23 sept. 2026), cerut de proprietar — vezi
+   * `TemplateAsezari.titluSerif`. Fără el, titlul rămâne pe fontul implicit.
+   */
+  titluSerif?: boolean;
 }) {
   /*
     Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
@@ -82,12 +89,15 @@ export function HowItWorks({
             fontSize: "clamp(32px, 4.4vw, 54px)",
             lineHeight: 1.08,
             letterSpacing: "-0.025em",
-            // Fontul de titlu al șablonului, ca la `SectionHeading` — corectat
-            // 19 sept. 2026: secțiunea asta nu trece prin `SectionHeading`
-            // (are propriul antet), deci rămăsese pe fontul implicit, diferit
-            // de restul titlurilor paginii (ex. „Apariții").
-            fontFamily: "var(--t-font-titlu)",
-            fontWeight: "var(--t-greutate-titlu)" as unknown as number,
+            // Fontul de titlu al șablonului, ca la `SectionHeading` — DOAR când
+            // `titluSerif` e pornit (Liniește). Fără el, rămâne fontWeight 700
+            // simplu, exact ca înainte de 19 sept. 2026, pe celelalte șabloane.
+            ...(titluSerif
+              ? {
+                  fontFamily: "var(--t-font-titlu)",
+                  fontWeight: "var(--t-greutate-titlu)" as unknown as number,
+                }
+              : { fontWeight: 700 }),
             textWrap: "balance",
           }}
         >

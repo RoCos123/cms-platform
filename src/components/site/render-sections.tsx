@@ -128,6 +128,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       pozaStivuita={ctx.asezari.desprePozaStivuita}
       friendly={ctx.asezari.despreFriendly}
       reperCard={ctx.asezari.despreReperCard}
+      titluSerif={ctx.asezari.titluSerif}
     />
   ),
   howItWorks: (row, ctx) => (
@@ -135,6 +136,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       data={row.data as HowItWorksData}
       tone={row.tone}
       carduri={ctx.asezari.cumLucrezCarduri}
+      titluSerif={ctx.asezari.titluSerif}
     />
   ),
   testimonials: (row, ctx) => (
@@ -142,12 +144,15 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       data={row.data as TestimonialsData}
       tone={row.tone}
       friendly={ctx.asezari.testimonialeFriendly}
+      titluSerif={ctx.asezari.titluSerif}
     />
   ),
   pricing: (row, ctx) => (
     <Pricing data={row.data as PricingData} tone={row.tone} friendly={ctx.asezari.pricingFriendly} />
   ),
-  faq: (row) => <Faq data={row.data as FaqData} tone={row.tone} />,
+  faq: (row, ctx) => (
+    <Faq data={row.data as FaqData} tone={row.tone} titluSerif={ctx.asezari.titluSerif} />
+  ),
   latestPosts: (row, ctx) => (
     <LatestPosts
       data={row.data as LatestPostsData}
@@ -176,7 +181,9 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       saptamana={ctx.asezari.programareSaptamana}
     />
   ),
-  newsletter: (row) => <Newsletter data={row.data as NewsletterData} tone={row.tone} />,
+  newsletter: (row, ctx) => (
+    <Newsletter data={row.data as NewsletterData} tone={row.tone} titluSerif={ctx.asezari.titluSerif} />
+  ),
 };
 
 export function sectiuneCunoscuta(key: string): boolean {

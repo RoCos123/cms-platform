@@ -25,7 +25,20 @@ const NOTA_IMPLICITA =
  * neconfirmată; dovada consimțământului pentru marketing e confirmarea prin
  * email, care se implementează în Faza 6, când există trimitere de emailuri.
  */
-export function Newsletter({ data, tone = "inchis" }: { data: NewsletterData; tone?: SectionTone }) {
+export function Newsletter({
+  data,
+  tone = "inchis",
+  titluSerif,
+}: {
+  data: NewsletterData;
+  tone?: SectionTone;
+  /**
+   * Fontul de titlu al șablonului (`--t-font-titlu`), ca la `SectionHeading`.
+   * Pornit DOAR pe „Liniește" (23 sept. 2026), cerut de proprietar — vezi
+   * `TemplateAsezari.titluSerif`. Fără el, titlul rămâne pe fontul implicit.
+   */
+  titluSerif?: boolean;
+}) {
   /*
     Fără un titlu, secțiunea nu se randează deloc.
 
@@ -53,12 +66,15 @@ export function Newsletter({ data, tone = "inchis" }: { data: NewsletterData; to
             fontSize: "clamp(30px, 4vw, 48px)",
             lineHeight: 1.1,
             letterSpacing: "-0.025em",
-            // Fontul de titlu al șablonului, ca la `SectionHeading` — corectat
-            // 19 sept. 2026: secțiunea asta nu trece prin `SectionHeading`
-            // (are propriul antet), deci rămăsese pe fontul implicit, diferit
-            // de restul titlurilor paginii (ex. „Apariții").
-            fontFamily: "var(--t-font-titlu)",
-            fontWeight: "var(--t-greutate-titlu)" as unknown as number,
+            // Fontul de titlu al șablonului, ca la `SectionHeading` — DOAR când
+            // `titluSerif` e pornit (Liniește). Fără el, rămâne fontWeight 700
+            // simplu, exact ca înainte de 19 sept. 2026, pe celelalte șabloane.
+            ...(titluSerif
+              ? {
+                  fontFamily: "var(--t-font-titlu)",
+                  fontWeight: "var(--t-greutate-titlu)" as unknown as number,
+                }
+              : { fontWeight: 700 }),
             textWrap: "balance",
           }}
         >

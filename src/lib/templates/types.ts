@@ -190,6 +190,19 @@ export type TemplateAsezari = {
    */
   bandaServiciiDiscreta?: boolean;
   /**
+   * Titlul acestei secțiuni ia fontul de titlu al șablonului (`--t-font-titlu`
+   * / `--t-greutate-titlu`), ca la `SectionHeading`. Secțiunile astea cinci
+   * (`aboutTeaser`, `faq`, `howItWorks`, `newsletter`, `testimonials`) au
+   * propriul antet, scris înainte ca `SectionHeading` să existe, și au rămas
+   * pe fontul implicit — inconsecvent cu accentul din titlu, care folosea deja
+   * fontul corect. Corect pentru toate șabloanele, dar pornit DOAR pe
+   * „Liniește" (23 sept. 2026): proprietarul a cerut explicit să nu atingă
+   * celelalte patru odată cu asta — o schimbare de platformă, dacă se dorește,
+   * e o decizie separată, nu un efect secundar al lucrului pe un singur
+   * șablon.
+   */
+  titluSerif?: boolean;
+  /**
    * Tratamentul de titlu al modelului prietenos, la prima secțiune: ultimul
    * cuvânt din titlu are o dungă piersică pe dedesubt, iar coada scrisă de mână
    * e verde. Doar „Apropiere" — la celelalte titlul rămâne simplu.

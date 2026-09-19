@@ -25,6 +25,7 @@ export function Testimonials({
   data,
   tone,
   friendly,
+  titluSerif,
 }: {
   data: TestimonialsData;
   tone?: SectionTone;
@@ -33,6 +34,12 @@ export function Testimonials({
    * ca la sursă. Doar „Apropiere"; restul rămân cu cardul-citat de dinainte.
    */
   friendly?: boolean;
+  /**
+   * Fontul de titlu al șablonului (`--t-font-titlu`), ca la `SectionHeading`.
+   * Pornit DOAR pe „Liniește" (23 sept. 2026), cerut de proprietar — vezi
+   * `TemplateAsezari.titluSerif`. Fără el, titlul rămâne pe fontul implicit.
+   */
+  titluSerif?: boolean;
 }) {
   /*
     Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
@@ -68,12 +75,15 @@ export function Testimonials({
           fontSize: "clamp(32px, 4.4vw, 54px)",
           lineHeight: 1.08,
           letterSpacing: "-0.025em",
-          // Fontul de titlu al șablonului, ca la `SectionHeading` — corectat
-          // 19 sept. 2026, cerut chiar de proprietar („Păreri" arăta altfel
-          // decât „Apariții"): secțiunea asta nu trece prin `SectionHeading`
-          // (are propriul antet), deci rămăsese pe fontul implicit.
-          fontFamily: "var(--t-font-titlu)",
-          fontWeight: "var(--t-greutate-titlu)" as unknown as number,
+          // Fontul de titlu al șablonului, ca la `SectionHeading` — DOAR când
+          // `titluSerif` e pornit (Liniește). Fără el, rămâne fontWeight 700
+          // simplu, exact ca înainte de 19 sept. 2026, pe celelalte șabloane.
+          ...(titluSerif
+            ? {
+                fontFamily: "var(--t-font-titlu)",
+                fontWeight: "var(--t-greutate-titlu)" as unknown as number,
+              }
+            : { fontWeight: 700 }),
           textWrap: "balance",
         }}
       >

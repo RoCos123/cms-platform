@@ -72,5 +72,6 @@ export const liniste: Template = {
     contactCard: true,
     blogCurat: true,
     bandaServiciiDiscreta: true,
+    titluSerif: true,
   },
 };

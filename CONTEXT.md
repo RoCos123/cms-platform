@@ -614,11 +614,23 @@ niciodată la el: `about-teaser`, `faq`, `how-it-works`, `newsletter`,
 `testimonials`. Toate cinci aveau `fontWeight: 700` fără `fontFamily` pe titlu
 — cădea pe fontul implicit (sans-serif bold) — în timp ce ACCENTUL din titlu
 (span separat) folosea deja corect fontul secundar, deci titlul ieșea cu DOUĂ
-fonturi diferite în aceeași propoziție. Corectat pe toate cinci, cu exact ce are
-deja `SectionHeading`. **Nu e specific Liniște** — cele cinci componente sunt
-comune tuturor șabloanelor, deci corecția se vede pe toate cinci (era cel mai
-vizibilă pe Liniște, unde titlurile sunt integral în serif). Verificat: toate
-titlurile randate alături, acum identice ca font.
+fonturi diferite în aceeași propoziție.
+
+Primul reflex a fost s-o corectez pe toate cinci componente necondiționat —
+deci pe toate cele cinci șabloane deodată, motivat de faptul că bug-ul exista
+la fel peste tot. Proprietarul a respins asta explicit: nu voia ca celelalte
+patru șabloane (Căldură, Lumină, Apropiere, Claritate) să se schimbe odată cu
+o cerere despre Liniește. Corectat a doua oară, redus strict la Liniește, cu
+același tipar de steag folosit peste tot în acest document
+(`cumLucrezCarduri`, `blogCurat` etc.): steag nou `titluSerif` în
+`TemplateAsezari`, pornit DOAR în `liniste.ts`, trecut prin `render-sections.tsx`
+la cele cinci componente. Fiecare titlu ia fontul de titlu al șablonului DOAR
+când `titluSerif` e pornit; altfel rămâne exact `fontWeight: 700` fără
+`fontFamily`, ca înainte de orice corecție. Verificat vizual: Liniește
+(`titluSerif` pornit) are titlurile în serif ca înainte; Căldură (`titluSerif`
+absent) a rămas neschimbat — bold sans-serif, exact ca la început. O schimbare
+de platformă pe toate cinci șabloane, dacă se dorește vreodată, e o decizie
+separată a proprietarului, nu un efect secundar al lucrului pe un șablon.
 
 Amândouă, tipuri/lint/218 probe/build trec.
 
