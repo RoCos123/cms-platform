@@ -87,7 +87,15 @@ export function BandaServicii({
               style={{
                 color: discreta ? "var(--t-accent)" : undefined,
                 opacity: discreta ? 1 : 0.55,
-                fontSize: "clamp(11px, 1.1vw, 15px)",
+                // La `discreta`, steaua ia ACELEAȘI proprietăți de font ca
+                // cuvântul de alături (serif italic, aceeași mărime) — corectat
+                // 19 sept. 2026, găsit prin măsurătoare pe pixeli: fără ele,
+                // glifa ✦ cade pe fontul principal sans-serif, subțire, la
+                // ~60% din înălțimea literelor mari — la referință steaua e
+                // cât o literă mare, un sparkle plin, nu o punctuație firavă.
+                fontFamily: discreta ? "var(--t-font-secundar)" : undefined,
+                fontStyle: discreta ? "italic" : undefined,
+                fontSize: discreta ? "clamp(18px, 2vw, 26px)" : "clamp(11px, 1.1vw, 15px)",
               }}
             >
               ✦
