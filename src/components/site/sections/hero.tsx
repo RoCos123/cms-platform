@@ -286,34 +286,9 @@ export function Hero({
 
   const imagine = (
     <div style={{ position: "relative" }}>
-      {/*
-        Cercul de accent din spatele portretului, care iese pe sub arcadă la
-        stânga — semnătura editorială a referinței „Liniște". E salvia
-        (`--t-accent`), coborâtă în opacitate ca să rămână un fundal, nu o pată
-        tare. Poza stă deasupra (`zIndex: 1`); `overflow` de pe secțiune taie ce
-        iese pe margini, deci nu apare derulare orizontală.
-      */}
-      {cercDecor && (
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            left: "-38px",
-            top: "36%",
-            width: "clamp(150px, 26vw, 230px)",
-            height: "clamp(150px, 26vw, 230px)",
-            borderRadius: "50%",
-            background: "var(--t-accent)",
-            opacity: 0.5,
-            zIndex: 0,
-            pointerEvents: "none",
-          }}
-        />
-      )}
       <div
         style={{
           position: "relative",
-          zIndex: 1,
           // Poza rotunjită, cu arcadă în cap pe așezarea cu poza lângă titlu (cerut
           // pe 16 sept. 2026, după modelul șablonului mov). Pe titlul lat (Căldură)
           // rămâne o rotunjire blândă, ca să nu se bată cu poza lată de acolo. Pe
@@ -334,6 +309,34 @@ export function Hero({
           pozitie={poza.pozitie}
           priority
         />
+
+        {/*
+          Cercul de accent, PESTE poză (nu în spate) — corectat 19 sept. 2026,
+          după ce proprietarul a arătat referința: la sursă cercul se vede
+          suprapus jos-stânga pe fotografie, foarte transparent, nu ca o pată
+          care iese doar pe lângă ramă. Pus AICI, după `SectionImage`, în același
+          înveliș tăiat de arcadă — se randează deasupra fotografiei prin ordinea
+          de desenare (element poziționat peste unul nepoziționat) și e tăiat de
+          arcadă la fel ca poza, fără niciun z-index de ținut minte. Opacitatea e
+          sub cea a sursei, dinadins — proprietarul a cerut „chiar mai transparent
+          cu un grad-două" decât acolo.
+        */}
+        {cercDecor && (
+          <div
+            aria-hidden
+            style={{
+              position: "absolute",
+              left: "-12%",
+              bottom: "-10%",
+              width: "64%",
+              aspectRatio: "1",
+              borderRadius: "50%",
+              background: "var(--t-accent)",
+              opacity: 0.22,
+              pointerEvents: "none",
+            }}
+          />
+        )}
       </div>
 
       {buline[0] && <Bulina bulina={buline[0]} pozitie={{ top: "26px", right: "-10px" }} />}
