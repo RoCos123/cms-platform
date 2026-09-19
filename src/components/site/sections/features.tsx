@@ -466,15 +466,27 @@ function ServiciiImagine({
               <div
                 style={{
                   position: "relative",
-                  width: "clamp(92px, 11vw, 132px)",
+                  // Procent din lățimea cardului, nu un plafon fix în px —
+                  // corectat 19 sept. 2026, găsit prin măsurătoare pe pixeli:
+                  // medalionul de la referință e ~82% din card (dominant),
+                  // plafonul vechi (132px) ieșea la doar ~39% pe cardurile
+                  // noastre, mai late. Clampul ține un minim/maxim rezonabil,
+                  // dar procentul crește cu cardul, nu rămâne în urmă pe ecran
+                  // lat.
+                  width: "clamp(130px, 58%, 200px)",
                   aspectRatio: "1",
                   borderRadius: "50%",
                   overflow: "hidden",
-                  border: "3px solid color-mix(in oklab, var(--t-text-pe-inchis) 25%, transparent)",
+                  // Inel aproape opac, deschis — corectat 19 sept. 2026: 25%
+                  // amestec ieșea prea șters (aproape confundabil cu fundalul
+                  // cardului); la referință inelul e aproape alb, clar. Culoarea
+                  // „text pe închis" a șablonului e deja crem-deschis, deci
+                  // merge direct, fără amestec.
+                  border: "3px solid var(--t-text-pe-inchis)",
                   marginBottom: "28px",
                 }}
               >
-                <SectionImage src={serviciu.coperta.url} alt="" aspectRatio="1 / 1" sizes="132px" />
+                <SectionImage src={serviciu.coperta.url} alt="" aspectRatio="1 / 1" sizes="200px" />
               </div>
             )}
 
@@ -551,7 +563,9 @@ function ServiciiImagine({
           // „Același ton al culorii": cardul rămâne pe fundalul șablonului —
           // o treaptă peste banda secțiunii — INDIFERENT de culorile pozei, care
           // acum nu-i mai atinge deloc fundalul (e doar medalionul rotund).
-          background: "color-mix(in oklab, var(--t-fundal-inchis) 88%, #ffffff)",
+          // 95%, nu 88% — corectat 19 sept. 2026, măsurat pe pixeli din
+          // referință: acolo cardul e doar cu ~5% alb amestecat, nu 12%.
+          background: "color-mix(in oklab, var(--t-fundal-inchis) 95%, #ffffff)",
           textDecoration: "none",
         };
 
