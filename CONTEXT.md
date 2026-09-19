@@ -512,8 +512,77 @@ Servicii = carduri-imagine închise pe crem. Amândouă arată bine; plasarea
 placeholder-e GRI (nu colorate — lecția din 16 sept.). Tipuri, lint și cele 218
 probe de logică trec (contrastul inclus, fiindcă paleta n-a fost atinsă).
 
-**Stare:** Liniște e adus vizual la referință, cap la cap. Rămân neatinse Căldură,
-Lumină și Claritate. Nimic nu mai e deschis din acest document.
+**Stare la 18 sept.:** Liniște e adus vizual la referință, cap la cap. Rămân
+neatinse Căldură, Lumină și Claritate. Nimic nu mai e deschis din acest
+document.
+
+## De modificat pe șabloane (19 sept. 2026) — al cincilea document, corecții pe Liniște
+
+Proprietarul a arătat, într-un document nou (`Modificari_noi_liniste.docx`),
+capturi ALE SITE-ULUI ADEVĂRAT „Dragoș Geamănă" — nu ale mockup-ului offline
+din care citisem codul la documentul precedent. Diferența contează: mockup-ul
+(un instrument de prototipare cu paletă/font-uri reglabile) nu e neapărat
+identic cu ce rulează cu adevărat live, iar la Servicii chiar nu era — vezi mai
+jos. **Lecția: o captură a site-ului viu bate citirea din codul unui mockup,
+de fiecare dată când vin amândouă.**
+
+Cinci corecții, fiecare cu poza proprietarului alături:
+
+1. **Cercul din hero** — trebuia să fie PESTE poză (nu în spate) și mult mai
+   transparent. Mutat în același înveliș tăiat de arcadă, după `SectionImage`
+   (se randează deasupra prin ordinea de desenare, fără niciun z-index de ținut
+   minte), opacitate coborâtă de la 0,5 la 0,22.
+2. **Banda cu servicii** — stătea pe accentul plin (verde), decizie corectă
+   pentru șablonul ei de origine (16 sept.), dar greșită pe Liniște: la
+   referință banda decorativă stă pe crem, cu cuvinte italice estompate. Steag
+   nou `bandaServiciiDiscreta`.
+3. **Servicii** — prima variantă (18 sept.) pusese poza pe tot cardul, citind
+   din CSS-ul mockup-ului. Pe site-ul ADEVĂRAT, fiecare card e un dreptunghi
+   închis cu poza doar ca un MEDALION rotund sus — cerut chiar așa: „același
+   ton al culorii și spațiu pentru poze în cerc". Rescris `ServiciiImagine`.
+4. **„Cum decurge colaborarea"** — trebuia să arate ca „Cum lucrez" de la
+   referință: ton bej, cutii albe, „atât" (fără iconițe, deși referința le
+   are). `cumLucrezCarduri` forțează acum tonul la „deschis" necondiționat,
+   ignorând tonul secțiunii din bază (venea „închis" de la provizionare).
+5. **Blog** — să fie ca la referință; cardurile erau deja aproape acolo (18
+   sept.).
+
+**Verificare adversarială, nu doar ochiul meu.** Fiindcă proprietarul spusese
+că omisesem părți importante data trecută, după implementare am rulat un
+workflow cu 6 agenți independenți: unul a recitit documentul de la zero (text
++ toate cele 6 imagini) și a scos o listă proprie de cerințe, iar câte unul,
+separat, a verificat fiecare din cele 5 corecții — comparând pe PIXELI
+referința cu rezultatul, nu doar „arată bine". A ieșit exact ce trebuia să
+iasă: 2 din 5 confirmate complet (cercul din hero, „Cum lucrez"), 3 cu
+diferențe reale, măsurate, rămase după prima trecere:
+
+- steaua din bandă era la ~60% din înălțimea literelor (firavă, fără fontul
+  serif) — corectat: aceleași proprietăți de font ca și cuvântul, la `discreta`;
+- medalionul de la Servicii era de două ori mai mic proporțional decât la
+  referință (39% din card, față de 82%) — corectat: lățime procentuală, nu
+  plafon fix în px; inelul avea doar 25% opacitate (aproape invizibil pe
+  fundal) — corectat: culoarea „text pe închis" direct, fără amestec; fundalul
+  cardului ieșea puțin prea deschis (12% alb amestecat, față de ~5% măsurat) —
+  corectat;
+- titlul cardului de blog n-avea `fontFamily`, deci cădea pe sans-serif — la
+  referință e serif, ca titlul secțiunii de deasupra — corectat; butonul-pastilă
+  comun („Toate serviciile"/„Toate articolele") avea săgeata greșită (→ în loc
+  de ↗, verificat direct din CSS-ul reținut al referinței) și cercul
+  supradimensionat (66% din înălțimea pastilei, față de ~33% la sursă) —
+  corectat pe amândouă.
+
+A doua trecere de verificare vizuală (aceleași capturi, după corecții) a
+confirmat toate cele trei. Un lucru semnalat de verificare, dar NEadăugat
+dinadins: stările de hover din CSS-ul referinței (card care se ridică, poză
+care se mărește la trecerea mausului, buton care se inversează) — nu erau
+cerute în documentul proprietarului, iar verificarea însăși le-a marcat drept
+neconfirmate ca defect, doar semnalate. Rămân de discutat separat, dacă se
+dorește.
+
+Tipuri, lint, cele 218 probe de logică și build-ul trec după toate corecțiile.
+
+**Stare la 19 sept.:** toate cele cinci corecții din al cincilea document sunt
+făcute și verificate adversarial. Nimic nu mai e deschis din acest document.
 
 ## Panoul pe telefon (11 sept. 2026)
 
