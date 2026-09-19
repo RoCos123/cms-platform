@@ -1,6 +1,6 @@
 import type { SectionTone } from "@/lib/templates";
 import type { Serviciu } from "@/lib/servicii";
-import { Section } from "@/components/site/section";
+import { Section, SectionActionButton } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
 
@@ -86,20 +86,27 @@ export function Features({
               printr-un portal într-un iframe. Acolo contextul de rutare e al
               PANOULUI — un `Link` ar încerca să navigheze panoul, nu site-ul, și
               ar preîncărca pagini de care previzualizarea n-are nevoie.
+
+              La „Liniște" (`imagine`), butonul-pastilă cu cerc-săgeată, ca la
+              referință; la restul rămâne linkul simplu de dinainte.
             */
-            // eslint-disable-next-line @next/next/no-html-link-for-pages
-            <a
-              href="/servicii"
-              style={{
-                fontSize: "15px",
-                fontWeight: 600,
-                color: "var(--s-accent)",
-                textDecoration: "none",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Toate serviciile →
-            </a>
+            imagine ? (
+              <SectionActionButton href="/servicii">Toate serviciile</SectionActionButton>
+            ) : (
+              // eslint-disable-next-line @next/next/no-html-link-for-pages
+              <a
+                href="/servicii"
+                style={{
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  color: "var(--s-accent)",
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Toate serviciile →
+              </a>
+            )
           ) : undefined
         }
       />
@@ -387,15 +394,22 @@ function ServiciiFriendly({
 }
 
 /**
- * Cardurile de servicii ale referinței „Liniște": carduri-imagine pe fundal
- * închis, cu poza serviciului peste tot cardul, un voal întunecat care se
- * îngroașă spre bază, titlul (și descrierea scurtă) peste imagine și o săgeată
- * rotundă în colț. Fără poză, cardul rămâne un dreptunghi închis doar cu titlul —
- * un serviciu abia scris, fără copertă, tot arată a card, nu a gol. Doar
- * „Liniște".
+ * Cardurile de servicii ale referinței „Liniște".
+ *
+ * Corectat 19 sept. 2026: prima variantă (aici) punea poza pe TOT cardul, sub
+ * un voal întunecat — citită din CSS-ul sursei, nu dintr-o captură a ei. Pe o
+ * captură a site-ului adevărat, proprietarul a arătat altceva: fiecare card e
+ * un dreptunghi ÎNCHIS, cu poza doar ca un MEDALION rotund sus, textul dedesubt.
+ * Cerut chiar așa: „același ton al culorii" (cardul rămâne închis, poza nu-i
+ * schimbă culoarea) „și spațiu pentru poze în cerc". Fără poză, cardul rămâne
+ * un dreptunghi închis doar cu titlul.
+ *
+ * Titlul repetat, uriaș și aproape stins, tăiat de marginea cardului, e
+ * flourish-ul tipografic de la sursă — o aproximare rezonabilă, nu o măsurătoare
+ * exactă (captura nu dă mărimea la pixel).
  *
  * Culorile vin din nivelul ȘABLONULUI (`--t-…`): cardul e mereu închis, iar
- * textul mereu deschis, oricare ar fi tonul benzii (la referință banda e închisă).
+ * textul mereu deschis, oricare ar fi tonul benzii.
  */
 function ServiciiImagine({
   servicii,
@@ -411,58 +425,76 @@ function ServiciiImagine({
         margin: "56px 0 0",
         padding: 0,
         display: "grid",
-        // Minim mare (420px) ca să iasă DOUĂ coloane pe lat și una pe telefon,
-        // fără media query — cardurile-imagine sunt late, ca la referință.
-        gridTemplateColumns: "repeat(auto-fit, minmax(min(420px, 100%), 1fr))",
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
         gap: "24px",
       }}
     >
       {servicii.map((serviciu) => {
         const continut = (
-          <>
+          <div
+            style={{
+              position: "relative",
+              minHeight: "260px",
+              padding: "clamp(28px, 3vw, 36px)",
+            }}
+          >
+            {/*
+              Titlul repetat, ca fundal decorativ. `aria-hidden`: cititoarele de
+              ecran au deja titlul adevărat, de mai jos — ăsta e doar desen.
+              Tăiat de `overflow: hidden` al cardului (mai jos), nu de aici.
+            */}
+            <span
+              aria-hidden
+              style={{
+                position: "absolute",
+                left: "clamp(24px, 3vw, 36px)",
+                bottom: "-0.18em",
+                fontFamily: "var(--t-font-titlu)",
+                fontWeight: "var(--t-greutate-titlu)" as unknown as number,
+                fontSize: "clamp(52px, 7.5vw, 88px)",
+                lineHeight: 1,
+                color: "var(--t-text-pe-inchis)",
+                opacity: 0.05,
+                whiteSpace: "nowrap",
+                pointerEvents: "none",
+              }}
+            >
+              {serviciu.titlu}
+            </span>
+
             {serviciu.coperta && (
-              <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-                <SectionImage
-                  src={serviciu.coperta.url}
-                  alt=""
-                  aspectRatio="5 / 4"
-                  sizes="(max-width: 860px) 100vw, 50vw"
-                />
-                {/*
-                  Voalul: transparent sus, întunecat spre bază, ca titlul alb să
-                  se citească peste orice poză. E un strat peste imagine, sub text.
-                */}
-                <div
-                  aria-hidden
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background:
-                      "linear-gradient(180deg, rgba(15,22,18,0) 30%, rgba(15,22,18,0.55) 62%, rgba(15,22,18,0.95) 100%)",
-                  }}
-                />
+              <div
+                style={{
+                  position: "relative",
+                  width: "clamp(92px, 11vw, 132px)",
+                  aspectRatio: "1",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  border: "3px solid color-mix(in oklab, var(--t-text-pe-inchis) 25%, transparent)",
+                  marginBottom: "28px",
+                }}
+              >
+                <SectionImage src={serviciu.coperta.url} alt="" aspectRatio="1 / 1" sizes="132px" />
               </div>
             )}
 
             <div
               style={{
                 position: "relative",
-                zIndex: 2,
-                padding: "clamp(28px, 3vw, 44px)",
                 display: "flex",
                 alignItems: "flex-end",
                 justifyContent: "space-between",
-                gap: "20px",
+                gap: "16px",
               }}
             >
               <div style={{ minWidth: 0 }}>
                 <h3
                   style={{
                     margin: 0,
-                    fontSize: "clamp(24px, 2.4vw, 34px)",
-                    fontWeight: 600,
+                    fontFamily: "var(--t-font-titlu)",
+                    fontWeight: "var(--t-greutate-titlu)" as unknown as number,
+                    fontSize: "clamp(21px, 2vw, 26px)",
                     color: "var(--t-text-pe-inchis)",
-                    textShadow: "0 2px 20px rgba(0, 0, 0, 0.45)",
                     textWrap: "pretty",
                   }}
                 >
@@ -471,12 +503,11 @@ function ServiciiImagine({
                 {serviciu.descriereScurta?.trim() && (
                   <p
                     style={{
-                      margin: "10px 0 0",
+                      margin: "8px 0 0",
                       fontSize: "15px",
                       lineHeight: 1.55,
-                      maxWidth: "34ch",
-                      color: "color-mix(in oklab, var(--t-text-pe-inchis) 88%, transparent)",
-                      textShadow: "0 1px 10px rgba(0, 0, 0, 0.5)",
+                      maxWidth: "30ch",
+                      color: "color-mix(in oklab, var(--t-text-pe-inchis) 78%, transparent)",
                       textWrap: "pretty",
                     }}
                   >
@@ -495,34 +526,32 @@ function ServiciiImagine({
                   aria-hidden
                   style={{
                     flexShrink: 0,
-                    width: "52px",
-                    height: "52px",
+                    width: "44px",
+                    height: "44px",
                     borderRadius: "999px",
                     display: "grid",
                     placeItems: "center",
                     background: "var(--t-fundal)",
                     color: "var(--t-text)",
-                    fontSize: "18px",
+                    fontSize: "16px",
                   }}
                 >
                   →
                 </span>
               )}
             </div>
-          </>
+          </div>
         );
 
         const stil: React.CSSProperties = {
+          display: "block",
           position: "relative",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-end",
-          aspectRatio: "5 / 4",
           borderRadius: "var(--t-raza)",
           overflow: "hidden",
-          // Fundalul de sub poză (și cardul întreg, fără poză): un închis o
-          // treaptă peste banda secțiunii, ca să se desprindă de ea.
-          background: "color-mix(in oklab, var(--t-fundal-inchis) 82%, #ffffff)",
+          // „Același ton al culorii": cardul rămâne pe fundalul șablonului —
+          // o treaptă peste banda secțiunii — INDIFERENT de culorile pozei, care
+          // acum nu-i mai atinge deloc fundalul (e doar medalionul rotund).
+          background: "color-mix(in oklab, var(--t-fundal-inchis) 88%, #ffffff)",
           textDecoration: "none",
         };
 

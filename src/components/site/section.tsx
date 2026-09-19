@@ -160,3 +160,61 @@ export function SectionEyebrow({ children }: { children: ReactNode }) {
     </p>
   );
 }
+
+/**
+ * Legătura „Vezi toate →" ca buton-pastilă cu un cerc-săgeată în capăt, ca la
+ * referința „Liniște" (`.btn-ghost` + `.btn-arrow` acolo). Adăugat 19 sept.
+ * 2026, la Servicii și la Blog — nu e implicitul: restul secțiunilor păstrează
+ * linkul simplu, colorat cu accentul, ca să nu apară schimbarea peste tot fără
+ * nicio cerere pentru ea. Se cere explicit din componenta apelantă.
+ *
+ * Fără `color` propriu: moștenește culoarea de pe `Section` (deja potrivită
+ * tonului), deci chenarul și textul rămân corecte oricare ar fi tonul, prin
+ * `currentColor` — nu o variabilă `--s-…` inventată, care n-ar fi existat.
+ * Cercul ia `var(--t-fundal)` pentru săgeată, ca la sursă: corect cât timp
+ * secțiunea stă pe un fundal deschis (cazul actual, la ambele apeluri).
+ */
+export function SectionActionButton({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <a
+      href={href}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "14px",
+        height: "48px",
+        paddingInline: "22px 6px",
+        borderRadius: "999px",
+        border: "1px solid currentColor",
+        fontSize: "15px",
+        fontWeight: 600,
+        textDecoration: "none",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {children}
+      {/*
+        Cercul ia `currentColor` MOȘTENIT de la `<a>` — dacă i-aș pune propria
+        `color` (pentru săgeată), `currentColor` s-ar întoarce la ea însăși, nu
+        la părinte, și cercul ar ieși crem-pe-crem, invizibil (exact ce s-a
+        întâmplat la prima încercare). De-aia săgeata stă într-un SPAN separat,
+        cu propria culoare, imbricat în cel care desenează cercul.
+      */}
+      <span
+        aria-hidden
+        style={{
+          flexShrink: 0,
+          width: "32px",
+          height: "32px",
+          borderRadius: "50%",
+          display: "grid",
+          placeItems: "center",
+          background: "currentColor",
+          fontSize: "14px",
+        }}
+      >
+        <span style={{ color: "var(--t-fundal)" }}>→</span>
+      </span>
+    </a>
+  );
+}
