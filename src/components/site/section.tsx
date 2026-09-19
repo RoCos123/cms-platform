@@ -181,13 +181,17 @@ export function SectionActionButton({ href, children }: { href: string; children
       style={{
         display: "inline-flex",
         alignItems: "center",
-        gap: "14px",
-        height: "48px",
-        paddingInline: "22px 6px",
+        gap: "12px",
+        // Fără `height` fixă — proporțiile vin din padding, ca la referință
+        // (`.btn { padding: 18px 32px; }`). Corectat 19 sept. 2026: o înălțime
+        // impusă (48px) lăsa cercul să pară îndesat spre margine și
+        // supradimensionat față de pastilă — găsit prin măsurătoare pe pixeli
+        // (cercul acoperea ~66% din înălțime, față de ~33% la sursă).
+        padding: "16px 28px",
         borderRadius: "999px",
         border: "1px solid currentColor",
         fontSize: "15px",
-        fontWeight: 600,
+        fontWeight: 500,
         textDecoration: "none",
         whiteSpace: "nowrap",
       }}
@@ -199,21 +203,25 @@ export function SectionActionButton({ href, children }: { href: string; children
         la părinte, și cercul ar ieși crem-pe-crem, invizibil (exact ce s-a
         întâmplat la prima încercare). De-aia săgeata stă într-un SPAN separat,
         cu propria culoare, imbricat în cel care desenează cercul.
+
+        Mărimea (24px, aproape de cei 22px ai sursei) și săgeata diagonală
+        (↗, nu →) sunt corectate 19 sept. 2026, verificate direct din CSS-ul
+        referinței (`.btn-arrow::after { content: "↗"; }`).
       */}
       <span
         aria-hidden
         style={{
           flexShrink: 0,
-          width: "32px",
-          height: "32px",
+          width: "24px",
+          height: "24px",
           borderRadius: "50%",
           display: "grid",
           placeItems: "center",
           background: "currentColor",
-          fontSize: "14px",
+          fontSize: "12px",
         }}
       >
-        <span style={{ color: "var(--t-fundal)" }}>→</span>
+        <span style={{ color: "var(--t-fundal)" }}>↗</span>
       </span>
     </a>
   );

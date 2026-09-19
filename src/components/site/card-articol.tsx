@@ -101,7 +101,22 @@ export function CardArticol({
           </span>
         )}
 
-        <h3 style={{ margin: 0, fontSize: "20px", lineHeight: 1.3, fontWeight: friendly ? 700 : 600, textWrap: "pretty" }}>
+        {/*
+          La „curat" (Liniște), titlul ia fontul de afișaj al șablonului
+          (serif), ca titlul secțiunii de deasupra — corectat 19 sept. 2026,
+          găsit prin comparație directă: fără `fontFamily`, cade pe sans-serif-ul
+          principal, un caracter tipografic complet diferit de restul paginii.
+        */}
+        <h3
+          style={{
+            margin: 0,
+            fontSize: "20px",
+            lineHeight: 1.3,
+            fontFamily: curat ? "var(--t-font-titlu)" : undefined,
+            fontWeight: curat ? ("var(--t-greutate-titlu)" as unknown as number) : friendly ? 700 : 600,
+            textWrap: "pretty",
+          }}
+        >
           {articol.titlu}
         </h3>
 
