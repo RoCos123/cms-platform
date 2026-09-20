@@ -109,6 +109,11 @@ export function Section({
     >
       {decor}
       <div
+        // Intrarea în cadru la scroll (vezi `reveal-la-scroll.tsx`) — pe
+        // CONȚINUT, nu pe `<section>`: fundalul colorat trebuie să rămână, ca
+        // să nu se vadă o gaură cu fundalul paginii dedesubt cât conținutul e
+        // încă invizibil.
+        data-reveal="fade"
         style={{
           maxWidth: "1180px",
           margin: "0 auto",

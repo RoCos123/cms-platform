@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getTemplate, templateStyle } from "@/lib/templates";
 import { templateFontStyle } from "@/lib/templates/fonturi";
 import { RenderSections } from "@/components/site/render-sections";
+import { RevealLaScroll } from "@/components/site/reveal-la-scroll";
 import { SECTIUNI, SERVICII } from "./continut";
 
 /**
@@ -51,6 +52,10 @@ export default function ProbaVanzari() {
           asezari: template.asezari,
         }}
       />
+      <RevealLaScroll />
+      <noscript>
+        <style>{"[data-reveal]{opacity:1!important;transform:none!important;}"}</style>
+      </noscript>
     </div>
   );
 }

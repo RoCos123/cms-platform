@@ -50,6 +50,18 @@ export function CadruPrevizualizare({
         .querySelectorAll('style, link[rel="stylesheet"]')
         .forEach((nod) => doc.head.appendChild(nod.cloneNode(true)));
 
+      /*
+       * Intrarea în cadru la scroll (`[data-reveal]`, din `Section`) pornește
+       * conținutul invizibil până-l „vede" un IntersectionObserver — care aici
+       * n-are ce observa, fiindcă fereastra asta nu derulează (`scrolling="no"`,
+       * totul e vizibil dintr-odată). Fără linia asta, fiecare previzualizare
+       * din panou ar rămâne cu secțiunile goale, la nesfârșit.
+       */
+      const suprascriereReveal = doc.createElement("style");
+      suprascriereReveal.textContent =
+        "[data-reveal]{opacity:1!important;transform:none!important;}";
+      doc.head.appendChild(suprascriereReveal);
+
       doc.body.style.margin = "0";
       // Previzualizarea se privește, nu se folosește: `inert` scoate tot ce e
       // înăuntru din ordinea de tabulare și din arborele de accesibilitate, ca

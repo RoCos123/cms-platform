@@ -15,6 +15,7 @@ import { SiteFooter } from "@/components/site/footer";
 import { BaraAdmin } from "@/components/site/bara-admin";
 import { NumaratorVizite } from "@/components/site/numarator-vizite";
 import { TranzitieLogo } from "@/components/site/tranzitie-logo";
+import { RevealLaScroll } from "@/components/site/reveal-la-scroll";
 
 /**
  * Cadrul oricărei pagini publice: fonturile șablonului, antetul, subsolul și,
@@ -154,6 +155,13 @@ export async function CadruSite({
             ca și cele de mai sus — nu ține de `siteId`, ci de navigarea din
             browser. Fără logo încărcat, nu apare deloc. */}
         <TranzitieLogo logoUrl={logoSemnat?.url} />
+
+        {/* Intrarea în cadru a secțiunilor la scroll — vezi `reveal-la-scroll.tsx`
+            și regula `[data-reveal]` din `globals.css`. */}
+        <RevealLaScroll />
+        <noscript>
+          <style>{"[data-reveal]{opacity:1!important;transform:none!important;}"}</style>
+        </noscript>
       </div>
     </>
   );

@@ -2036,3 +2036,68 @@ sunt el.
 
 Ecranul e `/dashboard/vizite`. Migrarea `20260827100000_vizite.sql` TREBUIE
 rulată în Supabase înainte ca ecranul să arate ceva.
+
+## Intrarea în cadru a secțiunilor, la scroll (20 sept. 2026)
+
+Proprietarul a întrebat de o animație pe care o văzuse pe referința „Dragoș
+Geamănă" (aceeași sursă din care a fost adus șablonul Liniește) — secțiunile
+apar cu un fade discret pe măsură ce dai scroll, nu direct, dintr-odată.
+Verificat direct în fișierul original primit (`Dragos-Geamana-site.html`, nu
+din memorie): sistemul chiar există acolo, în CSS —
+
+```css
+[data-reveal] { opacity: 0; transition: opacity 1100ms cubic-bezier(0.22, 0.61, 0.36, 1), transform ...; }
+[data-reveal="fade"] { transform: translateY(30px); }
+[data-reveal].is-in { opacity: 1; transform: none; }
+```
+
+— cu `--anim-distance: 60px`, `--anim-duration: 1100ms`,
+`--anim-ease: cubic-bezier(0.22, 0.61, 0.36, 1)`. JS-ul care pune clasa
+`is-in` (de obicei un `IntersectionObserver`) nu era în fișierul salvat —
+doar CSS-ul definea sistemul, fără nicio folosire pe elemente reale în
+export. Reconstruit cu mecanismul standard (observator care adaugă clasa o
+singură dată, la prima intrare în ecran).
+
+**Sferă: pe toate cinci șabloanele, nu doar Liniește** — decizia
+proprietarului, contrar corecțiilor anterioare (care erau toate „piele":
+culori, fonturi, așezări specifice unui singur șablon). Motivul lui, în
+propriile cuvinte de arhitectură din 11 sept.: „funcție nouă → disponibilă la
+toți, dar apare doar unde e folosită". O animație de intrare la scroll ține de
+STRUCTURĂ (comportamentul componentei comune `Section`), nu de piele — deci se
+construiește o singură dată, ca `SectionHeading`.
+
+**Unde s-a pus, exact:** `data-reveal="fade"` pe conținutul din `Section`
+(`section.tsx`), NU pe `<section>` însuși — fundalul colorat al benzii rămâne
+static; doar textul/cardurile dinăuntru fac fade. Așa, nu apare o "gaură" cu
+fundalul paginii dedesubt cât conținutul e încă invizibil. Un
+`IntersectionObserver` (`reveal-la-scroll.tsx`, componentă client nouă) pune
+clasa `is-in` prima dată când elementul intră în ecran, apoi se dezabonează —
+nu repetă la fiecare intrare/ieșire.
+
+**Trei plase de siguranță, toate verificate cu Playwright, nu presupuse:**
+1. `prefers-reduced-motion: reduce` — regula CSS stă sub
+   `@media (prefers-reduced-motion: no-preference)`, deci cine a cerut mai
+   puțină mișcare nu intră deloc sub ea: conținutul e vizibil din capul
+   locului, fără fade. Verificat cu un context Playwright cu
+   `reducedMotion: "reduce"` — opacitate 1, fără scroll.
+2. Fără JavaScript deloc — regula CSS tot s-ar aplica și ar ține conținutul
+   invizibil la nesfârșit, fiindcă n-ar mai exista observatorul care pune
+   `is-in`. `cadru-site.tsx` pune un `<noscript>` cu o regulă care anulează
+   `[data-reveal]`. Verificat cu `javaScriptEnabled: false` — opacitate 1.
+3. **Previzualizarea live din dashboard** (`CadruPrevizualizare`, folosită de
+   cele cinci editoare: secțiuni, servicii, pagini, blog, setări) randează
+   conținutul într-un `<iframe>` fără derulare (`scrolling="no"`) — nimic nu
+   „intră în ecran" acolo, niciodată, deci fără o plasă separată fiecare
+   previzualizare ar fi rămas cu secțiunile invizibile la nesfârșit. Fixat o
+   singură dată, în `copiazaStiluri` din `cadru-previzualizare.tsx`: o regulă
+   `!important` injectată în documentul iframe-ului anulează `[data-reveal]`
+   — previzualizarea rămâne instantă, cum trebuie să fie un instrument de
+   scris. Verificat cu o pagină de probă temporară care randează
+   `CadruPrevizualizare` izolat.
+
+`/proba-vanzari` (oglinda site-ului de vânzări) primește și ea animația
+(`RevealLaScroll` montat acolo) — spre deosebire de previzualizarea din
+panou, pagina asta chiar se derulează ca site-ul adevărat, deci comportamentul
+corect e să arate LA FEL, nu instant.
+
+Tipuri, lint, cele 218 probe și build-ul trec.

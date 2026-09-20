@@ -357,3 +357,39 @@ body {
     display: none !important;
   }
 }
+
+/* ==========================================================================
+ * Intrarea în cadru a secțiunilor, la scroll.
+ *
+ * Măsurat din site-ul-sursă „Dragoș Geamănă" (fișierul original primit, nu o
+ * presupunere): distanța, durata și curba sunt ale lui. `Section` pune
+ * `data-reveal="fade"` pe conținutul ei; `is-in` o adaugă un
+ * IntersectionObserver (`reveal-la-scroll.tsx`), o singură dată, când
+ * elementul intră în ecran.
+ *
+ * Regula stă sub `no-preference`: cine a cerut mai puțină mișcare
+ * (`prefers-reduced-motion: reduce`) nu intră deloc sub ea, deci conținutul e
+ * vizibil din start, fără fade. Fără JavaScript deloc, regula tot s-ar aplica
+ * — de-aia `cadru-site.tsx` pune un `<noscript>` care o anulează, ca un
+ * vizitator fără scripturi să nu rămână cu jumătate de site invizibil.
+ * ========================================================================== */
+:root {
+  --anim-distanta: 60px;
+  --anim-durata: 1100ms;
+  --anim-curba: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(calc(var(--anim-distanta) * 0.5));
+    transition: opacity var(--anim-durata) var(--anim-curba),
+      transform var(--anim-durata) var(--anim-curba);
+    will-change: opacity, transform;
+  }
+
+  [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+}
