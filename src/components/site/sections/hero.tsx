@@ -216,6 +216,11 @@ export function Hero({
             fontFamily: titluLat || pozaLata ? "var(--t-font-secundar)" : undefined,
             fontStyle: titluLat || pozaLata ? "italic" : undefined,
             maxWidth: "34em",
+            // La poza lată textul e centrat sub poză, la mijlocul ei (cerut de
+            // proprietar): `marginInline: auto` centrează blocul, `textAlign`
+            // centrează rândurile. `marginInline` vine DUPĂ `margin`, ca să-i
+            // suprascrie doar stânga/dreapta, păstrând marginea de sus.
+            ...(pozaLata ? { marginInline: "auto", textAlign: "center" as const } : {}),
             fontSize: "clamp(17px, 1.4vw, 19px)",
             lineHeight: 1.7,
             color: "var(--s-text-secundar)",
@@ -227,7 +232,16 @@ export function Hero({
       )}
 
       {(data.butonPrincipal || data.butonSecundar) && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "14px", marginTop: "44px" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "14px",
+            marginTop: "44px",
+            // La poza lată, butonul stă centrat sub poză, la mijlocul ei.
+            justifyContent: pozaLata ? "center" : undefined,
+          }}
+        >
           {data.butonPrincipal && (
             <a
               href={data.butonPrincipal.href}

@@ -2197,7 +2197,8 @@ să stea SUB poză, nu în dreapta ei.
 Așezare nouă `pozaLata` (a treia valoare a `AsezareHero`, lângă `titluLat` și
 `textPozaDreapta`): titlul lat sus, o poză peisaj (16/9) pe TOATĂ lățimea
 conținutului sub el, iar dedesubt textul (subtitlul, păstrat în serif italic ca
-înainte) și butonul. Pornită DOAR pe `caldura.ts` și `claritate.ts` — celelalte
+înainte) și butonul — CENTRATE, la mijlocul pozei (cerut de proprietar).
+Pornită DOAR pe `caldura.ts` și `claritate.ts` — celelalte
 trei (Liniște, Lumină, Apropiere) rămân pe `textPozaDreapta`, neatinse.
 
 Detalii de implementare (`hero.tsx`): poza lată ia `aspectRatio: 16/9` și
