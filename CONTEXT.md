@@ -841,6 +841,38 @@ bază**. Fără clonare per client: asta e chiar diferența față de „templat
 clonat", iar `site_id` + RLS de la prima migrare există exact ca să nu fie
 nevoie.
 
+### Cum dai o adresă unui șablon-demo, ca să fie clicabil (21 sept. 2026)
+
+Ca vizitatorul să apese un cartonaș din galeria de pe `sitepsihologi` și să vadă
+șablonul VIU, fiecare demo trebuie să fie un site propriu, la adresa lui. Deja
+funcționează pentru două (`cosmin-liniste.vercel.app` → Liniște,
+`cosmin-claritate.vercel.app` → Claritate); restul se fac la fel. Doi pași care
+trebuie să se potrivească LITERĂ CU LITERĂ:
+
+1. **În platformă (baza):** în `/proprietar` → „Client nou", faci un site cu
+   `domeniu` = adresa (ex. `cosmin-caldura.vercel.app`) și `sablon` = șablonul
+   dorit. Asta e ce leagă `sites.domain` → `site_id` → șablon (rezolvarea din
+   `src/lib/tenant.ts`, prin `normalizeHost` + `sites.domain`; funcția din spate
+   e `creeaza_client(p_domeniu, p_nume, p_email, p_sablon, p_cu_programari)`).
+2. **În Vercel:** proiect → Settings → Domains → Add → aceeași adresă. Fără pasul
+   ăsta, cererea nu ajunge la aplicație. O adresă `.vercel.app` liberă se dă pe
+   loc; un subdomeniu al domeniului real (ex. `caldura.sitepsihologi.ro`) cere un
+   CNAME la registrar, arătat de Vercel.
+
+**Regula de aur:** adresa din pasul 1 și cea din pasul 2 trebuie să fie identice.
+Dacă diferă, Vercel primește cererea dar platforma nu știe ce site să arate.
+
+**Capcana notată la §izolare:** dacă „două șabloane" arată la fel, aproape sigur
+`DEV_TENANT_DOMAIN` a rămas pornit pe Production — pinuiește orice `*.vercel.app`
+la un singur site. Se scoate (redeploy după), și fiecare adresă revine la site-ul
+ei. Verificarea „fiecare adresă deschide șablonul corect" se face înainte de a
+lega butoanele din galerie.
+
+Odată ce adresele merg, se leagă galeria: fiecare cartonaș din secțiunea de
+șabloane (secțiunea `portfolio`, care are deja `buton { text, href }` și
+`imagine` per element) primește `href` = adresa demo-ului și captura reală în
+locul desenului SVG. Nu cere cod nou — e conținut, editat din panou.
+
 ## Ce se predă clientului (28 aug. 2026)
 
 Hotărât de proprietar: **se predă un site GOL, iar clientul își pune singur
