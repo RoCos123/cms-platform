@@ -167,6 +167,12 @@ export function TranzitieLogo({ logoUrl }: { logoUrl?: string }) {
           width: "auto",
           maxWidth: "60vw",
           objectFit: "contain",
+          // Pulsează („respiră") cât timp se încarcă pagina nouă — semn că se
+          // lucrează, nu că s-a blocat. `@keyframes puls-logo` e în globals.css.
+          // Cât cade overlay-ul (`iese`), oprim pulsul, ca ieșirea să fie o simplă
+          // stingere, nu o zvâcnire. Cine a cerut mai puțină mișcare nu ajunge
+          // aici oricum — overlay-ul nu se arată deloc la `prefers-reduced-motion`.
+          animation: stare === "iese" ? undefined : "puls-logo 1.1s ease-in-out infinite",
         }}
       />
     </div>

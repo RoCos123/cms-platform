@@ -2215,3 +2215,24 @@ titlu mare → poză lată pe toată lățimea → subtitlu serif italic → but
 steagul `pozaLata` sau se reduce la comportamentul de dinainte).
 
 Tipuri, lint, cele 218 probe și build-ul trec.
+
+## Logoul pulsează la schimbarea paginii (21 sept. 2026)
+
+Clipa cu logoul la trecerea între pagini (`tranzitie-logo.tsx`) exista deja —
+la un clic pe un link intern, ecranul se acoperă cu logoul pe fundalul
+șablonului cât se încarcă pagina nouă. Proprietarul a cerut ca logoul să
+PULSEZE (să „respire") cât timp se încarcă, ca semn că se lucrează, nu că s-a
+blocat.
+
+Adăugat `@keyframes puls-logo` în `globals.css` (scale 1 → 1,08 și opacitate
+0,82 → 1 și înapoi, 1,1s, ritm calm) și aplicat pe `<img>`-ul logoului din
+overlay. Pulsul se oprește cât cade overlay-ul (`iese`), ca ieșirea să rămână o
+simplă stingere, nu o zvâcnire. Nu e sub `prefers-reduced-motion`, dar nici nu
+trebuie: overlay-ul care poartă logoul nu se arată deloc la cine a cerut mai
+puțină mișcare (gardat deja în `tranzitie-logo.tsx`), deci pulsul nu apare.
+
+Verificat cu componenta reală, forțând overlay-ul să se arate prin semnalul din
+`sessionStorage`: logoul e vizibil și pulsează — scale-ul măsurat trece prin
+1,01 → 1,07 și opacitatea prin 0,84 → 0,98 de la un cadru la altul.
+
+Tipuri, lint, cele 218 probe și build-ul trec.
