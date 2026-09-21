@@ -34,5 +34,13 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
-  "packageManager": "pnpm@10.33.0"
+  "packageManager": "pnpm@10.33.0",
+  "//browserslist": "Ținta de browsere pentru transpilare. Fără ea, Next țintește browsere foarte vechi și adaugă „polyfill-uri” pentru funcții pe care toate browserele din ~2022 încoace le au deja (Array.at/flat/flatMap, Object.fromEntries/hasOwn, String.trimStart/trimEnd) — ~27 KiB de cod inutil, prins în raportul Lighthouse. Pragurile de mai jos sunt exact acolo unde a apărut cea mai nouă dintre funcțiile astea (Object.hasOwn: Safari 15.4, Chrome/Edge 93, Firefox 92); un vizitator pe un browser mai vechi de-atât (fracțiune de procent în 2026) e compromisul.",
+  "browserslist": [
+    "chrome >= 100",
+    "edge >= 100",
+    "firefox >= 100",
+    "safari >= 15.4",
+    "ios_saf >= 15.4"
+  ]
 }

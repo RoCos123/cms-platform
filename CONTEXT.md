@@ -2156,3 +2156,33 @@ target-ul de build) și cele 7 fonturi woff2 (~390 KiB) — `font-display` e dej
 `swap` (audit trecut).
 
 Tipuri, lint, cele 218 probe și build-ul trec.
+
+### Îmbunătățirile mai mici: fonturi și polyfill-uri (21 sept. 2026)
+
+Făcute după cele două de mai sus, la cererea proprietarului, înainte de merge.
+
+**Fonturile nu se mai preîncarcă degeaba.** Cele șase fonturi ale șabloanelor se
+declară toate într-un fișier (`fonturi.ts`), iar `next/font` le preîncărca pe
+TOATE pe fiecare pagină — ~16 fișiere woff2 (~390 KiB) — deși un site folosește
+doar fonturile șablonului lui (două). Plus cele două Geist ale panoului, care pe
+site-ul public nici nu se folosesc (textul e cu fontul șablonului). Pus
+`preload: false` la toate opt (șase în `fonturi.ts`, două Geist în `layout.tsx`).
+Fonturile rămân AUTO-GĂZDUITE (descărcate la build, servite de pe domeniul
+clientului — GDPR-ul neatins, vezi comentariul lung din `fonturi.ts`); doar
+dispare `<link rel=preload>`. Fontul șablonului activ se încarcă tot, leneș, prin
+`@font-face` + elementul care-l cere, iar `display: "swap"` arată textul imediat,
+deci LCP-ul nu suferă. Verificat: 0 preload-uri de fonturi în HTML (erau 16), iar
+titlul se randează tot cu fontul corect (Inter pe „Claritate"), cu doar 3 fonturi
+încărcate în loc de 16.
+
+**Polyfill-uri legacy scoase printr-o țintă de browsere.** Fără `browserslist`,
+Next țintea browsere foarte vechi și transpila funcții pe care toate browserele
+din ~2022 încoace le au deja (Array.at/flat/flatMap, Object.fromEntries/hasOwn,
+String.trimStart/trimEnd) — ~27 KiB de cod inutil (raportul Lighthouse). Adăugat
+`browserslist` în `package.json` cu praguri fix acolo unde a apărut cea mai nouă
+dintre funcțiile astea (Object.hasOwn: Safari 15.4, Chrome/Edge 93, Firefox 92).
+Compromisul, scris pe față: un vizitator pe un browser mai vechi de-atât
+(fracțiune de procent în 2026) nu mai primește polyfill-urile — dacă se dorește
+altfel, e o linie de schimbat în `package.json`.
+
+Tipuri, lint, cele 218 probe și build-ul trec.

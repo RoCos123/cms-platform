@@ -39,10 +39,19 @@ import type { Template } from "@/lib/templates/types";
  * `display: "swap"` arată textul imediat, cu fontul de sistem, și îl schimbă
  * când sosește cel adevărat.
  */
-const manrope = Manrope({ subsets: ["latin", "latin-ext"], display: "swap" });
-const dmSans = DM_Sans({ subsets: ["latin", "latin-ext"], display: "swap" });
-const inter = Inter({ subsets: ["latin", "latin-ext"], display: "swap" });
-const nunito = Nunito({ subsets: ["latin", "latin-ext"], display: "swap" });
+// `preload: false` la toate: fonturile rămân auto-găzduite (descărcate la build,
+// servite de pe domeniul clientului — deci GDPR-ul neatins), dar Next NU mai pune
+// `<link rel=preload>` pentru ele. Toate șase se declară aici, într-un fișier,
+// deci cu preload pornit fiecare pagină preîncărca fonturile TUTUROR celor patru
+// șabloane (~16 fișiere woff2), deși un site folosește doar două. Acum fontul
+// șablonului activ se încarcă tot, dar leneș (prin `@font-face` + elementul care-l
+// cere); `display: "swap"` arată textul imediat cu fontul de sistem și-l schimbă
+// când sosește, deci LCP-ul nu are de suferit. Prins în raportul Lighthouse:
+// ~390 KiB de fonturi în încărcarea inițială, majoritatea nefolosite.
+const manrope = Manrope({ subsets: ["latin", "latin-ext"], display: "swap", preload: false });
+const dmSans = DM_Sans({ subsets: ["latin", "latin-ext"], display: "swap", preload: false });
+const inter = Inter({ subsets: ["latin", "latin-ext"], display: "swap", preload: false });
+const nunito = Nunito({ subsets: ["latin", "latin-ext"], display: "swap", preload: false });
 
 // Cursivele se cer explicit: `--t-stil-accent` scrie accentele în cursiv la trei
 // din cele patru șabloane, iar fără fișierul de cursive browserul ar înclina el
@@ -50,12 +59,13 @@ const nunito = Nunito({ subsets: ["latin", "latin-ext"], display: "swap" });
 const cormorant = Cormorant_Garamond({
   subsets: ["latin", "latin-ext"],
   display: "swap",
+  preload: false,
   style: ["normal", "italic"],
 });
 
 // Caveat n-are cursive deloc; șablonul Apropiere știe asta
 // (`accentInItalic: false`) și nu le cere.
-const caveat = Caveat({ subsets: ["latin", "latin-ext"], display: "swap" });
+const caveat = Caveat({ subsets: ["latin", "latin-ext"], display: "swap", preload: false });
 
 /**
  * Numele din șablon → familia adevărată, așa cum a numit-o Next după ce a

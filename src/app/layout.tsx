@@ -7,14 +7,22 @@ import { BandaNepublicat } from "@/components/site/banda-nepublicat";
 import { estePanou, esteConectare } from "@/lib/rute";
 import "./globals.css";
 
+// `preload: false`: Geist sunt fonturile PANOULUI, dar layoutul ăsta înfășoară și
+// site-urile publice ale clienților, unde textul e scris cu fontul ȘABLONULUI
+// (`--t-font-*`), nu cu Geist. Cu preload pornit, fiecare pagină publică
+// preîncărca două fișiere Geist pe care nu le folosea. Rămân auto-găzduite; în
+// panou se încarcă leneș, cu fontul de sistem până sosesc — un panou intern n-are
+// nevoie de preîncărcare.
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  preload: false,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  preload: false,
 });
 
 /**
