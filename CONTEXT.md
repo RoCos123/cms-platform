@@ -2186,3 +2186,31 @@ Compromisul, scris pe față: un vizitator pe un browser mai vechi de-atât
 altfel, e o linie de schimbat în `package.json`.
 
 Tipuri, lint, cele 218 probe și build-ul trec.
+
+## Hero cu poză lată pe Căldură și Claritate (21 sept. 2026)
+
+Proprietarul a cerut ca, pe „Căldură" și „Claritate", poza din hero să fie mult
+mai mare — fiindcă acolo poza NU va fi un portret, ci cabinetul / spațiul de
+terapie, care are nevoie de lățime. Iar textul și butonul „Programează o ședință"
+să stea SUB poză, nu în dreapta ei.
+
+Așezare nouă `pozaLata` (a treia valoare a `AsezareHero`, lângă `titluLat` și
+`textPozaDreapta`): titlul lat sus, o poză peisaj (16/9) pe TOATĂ lățimea
+conținutului sub el, iar dedesubt textul (subtitlul, păstrat în serif italic ca
+înainte) și butonul. Pornită DOAR pe `caldura.ts` și `claritate.ts` — celelalte
+trei (Liniște, Lumină, Apropiere) rămân pe `textPozaDreapta`, neatinse.
+
+Detalii de implementare (`hero.tsx`): poza lată ia `aspectRatio: 16/9` și
+`sizes` de lățime plină, în loc de pătratul de 45–47% de la celelalte așezări;
+rotunjire simplă (`var(--t-raza)`), nu arcada înaltă; titlul rămâne pe mărimea
+mare (ca la `titluLat`), fiindcă e pe toată lățimea, nu lângă poză. `object-fit:
+cover` taie ce nu încape, iar punctul focal tras din panou ține cadrul potrivit —
+important, fiindcă o poză de cabinet reală rareori e fix 16/9.
+
+Verificat vizual, ambele șabloane randate una sub alta cu o poză de probă lată:
+titlu mare → poză lată pe toată lățimea → subtitlu serif italic → buton
+(albastru la Claritate, cărămiziu la Căldură). Cele trei șabloane pe
+`textPozaDreapta` sunt neatinse (fiecare schimbare din `hero.tsx` e păzită de
+steagul `pozaLata` sau se reduce la comportamentul de dinainte).
+
+Tipuri, lint, cele 218 probe și build-ul trec.

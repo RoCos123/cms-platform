@@ -56,7 +56,8 @@ export const caldura: Template = {
     spatiereSectiune: "clamp(72px, 9vw, 128px)",
   },
 
-  // Titlul lat, cu poza dedesubt la stânga. Măsurat pe original: titlul curge
-  // pe toată lățimea, iar poza ocupă 47% din ecran, începând de la 8% stânga.
-  asezari: { hero: "titluLat" },
+  // Titlul lat, poza LATĂ (peisaj) pe toată lățimea sub el, iar textul și butonul
+  // dedesubt. Cerut de proprietar (21 sept. 2026): poza din hero e cabinetul /
+  // spațiul de terapie, care are nevoie de lățime, nu un portret lângă text.
+  asezari: { hero: "pozaLata" },
 };

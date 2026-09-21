@@ -193,9 +193,16 @@ rotunjimi.
 `hero`. Nu 21, nu 5. Una.
 
 ```
-hero: "titluLat"        → Căldură
+hero: "titluLat"        → (măsurat inițial pe Căldură)
 hero: "textPozaDreapta" → Liniște, Lumină, Apropiere
+hero: "pozaLata"        → Căldură, Claritate (adăugat 21 sept. 2026)
 ```
+
+> Actualizare (21 sept. 2026): Căldură și Claritate au trecut de la `titluLat`
+> la `pozaLata` — titlul lat sus, o poză LATĂ (peisaj) pe toată lățimea sub el,
+> iar textul și butonul dedesubt. Cerut de proprietar: la ele poza din hero e
+> cabinetul / spațiul de terapie, care are nevoie de lățime, nu un portret lângă
+> text. Vezi și starea curentă în CONTEXT.md.
 
 Rafinamentul de nivelul doi, dacă merită mai târziu: cartonașele plutitoare
 peste poză (le au trei din patru, cu conținut diferit) și insigna de pe poza din

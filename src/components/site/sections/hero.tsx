@@ -79,6 +79,10 @@ export function Hero({
 
   const poza = data.imagine?.url ? data.imagine : null;
   const titluLat = asezare === "titluLat" && poza !== null;
+  // Poză lată (peisaj), pe toată lățimea, cu textul și butonul dedesubt. Titlul
+  // rămâne lat, ca la `titluLat`. Doar „Căldură" și „Claritate": acolo poza e
+  // cabinetul, nu un portret. Fără poză, cade pe hero-ul doar-text, ca restul.
+  const pozaLata = asezare === "pozaLata" && poza !== null;
 
   // La „Apropiere", dunga piersică stă sub ULTIMUL cuvânt din titlu (ca „tu" la
   // sursă), nu sub coada scrisă de mână. Îl desprind ca să subliniez doar
@@ -136,8 +140,12 @@ export function Hero({
           // că nu există poză deloc, fie că așezarea o pune dedesubt. Pe
           // jumătate de rând, aceleași 118px ar rupe fiecare cuvânt pe câte un
           // rând.
+          // Titlul mic doar când stă LÂNGĂ poză (`textPozaDreapta`). La titlu lat
+          // și la poza lată titlul e pe toată lățimea, deci ia mărimea mare.
           fontSize:
-            poza && !titluLat ? "clamp(40px, 5.2vw, 72px)" : "clamp(48px, 9vw, 118px)",
+            poza && !titluLat && !pozaLata
+              ? "clamp(40px, 5.2vw, 72px)"
+              : "clamp(48px, 9vw, 118px)",
           lineHeight: 0.98,
           letterSpacing: "-0.035em",
           fontFamily: "var(--t-font-titlu)",
@@ -199,11 +207,14 @@ export function Hero({
           style={{
             // În așezarea cu titlul lat, textul stă lângă poză, nu sub titlu:
             // marginea de sus ar împinge un paragraf deja aliniat la bază.
+            // La titlu lat textul stă lângă poză, aliniat la bază (margine 0); la
+            // poza lată stă SUB poză, deci are nevoie de o margine de sus.
             margin: titluLat ? 0 : "36px 0 0",
             // Serif italic, ca pe originalul „Căldură": acolo paragraful de sub
-            // titlu nu e text curent, e o continuare a titlului.
-            fontFamily: titluLat ? "var(--t-font-secundar)" : undefined,
-            fontStyle: titluLat ? "italic" : undefined,
+            // titlu nu e text curent, e o continuare a titlului. Păstrat și la
+            // poza lată (aceleași două șabloane), ca să nu se schimbe vocea.
+            fontFamily: titluLat || pozaLata ? "var(--t-font-secundar)" : undefined,
+            fontStyle: titluLat || pozaLata ? "italic" : undefined,
             maxWidth: "34em",
             fontSize: "clamp(17px, 1.4vw, 19px)",
             lineHeight: 1.7,
@@ -284,6 +295,16 @@ export function Hero({
   // două: una sus-dreapta, una jos-stânga, ca la modelul prietenos.
   const buline = (data.bulinePoza ?? []).filter((b) => b?.mare?.trim()).slice(0, 2);
 
+  // Poza lată e peisaj (16/9), pe toată lățimea conținutului — cabinetul are
+  // nevoie de lățime. Restul rămân pătrate, ca înainte. `object-fit: cover`
+  // taie ce nu încape, iar punctul focal (tras din panou) ține cadrul potrivit.
+  const raportPoza = pozaLata ? "16 / 9" : "1 / 1";
+  const sizesPoza = pozaLata
+    ? "(max-width: 1240px) 100vw, 1180px"
+    : titluLat
+      ? "(max-width: 860px) 100vw, 47vw"
+      : "(max-width: 860px) 100vw, 45vw";
+
   const imagine = (
     <div style={{ position: "relative" }}>
       <div
@@ -295,7 +316,7 @@ export function Hero({
           // „Apropiere" (`faraArcada`) e un dreptunghi rotunjit simplu — sursa lui
           // n-are arcadă.
           borderRadius:
-            titluLat || faraArcada
+            titluLat || faraArcada || pozaLata
               ? "var(--t-raza)"
               : "clamp(64px, 13vw, 190px) clamp(64px, 13vw, 190px) var(--t-raza) var(--t-raza)",
           overflow: "hidden",
@@ -304,8 +325,8 @@ export function Hero({
         <SectionImage
           src={poza.url}
           alt={poza.altText ?? ""}
-          aspectRatio="1 / 1"
-          sizes={titluLat ? "(max-width: 860px) 100vw, 47vw" : "(max-width: 860px) 100vw, 45vw"}
+          aspectRatio={raportPoza}
+          sizes={sizesPoza}
           pozitie={poza.pozitie}
           priority
         />
@@ -343,6 +364,19 @@ export function Hero({
       {buline[1] && <Bulina bulina={buline[1]} pozitie={{ bottom: "30px", left: "-10px" }} />}
     </div>
   );
+
+  if (pozaLata) {
+    // Titlul lat sus, poza lată pe toată lățimea sub el, iar textul și butonul
+    // dedesubt. Marginile de sus ale textului vin din `restul` (subtitlul are
+    // „36px 0 0", butonul „44px"), deci nu mai adaug un înveliș peste ele.
+    return (
+      <Section tone={tone} decor={decorBlob}>
+        {titlu}
+        <div style={{ marginTop: "clamp(32px, 4vw, 56px)" }}>{imagine}</div>
+        {restul}
+      </Section>
+    );
+  }
 
   if (titluLat) {
     return (

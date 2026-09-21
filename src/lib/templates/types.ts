@@ -101,15 +101,19 @@ export type TemplateTypography = {
  * (design/sabloane/README.md, „Așezarea, măsurată"):
  *
  * - `titluLat` — titlul ocupă TOATĂ lățimea, iar sub el vine poza la stânga cu
- *   textul la dreapta. Doar „Căldură" face asta.
+ *   textul la dreapta.
  * - `textPozaDreapta` — text stânga, poză dreapta, pe două coloane. „Liniște",
  *   „Lumină" și „Apropiere" fac toate trei același lucru.
+ * - `pozaLata` — titlul pe toată lățimea, sub el o poză LATĂ (peisaj) pe toată
+ *   lățimea, iar sub poză textul și butonul. Cerut pe „Căldură" și „Claritate"
+ *   (21 sept. 2026): la ele poza nu mai e un portret, ci cabinetul / spațiul de
+ *   terapie, care are nevoie de lățime, nu de un pătrat lângă text.
  *
  * E singura secțiune din 21 unde așezarea chiar diferă între șabloane. Restul
  * (grile de cartonașe, benzi, formulare) ies identice la măsurare, iar
  * diferența o fac culorile, fonturile și rotunjimile.
  */
-export type AsezareHero = "titluLat" | "textPozaDreapta";
+export type AsezareHero = "titluLat" | "textPozaDreapta" | "pozaLata";
 
 export type TemplateAsezari = {
   hero: AsezareHero;
