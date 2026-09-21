@@ -2305,3 +2305,27 @@ Verificat cu componenta reală, forțând overlay-ul să se arate prin semnalul 
 1,01 → 1,07 și opacitatea prin 0,84 → 0,98 de la un cadru la altul.
 
 Tipuri, lint, cele 218 probe și build-ul trec.
+
+## Rupturile de rând scrise de client se văd pe site (21 sept. 2026)
+
+Proprietarul a scris subtitlul din hero pe două rânduri (Enter între propoziții)
+și pe site apărea pe unul singur. Cauza: din oficiu, o rupere de rând într-un
+paragraf HTML e tratată ca un spațiu. În casetele mari din panou Enter chiar
+coboară rândul (sunt `<textarea>`), dar afișarea îl înghițea.
+
+Reparat cu o regulă în `globals.css`: `[data-reveal] p, [data-reveal] blockquote
+{ white-space: pre-line }`. `pre-line` păstrează rupturile intenționate și doar
+pe ele — șirurile de spații tot se string, rândurile tot se rup singure la
+marginea coloanei. Ținta e `[data-reveal]`, învelișul de conținut pus de
+`Section` la FIECARE secțiune, deci regula prinde peste tot: site viu,
+`proba-vanzari` ȘI previzualizarea din panou (unde s-a și văzut problema, fiindcă
+iframe-ul copiază foaia de stil). Doar paragrafe și citate — titlurile
+(`h1/h2/h3`) și butoanele (`a`) rămân neatinse.
+
+Corpul de articol/servicii (`CorpText` + `blocuriText`) nu e afectat: acolo
+parserul taie deja fiecare rând într-un paragraf separat (regula „un rând nou =
+un paragraf nou"), deci un `<p>` de-al lui n-are rupturi în interior pe care
+`pre-line` să le arate. Verificat vizual: subtitlul scris pe două rânduri apare
+pe două rânduri, exact unde a fost apăsat Enter.
+
+Tipuri, lint, cele 218 probe și build-ul trec.

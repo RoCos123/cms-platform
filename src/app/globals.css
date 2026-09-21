@@ -400,6 +400,27 @@ body {
 }
 
 /*
+ * Rupturile de rând scrise de client se văd pe site.
+ *
+ * Într-o casetă de text din panou, Enter coboară un rând — dar pe site, din
+ * oficiu, o rupere de rând într-un paragraf e tratată ca un spațiu, deci
+ * dispărea. Proprietarul a scris subtitlul pe două rânduri și pe site apărea pe
+ * unul. `pre-line` păstrează rupturile intenționate (și doar pe ele: șirurile de
+ * spații tot se string, rândurile tot se rup singure la marginea coloanei).
+ *
+ * Ținta e `[data-reveal]` — învelișul de conținut pe care `Section` îl pune la
+ * FIECARE secțiune, în toate contextele (site viu, `proba-vanzari`, ȘI
+ * previzualizarea din panou, unde s-a și văzut problema). Doar paragrafele și
+ * citatele: titlurile (`h1/h2/h3`) și butoanele (`a`) rămân neatinse. Corpul de
+ * articol/servicii (`CorpText`) nu e afectat — parserul lui taie deja fiecare
+ * rând într-un paragraf separat, deci n-are rupturi în interiorul unui `<p>`.
+ */
+[data-reveal] p,
+[data-reveal] blockquote {
+  white-space: pre-line;
+}
+
+/*
  * Pulsul logoului din clipa de trecere între pagini (`tranzitie-logo.tsx`).
  * O respirație blândă — se mărește ușor și se aprinde puțin, apoi înapoi — cât
  * timp se încarcă pagina nouă. Ritm calm (1,1s), pe măsura unui site de cabinet.
