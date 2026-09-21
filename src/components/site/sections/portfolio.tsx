@@ -58,12 +58,14 @@ export function Portfolio({
   data: PortfolioData;
   tone?: SectionTone;
   /**
-   * `"vitrina"` — cartonaș doar cu poza (mare) și numele dedesubt, fără
-   * etichetă, detalii, descriere, materiale sau buton. Cerut pentru galeria de
+   * `"vitrina"` — cartonaș doar cu poza (mare) și numele scris peste ea, fără
+   * etichetă, detalii, descriere sau materiale. Cerut pentru galeria de
    * șabloane de pe `sitepsihologi.ro` (21 sept. 2026): acolo poza E mesajul —
    * un vizitator care apasă cartonașul vede șablonul viu, nu mai are nevoie
-   * să citească o descriere înainte. Se pune din SQL (`variant` pe rândul din
-   * `site_content`), nu din panou — la fel ca `"linie"` de la „Serviciile mele".
+   * să citească o descriere înainte. Adresa din `buton.href`, dacă e pusă,
+   * face TOT cartonașul clicabil; textul butonului nu se mai afișează nicăieri.
+   * Se pune din SQL (`variant` pe rândul din `site_content`), nu din panou —
+   * la fel ca `"linie"` de la „Serviciile mele".
    * Orice altă valoare (inclusiv lipsa) = cartonașul complet, ca la un
    * retreat/workshop real, unde descrierea contează.
    */
@@ -109,7 +111,17 @@ export function Portfolio({
           margin: "52px 0 0",
           padding: 0,
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          /*
+            La „vitrina" cartonașele sunt mai LARGI dinadins: acolo tot rostul
+            secțiunii e captura, iar pe trei coloane o captură de site întreg
+            ajunge o miniatură din care nu se înțelege nimic. Două coloane pe
+            ecran de calculator, una pe telefon (`min(100%, …)` — fără el,
+            pragul de 400px face cartonașul să dea pe dinafară pe ecrane
+            înguste). Restul secțiunilor rămân pe pragul vechi.
+          */
+          gridTemplateColumns: vitrina
+            ? "repeat(auto-fit, minmax(min(100%, 400px), 1fr))"
+            : "repeat(auto-fit, minmax(320px, 1fr))",
           gap: "24px",
         }}
       >
@@ -278,13 +290,21 @@ export function Portfolio({
 }
 
 /**
- * Cartonașul „vitrina": doar poza (mare) și numele șablonului, într-un cadru
- * care imită o fereastră de browser — cerut pentru galeria de șabloane de pe
+ * Cartonașul „vitrina": doar poza (mare) și numele, într-un cadru care imită o
+ * fereastră de browser — cerut pentru galeria de șabloane de pe
  * `sitepsihologi.ro` (21 sept. 2026, referință: softwaves.ro). Bara de sus (3
  * puncte + o „adresă") spune „ăsta e un site adevărat", nu o poză oarecare;
- * numele stă scris PESTE poză, pe un voal întunecat, ca la referință —
- * eticheta (dacă există) călare pe marginea de jos a pozei, iar butonul „Vezi"
- * într-o bandă albă sub poză, separată.
+ * numele stă scris PESTE poză, pe un voal întunecat, ca la referință.
+ *
+ * Nimic altceva — fără etichetă, detalii, descriere, materiale sau bandă cu
+ * buton sub poză. Cerut cuvânt cu cuvânt de proprietar: „nu avem nevoie de
+ * scrisul ăla […] avem nevoie doar de denumirea șablonului".
+ *
+ * APASĂ TOT CARTONAȘUL, nu un buton dintr-un colț: la referință dalele sunt
+ * clicabile întregi, iar un buton în plus ar fi fost exact textul pe care
+ * proprietarul l-a scos. Fără `buton.href` cartonașul rămâne identic la
+ * vedere, doar că nu duce nicăieri — deci galeria arată la fel și înainte, și
+ * după ce fiecare șablon-demo își primește adresa.
  *
  * Componentă proprie, nu o ramură în bucla de mai sus: are alt raport al pozei
  * (16/10, nu 3/2) și alt fel de a-și pune textul — peste imagine, nu sub ea —
@@ -296,21 +316,16 @@ function CartonasVitrina({
 }: {
   element: PortfolioData["elemente"][number];
 }) {
-  const domeniu = element.buton ? domeniulDin(element.buton.href) : null;
+  const href = element.buton?.href?.trim() || null;
+  const domeniu = href ? domeniulDin(href) : null;
 
-  return (
-    <li
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        borderRadius: "var(--t-raza)",
-        border: "1px solid var(--t-chenar)",
-        background: "var(--t-suprafata, var(--t-fundal-nuantat))",
-      }}
-    >
+  const continut = (
+    <>
       {/* Bara falsă de browser. Puncte neutre, nu roșu/galben/verde — nu
-          imităm un sistem de operare anume, doar ideea de „fereastră". */}
+          imităm un sistem de operare anume, doar ideea de „fereastră".
+          Pastila de adresă se desenează ÎNTOTDEAUNA, goală dacă încă nu se
+          știe adresa: altfel cartonașele fără link ar avea altă bară decât
+          cele cu link, și s-ar vedea în galerie că unele sunt „neterminate". */}
       <div
         style={{
           display: "flex",
@@ -335,25 +350,25 @@ function CartonasVitrina({
             />
           ))}
         </div>
-        {domeniu && (
-          <span
-            style={{
-              flex: 1,
-              minWidth: 0,
-              padding: "4px 14px",
-              borderRadius: "999px",
-              background: "var(--t-fundal)",
-              color: "var(--t-text-secundar)",
-              fontSize: "12px",
-              textAlign: "center",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {domeniu}
-          </span>
-        )}
+        <span
+          style={{
+            flex: 1,
+            minWidth: 0,
+            height: "22px",
+            lineHeight: "22px",
+            padding: "0 14px",
+            borderRadius: "999px",
+            background: "var(--t-fundal)",
+            color: "var(--t-text-secundar)",
+            fontSize: "12px",
+            textAlign: "center",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {domeniu}
+        </span>
       </div>
 
       {/* Poza, mare — 16/10, nu 3/2: aici e chiar mesajul, nu o ilustrație
@@ -369,46 +384,27 @@ function CartonasVitrina({
           />
         )}
 
-        {/* Voalul: fără el, un nume scris peste o poză deschisă ar fi
-            ilizibil — vezi cardul „Servicii" pentru același voal, la altă
-            secțiune. */}
+        {/* Voalul: fără el, un nume alb scris peste captura unui site deschis
+            la culoare ar fi ilizibil — vezi cardul „Servicii" pentru același
+            voal, la altă secțiune. Ținut jos și scurt (se stinge pe la 62%):
+            captura E marfa, iar un voal întins pe jumătate de cartonaș ar
+            întuneca exact partea din site pe care omul vrea s-o vadă. */}
         <div
           aria-hidden
           style={{
             position: "absolute",
             inset: 0,
-            background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.08) 55%, transparent 80%)",
+            background: "linear-gradient(to top, rgba(0,0,0,0.66), rgba(0,0,0,0.06) 38%, transparent 62%)",
           }}
         />
-
-        {element.eticheta && (
-          <span
-            style={{
-              position: "absolute",
-              left: "20px",
-              bottom: "20px",
-              padding: "6px 12px",
-              borderRadius: "999px",
-              background: "rgba(255,255,255,0.92)",
-              color: "#1a1a1a",
-              fontSize: "11px",
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}
-          >
-            {element.eticheta}
-          </span>
-        )}
 
         <h3
           style={{
             position: "absolute",
             right: "20px",
             bottom: "20px",
-            left: element.eticheta ? "auto" : "20px",
+            left: "20px",
             margin: 0,
-            maxWidth: element.eticheta ? "60%" : undefined,
             textAlign: "right",
             fontSize: "clamp(20px, 2.6vw, 28px)",
             lineHeight: 1.15,
@@ -420,31 +416,27 @@ function CartonasVitrina({
           {element.titlu}
         </h3>
       </div>
+    </>
+  );
 
-      {/* Banda albă de sub poză, doar cu butonul — fără preț, fără
-          descriere: aici poza E mesajul, cerut de proprietar. */}
-      {element.buton && (
-        <div style={{ padding: "16px 20px", display: "flex", justifyContent: "flex-end" }}>
-          <a
-            href={element.buton.href}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              height: "38px",
-              paddingInline: "18px",
-              borderRadius: "999px",
-              background: "var(--t-accent)",
-              color: "var(--t-accent-text)",
-              fontSize: "14px",
-              fontWeight: 600,
-              textDecoration: "none",
-            }}
-          >
-            {element.buton.text}
-            <span aria-hidden>→</span>
-          </a>
-        </div>
+  return (
+    <li
+      className="cartonas-vitrina"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        borderRadius: "var(--t-raza)",
+        border: "1px solid var(--t-chenar)",
+        background: "var(--t-suprafata, var(--t-fundal-nuantat))",
+      }}
+    >
+      {href ? (
+        <a href={href} style={{ display: "block", color: "inherit", textDecoration: "none" }}>
+          {continut}
+        </a>
+      ) : (
+        continut
       )}
     </li>
   );

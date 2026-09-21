@@ -167,7 +167,10 @@ export const SECTIUNI: SectionRow[] = [
   {
     id: "sabloane",
     key: "portfolio",
-    variant: null,
+    // Cartonaș doar cu poza și numele, în ramă de fereastră de browser (21
+    // sept. 2026, referință: softwaves.ro). Aici, nu la clienți: la un retreat
+    // adevărat descrierea chiar trebuie citită înainte de înscriere.
+    variant: "vitrina",
     tone: "deschis",
     data: {
       eyebrow: "Înfățișări",

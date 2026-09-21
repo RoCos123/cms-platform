@@ -438,3 +438,23 @@ body {
     opacity: 1;
   }
 }
+
+/*
+ * Cartonașul „vitrina" din galeria de șabloane (`portfolio.tsx`, varianta
+ * `vitrina`). Cartonașul întreg e un link, iar un link fără niciun semn că e
+ * link nu se apasă: ridicarea de 4px e singurul indiciu, fiindcă pe cartonaș
+ * nu mai există nici buton, nici text subliniat.
+ *
+ * Doar unde chiar există maus: pe telefon `:hover` rămâne agățat după atingere,
+ * și cartonașul ar sta ridicat degeaba. Sub `prefers-reduced-motion` mișcarea
+ * dispare, dar linkul funcționează la fel.
+ */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .cartonas-vitrina {
+    transition: transform 220ms var(--anim-curba, ease);
+  }
+
+  .cartonas-vitrina:hover {
+    transform: translateY(-4px);
+  }
+}

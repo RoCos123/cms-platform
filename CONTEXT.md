@@ -2361,50 +2361,95 @@ Tipuri, lint, cele 218 probe și build-ul trec.
 
 Proprietarul a arătat referința `softwaves.ro` — cartonașe cu poza mare, într-un
 cadru care imită o fereastră de browser (puncte + bară de adresă), cu numele
-scris PESTE poză, și un buton „Vezi" — și a cerut asta pentru galeria de
-șabloane de pe `sitepsihologi.ro` (secțiunea „Programe și materiale").
+scris PESTE poză — și a cerut asta pentru galeria de șabloane de pe
+`sitepsihologi` (secțiunea „Programe și materiale"). Cerința, cuvânt cu cuvânt:
+„nu avem nevoie de scrisul ăla «Crem cald și cărămiziu…». Avem nevoie doar de
+denumirea șablonului."
 
-**Sferă, confirmată explicit de proprietar**: STRICT pe `sitepsihologi.ro`, nu
-pe secțiunea „Programe și materiale" a tuturor clienților — acolo un psiholog
-cu un retreat real are nevoie de descrierea completă (dată, loc, câte locuri),
-nu doar de-o poză. Deci nu s-a schimbat comportamentul implicit al secțiunii,
-s-a adăugat o a doua formă, pornită STRICT prin `variant`, la fel ca `"linie"`
-de la „Serviciile mele".
+**Sferă, confirmată explicit de proprietar**: STRICT pe `sitepsihologi`, nu pe
+secțiunea „Programe și materiale" a tuturor clienților — acolo un psiholog cu
+un retreat real are nevoie de descrierea completă (dată, loc, câte locuri), nu
+doar de-o poză. Deci nu s-a schimbat comportamentul implicit al secțiunii, s-a
+adăugat o a doua formă, pornită STRICT prin `variant`, la fel ca `"linie"` de
+la „Serviciile mele".
 
 Adăugat `CartonasVitrina` în `portfolio.tsx`, pornit când rândul din
 `site_content` are `variant = 'vitrina'`:
-- poza la 16/10 (nu 3/2, ca la cardul obișnuit) — mai mare, mai lată;
+
+- poza la 16/10 (nu 3/2, ca la cardul obișnuit) și grilă pe **două** coloane,
+  nu trei (`minmax(min(100%, 400px), 1fr)` — `min(100%, …)` ca pragul de 400px
+  să nu scoată cartonașul din ecran pe telefon; măsurat: la 390px lățime nu
+  apare derulare laterală). Pe trei coloane, captura unui site întreg ajungea o
+  miniatură din care nu se înțelegea nimic;
 - o bară falsă de „fereastră de browser" sus: trei puncte neutre (nu
-  roșu/galben/verde — nu imităm vizual un sistem de operare anume) și, dacă
-  elementul are `buton`, o „adresă" cu domeniul REAL extras din `buton.href`
-  (`domeniulDin`, cu `new URL().hostname`, prins în `try/catch` — un link
-  relativ n-are domeniu, bara rămâne fără text inventat);
-- numele șablonului scris PESTE poză, pe un voal întunecat (gradient), colț
-  dreapta-jos; eticheta (dacă există) călare pe colțul stânga-jos al pozei;
-- butonul (`element.buton`) într-o bandă albă SUB poză — fără preț (nu avem
-  câmpul), fără descriere, fără detalii, fără materiale: „poza E mesajul",
-  cerut explicit de proprietar.
+  roșu/galben/verde — nu imităm vizual un sistem de operare anume) și o pastilă
+  de adresă desenată ÎNTOTDEAUNA, cu domeniul real extras din `buton.href`
+  (`domeniulDin`, cu `new URL().hostname`, prins în `try/catch`) sau goală cât
+  timp adresa încă nu e pusă. Goală, nu lipsă: altfel cartonașele fără link ar
+  fi avut altă bară decât cele cu link, și s-ar fi văzut în galerie că unele
+  sunt neterminate;
+- numele șablonului scris PESTE poză, colț dreapta-jos, pe un voal întunecat
+  ținut jos și scurt (se stinge pe la 62% din înălțime): captura e marfa, iar
+  un voal întins pe jumătate de cartonaș ar întuneca exact partea de site pe
+  care omul vrea s-o vadă;
+- **tot cartonașul e link**, dacă elementul are `buton.href` — nu un buton
+  într-un colț. La referință dalele se apasă întregi, iar un buton în plus ar
+  fi fost exact textul pe care proprietarul l-a scos. Textul butonului nu se
+  mai afișează nicăieri, doar adresa lui e folosită. Fără `href`, cartonașul
+  arată IDENTIC, doar că nu duce nicăieri — galeria e la fel și înainte, și
+  după ce fiecare șablon-demo își primește adresa;
+- nimic altceva: fără etichetă, detalii, descriere, materiale sau bandă cu
+  buton sub poză.
 
 Cartonașul obișnuit (fără `variant`, cazul oricărui client cu un retreat/
 workshop real) e NEATINS — codul lui vechi a rămas identic, doar învelit
-într-un `if`. Verificat vizual, ambele: cartonașul „vitrina" (cu etichetă+
-buton, cu buton fără etichetă, și fără niciunul din ele) și cartonașul vechi
-(un retreat de test, cu etichetă/detalii/descriere/buton) — arată exact ca
-înainte.
+într-un `if`, iar grila lui a rămas pe pragul vechi de 320px. Singura regulă
+nouă de CSS e `.cartonas-vitrina:hover` (ridicare de 4px, doar unde există
+maus și doar dacă nu s-a cerut mai puțină mișcare) — un cartonaș-link fără
+niciun semn că e link nu se apasă.
 
-**De făcut de proprietar, ca să apară pe site-ul viu**: o linie de SQL în
-Supabase, care schimbă STRICT `variant` pe rândul „portfolio" al lui
-`sitepsihologi`, fără să-i toace `data` (textele deja scrise):
+**Ce mai trebuie ca să arate ca la referință.** Două lucruri, niciunul de cod:
+
+1. **Capturile adevărate.** Deocamdată cele cinci poze sunt desene SVG cu
+   „exemplu — aici va veni o captură adevărată" scris în ele, iar desenul are
+   și numele șablonului scris înăuntru — deci numele apare de două ori, o dată
+   desenat și o dată peste poză. Dispare de la sine la prima captură adevărată.
+   Cum se fac capturile: vezi §„Capturi elocvente pentru galeria de șabloane".
+2. **Adresele demo-urilor**, ca să se poată apăsa cartonașele. Se scriu din
+   panou: Secțiuni → „Programe și materiale" → fiecare program → câmpul
+   „Buton" → adresa (ex. `https://cosmin-caldura.vercel.app`). Textul butonului
+   poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
+   §„Cum dai o adresă unui șablon-demo".
+
+**Pornirea pe site-ul viu.** `variant` nu se poate scrie din panou (panoul
+scrie doar `data`, `position`, `visible`, `is_demo`) — și e bine că nu se
+poate: așa forma cartonașului rămâne pusă oricâte editări ar face cineva peste
+texte. Se pornește o singură dată, din Supabase:
+
+1. supabase.com → proiectul → **SQL Editor** (în meniul din stânga) → **New
+   query**;
+2. lipit textul de mai jos, cu domeniul potrivit (azi
+   `sitepsihologi.vercel.app`; după cumpărarea domeniului, `sitepsihologi.ro`);
+3. **Run**. Dacă scrie `UPDATE 1`, e gata — se vede la reîncărcarea paginii.
+   Dacă scrie `UPDATE 0`, domeniul scris nu s-a potrivit cu niciun site.
 
 ```sql
 update public.site_content
 set variant = 'vitrina'
-where site_id = (select id from public.sites where domain = '<domeniul lui sitepsihologi>')
+where site_id = (select id from public.sites where domain = 'sitepsihologi.vercel.app')
   and key = 'portfolio';
 ```
 
-Dinadins NU s-a rulat din nou `scripts/sql-vanzari.mjs`: acela REFACE toate
-secțiunile de la zero din `src/app/proba-vanzari/continut.ts` — ar fi pierdut
-textele scrise deja manual pe site-ul viu.
+Linia asta schimbă STRICT forma cartonașului. NU atinge `data` — adică niciun
+text, nicio poză, nimic din ce s-a scris în panou. Se dă o singură dată; după
+ea, panoul se folosește normal.
 
-Tipuri, lint, cele 218 probe și build-ul trec.
+**De ce nu se rulează din nou `scripts/sql-vanzari.mjs`**, deși `continut.ts`
+are acum `variant: "vitrina"` pe rândul „sabloane": acela REFACE toate
+secțiunile de la zero din `src/app/proba-vanzari/continut.ts` — ar pierde
+textele scrise deja manual pe site-ul viu. `continut.ts` s-a actualizat doar ca
+sursa de adevăr să nu mintă, și ca previzualizarea `/proba-vanzari` să arate
+exact ce se va vedea pe site.
+
+Verificat vizual pe `/proba-vanzari`, cu toate cele cinci cartonașe, pe
+calculator și pe telefon. Tipuri, lint, cele 218 probe și build-ul trec.
