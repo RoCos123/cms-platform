@@ -193,6 +193,33 @@ Lanțul, ca să nu se piardă: **site-model completat → capturi reale → intr
 Legalul (rândul 1) și lanțul ăsta curg în paralel; vânzarea așteaptă cel mai
 lent dintre ele, nu suma lor.
 
+### Unde se editează textele pe sitepsihologi.ro (21 sept. 2026)
+
+Proprietarul a căutat unde se scrie textul celor 6 cartonașe din secțiunea
+„Ce primești" (pe site) și a fost derutat — arăta diferit de restul secțiunilor.
+Explicat, ca să nu se caute de la zero altă dată:
+
+„Ce primești" e secțiunea tip **„Serviciile mele"** (cheia `features`), cu alt
+titlu scris peste cel implicit. Ea NU își ține propriul text pentru cartonașe —
+citește Serviciile, la fel ca pe orice alt site (vezi docstring-ul din
+`features.tsx`: „Nu-și ține conținutul: îl citește din Servicii… altfel fiecare
+serviciu ar fi scris de două ori”). Catalogul secțiunilor (`src/lib/sectiuni.ts`,
+cheia `features`) chiar avertizează despre asta în descrierea ei, vizibilă în
+panou: *„Ce oferi. Textele vin din Servicii, nu de aici.”* — doar că titlul
+AFIȘAT pe site („Ce primești”) nu se leagă vizual de eticheta din listă
+(„Serviciile mele”), de-aici confuzia.
+
+Deci, concret:
+- **Titlul mare + textul de sub el** (dacă are) → Panou → **Secțiuni** →
+  „Serviciile mele”.
+- **Fiecare din cele 6 cartonașe** (titlu + descriere) → Panou → **Servicii** —
+  un rând per cartonaș, exact ca la lista de servicii a unui cabinet obișnuit.
+- **Banda de puncte cu linie orizontală** (în loc de cartonașe cu chenar) e o
+  AȘEZARE fixată în bază (`variant: "linie"` pe rândul din `site_content`,
+  pusă din SQL la provizionare — vezi comentariul de pe `SectionRow.variant`
+  din `render-sections.tsx`), nu un comutator din panou. Nu trebuie schimbată:
+  e voită pentru sitepsihologi.
+
 ### Amânate în cunoștință de cauză
 
 Plățile cu cardul (Netopia — vezi capitolul lui), categoriile de blog, și semnul
