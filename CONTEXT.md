@@ -36,6 +36,43 @@ platformei nu e chemabilă din browser. Depozitul de fișiere e privat. Șterger
 și exportul datelor există. Provizionarea e o linie de SQL, iar migrările trec
 prin CI. Primul site a fost făcut cu ea cap la cap, pe 8 sept.
 
+### Lucrări vizuale, performanță și UX (18–21 sept. 2026)
+
+Nimic din ce blochează vânzarea (tabelul de mai jos) nu s-a schimbat — astea
+sunt rafinări cerute de proprietar, uitându-se la site-ul lui viu. Fiecare are
+o secțiune proprie mai jos, cu detaliile și motivele; aici doar lista, ca să se
+vadă la o privire ce e nou:
+
+- **Șablonul „Liniște" adus la referința „Dragoș Geamănă"** (18–19 sept.) —
+  secțiune cu secțiune (hero, citat, despre, cum lucrez, servicii, contact,
+  blog), plus cele cinci corecții din al cincilea document și o verificare
+  adversarială. Vezi §„De modificat pe șabloane (19 sept.) — al cincilea
+  document" și §„Două/Trei lucruri găsite chiar de proprietar".
+- **Blog — poza copertei** (19 sept.): se repoziționează acum peste tot
+  (era un gol vechi), iar previzualizarea vie din editor arată poziția reală,
+  nu centrul. Vezi punctele 1 și 3 din §„Trei lucruri găsite chiar de proprietar".
+- **Fontul de titlu serif din cinci secțiuni** (19–21 sept.): corectat, dar
+  scos STRICT pe „Liniște" prin steagul `titluSerif` — proprietarul a respins
+  prima variantă, care atingea toate cinci șabloanele. Vezi punctul 2 din
+  aceeași secțiune.
+- **Animație de fade la scroll** (20 sept.): secțiunile intră în cadru cu un
+  fade, ca la referință. Pe toate cinci șabloanele (funcție, nu piele). Vezi
+  §„Intrarea în cadru a secțiunilor, la scroll".
+- **Performanță (raport Lighthouse)** (21 sept.): hCaptcha (~730 KiB) nu se
+  mai încarcă pe prima pagină, ci la formular; titlul hero (LCP) se pictează
+  instant, nu mai așteaptă JS-ul; fonturile nu se mai preîncarcă (16 → 0);
+  țintă de browsere modernă pentru mai puține polyfill-uri. Vezi §„Scor
+  Lighthouse" și §„Îmbunătățirile mai mici".
+- **Hero cu poză lată pe „Căldură" și „Claritate"** (21 sept.): poză peisaj pe
+  toată lățimea (cabinetul, nu un portret), cu textul și butonul centrate
+  dedesubt. Așezarea `pozaLata`. Vezi §„Hero cu poză lată".
+- **Logoul pulsează la schimbarea paginii** (21 sept.): cât se încarcă pagina
+  nouă, logoul din clipa de tranziție respiră. Vezi §„Logoul pulsează".
+
+Toate sunt pe master, CI verde. Șabloanele neatinse de o cerere anume au rămas
+neschimbate — regula „funcție/structură la toți, piele doar unde" a ținut peste
+tot.
+
 ### Ce blochează primul client PLĂTITOR
 
 | # | Ce | Al cui | Cât ține |
