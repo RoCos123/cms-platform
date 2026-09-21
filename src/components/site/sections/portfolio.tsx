@@ -4,20 +4,6 @@ import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
 
-/**
- * Domeniul dintr-un link absolut, pentru bara de adresă falsă a cartonașului
- * „vitrina" — ca omul să vadă imediat CE adresă deschide, nu doar „Vezi".
- * Un link relativ („#", „/ceva") nu are domeniu: cade pe `null`, iar bara
- * arată doar cele trei puncte, fără text inventat.
- */
-function domeniulDin(href: string): string | null {
-  try {
-    return new URL(href).hostname;
-  } catch {
-    return null;
-  }
-}
-
 export type PortfolioData = {
   eyebrow?: string;
   titlu: string;
@@ -63,7 +49,8 @@ export function Portfolio({
    * șabloane de pe `sitepsihologi.ro` (21 sept. 2026): acolo poza E mesajul —
    * un vizitator care apasă cartonașul vede șablonul viu, nu mai are nevoie
    * să citească o descriere înainte. Adresa din `buton.href`, dacă e pusă,
-   * face TOT cartonașul clicabil; textul butonului nu se mai afișează nicăieri.
+   * face TOT cartonașul clicabil; nici textul butonului, nici adresa nu se
+   * mai afișează nicăieri.
    * Se pune din SQL (`variant` pe rândul din `site_content`), nu din panou —
    * la fel ca `"linie"` de la „Serviciile mele".
    * Orice altă valoare (inclusiv lipsa) = cartonașul complet, ca la un
@@ -293,8 +280,8 @@ export function Portfolio({
  * Cartonașul „vitrina": doar poza (mare) și numele, într-un cadru care imită o
  * fereastră de browser — cerut pentru galeria de șabloane de pe
  * `sitepsihologi.ro` (21 sept. 2026, referință: softwaves.ro). Bara de sus (3
- * puncte + o „adresă") spune „ăsta e un site adevărat", nu o poză oarecare;
- * numele stă scris PESTE poză, pe un voal întunecat, ca la referință.
+ * puncte + o pastilă goală) spune „ăsta e un site adevărat", nu o poză
+ * oarecare; numele stă scris PESTE poză, pe un voal întunecat, ca la referință.
  *
  * Nimic altceva — fără etichetă, detalii, descriere, materiale sau bandă cu
  * buton sub poză. Cerut cuvânt cu cuvânt de proprietar: „nu avem nevoie de
@@ -317,15 +304,19 @@ function CartonasVitrina({
   element: PortfolioData["elemente"][number];
 }) {
   const href = element.buton?.href?.trim() || null;
-  const domeniu = href ? domeniulDin(href) : null;
 
   const continut = (
     <>
       {/* Bara falsă de browser. Puncte neutre, nu roșu/galben/verde — nu
           imităm un sistem de operare anume, doar ideea de „fereastră".
-          Pastila de adresă se desenează ÎNTOTDEAUNA, goală dacă încă nu se
-          știe adresa: altfel cartonașele fără link ar avea altă bară decât
-          cele cu link, și s-ar vedea în galerie că unele sunt „neterminate". */}
+
+          Pastila de adresă rămâne GOALĂ, dinadins. A avut o vreme domeniul
+          scris în ea, scos din `buton.href`; proprietarul a cerut să dispară
+          (22 sept. 2026), fiindcă demo-urile stau pe adrese temporare și
+          „cosmin-caldura.vercel.app" scris mare pe site-ul care vinde produsul
+          arăta a lucru neterminat. La referință (softwaves.ro) pastila e tot
+          goală. Rama rămâne — ea spune „ăsta e un site adevărat", nu o poză
+          oarecare; ea era lucrul de păstrat, nu adresa. */}
       <div
         style={{
           display: "flex",
@@ -351,24 +342,14 @@ function CartonasVitrina({
           ))}
         </div>
         <span
+          aria-hidden
           style={{
             flex: 1,
-            minWidth: 0,
             height: "22px",
-            lineHeight: "22px",
-            padding: "0 14px",
             borderRadius: "999px",
             background: "var(--t-fundal)",
-            color: "var(--t-text-secundar)",
-            fontSize: "12px",
-            textAlign: "center",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
           }}
-        >
-          {domeniu}
-        </span>
+        />
       </div>
 
       {/* Poza, mare — 16/10, nu 3/2: aici e chiar mesajul, nu o ilustrație
