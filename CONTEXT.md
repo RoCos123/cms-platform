@@ -2356,3 +2356,55 @@ un paragraf nou"), deci un `<p>` de-al lui n-are rupturi în interior pe care
 pe două rânduri, exact unde a fost apăsat Enter.
 
 Tipuri, lint, cele 218 probe și build-ul trec.
+
+## Galeria de șabloane de pe sitepsihologi.ro: cartonaș „vitrina" (21 sept. 2026)
+
+Proprietarul a arătat referința `softwaves.ro` — cartonașe cu poza mare, într-un
+cadru care imită o fereastră de browser (puncte + bară de adresă), cu numele
+scris PESTE poză, și un buton „Vezi" — și a cerut asta pentru galeria de
+șabloane de pe `sitepsihologi.ro` (secțiunea „Programe și materiale").
+
+**Sferă, confirmată explicit de proprietar**: STRICT pe `sitepsihologi.ro`, nu
+pe secțiunea „Programe și materiale" a tuturor clienților — acolo un psiholog
+cu un retreat real are nevoie de descrierea completă (dată, loc, câte locuri),
+nu doar de-o poză. Deci nu s-a schimbat comportamentul implicit al secțiunii,
+s-a adăugat o a doua formă, pornită STRICT prin `variant`, la fel ca `"linie"`
+de la „Serviciile mele".
+
+Adăugat `CartonasVitrina` în `portfolio.tsx`, pornit când rândul din
+`site_content` are `variant = 'vitrina'`:
+- poza la 16/10 (nu 3/2, ca la cardul obișnuit) — mai mare, mai lată;
+- o bară falsă de „fereastră de browser" sus: trei puncte neutre (nu
+  roșu/galben/verde — nu imităm vizual un sistem de operare anume) și, dacă
+  elementul are `buton`, o „adresă" cu domeniul REAL extras din `buton.href`
+  (`domeniulDin`, cu `new URL().hostname`, prins în `try/catch` — un link
+  relativ n-are domeniu, bara rămâne fără text inventat);
+- numele șablonului scris PESTE poză, pe un voal întunecat (gradient), colț
+  dreapta-jos; eticheta (dacă există) călare pe colțul stânga-jos al pozei;
+- butonul (`element.buton`) într-o bandă albă SUB poză — fără preț (nu avem
+  câmpul), fără descriere, fără detalii, fără materiale: „poza E mesajul",
+  cerut explicit de proprietar.
+
+Cartonașul obișnuit (fără `variant`, cazul oricărui client cu un retreat/
+workshop real) e NEATINS — codul lui vechi a rămas identic, doar învelit
+într-un `if`. Verificat vizual, ambele: cartonașul „vitrina" (cu etichetă+
+buton, cu buton fără etichetă, și fără niciunul din ele) și cartonașul vechi
+(un retreat de test, cu etichetă/detalii/descriere/buton) — arată exact ca
+înainte.
+
+**De făcut de proprietar, ca să apară pe site-ul viu**: o linie de SQL în
+Supabase, care schimbă STRICT `variant` pe rândul „portfolio" al lui
+`sitepsihologi`, fără să-i toace `data` (textele deja scrise):
+
+```sql
+update public.site_content
+set variant = 'vitrina'
+where site_id = (select id from public.sites where domain = '<domeniul lui sitepsihologi>')
+  and key = 'portfolio';
+```
+
+Dinadins NU s-a rulat din nou `scripts/sql-vanzari.mjs`: acela REFACE toate
+secțiunile de la zero din `src/app/proba-vanzari/continut.ts` — ar fi pierdut
+textele scrise deja manual pe site-ul viu.
+
+Tipuri, lint, cele 218 probe și build-ul trec.

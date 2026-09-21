@@ -4,6 +4,20 @@ import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
 
+/**
+ * Domeniul dintr-un link absolut, pentru bara de adresă falsă a cartonașului
+ * „vitrina" — ca omul să vadă imediat CE adresă deschide, nu doar „Vezi".
+ * Un link relativ („#", „/ceva") nu are domeniu: cade pe `null`, iar bara
+ * arată doar cele trei puncte, fără text inventat.
+ */
+function domeniulDin(href: string): string | null {
+  try {
+    return new URL(href).hostname;
+  } catch {
+    return null;
+  }
+}
+
 export type PortfolioData = {
   eyebrow?: string;
   titlu: string;
@@ -36,7 +50,25 @@ export type PortfolioData = {
  * și loc, care se schimbă des. Aceeași componentă pentru amândouă ar fi
  * însemnat câmpuri goale pe jumătate din cazuri.
  */
-export function Portfolio({ data, tone }: { data: PortfolioData; tone?: SectionTone }) {
+export function Portfolio({
+  data,
+  tone,
+  variant,
+}: {
+  data: PortfolioData;
+  tone?: SectionTone;
+  /**
+   * `"vitrina"` — cartonaș doar cu poza (mare) și numele dedesubt, fără
+   * etichetă, detalii, descriere, materiale sau buton. Cerut pentru galeria de
+   * șabloane de pe `sitepsihologi.ro` (21 sept. 2026): acolo poza E mesajul —
+   * un vizitator care apasă cartonașul vede șablonul viu, nu mai are nevoie
+   * să citească o descriere înainte. Se pune din SQL (`variant` pe rândul din
+   * `site_content`), nu din panou — la fel ca `"linie"` de la „Serviciile mele".
+   * Orice altă valoare (inclusiv lipsa) = cartonașul complet, ca la un
+   * retreat/workshop real, unde descrierea contează.
+   */
+  variant?: string | null;
+}) {
   /*
     Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
     toate secțiunile APRINSE, cu `{}` în ele (migrarea `comutator_lansare` —
@@ -60,6 +92,7 @@ export function Portfolio({ data, tone }: { data: PortfolioData; tone?: SectionT
   */
   if (elemente.length === 0 && !data.titlu?.trim()) return null;
 
+  const vitrina = variant === "vitrina";
 
   return (
     <Section tone={tone} id="programe">
@@ -80,7 +113,10 @@ export function Portfolio({ data, tone }: { data: PortfolioData; tone?: SectionT
           gap: "24px",
         }}
       >
-        {elemente.map((element, i) => (
+        {elemente.map((element, i) =>
+          vitrina ? (
+            <CartonasVitrina key={`${element.titlu}-${i}`} element={element} />
+          ) : (
           <li
             key={`${element.titlu}-${i}`}
             style={{
@@ -234,8 +270,182 @@ export function Portfolio({ data, tone }: { data: PortfolioData; tone?: SectionT
               )}
             </div>
           </li>
-        ))}
+          ),
+        )}
       </ul>
     </Section>
+  );
+}
+
+/**
+ * Cartonașul „vitrina": doar poza (mare) și numele șablonului, într-un cadru
+ * care imită o fereastră de browser — cerut pentru galeria de șabloane de pe
+ * `sitepsihologi.ro` (21 sept. 2026, referință: softwaves.ro). Bara de sus (3
+ * puncte + o „adresă") spune „ăsta e un site adevărat", nu o poză oarecare;
+ * numele stă scris PESTE poză, pe un voal întunecat, ca la referință —
+ * eticheta (dacă există) călare pe marginea de jos a pozei, iar butonul „Vezi"
+ * într-o bandă albă sub poză, separată.
+ *
+ * Componentă proprie, nu o ramură în bucla de mai sus: are alt raport al pozei
+ * (16/10, nu 3/2) și alt fel de a-și pune textul — peste imagine, nu sub ea —
+ * deci ar fi însemnat `style`-uri condiționale peste tot, în loc de un cod
+ * separat, mai simplu de citit.
+ */
+function CartonasVitrina({
+  element,
+}: {
+  element: PortfolioData["elemente"][number];
+}) {
+  const domeniu = element.buton ? domeniulDin(element.buton.href) : null;
+
+  return (
+    <li
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        borderRadius: "var(--t-raza)",
+        border: "1px solid var(--t-chenar)",
+        background: "var(--t-suprafata, var(--t-fundal-nuantat))",
+      }}
+    >
+      {/* Bara falsă de browser. Puncte neutre, nu roșu/galben/verde — nu
+          imităm un sistem de operare anume, doar ideea de „fereastră". */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "16px",
+          padding: "10px 14px",
+          background: "var(--t-fundal-nuantat)",
+          borderBottom: "1px solid var(--t-chenar)",
+        }}
+      >
+        <div aria-hidden style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
+          {[0, 1, 2].map((j) => (
+            <span
+              key={j}
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                background: "var(--t-text-secundar)",
+                opacity: 0.35,
+              }}
+            />
+          ))}
+        </div>
+        {domeniu && (
+          <span
+            style={{
+              flex: 1,
+              minWidth: 0,
+              padding: "4px 14px",
+              borderRadius: "999px",
+              background: "var(--t-fundal)",
+              color: "var(--t-text-secundar)",
+              fontSize: "12px",
+              textAlign: "center",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {domeniu}
+          </span>
+        )}
+      </div>
+
+      {/* Poza, mare — 16/10, nu 3/2: aici e chiar mesajul, nu o ilustrație
+          lângă text. */}
+      <div style={{ position: "relative" }}>
+        {element.imagine && (
+          <SectionImage
+            src={element.imagine.url}
+            alt={element.imagine.altText ?? ""}
+            aspectRatio="16 / 10"
+            sizes="(max-width: 720px) 100vw, 560px"
+            pozitie={element.imagine.pozitie}
+          />
+        )}
+
+        {/* Voalul: fără el, un nume scris peste o poză deschisă ar fi
+            ilizibil — vezi cardul „Servicii" pentru același voal, la altă
+            secțiune. */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(to top, rgba(0,0,0,0.72), rgba(0,0,0,0.08) 55%, transparent 80%)",
+          }}
+        />
+
+        {element.eticheta && (
+          <span
+            style={{
+              position: "absolute",
+              left: "20px",
+              bottom: "20px",
+              padding: "6px 12px",
+              borderRadius: "999px",
+              background: "rgba(255,255,255,0.92)",
+              color: "#1a1a1a",
+              fontSize: "11px",
+              fontWeight: 700,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+            }}
+          >
+            {element.eticheta}
+          </span>
+        )}
+
+        <h3
+          style={{
+            position: "absolute",
+            right: "20px",
+            bottom: "20px",
+            left: element.eticheta ? "auto" : "20px",
+            margin: 0,
+            maxWidth: element.eticheta ? "60%" : undefined,
+            textAlign: "right",
+            fontSize: "clamp(20px, 2.6vw, 28px)",
+            lineHeight: 1.15,
+            fontWeight: 700,
+            color: "#fff",
+            textWrap: "pretty",
+          }}
+        >
+          {element.titlu}
+        </h3>
+      </div>
+
+      {/* Banda albă de sub poză, doar cu butonul — fără preț, fără
+          descriere: aici poza E mesajul, cerut de proprietar. */}
+      {element.buton && (
+        <div style={{ padding: "16px 20px", display: "flex", justifyContent: "flex-end" }}>
+          <a
+            href={element.buton.href}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              height: "38px",
+              paddingInline: "18px",
+              borderRadius: "999px",
+              background: "var(--t-accent)",
+              color: "var(--t-accent-text)",
+              fontSize: "14px",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            {element.buton.text}
+            <span aria-hidden>→</span>
+          </a>
+        </div>
+      )}
+    </li>
   );
 }

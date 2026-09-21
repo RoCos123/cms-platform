@@ -163,7 +163,9 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
     />
   ),
   logos: (row) => <Logos data={row.data as LogosData} tone={row.tone} />,
-  portfolio: (row) => <Portfolio data={row.data as PortfolioData} tone={row.tone} />,
+  portfolio: (row) => (
+    <Portfolio data={row.data as PortfolioData} tone={row.tone} variant={row.variant} />
+  ),
   contact: (row, ctx) => (
     <Contact
       data={row.data as ContactData}
