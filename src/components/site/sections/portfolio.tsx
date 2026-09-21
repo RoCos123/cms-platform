@@ -426,7 +426,14 @@ function CartonasVitrina({
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
-        borderRadius: "var(--t-raza)",
+        /*
+          Colțuri vizibil mai rotunde decât ale șablonului — cerute de
+          proprietar, după referință (softwaves.ro). `max(…)` și nu 18px fix:
+          Claritate, șablonul pe care stă azi galeria, are `--t-raza` de 6px și
+          ar lăsa cartonașele aproape drepte; dar dacă galeria ajunge vreodată
+          pe un șablon mai rotund, nu vrem s-o tragem înapoi la 18.
+        */
+        borderRadius: "max(var(--t-raza), 18px)",
         border: "1px solid var(--t-chenar)",
         background: "var(--t-suprafata, var(--t-fundal-nuantat))",
       }}
