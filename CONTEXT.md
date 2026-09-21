@@ -2381,21 +2381,27 @@ Adăugat `CartonasVitrina` în `portfolio.tsx`, pornit când rândul din
   să nu scoată cartonașul din ecran pe telefon; măsurat: la 390px lățime nu
   apare derulare laterală). Pe trei coloane, captura unui site întreg ajungea o
   miniatură din care nu se înțelegea nimic;
-- o bară falsă de „fereastră de browser" sus: trei puncte neutre (nu
-  roșu/galben/verde — nu imităm vizual un sistem de operare anume) și o pastilă
-  de adresă desenată ÎNTOTDEAUNA, cu domeniul real extras din `buton.href`
-  (`domeniulDin`, cu `new URL().hostname`, prins în `try/catch`) sau goală cât
-  timp adresa încă nu e pusă. Goală, nu lipsă: altfel cartonașele fără link ar
-  fi avut altă bară decât cele cu link, și s-ar fi văzut în galerie că unele
-  sunt neterminate;
+- colțuri rotunjite la `max(var(--t-raza), 18px)` — Claritate are 6px și lăsa
+  cartonașele aproape drepte;
+- **fără nicio bară deasupra pozei.** A existat o vreme o ramă care imita o
+  fereastră de browser (trei puncte + bară de adresă cu domeniul scos din
+  `buton.href`). A căzut în două trepte, amândouă cerute de proprietar:
+  întâi adresa — demo-urile stau pe `.vercel.app`, iar
+  „cosmin-caldura.vercel.app" scris mare pe site-ul care vinde produsul arăta
+  a lucru neterminat — apoi toată rama, fiindcă la referință nu e.
+  **De notat, fiindcă s-a întâmplat de două ori la rând:** rama a fost o
+  presupunere de-a mea despre cum arată softwaves.ro, corectată de cineva care
+  chiar îl vede. Mediul de lucru n-are ieșire la internet (nici `WebFetch`,
+  nici `curl`, nici Playwright nu ajung afară), deci o referință se citește din
+  ce spune proprietarul și din capturile lui, nu din ce-mi închipui eu;
 - numele șablonului scris PESTE poză, colț dreapta-jos, pe un voal întunecat
   ținut jos și scurt (se stinge pe la 62% din înălțime): captura e marfa, iar
   un voal întins pe jumătate de cartonaș ar întuneca exact partea de site pe
   care omul vrea s-o vadă;
 - **tot cartonașul e link**, dacă elementul are `buton.href` — nu un buton
   într-un colț. La referință dalele se apasă întregi, iar un buton în plus ar
-  fi fost exact textul pe care proprietarul l-a scos. Textul butonului nu se
-  mai afișează nicăieri, doar adresa lui e folosită. Fără `href`, cartonașul
+  fi fost exact textul pe care proprietarul l-a scos. Nici textul butonului,
+  nici adresa nu se afișează nicăieri; din `buton` se folosește doar `href`. Fără `href`, cartonașul
   arată IDENTIC, doar că nu duce nicăieri — galeria e la fel și înainte, și
   după ce fiecare șablon-demo își primește adresa;
 - nimic altceva: fără etichetă, detalii, descriere, materiale sau bandă cu

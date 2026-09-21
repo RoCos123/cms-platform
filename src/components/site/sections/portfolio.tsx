@@ -279,9 +279,15 @@ export function Portfolio({
 /**
  * Cartonașul „vitrina": doar poza (mare) și numele, într-un cadru care imită o
  * fereastră de browser — cerut pentru galeria de șabloane de pe
- * `sitepsihologi.ro` (21 sept. 2026, referință: softwaves.ro). Bara de sus (3
- * puncte + o pastilă goală) spune „ăsta e un site adevărat", nu o poză
- * oarecare; numele stă scris PESTE poză, pe un voal întunecat, ca la referință.
+ * `sitepsihologi.ro` (21 sept. 2026, referință: softwaves.ro): poza, colțuri
+ * rotunjite, numele scris PESTE ea, pe un voal întunecat. Atât.
+ *
+ * A avut o vreme și o ramă care imita o fereastră de browser (trei puncte plus
+ * o bară de adresă). Proprietarul a cerut-o scoasă, uitându-se la referință —
+ * acolo nu e. Notat fiindcă e a doua oară când o presupunere de-a mea despre
+ * cum arată softwaves.ro a trebuit corectată de cineva care chiar o vede:
+ * mediul de lucru n-are ieșire la internet, deci referința se citește din ce
+ * spune proprietarul, nu din ce-mi închipui eu.
  *
  * Nimic altceva — fără etichetă, detalii, descriere, materiale sau bandă cu
  * buton sub poză. Cerut cuvânt cu cuvânt de proprietar: „nu avem nevoie de
@@ -306,98 +312,51 @@ function CartonasVitrina({
   const href = element.buton?.href?.trim() || null;
 
   const continut = (
-    <>
-      {/* Bara falsă de browser. Puncte neutre, nu roșu/galben/verde — nu
-          imităm un sistem de operare anume, doar ideea de „fereastră".
+    // Poza, mare — 16/10, nu 3/2: aici e chiar mesajul, nu o ilustrație
+    // lângă text.
+    <div style={{ position: "relative" }}>
+      {element.imagine && (
+        <SectionImage
+          src={element.imagine.url}
+          alt={element.imagine.altText ?? ""}
+          aspectRatio="16 / 10"
+          sizes="(max-width: 720px) 100vw, 560px"
+          pozitie={element.imagine.pozitie}
+        />
+      )}
 
-          Pastila de adresă rămâne GOALĂ, dinadins. A avut o vreme domeniul
-          scris în ea, scos din `buton.href`; proprietarul a cerut să dispară
-          (22 sept. 2026), fiindcă demo-urile stau pe adrese temporare și
-          „cosmin-caldura.vercel.app" scris mare pe site-ul care vinde produsul
-          arăta a lucru neterminat. La referință (softwaves.ro) pastila e tot
-          goală. Rama rămâne — ea spune „ăsta e un site adevărat", nu o poză
-          oarecare; ea era lucrul de păstrat, nu adresa. */}
+      {/* Voalul: fără el, un nume alb scris peste captura unui site deschis
+          la culoare ar fi ilizibil — vezi cardul „Servicii" pentru același
+          voal, la altă secțiune. Ținut jos și scurt (se stinge pe la 62%):
+          captura E marfa, iar un voal întins pe jumătate de cartonaș ar
+          întuneca exact partea din site pe care omul vrea s-o vadă. */}
       <div
+        aria-hidden
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "16px",
-          padding: "10px 14px",
-          background: "var(--t-fundal-nuantat)",
-          borderBottom: "1px solid var(--t-chenar)",
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(to top, rgba(0,0,0,0.66), rgba(0,0,0,0.06) 38%, transparent 62%)",
+        }}
+      />
+
+      <h3
+        style={{
+          position: "absolute",
+          right: "20px",
+          bottom: "20px",
+          left: "20px",
+          margin: 0,
+          textAlign: "right",
+          fontSize: "clamp(20px, 2.6vw, 28px)",
+          lineHeight: 1.15,
+          fontWeight: 700,
+          color: "#fff",
+          textWrap: "pretty",
         }}
       >
-        <div aria-hidden style={{ display: "flex", gap: "6px", flexShrink: 0 }}>
-          {[0, 1, 2].map((j) => (
-            <span
-              key={j}
-              style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                background: "var(--t-text-secundar)",
-                opacity: 0.35,
-              }}
-            />
-          ))}
-        </div>
-        <span
-          aria-hidden
-          style={{
-            flex: 1,
-            height: "22px",
-            borderRadius: "999px",
-            background: "var(--t-fundal)",
-          }}
-        />
-      </div>
-
-      {/* Poza, mare — 16/10, nu 3/2: aici e chiar mesajul, nu o ilustrație
-          lângă text. */}
-      <div style={{ position: "relative" }}>
-        {element.imagine && (
-          <SectionImage
-            src={element.imagine.url}
-            alt={element.imagine.altText ?? ""}
-            aspectRatio="16 / 10"
-            sizes="(max-width: 720px) 100vw, 560px"
-            pozitie={element.imagine.pozitie}
-          />
-        )}
-
-        {/* Voalul: fără el, un nume alb scris peste captura unui site deschis
-            la culoare ar fi ilizibil — vezi cardul „Servicii" pentru același
-            voal, la altă secțiune. Ținut jos și scurt (se stinge pe la 62%):
-            captura E marfa, iar un voal întins pe jumătate de cartonaș ar
-            întuneca exact partea din site pe care omul vrea s-o vadă. */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "linear-gradient(to top, rgba(0,0,0,0.66), rgba(0,0,0,0.06) 38%, transparent 62%)",
-          }}
-        />
-
-        <h3
-          style={{
-            position: "absolute",
-            right: "20px",
-            bottom: "20px",
-            left: "20px",
-            margin: 0,
-            textAlign: "right",
-            fontSize: "clamp(20px, 2.6vw, 28px)",
-            lineHeight: 1.15,
-            fontWeight: 700,
-            color: "#fff",
-            textWrap: "pretty",
-          }}
-        >
-          {element.titlu}
-        </h3>
-      </div>
-    </>
+        {element.titlu}
+      </h3>
+    </div>
   );
 
   return (
