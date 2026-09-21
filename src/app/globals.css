@@ -380,16 +380,21 @@ body {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /*
+    Starea implicită e VIZIBILĂ. Ascunderea (`reveal-ascuns`) o pune JS-ul
+    (`reveal-la-scroll.tsx`) doar pe ce e sub primul ecran; când elementul intră
+    în cadru, clasa se scoate și tranziția îl aduce înapoi. Așa, titlul din hero
+    (LCP) nu așteaptă niciodată JS-ul ca să se picteze, iar fără JS totul rămâne
+    vizibil din oficiu.
+  */
   [data-reveal] {
-    opacity: 0;
-    transform: translateY(calc(var(--anim-distanta) * 0.5));
     transition: opacity var(--anim-durata) var(--anim-curba),
       transform var(--anim-durata) var(--anim-curba);
-    will-change: opacity, transform;
   }
 
-  [data-reveal].is-in {
-    opacity: 1;
-    transform: none;
+  [data-reveal].reveal-ascuns {
+    opacity: 0;
+    transform: translateY(calc(var(--anim-distanta) * 0.5));
+    will-change: opacity, transform;
   }
 }

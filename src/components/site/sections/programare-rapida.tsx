@@ -6,7 +6,7 @@ import Link from "next/link";
 import { cereProgramare } from "@/app/actions/programari";
 import { LIMITE, STARE_INITIALA } from "@/lib/formulare";
 import { Camp, Capcana, MesajFormular, stilButonTrimite } from "@/components/site/form-parts";
-import { Caseta } from "@/components/site/captcha";
+import { CasetaAmanata } from "@/components/site/captcha";
 import { Calendar } from "@/components/site/calendar";
 import type { LunaCalendar } from "@/lib/calendar";
 import type { ZiCuOreScrise } from "./programare";
@@ -184,7 +184,7 @@ export function ProgramareRapida({
           </p>
 
           {siteKey && (
-            <Caseta
+            <CasetaAmanata
               key={stare.incercari}
               siteKey={siteKey}
               furnizor={furnizorCaptcha}

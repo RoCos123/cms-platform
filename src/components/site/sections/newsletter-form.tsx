@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { aboneazaLaNewsletter } from "@/app/actions/formulare";
 import { LIMITE, STARE_INITIALA } from "@/lib/formulare";
 import { Capcana, MesajFormular, stilButonTrimite, stilControl } from "@/components/site/form-parts";
-import { Caseta } from "@/components/site/captcha";
+import { CasetaAmanata } from "@/components/site/captcha";
 
 export function NewsletterForm({
   siteKey,
@@ -80,7 +80,7 @@ export function NewsletterForm({
         Fără asta, a doua trimitere din aceeași pagină ar fi mereu respinsă.
       */}
       {siteKey && (
-            <Caseta
+            <CasetaAmanata
               key={stare.incercari}
               siteKey={siteKey}
               furnizor={furnizorCaptcha}

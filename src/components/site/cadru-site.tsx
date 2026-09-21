@@ -157,11 +157,10 @@ export async function CadruSite({
         <TranzitieLogo logoUrl={logoSemnat?.url} />
 
         {/* Intrarea în cadru a secțiunilor la scroll — vezi `reveal-la-scroll.tsx`
-            și regula `[data-reveal]` din `globals.css`. */}
+            și regula `[data-reveal]` din `globals.css`. Starea implicită e
+            vizibilă, deci fără JavaScript totul se vede oricum — nu mai e nevoie
+            de plasa `<noscript>` de dinainte. */}
         <RevealLaScroll />
-        <noscript>
-          <style>{"[data-reveal]{opacity:1!important;transform:none!important;}"}</style>
-        </noscript>
       </div>
     </>
   );

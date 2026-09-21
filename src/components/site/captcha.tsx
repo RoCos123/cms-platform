@@ -185,3 +185,72 @@ export function Caseta({
 
   return <div ref={container} />;
 }
+
+/**
+ * Caseta anti-spam, dar încărcată abia când chiar se apropie momentul.
+ *
+ * De ce există: SDK-ul hCaptcha e enorm (~730 KiB cu tot cu iframe-ul lui) și, la
+ * montarea `Caseta`, pornește imediat. Formularul de newsletter și cel de contact
+ * stau pe prima pagină, dar SUB primul ecran — deci pe un site abia deschis se
+ * descărcau ~730 KiB de captcha înainte ca vizitatorul să apuce să vadă titlul.
+ * În Lighthouse asta ținea lanțul critic și LCP-ul la ~4s degeaba.
+ *
+ * Acum widgetul se montează abia când: (1) locul lui ajunge la ~800px de ecran
+ * (deci apucă să se încarce înainte să derulezi până la el), SAU (2) atingi/pui
+ * focus în formularul din jur. Oricare vine prima. Pe o pagină unde formularul e
+ * deja pe primul ecran, observatorul pornește pe loc, deci nu se pierde nimic.
+ *
+ * Tokenul rămâne de unică folosință: `key`-ul de pe componentă (din formular) o
+ * remontează după fiecare trimitere, la fel ca înainte.
+ */
+export function CasetaAmanata(props: {
+  siteKey: string;
+  furnizor?: string | null;
+  tema: "light" | "dark";
+}) {
+  const ancora = useRef<HTMLDivElement>(null);
+  const [activ, setActiv] = useState(false);
+
+  useEffect(() => {
+    if (activ) return;
+    const nod = ancora.current;
+    if (!nod) return;
+
+    let pornit = false;
+    const porneste = () => {
+      if (pornit) return;
+      pornit = true;
+      setActiv(true);
+    };
+
+    // Aproape de ecran. `rootMargin` generos, ca widgetul să fie deja acolo când
+    // ajungi la el. Observatorul cheamă callbackul pe loc dacă locul e deja în
+    // cadru (ex. formularul e pe primul ecran, sau remontare după trimitere).
+    const observator = new IntersectionObserver(
+      (intrari) => {
+        if (intrari.some((i) => i.isIntersecting)) porneste();
+      },
+      { rootMargin: "800px 0px" },
+    );
+    observator.observe(nod);
+
+    // Sau prima atingere a formularului din jur — dacă cineva pune focus pe câmp
+    // înainte ca locul casetei să intre în raza de mai sus.
+    const form = nod.closest("form");
+    form?.addEventListener("focusin", porneste, { once: true });
+    form?.addEventListener("pointerdown", porneste, { once: true });
+
+    return () => {
+      observator.disconnect();
+      form?.removeEventListener("focusin", porneste);
+      form?.removeEventListener("pointerdown", porneste);
+    };
+  }, [activ]);
+
+  if (activ) return <Caseta {...props} />;
+
+  // Cât timp e amânată, un loc gol de înălțime zero. Nu rezervăm înălțimea
+  // widgetului: se activează cu 800px înainte să intre în ecran, deci e încărcat
+  // până ajungi la el — nu se vede niciun salt de așezare.
+  return <div ref={ancora} aria-hidden />;
+}

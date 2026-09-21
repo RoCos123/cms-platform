@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { trimiteMesajContact } from "@/app/actions/formulare";
 import { LIMITE, STARE_INITIALA } from "@/lib/formulare";
 import { Camp, Capcana, MesajFormular, stilButonTrimite } from "@/components/site/form-parts";
-import { Caseta } from "@/components/site/captcha";
+import { CasetaAmanata } from "@/components/site/captcha";
 
 export function ContactForm({
   siteKey,
@@ -92,7 +92,7 @@ export function ContactForm({
         Fără asta, a doua trimitere din aceeași pagină ar fi mereu respinsă.
       */}
       {siteKey && (
-            <Caseta
+            <CasetaAmanata
               key={stare.incercari}
               siteKey={siteKey}
               furnizor={furnizorCaptcha}

@@ -2101,3 +2101,58 @@ panou, pagina asta chiar se derulează ca site-ul adevărat, deci comportamentul
 corect e să arate LA FEL, nu instant.
 
 Tipuri, lint, cele 218 probe și build-ul trec.
+
+## Scor Lighthouse: LCP și greutatea paginii (21 sept. 2026)
+
+Proprietarul a rulat Lighthouse (pe `cosmin-claritate`, dar codul e comun tuturor
+șabloanelor) și a cerut ajutor la scorul de performanță: LCP 4,2s, TBT 270ms,
+Speed Index 5,0s. Două cauze, amândouă ale noastre, amândouă reparate.
+
+**1. hCaptcha (~730 KiB) se încărca pe prima pagină, degeaba.** Formularele de
+newsletter și contact stau pe prima pagină, dar sub primul ecran. `Caseta`
+pornea SDK-ul hCaptcha la montare, deci un site abia deschis descărca ~730 KiB
+de captcha (`hsw.js` 439 KiB + `hcaptcha.html` 188 KiB + `api.js` 100 KiB) —
+aproape jumătate din toată greutatea paginii (1.576 KiB) — înainte ca omul să
+apuce să vadă titlul. Ținea lanțul critic (`checksiteconfig` la 4,1s), TBT-ul
+(taskuri de 131ms + 106ms) și munca pe firul principal.
+
+Reparat: componentă nouă `CasetaAmanata` (în `captcha.tsx`), pusă în locul lui
+`Caseta` în toate cele patru formulare (newsletter, contact, programare rapidă,
+pagina de programare). Montează widgetul abia când locul lui ajunge la ~800px de
+ecran (IntersectionObserver, deci e încărcat până derulezi la el) SAU la primul
+focus/atingere a formularului din jur. Unde formularul e deja pe primul ecran,
+observatorul pornește pe loc — nu se pierde nimic. Verificat cu Playwright, pe o
+pagină de probă cu formularul mult sub fold: 0 scripturi hCaptcha la încărcare,
+1 după ce derulezi la formular (înainte se încărca imediat).
+
+**2. Animația de scroll ținea titlul hero (LCP) invizibil.** Regresie a
+mecanismului de fade adăugat pe 20 sept.: `Section` pune `data-reveal` pe
+conținut, iar CSS-ul îl pornea `opacity: 0` până când JS-ul punea clasa care-l
+arată. Titlul din hero — elementul LCP (un `span`) — pornea deci invizibil și
+aștepta încărcarea + hidratarea + observatorul: exact „element render delay ~3s"
+din raport. FCP era 1,1s (antetul, care nu e într-un `Section`), dar LCP sărea
+la 4,2s — fix gaura asta.
+
+Reparat prin inversarea logicii (`reveal-la-scroll.tsx` + regula din
+`globals.css`): starea implicită e acum VIZIBILĂ. JS-ul pune clasa de ascundere
+(`reveal-ascuns`) DOAR pe `[data-reveal]`-urile care sunt sub primul ecran; ce e
+deja pe ecran (hero-ul) nu se atinge și se pictează din primul cadru. Fade-ul sub
+fold rămâne neschimbat. Verificat cu Playwright: hero `opacity: 1` la încărcare;
+`#pareri` (sub fold) pornește `opacity: 0` + `reveal-ascuns`, apoi ajunge la 1
+după scroll.
+
+Bonus curat: fiindcă starea implicită e vizibilă, au dispărut două cârlige de
+dinainte — plasa `<noscript>` din `cadru-site.tsx` și suprascrierea injectată în
+iframe-ul de previzualizare din panou (`cadru-previzualizare.tsx`). Fără JS: 0
+secțiuni ascunse (verificat). Previzualizarea din panou: vizibilă din oficiu,
+fără hack.
+
+**Ce NU e al nostru** (spus proprietarului): zgomotul din raport de la
+`chrome-extension://…` (reader_mode.js, video_toolbar.js etc.) vine din
+extensiile browserului lui, nu din site — un Lighthouse rulat în Incognito, cu
+extensiile oprite, curăță o parte din „unused JS" și TBT. Rămân, ca îmbunătățiri
+mai mici de luat separat dacă se dorește: polyfill-uri legacy (~27 KiB, din
+target-ul de build) și cele 7 fonturi woff2 (~390 KiB) — `font-display` e deja
+`swap` (audit trecut).
+
+Tipuri, lint, cele 218 probe și build-ul trec.
