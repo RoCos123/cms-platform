@@ -2431,6 +2431,25 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Poza de la „Despre mine": colțuri rotunjite peste tot (22 sept. 2026)
+
+Cerut de proprietar, uitându-se la Lumină: portretul era singurul dreptunghi cu
+colțuri drepte într-o pagină în care tot restul e rotunjit, și se citea ca o
+scăpare. Rotunjirea era pusă doar la Apropiere (unde vine oricum cu cardul
+decalat din spate) și la Claritate (unde poza e cerc).
+
+Raza e a ȘABLONULUI (`--t-raza`), nu un număr scris în componentă: 16px la
+Căldură, 24px la Liniște și Lumină, 36px la Apropiere. Rotunjirea e o trăsătură
+a înfățișării, iar portretul n-are de ce să iasă din ea. Claritate rămâne cerc.
+
+`overflow: hidden` se pune de-acum întotdeauna, nu doar la cerc și la Apropiere:
+fără el colțurile tăiate n-ar ascunde nimic, fiindcă poza umple rama
+(`object-fit: cover`) și ar ieși peste rotunjire.
+
+Cardul închis suprapus („12+ ani", doar Liniște) rămâne neatins — e frate cu
+rama, nu copil, deci tăierea nu-l prinde. Verificat vizual pe toate cinci
+șabloanele, cu reperele puse, plus măsurat la randare: 16 / 24 / 24 / 36 / 50%.
+
 ### Cum arată poza în cartonașul „vitrina" (22 sept. 2026)
 
 **Regula de acum:** caseta e fixă (16/9, aceeași la toate cartonașele), poza o

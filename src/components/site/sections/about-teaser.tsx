@@ -188,11 +188,25 @@ export function AboutTeaser({
                 }}
               />
             )}
+            {/*
+              Colțurile rotunjite sunt ale TUTUROR șabloanelor cu poză
+              dreptunghiulară aici, nu doar ale lui Apropiere — cerut de
+              proprietar pe 22 sept. 2026, uitându-se la Lumină: un portret cu
+              colțuri drepte, singur într-o pagină în care tot restul e rotunjit,
+              se citea ca o scăpare.
+
+              Raza e a ȘABLONULUI (`--t-raza`: 16px la Căldură, 24px la Liniște
+              și Lumină, 36px la Apropiere), nu un număr scris aici: rotunjirea e
+              o trăsătură a înfățișării, iar portretul n-are de ce să iasă din ea.
+              Claritate nu intră în socoteală — acolo poza e cerc.
+            */}
             <div
               style={{
                 position: pozaStivuita ? "relative" : undefined,
-                borderRadius: pozaRotunda ? "50%" : pozaStivuita ? "var(--t-raza)" : undefined,
-                overflow: pozaRotunda || pozaStivuita ? "hidden" : undefined,
+                borderRadius: pozaRotunda ? "50%" : "var(--t-raza)",
+                // Fără el, colțurile tăiate n-ar ascunde nimic: poza umple rama
+                // (`object-fit: cover`) și ar ieși peste rotunjire.
+                overflow: "hidden",
               }}
             >
               <SectionImage
