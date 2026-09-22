@@ -312,14 +312,23 @@ function CartonasVitrina({
   const href = element.buton?.href?.trim() || null;
 
   const continut = (
-    // Poza, mare — 16/10, nu 3/2: aici e chiar mesajul, nu o ilustrație
-    // lângă text.
+    /*
+      Poza, mare — 16/9, nu 3/2 ca la cartonașul obișnuit: aici e chiar
+      mesajul, nu o ilustrație lângă text.
+
+      16/9, nu 16/10 cum a fost întâi, dintr-un motiv care n-are legătură cu
+      designul: poza se taie ca să umple caseta (`object-fit: cover`), deci
+      capturile trebuie decupate la raportul casetei — iar 16/10 nu există ca
+      presetare în uneltele de decupat din Windows, pe când 16/9 e peste tot.
+      Proprietarul pierdea de fiecare dată marginea de jos a capturii.
+      Mărimea țintă a unei capturi: 1600 × 900.
+    */
     <div style={{ position: "relative" }}>
       {element.imagine && (
         <SectionImage
           src={element.imagine.url}
           alt={element.imagine.altText ?? ""}
-          aspectRatio="16 / 10"
+          aspectRatio="16 / 9"
           sizes="(max-width: 720px) 100vw, 560px"
           pozitie={element.imagine.pozitie}
         />

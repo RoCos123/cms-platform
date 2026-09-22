@@ -2376,13 +2376,24 @@ la „Serviciile mele".
 Adăugat `CartonasVitrina` în `portfolio.tsx`, pornit când rândul din
 `site_content` are `variant = 'vitrina'`:
 
-- poza la 16/10 (nu 3/2, ca la cardul obișnuit) și grilă pe **două** coloane,
+- poza la **16/9** (nu 3/2, ca la cardul obișnuit) și grilă pe **două** coloane,
   nu trei (`minmax(min(100%, 400px), 1fr)` — `min(100%, …)` ca pragul de 400px
   să nu scoată cartonașul din ecran pe telefon; măsurat: la 390px lățime nu
   apare derulare laterală). Pe trei coloane, captura unui site întreg ajungea o
   miniatură din care nu se înțelegea nimic;
 - colțuri rotunjite la `max(var(--t-raza), 18px)` — Claritate are 6px și lăsa
   cartonașele aproape drepte;
+- **capturile se decupează la 16/9, ținta 1600 × 900.** Poza se taie ca să
+  umple caseta (`object-fit: cover`), niciodată nu se micșorează ca să încapă
+  toată — deci raportul capturii trebuie să fie chiar raportul casetei. Caseta
+  a fost întâi 16/10 și s-a mutat pe 16/9 dintr-un motiv care n-are legătură
+  cu designul: 16/10 nu există ca presetare în uneltele de decupat din Windows
+  (Photos, Paint, editorul din Snipping Tool), 16/9 e în toate. Proprietarul
+  pierdea de fiecare dată marginea de jos a capturii. Tot de-aici: captura se
+  face pe FEREASTRĂ (`Alt + PrtScn`), nu cu dreptunghi tras cu mâna — un
+  decupaj din ochi taie marginea albă din stânga a paginii, și se vede;
+- dacă o poză tot nu e fix 16/9, se trage în panou (punct focal,
+  `object-position`) ca să se aleagă ce rămâne în cadru;
 - **fără nicio bară deasupra pozei.** A existat o vreme o ramă care imita o
   fereastră de browser (trei puncte + bară de adresă cu domeniul scos din
   `buton.href`). A căzut în două trepte, amândouă cerute de proprietar:
