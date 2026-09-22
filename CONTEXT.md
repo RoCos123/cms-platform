@@ -2376,8 +2376,8 @@ la „Serviciile mele".
 Adăugat `CartonasVitrina` în `portfolio.tsx`, pornit când rândul din
 `site_content` are `variant = 'vitrina'`:
 
-- **caseta se potrivește după poză, nu poza după casetă** (22 sept. 2026) —
-  vezi §„Caseta după poză" mai jos; și grilă pe **două** coloane,
+- caseta fixă 16/9, poza o umple, aliniată SUS — vezi §„Cum arată poza în
+  cartonașul «vitrina»" mai jos; și grilă pe **două** coloane,
   nu trei (`minmax(min(100%, 400px), 1fr)` — `min(100%, …)` ca pragul de 400px
   să nu scoată cartonașul din ecran pe telefon; măsurat: la 390px lățime nu
   apare derulare laterală). Pe trei coloane, captura unui site întreg ajungea o
@@ -2431,45 +2431,39 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
-### Poza se vede întreagă, oricare ar fi ea (22 sept. 2026)
+### Cum arată poza în cartonașul „vitrina" (22 sept. 2026)
 
-**Regula, în trei părți:**
-1. **Căsuța e fixă**, 16/9, aceeași la toate cartonașele, orice s-ar încărca.
-   Cerut în cuvintele proprietarului: „mărimea și forma căsuței nu se schimbă."
-2. **Poza se vede toată, în proporțiile ei** — `incadrare="intreaga"`
-   (`object-fit: contain`). „Nici alungită, nici înghesuită", tot el.
-3. **Locul rămas pe margini se umple cu o copie estompată a pozei însăși**,
-   mărită și neclară. Fără ea rămâneau două dungi albe, care se citeau ca o
-   greșeală; cu ea, marginea ia culoarea capturii (crem la un site crem) și
-   pare continuarea pozei. Tiparul folosit de playerele video pentru filme de
-   altă formă decât ecranul.
+**Regula de acum:** caseta e fixă (16/9, aceeași la toate cartonașele), poza o
+UMPLE, iar punctul focal implicit e SUS (`{x: 50, y: 0}`), nu la mijloc ca
+peste tot altundeva. Deci se vede partea de sus a capturii — titlul, textul,
+butonul — și se pierde restul paginii, care oricum n-ar fi lizibil într-un
+cartonaș. Dacă clientul a tras de poză în panou, alegerea lui bate implicitul.
 
-Geometria nu lasă decât trei purtări când forma pozei nu e forma casetei: tai
-din poză, o lași mai mică, sau o deformezi. A treia e exclusă — scrisul dintr-o
-captură turtită se vede imediat. Aleasă a doua, îmbrăcată ca să nu arate a
-lipsă.
+**Drumul până aici merită citit înainte de a-l relua.** Cerințele
+proprietarului, în cuvintele lui, erau trei deodată: „mărimea și forma căsuței
+nu se schimbă", „orice poză pe care o încarc să ia automat mărimea căsuței",
+„nici alungită, nici înghesuită". Geometria nu lasă decât trei purtări când
+forma pozei nu e forma casetei: poza umple caseta și se taie ce prisosește, sau
+încape toată și rămâne loc pe margini, sau se deformează.
 
-Nimic din toate astea nu depinde de măsurile pozei. Ce scrie mai jos despre
-ele a rămas ca istorie a deciziei și fiindcă măsurile se văd în bibliotecă;
-galeria nu mai hotărăște nimic după ele.
+Încercate pe rând, toate respinse până la ultima:
 
-**De ce e scris așa de apăsat.** Trei încercări la rând au picat, toate
-sprijinite pe ideea că se poate afla forma pozei dinainte: rapoarte fixe
-(3/2 → 16/10 → 16/9), apoi caseta potrivită după măsurile pozei, apoi
-completarea măsurilor pe server. Fiecare era corectă pe hârtie. Fiecare avea
-un drum lung până la ecran (încărcare → conținutul secțiunii → salvare →
-randare), iar orice verigă lipsă o întorcea TĂCUT la tăiere. Proprietarul a
-văzut de trei ori „e la fel", fără ca ceva să pară stricat, și pe bună
-dreptate și-a pierdut răbdarea.
+1. raport fix 3/2, apoi 16/10, apoi 16/9 — fiecare tăia altă margine;
+2. caseta potrivită după măsurile pozei — corect în principiu, dar măsurile
+   aveau de străbătut un drum lung (încărcare → conținut → salvare → randare)
+   și orice verigă lipsă o întorcea TĂCUT la tăiere. Proprietarul a văzut de
+   trei ori „e la fel", fără ca ceva să pară stricat;
+3. poza întreagă, cu margini simple — dungi albe, citite ca o greșeală;
+4. poza întreagă, cu marginile umplute de o copie estompată a ei — respinsă;
+5. **poza umple caseta, aliniată sus** — acceptată.
 
-Lecția, care nu e despre imagini: **când nereușita unui mecanism arată exact
-ca purtarea veche, nu se poate depana nici de mine, nici de client.** Într-un
-asemenea caz se alege varianta care nu are ce să-i lipsească, chiar dacă iese
-cu un compromis vizibil (aici: o fâșie de cartonaș lângă poză). Un rezultat
-„bine" de fiecare dată bate un rezultat „perfect" care cade în tăcere.
-
-Ținut de `e2e/masuri-imagine.proba.mjs`, printr-o probă pe sursă: un
-`incadrare` uitat n-ar da nicio eroare, doar ar aduce tăierea înapoi.
+**Două lecții, niciuna despre imagini.** Prima: când nereușita unui mecanism
+arată exact ca purtarea veche, nu se poate depana nici de developer, nici de
+client — se alege varianta care nu are ce să-i lipsească. A doua, mai scumpă:
+patru încercări s-au dus pe deduceri din capturi de ecran, fără să întreb
+niciodată ce anume trebuie să se VADĂ în cartonaș. Răspunsul („partea de sus a
+paginii") făcea alegerea evidentă de la bun început. Pentru un lucru vizual,
+întrebarea „ce trebuie să se vadă" vine înaintea oricărei soluții.
 
 ### Măsurile pozei: de la „taie" la „nicio dungă" (22 sept. 2026)
 

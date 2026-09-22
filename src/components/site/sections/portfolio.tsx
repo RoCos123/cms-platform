@@ -330,26 +330,28 @@ function CartonasVitrina({
   const href = element.buton?.href?.trim() || null;
 
   /*
-    CĂSUȚA E FIXĂ, POZA SE VEDE ÎNTREAGĂ ÎN EA.
+    CĂSUȚA E FIXĂ, POZA O UMPLE, ALINIATĂ SUS.
 
-    Cerut de proprietar, în cuvintele lui: „căsuța are o mărime, acea mărime
-    rămâne pentru fiecare căsuță, mărimea și forma căsuței nu se schimbă. Vreau
-    ca orice poză pe care o încarc să ia automat mărimea căsuței." Deci raport
-    fix 16/9 la toate cartonașele, indiferent ce fișier se încarcă — o galerie
-    de cartonașe de forme diferite arăta dezordonat.
+    Hotărât de proprietar pe 22 sept. 2026, după un drum lung (vezi CONTEXT.md
+    §„Cum arată poza în cartonașul «vitrina»"). Cele trei cerințe ale lui, în
+    cuvintele lui: „mărimea și forma căsuței nu se schimbă", „orice poză pe care
+    o încarc să ia automat mărimea căsuței", „nici alungită, nici înghesuită".
 
-    Mai devreme caseta lua forma pozei (din `latime`/`inaltime`). S-a renunțat:
-    rezolva dungile, dar strica tocmai lucrul cerut aici, ca toate să fie la
-    fel. Măsurile rămân în date — se văd în bibliotecă și pot folosi altundeva
-    — doar că galeria nu mai decide nimic după ele.
+    Geometria nu lasă decât trei purtări când forma pozei nu e forma casetei:
+    poza umple caseta și se taie ce prisosește, sau încape toată și rămâne loc
+    pe margini, sau se deformează. A treia e exclusă — scrisul dintr-o captură
+    turtită se vede imediat. A doua s-a încercat, cu margini simple și apoi cu
+    o copie estompată a pozei în ele; proprietarul le-a respins pe amândouă.
+    Rămâne prima, și e și cea potrivită aici: cartonașele arată CAPTURI DE SITE,
+    iar partea de sus a unei pagini — titlul, textul, butonul — e chiar ce
+    trebuie arătat. Restul paginii n-ar fi lizibil într-un cartonaș oricum.
 
-    Ce se întâmplă cu o poză de altă formă: se vede TOATĂ, micșorată cât e
-    nevoie, iar locul rămas se umple cu o copie estompată a ei
-    (`incadrare="intreaga"`, vezi `SectionImage`). Nu se taie și nu se
-    deformează. Istoricul lung al deciziei — trei rapoarte fixe încercate pe
-    rând, apoi caseta după măsuri, apoi asta — e în CONTEXT.md.
+    De-aia punctul focal implicit e SUS (`y: 0`), nu la mijloc ca peste tot
+    altundeva: tăierea de la centru ar mânca tocmai titlul. Dacă însă clientul
+    a tras de poză în panou, alegerea lui bate implicitul — poate vrea să arate
+    altă parte a capturii.
   */
-  const raport = "16 / 9";
+  const incadrarePoza = element.imagine?.pozitie ?? { x: 50, y: 0 };
 
   const continut = (
     <div style={{ position: "relative" }}>
@@ -357,9 +359,9 @@ function CartonasVitrina({
         <SectionImage
           src={element.imagine.url}
           alt={element.imagine.altText ?? ""}
-          aspectRatio={raport}
+          aspectRatio="16 / 9"
           sizes="(max-width: 720px) 100vw, 560px"
-          incadrare="intreaga"
+          pozitie={incadrarePoza}
         />
       )}
 
