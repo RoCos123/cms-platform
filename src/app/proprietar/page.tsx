@@ -154,7 +154,12 @@ export default async function PanouProprietar({
         )}
 
         {/* Căutare + filtru: un formular GET, fără JavaScript — se poate marca și
-            trimite din tastatură, iar adresa rezultată e de pus la favorite. */}
+            trimite din tastatură, iar adresa rezultată e de pus la favorite.
+
+            Pe telefon caseta de căutare ia rândul ei întreg, iar filtrul și
+            butonul stau pe rândul de sub ea. Înghesuite toate trei pe un rând,
+            caseta rămânea atât de scurtă încât îi tăia și textul de îndrumare
+            („Caută după domeniu, nume sa…"). */}
         <form method="get" className="mb-4 flex flex-wrap items-center gap-2">
           <input
             type="search"
@@ -162,7 +167,7 @@ export default async function PanouProprietar({
             defaultValue={sp.q ?? ""}
             placeholder="Caută după domeniu, nume sau email"
             aria-label="Caută site"
-            className="min-w-56 flex-1 rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 placeholder:text-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            className="w-full rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 placeholder:text-zinc-400 sm:w-auto sm:min-w-56 sm:flex-1 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           />
           <select
             name="status"

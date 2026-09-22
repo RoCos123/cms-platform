@@ -2431,6 +2431,33 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Panoul proprietarului, pe telefon (22 sept. 2026)
+
+Proprietarul a deschis `/proprietar` pe telefon și a văzut doar două coloane
+din șase — „Cabinet" și „Adresă". Restul (șablon, stare, programări, butonul
+„Intră în panou") rămâneau după marginea ecranului. Derularea laterală exista
+(`overflow-x-auto`), dar **nimic nu spune că e acolo**: pe telefon nu există
+bară de derulare vizibilă, deci lista părea pur și simplu ciuntită.
+
+Reparat cu DOUĂ ÎNFĂȚIȘĂRI, nu cu un tabel care se strâmbă: pe telefon,
+cartonașe stivuite (`sm:hidden`); de la `sm` în sus, tabelul de dinainte,
+neatins. Aceleași date în amândouă — cine administrează platforma de pe telefon
+are nevoie de aceleași lucruri ca de pe calculator, deci nu s-a ascuns nimic.
+
+Trei amănunte care se uită ușor și se văd imediat:
+- `break-all` pe domeniu și pe email: n-au spații în ele, deci fără asta ies din
+  cartonaș și împing toată pagina la dreapta;
+- `shrink-0` pe pastila de stare, ca să nu se turtească lângă un nume lung;
+- caseta de căutare ia rândul ei întreg pe telefon (`w-full sm:w-auto`);
+  înghesuită lângă filtru și buton, îi tăia și textul de îndrumare.
+
+Pastila de stare și linkul de adresă sunt scrise o dată și folosite în amândouă
+înfățișările: două copii ar fi ajuns să difere la prima schimbare de culoare.
+
+Măsurat la randare, pe 393px lățime: fără derulare laterală (documentul are
+exact lățimea ferestrei), tabelul ascuns, cinci cartonașe. Pe 1280px: tabelul
+vizibil, cartonașele ascunse.
+
 ### Poza de la „Despre mine": colțuri rotunjite peste tot (22 sept. 2026)
 
 Cerut de proprietar, uitându-se la Lumină: portretul era singurul dreptunghi cu
