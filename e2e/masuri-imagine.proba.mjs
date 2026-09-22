@@ -62,3 +62,45 @@ test("locurile care reconstruiesc o imagine nu uită măsurile", () => {
     assert.ok(sursa.includes("inaltime"), `${cale} nu pomenește inaltime`);
   }
 });
+
+/*
+ * Completarea pe server: cine n-are măsuri le primește după `uploadId`, cine
+ * le are rămâne neatins, iar un id negăsit nu inventează nimic. Pe funcțiile
+ * pure de aici stă `salveazaSectiune` — varianta cu pas manual („re-alege poza
+ * din bibliotecă") a picat la primul om care a folosit-o.
+ */
+const { imaginileFaraMasuri, completeazaMasurileImaginilor } = await import("@/lib/imagini");
+
+const SECTIUNE = {
+  titlu: "Cinci feluri de a arăta.",
+  elemente: [
+    { titlu: "Copal", imagine: { uploadId: "a1", url: "/imagini/a1/s", latime: 1600, inaltime: 900 } },
+    { titlu: "Jadeit", imagine: { uploadId: "b2", url: "/imagini/b2/s" } },
+    { titlu: "Fără poză" },
+  ],
+};
+
+test("găsește doar imaginile fără măsuri, oricât de adânc ar sta", () => {
+  assert.deepEqual([...imaginileFaraMasuri(SECTIUNE)], ["b2"]);
+});
+
+test("completează măsurile după uploadId și nu atinge restul", () => {
+  const masuri = new Map([["b2", { latime: 1920, inaltime: 1030 }]]);
+  const completat = completeazaMasurileImaginilor(SECTIUNE, masuri);
+
+  assert.deepEqual(completat.elemente[1].imagine, {
+    uploadId: "b2",
+    url: "/imagini/b2/s",
+    latime: 1920,
+    inaltime: 1030,
+  });
+  // Cine avea măsuri e chiar același obiect, nu o copie schimbată.
+  assert.deepEqual(completat.elemente[0], SECTIUNE.elemente[0]);
+  assert.equal(imaginileFaraMasuri(completat).size, 0);
+});
+
+test("un id care nu e în hartă rămâne fără măsuri, nu cu unele inventate", () => {
+  const completat = completeazaMasurileImaginilor(SECTIUNE, new Map());
+
+  assert.deepEqual(completat.elemente[1].imagine, { uploadId: "b2", url: "/imagini/b2/s" });
+});

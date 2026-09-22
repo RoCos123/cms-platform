@@ -121,6 +121,88 @@ export function idurileImaginilor(valoare: unknown, gasite = new Set<string>()):
   return gasite;
 }
 
+/** Măsurile unei poze, în pixeli — perechea trebuie întreagă ca să dea un raport. */
+export type MasuriImagine = { latime: number; inaltime: number };
+
+function areMasuri(valoare: Record<string, unknown>): boolean {
+  return (
+    typeof valoare.latime === "number" &&
+    valoare.latime > 0 &&
+    typeof valoare.inaltime === "number" &&
+    valoare.inaltime > 0
+  );
+}
+
+/**
+ * Imaginile dintr-un conținut care NU își știu măsurile (`latime`/`inaltime`).
+ *
+ * Există fiindcă măsurile s-au adăugat în `ImageValue` abia pe 22 sept. 2026:
+ * pozele puse în secțiuni înainte de asta le au în tabelul `uploads` (se
+ * măsurau de la început), dar nu și în conținutul secțiunii, de unde le
+ * citește site-ul public. Perechea lui `completeazaMasurileImaginilor`: asta
+ * spune CE lipsește, aia scrie ce s-a găsit.
+ */
+export function imaginileFaraMasuri(valoare: unknown, gasite = new Set<string>()): Set<string> {
+  if (esteImagine(valoare)) {
+    if (!areMasuri(valoare)) gasite.add(valoare.uploadId as string);
+    return gasite;
+  }
+
+  if (Array.isArray(valoare)) {
+    for (const element of valoare) imaginileFaraMasuri(element, gasite);
+    return gasite;
+  }
+
+  if (esteObiect(valoare)) {
+    for (const camp of Object.values(valoare)) imaginileFaraMasuri(camp, gasite);
+  }
+
+  return gasite;
+}
+
+/**
+ * Scrie măsurile în fiecare imagine care nu le are, după `uploadId`.
+ *
+ * Se cheamă LA SALVAREA secțiunii, pe server — nu la randare. Locul e ales pe
+ * aceeași regulă ca la `url` și la descrieri (`rescrieInSectiuni`): site-ul
+ * public citește conținutul de-a gata, fără să întrebe `uploads`, deci tot ce
+ * trebuie să știe o pagină se scrie în conținut ATUNCI CÂND SE SCHIMBĂ, nu se
+ * caută la fiecare afișare.
+ *
+ * A existat întâi o variantă în care omul trebuia să-și RE-ALEAGĂ poza din
+ * bibliotecă, ca să-i aducă măsurile. N-a mers: pasul manual s-a dovedit exact
+ * genul de instrucțiune care se pierde pe drum, iar nereușita lui era tăcută —
+ * cartonașul cădea pe raportul de rezervă și arăta „la fel ca înainte". De-aia
+ * completarea e acum treaba serverului, la orice salvare.
+ *
+ * O imagine care își are deja măsurile rămâne neatinsă; una al cărei id nu e
+ * în hartă, la fel — nu se inventează nimic.
+ */
+export function completeazaMasurileImaginilor(
+  valoare: unknown,
+  masuri: ReadonlyMap<string, MasuriImagine>,
+): unknown {
+  if (esteImagine(valoare)) {
+    if (areMasuri(valoare)) return valoare;
+    const gasite = masuri.get(valoare.uploadId as string);
+    return gasite ? { ...valoare, latime: gasite.latime, inaltime: gasite.inaltime } : valoare;
+  }
+
+  if (Array.isArray(valoare)) {
+    return valoare.map((element) => completeazaMasurileImaginilor(element, masuri));
+  }
+
+  if (esteObiect(valoare)) {
+    const rezultat: Record<string, unknown> = {};
+    for (const [cheie, camp] of Object.entries(valoare)) {
+      rezultat[cheie] = completeazaMasurileImaginilor(camp, masuri);
+    }
+    return rezultat;
+  }
+
+  return valoare;
+}
+
 export type RandSectiune = { id: string; key: string; data: unknown };
 
 /** Un articol de blog, cât ne trebuie ca să știm dacă folosește o imagine. */

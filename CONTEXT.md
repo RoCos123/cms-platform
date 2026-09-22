@@ -2459,11 +2459,26 @@ sare") se respectă, doar că numărul vine din poză, nu din cod. Grila primeș
 `align-items: start` doar la „vitrina": cu raporturi diferite, întinderea
 obișnuită ar lăsa o fâșie de fundal gol sub pozele mai scunde.
 
-**Rezervă:** fără măsuri — poze încărcate înainte de 22 sept. 2026, sau un SVG
-fără dimensiuni scrise în el — rămâne 16/9, adică purtarea de dinainte. Se
-repară fără să fie încărcat fișierul din nou: se alege poza încă o dată din
-bibliotecă, de unde își aduce măsurile (`uploads.width/height` erau scrise de
-la bun început).
+**Rezervă:** fără măsuri — un SVG fără dimensiuni scrise în el, o poză al
+cărei fișier n-a putut fi măsurat — rămâne 16/9, adică purtarea de dinainte.
+
+**Completarea e treaba serverului, nu a omului (tot 22 sept. 2026).** Prima
+variantă cerea clientului să-și RE-ALEAGĂ poza din bibliotecă, de unde și-ar
+fi adus măsurile. A picat la primul om care a folosit-o: proprietarul a văzut
+site-ul „la fel ca înainte" — fie pasul nu s-a făcut, fie a picat undeva pe
+drum, și n-avea cum să-și dea seama, fiindcă nereușita e tăcută (cartonașul
+cade pe raportul de rezervă, care arată exact ca vechiul comportament). Un pas
+manual a cărui nereușită nu se vede nu e o soluție.
+
+Acum `salveazaSectiune` completează singură, la ORICE salvare: adună
+imaginile fără măsuri din conținut (`imaginileFaraMasuri`), le citește
+`width/height` din `uploads` (unde se scriau de la bun început) și le scrie în
+conținut (`completeazaMasurileImaginilor`, amândouă în `src/lib/imagini.ts` —
+ținute de probe în `e2e/masuri-imagine.proba.mjs`). Dacă interogarea pică sau
+un rând n-are măsuri, salvarea merge înainte fără ele: completarea nu are voie
+să blocheze salvarea unui text. Pentru client: deschide secțiunea, apasă
+Salvează, gata — iar pozele noi vin cu măsurile de la încărcare, deci fără
+niciun pas.
 
 **Trei locuri enumeră câmpurile unei imagini pe nume**, deci pot pierde
 măsurile în tăcere: reconstrucția din `campuri-sectiune.tsx`, alegerea din

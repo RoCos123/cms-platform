@@ -6,6 +6,11 @@ import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
 import { metaSectiune } from "@/lib/sectiuni";
 import { catreEditor, catreStocare, valideaza } from "@/lib/sectiuni-editare";
+import {
+  completeazaMasurileImaginilor,
+  imaginileFaraMasuri,
+  type MasuriImagine,
+} from "@/lib/imagini";
 
 export type RandStructura = {
   id: string;
@@ -17,6 +22,17 @@ export type RezultatSalvare = { ok: true } | { ok: false; mesaj: string };
 
 /** Peste atât nu e o pagină, e o greșeală sau un abuz. */
 const MAXIM_SECTIUNI = 60;
+
+/**
+ * Un `uploadId` care nu arată a UUID nu se dă mai departe spre Postgres: ar da
+ * o eroare de conversie pe toată interogarea, iar completarea măsurilor ar
+ * pica pentru toate pozele din secțiune din cauza unui singur id stricat.
+ */
+const TIPAR_UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function idValid(uploadId: string): boolean {
+  return TIPAR_UUID.test(uploadId);
+}
 
 /**
  * Salvează ordinea și vizibilitatea secțiunilor de pe pagina principală.
@@ -153,12 +169,44 @@ export async function salveazaSectiune(
     return { ok: false, mesaj: "Mai lipsește ceva. Verifică marcajele din formular." };
   }
 
+  /*
+    Pozele fără măsuri (`latime`/`inaltime`) și le primesc AICI, din `uploads`,
+    la fiecare salvare — nu printr-un pas manual al clientului. Măsurile s-au
+    adăugat în `ImageValue` pe 22 sept. 2026; pozele puse în secțiuni înainte
+    le au doar în `uploads`. Varianta „re-alege poza din bibliotecă" a picat la
+    primul om care a folosit-o (vezi CONTEXT.md §„Caseta după poză").
+
+    RLS-ul lui `uploads` cere site-ul din sesiune, deci un id străin, oricum ar
+    ajunge în date, pur și simplu nu potrivește niciun rând. Dacă interogarea
+    pică sau un rând n-are măsuri (fișier nemăsurabil la încărcare), salvarea
+    merge înainte fără ele — poza cade pe caseta de rezervă, ca până acum;
+    completarea măsurilor nu are voie să blocheze salvarea unui text.
+  */
+  let deScris = curatat;
+  const faraMasuri = [...imaginileFaraMasuri(curatat)].filter(idValid);
+  if (faraMasuri.length > 0) {
+    const { data: randuriMasuri } = await supabase
+      .from("uploads")
+      .select("id, width, height")
+      .in("id", faraMasuri);
+
+    const masuri = new Map<string, MasuriImagine>();
+    for (const rand of randuriMasuri ?? []) {
+      const r = rand as { id: string; width: number | null; height: number | null };
+      if (r.width && r.height) masuri.set(r.id, { latime: r.width, inaltime: r.height });
+    }
+
+    if (masuri.size > 0) {
+      deScris = completeazaMasurileImaginilor(curatat, masuri) as Record<string, unknown>;
+    }
+  }
+
   const { error } = await supabase
     .from("site_content")
     // `is_demo` cade la prima editare: din clipa în care clientul a scris ceva
     // aici, secțiunea nu mai e textul demonstrativ pus de noi la provizionare,
     // iar ecranul „Pregătit de lansare" nu mai are de ce s-o semnaleze.
-    .update({ data: curatat, is_demo: false })
+    .update({ data: deScris, is_demo: false })
     .eq("id", id)
     .eq("site_id", session.siteId);
 
