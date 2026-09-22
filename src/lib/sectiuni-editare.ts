@@ -165,8 +165,23 @@ export function catreStocare(valoare: ValoareEditor, campuri: CampSchema[]): Rec
         const link = esteObiect(brut) ? brut : {};
         const text = String(link.text ?? "").trim();
         const href = String(link.href ?? "").trim();
-        // Un buton fără text n-are ce căuta pe pagină, chiar dacă are adresă.
-        if (text !== "") rezultat[camp.cheie] = { text, href };
+        /*
+          Se păstrează dacă are ORICARE din cele două. Regula veche cerea text
+          — „un buton fără text n-are ce căuta pe pagină" — și era adevărată
+          atâta vreme cât din `buton` se citea mereu și textul, și adresa.
+
+          Nu mai e: cartonașul „vitrina" din galeria de șabloane folosește DOAR
+          `href`, ca să facă tot cartonașul clicabil, fără niciun buton scris.
+          Cu regula veche, cine punea adresa și lăsa textul gol (firesc, de
+          vreme ce nu se vede nicăieri) pierdea linkul LA SALVARE, în tăcere —
+          exact ce s-a întâmplat pe sitepsihologi.ro pe 22 sept. 2026.
+
+          Grija din regula veche rămâne, dar se rezolvă acolo unde e locul ei:
+          componentele care chiar DESENEAZĂ un buton se uită la `buton?.text`,
+          nu la existența lui `buton`. Deci un link fără text tot nu produce
+          un buton gol pe pagină — doar că acum nu mai dispare din date.
+        */
+        if (text !== "" || href !== "") rezultat[camp.cheie] = { text, href };
         break;
       }
       case "imagine":

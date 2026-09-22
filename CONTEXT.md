@@ -2427,6 +2427,33 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Linkul fără text dispărea la salvare (22 sept. 2026)
+
+Proprietarul a pus capturile adevărate și adresele demo-urilor din panou, apoi
+a apăsat un cartonaș și n-a dus nicăieri. Cauza: `catreStocare`
+(`src/lib/sectiuni-editare.ts`) arunca TOT linkul când „Textul de pe buton"
+era gol — „un buton fără text n-are ce căuta pe pagină". Regula era bună cât
+timp din `buton` se citeau mereu și textul, și adresa; a încetat să fie în
+clipa în care cartonașul „vitrina" a început să folosească doar `href`.
+
+Și e o capcană pe care chiar eu am întins-o: îi spusesem „textul butonului
+poate fi orice, nu se vede". Firesc, l-a lăsat gol. Panoul arăta adresa
+scrisă, baza n-o primea — pierdere tăcută, la salvare, vizibilă abia apăsând.
+
+Reparat în două jumătăți care trebuie să rămână împreună:
+1. datele păstrează ce-a scris omul: linkul se salvează dacă are text, dacă
+   are adresă, sau amândouă (gol de tot, tot nu se scrie);
+2. componentele care DESENEAZĂ un buton se uită la `buton?.text`, nu la
+   existența lui `buton` — altfel un link fără text ar produce o pastilă
+   colorată fără nicio literă. Corectat la `hero` (ambele butoane),
+   `aboutTeaser` și cartonașul obișnuit din `portfolio`; `pricing` era deja
+   așa.
+
+Ținute de `e2e/link-fara-text.proba.mjs`: patru probe pentru stocare și una pe
+SURSĂ, care caută în toate secțiunile pază de forma `{data.buton && (` și cade
+dacă găsește vreuna. Proba a fost verificată că într-adevăr pică, nu doar că
+trece — stricând înadins paza din `aboutTeaser` și punând-o la loc.
+
 **Pornirea pe site-ul viu.** `variant` nu se poate scrie din panou (panoul
 scrie doar `data`, `position`, `visible`, `is_demo`) — și e bine că nu se
 poate: așa forma cartonașului rămâne pusă oricâte editări ar face cineva peste

@@ -246,7 +246,7 @@ export function Portfolio({
                 </ul>
               )}
 
-              {element.buton && (
+              {element.buton?.text && (
                 <a
                   href={element.buton.href}
                   style={{

@@ -231,7 +231,7 @@ export function Hero({
         </p>
       )}
 
-      {(data.butonPrincipal || data.butonSecundar) && (
+      {(data.butonPrincipal?.text || data.butonSecundar?.text) && (
         <div
           style={{
             display: "flex",
@@ -242,7 +242,7 @@ export function Hero({
             justifyContent: pozaLata ? "center" : undefined,
           }}
         >
-          {data.butonPrincipal && (
+          {data.butonPrincipal?.text && (
             <a
               href={data.butonPrincipal.href}
               style={{
@@ -261,7 +261,7 @@ export function Hero({
               {data.butonPrincipal.text}
             </a>
           )}
-          {data.butonSecundar && (
+          {data.butonSecundar?.text && (
             <a
               href={data.butonSecundar.href}
               style={{

@@ -291,7 +291,7 @@ export function AboutTeaser({
             </p>
           )}
 
-          {data.buton && (
+          {data.buton?.text && (
             <a
               href={data.buton.href}
               style={{
