@@ -328,25 +328,28 @@ function CartonasVitrina({
   const href = element.buton?.href?.trim() || null;
 
   /*
-    CASETA SE POTRIVEȘTE DUPĂ POZĂ, nu invers.
+    POZA SE VEDE ÎNTREAGĂ. Întotdeauna, orice ar fi încărcat.
 
-    Cerut de proprietar după trei încercări de raport fix (3/2, apoi 16/10,
-    apoi 16/9): „fă în așa fel încât odată ce încarc poza să se randeze automat
-    pe dimensiunea potrivită și să încapă toată". Avea dreptate să ceară asta —
-    un raport fix taie orice captură care nu e chiar pe el, iar a cere cuiva să
-    decupeze la milimetru înainte de fiecare încărcare e o unealtă care-și mută
-    munca pe om.
+    Cerut de proprietar de două ori, în cuvintele lui: „fă în așa fel încât
+    odată ce încarc poza să se randeze automat pe dimensiunea potrivită și să
+    încapă toată". Cartonașele astea arată CAPTURI DE SITE — o captură din care
+    lipsește o margine nu mai arată ce trebuia să arate, spre deosebire de poza
+    unui cabinet, unde o tăietură pe margini nu supără pe nimeni.
 
-    Măsurile vin cu poza din încărcare (`ImageValue.latime/inaltime`), deci nu
-    e nevoie de nicio interogare în plus pe site-ul public. Cu ele, caseta ia
-    exact raportul pozei: nimic tăiat, nicio dungă goală pe margini, și tot
-    fără sărituri de așezare la încărcare (`aspect-ratio` e pus dinainte, deci
-    regula din `SectionImage` se respectă).
+    Cum s-a ajuns aici, fiindcă merită ținut minte: întâi au fost trei
+    rapoarte fixe (3/2, 16/10, 16/9), fiecare tăind altă margine. Apoi caseta
+    s-a potrivit după măsurile pozei — corect în principiu, dar măsurile aveau
+    de străbătut un drum lung până la ecran (încărcare → conținutul secțiunii →
+    salvare → randare), iar ORICE verigă lipsă o întorcea tăcut la tăiere.
+    Proprietarul a văzut de trei ori la rând „e la fel", fără ca ceva să pară
+    stricat.
 
-    Fără ele — poze puse înainte de 22 sept. 2026, sau un SVG fără dimensiuni
-    scrise în el — rămâne 16/9, adică purtarea de dinainte. Se repară alegând
-    poza din nou din bibliotecă: de acolo își aduce măsurile, fără să fie
-    încărcat fișierul a doua oară.
+    Deci acum nu se mai deduce nimic: `incadrare="intreaga"`
+    (`object-fit: contain`) face poza să încapă toată fără să știe nimic despre
+    fișier. Măsurile, CÂND există, mai aduc un lucru — caseta ia chiar forma
+    pozei, deci nu rămâne nicio dungă pe margini. Când lipsesc, caseta stă pe
+    16/9 și poza tot se vede întreagă, doar că e o fâșie de cartonaș lângă ea.
+    Diferența dintre „perfect" și „bine". Niciodată „tăiat".
   */
   const { latime, inaltime } = element.imagine ?? {};
   const raport = latime && inaltime ? `${latime} / ${inaltime}` : "16 / 9";
@@ -359,7 +362,7 @@ function CartonasVitrina({
           alt={element.imagine.altText ?? ""}
           aspectRatio={raport}
           sizes="(max-width: 720px) 100vw, 560px"
-          pozitie={element.imagine.pozitie}
+          incadrare="intreaga"
         />
       )}
 

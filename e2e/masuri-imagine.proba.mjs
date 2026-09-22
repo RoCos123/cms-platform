@@ -104,3 +104,23 @@ test("un id care nu e în hartă rămâne fără măsuri, nu cu unele inventate"
 
   assert.deepEqual(completat.elemente[1].imagine, { uploadId: "b2", url: "/imagini/b2/s" });
 });
+
+/*
+ * Ultima plasă, și cea care chiar ține: cartonașul „vitrina" cere
+ * `incadrare="intreaga"`, adică poza încape toată INDIFERENT de măsuri.
+ *
+ * Tot ce e mai sus — măsurile duse prin conținut, completarea pe server —
+ * doar scoate dungile de pe margini, ca să iasă frumos. Nu mai hotărăște dacă
+ * se taie sau nu. Regula asta s-a scris după ce trei încercări la rând, toate
+ * sprijinite pe măsuri, au picat în tăcere: o verigă lipsă undeva pe drum
+ * întorcea cartonașul la tăiere, iar proprietarul vedea „e la fel".
+ *
+ * Probă pe sursă, fiindcă nu există nicio eroare de prins: un `incadrare` uitat
+ * nu strică nimic vizibil, doar aduce tăierea înapoi.
+ */
+test("cartonașul vitrina cere poza întreagă, nu tăiată", () => {
+  const sursa = readFileSync("src/components/site/sections/portfolio.tsx", "utf8");
+  const cartonas = sursa.slice(sursa.indexOf("function CartonasVitrina"));
+
+  assert.match(cartonas, /incadrare="intreaga"/);
+});

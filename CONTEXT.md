@@ -2431,7 +2431,32 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
-### Caseta după poză, nu poza după casetă (22 sept. 2026)
+### Poza se vede întreagă, oricare ar fi ea (22 sept. 2026)
+
+**Regula, în două cuvinte:** cartonașul „vitrina" randează poza cu
+`incadrare="intreaga"` (`object-fit: contain`). Poza încape toată, fără să se
+știe nimic despre fișier. Tot ce scrie mai jos despre măsuri doar scoate
+dungile de pe margini — nu mai hotărăște dacă se taie sau nu.
+
+**De ce e scris așa de apăsat.** Trei încercări la rând au picat, toate
+sprijinite pe ideea că se poate afla forma pozei dinainte: rapoarte fixe
+(3/2 → 16/10 → 16/9), apoi caseta potrivită după măsurile pozei, apoi
+completarea măsurilor pe server. Fiecare era corectă pe hârtie. Fiecare avea
+un drum lung până la ecran (încărcare → conținutul secțiunii → salvare →
+randare), iar orice verigă lipsă o întorcea TĂCUT la tăiere. Proprietarul a
+văzut de trei ori „e la fel", fără ca ceva să pară stricat, și pe bună
+dreptate și-a pierdut răbdarea.
+
+Lecția, care nu e despre imagini: **când nereușita unui mecanism arată exact
+ca purtarea veche, nu se poate depana nici de mine, nici de client.** Într-un
+asemenea caz se alege varianta care nu are ce să-i lipsească, chiar dacă iese
+cu un compromis vizibil (aici: o fâșie de cartonaș lângă poză). Un rezultat
+„bine" de fiecare dată bate un rezultat „perfect" care cade în tăcere.
+
+Ținut de `e2e/masuri-imagine.proba.mjs`, printr-o probă pe sursă: un
+`incadrare` uitat n-ar da nicio eroare, doar ar aduce tăierea înapoi.
+
+### Măsurile pozei: de la „taie" la „nicio dungă" (22 sept. 2026)
 
 Trei încercări de raport fix, fiecare tăind altă margine din capturile
 proprietarului: 3/2 la început, apoi 16/10, apoi 16/9. La a treia a spus, pe
@@ -2452,10 +2477,13 @@ secțiunii, din exact motivul pentru care stă și `url` acolo: site-ul public
 randează imaginile fără să întrebe tabelul `uploads`, deci pagina unui client
 nu capătă o a doua interogare.
 
-Cu ele, cartonașul „vitrina" își pune `aspect-ratio` egal cu raportul pozei:
-nimic tăiat, nicio dungă goală pe margini, și fără sărituri de așezare — regula
-din `SectionImage` („`aspectRatio` e obligatoriu, altfel conținutul de dedesubt
-sare") se respectă, doar că numărul vine din poză, nu din cod. Grila primește
+Cu ele, cartonașul „vitrina" își pune `aspect-ratio` egal cu raportul pozei,
+deci caseta ia chiar forma pozei și nu mai rămâne nicio dungă pe margini — și
+tot fără sărituri de așezare, fiindcă regula din `SectionImage` („`aspectRatio`
+e obligatoriu, altfel conținutul de dedesubt sare") se respectă, doar că
+numărul vine din poză, nu din cod. **Fără ele, poza tot se vede întreagă** (vezi
+secțiunea de mai sus); diferența e între „perfect" și „bine", nu între „bine"
+și „tăiat". Grila primește
 `align-items: start` doar la „vitrina": cu raporturi diferite, întinderea
 obișnuită ar lăsa o fâșie de fundal gol sub pozele mai scunde.
 
