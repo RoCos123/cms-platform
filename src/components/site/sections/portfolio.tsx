@@ -117,12 +117,14 @@ export function Portfolio({
             ? "repeat(auto-fit, minmax(min(100%, 400px), 1fr))"
             : "repeat(auto-fit, minmax(320px, 1fr))",
           /*
-            La „vitrina", fiecare cartonaș e exact cât poza lui. Fără asta,
-            cartonașele dintr-un rând se întind toate cât cel mai înalt (așa
-            face grila), iar sub pozele mai scunde ar rămâne o fâșie de fundal
-            gol — se vedea ca o greșeală. La restul secțiunilor, unde poza are
-            raport fix și sub ea vine text de lungimi diferite, întinderea e
-            chiar ce trebuie: cartonașele rămân egale.
+            La „vitrina", cartonașul e exact cât caseta lui și nimic altceva —
+            nu se întinde cât cel mai înalt din rând, cum face grila din
+            obișnuință. Azi toate casetele sunt oricum 16/9, deci nu se vede
+            nicio diferență; rândul rămâne fiindcă ziua în care cineva schimbă
+            raportul e ziua în care, fără el, ar apărea o fâșie de fundal gol
+            sub cartonașele mai scunde. La restul secțiunilor, unde sub poză
+            vine text de lungimi diferite, întinderea e chiar ce trebuie:
+            cartonașele rămân egale.
           */
           alignItems: vitrina ? "start" : undefined,
           gap: "24px",
@@ -328,31 +330,26 @@ function CartonasVitrina({
   const href = element.buton?.href?.trim() || null;
 
   /*
-    POZA SE VEDE ÎNTREAGĂ. Întotdeauna, orice ar fi încărcat.
+    CĂSUȚA E FIXĂ, POZA SE VEDE ÎNTREAGĂ ÎN EA.
 
-    Cerut de proprietar de două ori, în cuvintele lui: „fă în așa fel încât
-    odată ce încarc poza să se randeze automat pe dimensiunea potrivită și să
-    încapă toată". Cartonașele astea arată CAPTURI DE SITE — o captură din care
-    lipsește o margine nu mai arată ce trebuia să arate, spre deosebire de poza
-    unui cabinet, unde o tăietură pe margini nu supără pe nimeni.
+    Cerut de proprietar, în cuvintele lui: „căsuța are o mărime, acea mărime
+    rămâne pentru fiecare căsuță, mărimea și forma căsuței nu se schimbă. Vreau
+    ca orice poză pe care o încarc să ia automat mărimea căsuței." Deci raport
+    fix 16/9 la toate cartonașele, indiferent ce fișier se încarcă — o galerie
+    de cartonașe de forme diferite arăta dezordonat.
 
-    Cum s-a ajuns aici, fiindcă merită ținut minte: întâi au fost trei
-    rapoarte fixe (3/2, 16/10, 16/9), fiecare tăind altă margine. Apoi caseta
-    s-a potrivit după măsurile pozei — corect în principiu, dar măsurile aveau
-    de străbătut un drum lung până la ecran (încărcare → conținutul secțiunii →
-    salvare → randare), iar ORICE verigă lipsă o întorcea tăcut la tăiere.
-    Proprietarul a văzut de trei ori la rând „e la fel", fără ca ceva să pară
-    stricat.
+    Mai devreme caseta lua forma pozei (din `latime`/`inaltime`). S-a renunțat:
+    rezolva dungile, dar strica tocmai lucrul cerut aici, ca toate să fie la
+    fel. Măsurile rămân în date — se văd în bibliotecă și pot folosi altundeva
+    — doar că galeria nu mai decide nimic după ele.
 
-    Deci acum nu se mai deduce nimic: `incadrare="intreaga"`
-    (`object-fit: contain`) face poza să încapă toată fără să știe nimic despre
-    fișier. Măsurile, CÂND există, mai aduc un lucru — caseta ia chiar forma
-    pozei, deci nu rămâne nicio dungă pe margini. Când lipsesc, caseta stă pe
-    16/9 și poza tot se vede întreagă, doar că e o fâșie de cartonaș lângă ea.
-    Diferența dintre „perfect" și „bine". Niciodată „tăiat".
+    Ce se întâmplă cu o poză de altă formă: se vede TOATĂ, micșorată cât e
+    nevoie, iar locul rămas se umple cu o copie estompată a ei
+    (`incadrare="intreaga"`, vezi `SectionImage`). Nu se taie și nu se
+    deformează. Istoricul lung al deciziei — trei rapoarte fixe încercate pe
+    rând, apoi caseta după măsuri, apoi asta — e în CONTEXT.md.
   */
-  const { latime, inaltime } = element.imagine ?? {};
-  const raport = latime && inaltime ? `${latime} / ${inaltime}` : "16 / 9";
+  const raport = "16 / 9";
 
   const continut = (
     <div style={{ position: "relative" }}>

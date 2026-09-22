@@ -2433,10 +2433,25 @@ niciun semn că e link nu se apasă.
 
 ### Poza se vede întreagă, oricare ar fi ea (22 sept. 2026)
 
-**Regula, în două cuvinte:** cartonașul „vitrina" randează poza cu
-`incadrare="intreaga"` (`object-fit: contain`). Poza încape toată, fără să se
-știe nimic despre fișier. Tot ce scrie mai jos despre măsuri doar scoate
-dungile de pe margini — nu mai hotărăște dacă se taie sau nu.
+**Regula, în trei părți:**
+1. **Căsuța e fixă**, 16/9, aceeași la toate cartonașele, orice s-ar încărca.
+   Cerut în cuvintele proprietarului: „mărimea și forma căsuței nu se schimbă."
+2. **Poza se vede toată, în proporțiile ei** — `incadrare="intreaga"`
+   (`object-fit: contain`). „Nici alungită, nici înghesuită", tot el.
+3. **Locul rămas pe margini se umple cu o copie estompată a pozei însăși**,
+   mărită și neclară. Fără ea rămâneau două dungi albe, care se citeau ca o
+   greșeală; cu ea, marginea ia culoarea capturii (crem la un site crem) și
+   pare continuarea pozei. Tiparul folosit de playerele video pentru filme de
+   altă formă decât ecranul.
+
+Geometria nu lasă decât trei purtări când forma pozei nu e forma casetei: tai
+din poză, o lași mai mică, sau o deformezi. A treia e exclusă — scrisul dintr-o
+captură turtită se vede imediat. Aleasă a doua, îmbrăcată ca să nu arate a
+lipsă.
+
+Nimic din toate astea nu depinde de măsurile pozei. Ce scrie mai jos despre
+ele a rămas ca istorie a deciziei și fiindcă măsurile se văd în bibliotecă;
+galeria nu mai hotărăște nimic după ele.
 
 **De ce e scris așa de apăsat.** Trei încercări la rând au picat, toate
 sprijinite pe ideea că se poate afla forma pozei dinainte: rapoarte fixe
@@ -2477,13 +2492,13 @@ secțiunii, din exact motivul pentru care stă și `url` acolo: site-ul public
 randează imaginile fără să întrebe tabelul `uploads`, deci pagina unui client
 nu capătă o a doua interogare.
 
-Cu ele, cartonașul „vitrina" își pune `aspect-ratio` egal cu raportul pozei,
-deci caseta ia chiar forma pozei și nu mai rămâne nicio dungă pe margini — și
-tot fără sărituri de așezare, fiindcă regula din `SectionImage` („`aspectRatio`
-e obligatoriu, altfel conținutul de dedesubt sare") se respectă, doar că
-numărul vine din poză, nu din cod. **Fără ele, poza tot se vede întreagă** (vezi
-secțiunea de mai sus); diferența e între „perfect" și „bine", nu între „bine"
-și „tăiat". Grila primește
+O vreme, cartonașul „vitrina" și-a pus `aspect-ratio` egal cu raportul pozei,
+ca să nu rămână nicio dungă. **S-a renunțat**: rezolva dungile, dar strica
+lucrul cerut mai apăsat — ca toate cartonașele să aibă aceeași formă. Dungile
+se rezolvă acum altfel (copia estompată), fără să atingă forma casetei.
+
+Măsurile rămân în date fiindcă se văd în bibliotecă („1600 × 900 pixeli") și
+pot folosi altundeva. Galeria nu le mai citește. Grila primește
 `align-items: start` doar la „vitrina": cu raporturi diferite, întinderea
 obișnuită ar lăsa o fâșie de fundal gol sub pozele mai scunde.
 
