@@ -24,7 +24,14 @@ export type PortfolioData = {
     materiale?: { text?: string; fisier?: { fisierId?: string; url?: string } }[];
     buton?: { text: string; href: string };
     /** Aceeași formă ca la încărcare (`ImageValue`): `altText`, nu `alt`. */
-    imagine?: { url: string; altText?: string; pozitie?: PunctFocal };
+    imagine?: {
+      url: string;
+      altText?: string;
+      pozitie?: PunctFocal;
+      /** Măsurile citite la încărcare. Lipsesc la pozele mai vechi. */
+      latime?: number;
+      inaltime?: number;
+    };
   }[];
 };
 
@@ -109,6 +116,15 @@ export function Portfolio({
           gridTemplateColumns: vitrina
             ? "repeat(auto-fit, minmax(min(100%, 400px), 1fr))"
             : "repeat(auto-fit, minmax(320px, 1fr))",
+          /*
+            La „vitrina", fiecare cartonaș e exact cât poza lui. Fără asta,
+            cartonașele dintr-un rând se întind toate cât cel mai înalt (așa
+            face grila), iar sub pozele mai scunde ar rămâne o fâșie de fundal
+            gol — se vedea ca o greșeală. La restul secțiunilor, unde poza are
+            raport fix și sub ea vine text de lungimi diferite, întinderea e
+            chiar ce trebuie: cartonașele rămân egale.
+          */
+          alignItems: vitrina ? "start" : undefined,
           gap: "24px",
         }}
       >
@@ -311,24 +327,37 @@ function CartonasVitrina({
 }) {
   const href = element.buton?.href?.trim() || null;
 
-  const continut = (
-    /*
-      Poza, mare — 16/9, nu 3/2 ca la cartonașul obișnuit: aici e chiar
-      mesajul, nu o ilustrație lângă text.
+  /*
+    CASETA SE POTRIVEȘTE DUPĂ POZĂ, nu invers.
 
-      16/9, nu 16/10 cum a fost întâi, dintr-un motiv care n-are legătură cu
-      designul: poza se taie ca să umple caseta (`object-fit: cover`), deci
-      capturile trebuie decupate la raportul casetei — iar 16/10 nu există ca
-      presetare în uneltele de decupat din Windows, pe când 16/9 e peste tot.
-      Proprietarul pierdea de fiecare dată marginea de jos a capturii.
-      Mărimea țintă a unei capturi: 1600 × 900.
-    */
+    Cerut de proprietar după trei încercări de raport fix (3/2, apoi 16/10,
+    apoi 16/9): „fă în așa fel încât odată ce încarc poza să se randeze automat
+    pe dimensiunea potrivită și să încapă toată". Avea dreptate să ceară asta —
+    un raport fix taie orice captură care nu e chiar pe el, iar a cere cuiva să
+    decupeze la milimetru înainte de fiecare încărcare e o unealtă care-și mută
+    munca pe om.
+
+    Măsurile vin cu poza din încărcare (`ImageValue.latime/inaltime`), deci nu
+    e nevoie de nicio interogare în plus pe site-ul public. Cu ele, caseta ia
+    exact raportul pozei: nimic tăiat, nicio dungă goală pe margini, și tot
+    fără sărituri de așezare la încărcare (`aspect-ratio` e pus dinainte, deci
+    regula din `SectionImage` se respectă).
+
+    Fără ele — poze puse înainte de 22 sept. 2026, sau un SVG fără dimensiuni
+    scrise în el — rămâne 16/9, adică purtarea de dinainte. Se repară alegând
+    poza din nou din bibliotecă: de acolo își aduce măsurile, fără să fie
+    încărcat fișierul a doua oară.
+  */
+  const { latime, inaltime } = element.imagine ?? {};
+  const raport = latime && inaltime ? `${latime} / ${inaltime}` : "16 / 9";
+
+  const continut = (
     <div style={{ position: "relative" }}>
       {element.imagine && (
         <SectionImage
           src={element.imagine.url}
           alt={element.imagine.altText ?? ""}
-          aspectRatio="16 / 9"
+          aspectRatio={raport}
           sizes="(max-width: 720px) 100vw, 560px"
           pozitie={element.imagine.pozitie}
         />

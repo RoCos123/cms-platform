@@ -159,6 +159,11 @@ export function CampuriSectiune({
                     // fără el, reconstrucția de aici l-ar șterge la prima
                     // deschidere a secțiunii, iar poza s-ar recentra singură.
                     pozitie: stocata.pozitie,
+                    // Măsurile, la fel: reconstrucția asta enumeră câmpurile pe
+                    // nume, deci orice câmp neamintit aici dispare la prima
+                    // salvare a secțiunii, fără ca nimeni să atingă poza.
+                    latime: stocata.latime,
+                    inaltime: stocata.inaltime,
                   }
                 : null;
 

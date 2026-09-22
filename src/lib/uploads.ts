@@ -46,6 +46,25 @@ export type ImageValue = {
    * Lipsă = centru, adică purtarea de dinainte. Vezi `@/lib/punct-focal`.
    */
   pozitie?: PunctFocal;
+  /**
+   * Măsurile pozei, în pixeli, așa cum au fost citite din fișier la încărcare
+   * (`measureImage`). Stau LÂNGĂ poză, în conținutul secțiunii, din același
+   * motiv pentru care stă și `url`: site-ul public randează imaginile fără să
+   * mai întrebe tabelul `uploads`, deci pagina unui client nu depinde de o a
+   * doua interogare ca să afișeze o poză.
+   *
+   * Pentru ce: o secțiune care vrea să arate poza ÎNTREAGĂ, netăiată, are
+   * nevoie de raportul ei ca să-și potrivească înălțimea casetei — altfel
+   * caseta are un raport fix, iar tot ce nu intră se taie. Vezi cartonașul
+   * „vitrina" din galeria de șabloane.
+   *
+   * Lipsesc la pozele încărcate înainte de 22 sept. 2026 și la cele al căror
+   * fișier n-a putut fi măsurat (un SVG fără dimensiuni scrise în el). Cine le
+   * folosește trebuie să aibă o purtare de rezervă; nu se presupune niciodată
+   * că există.
+   */
+  latime?: number;
+  inaltime?: number;
 };
 
 export type UploadImageResult =

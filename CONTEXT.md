@@ -2376,24 +2376,17 @@ la „Serviciile mele".
 Adăugat `CartonasVitrina` în `portfolio.tsx`, pornit când rândul din
 `site_content` are `variant = 'vitrina'`:
 
-- poza la **16/9** (nu 3/2, ca la cardul obișnuit) și grilă pe **două** coloane,
+- **caseta se potrivește după poză, nu poza după casetă** (22 sept. 2026) —
+  vezi §„Caseta după poză" mai jos; și grilă pe **două** coloane,
   nu trei (`minmax(min(100%, 400px), 1fr)` — `min(100%, …)` ca pragul de 400px
   să nu scoată cartonașul din ecran pe telefon; măsurat: la 390px lățime nu
   apare derulare laterală). Pe trei coloane, captura unui site întreg ajungea o
   miniatură din care nu se înțelegea nimic;
 - colțuri rotunjite la `max(var(--t-raza), 18px)` — Claritate are 6px și lăsa
   cartonașele aproape drepte;
-- **capturile se decupează la 16/9, ținta 1600 × 900.** Poza se taie ca să
-  umple caseta (`object-fit: cover`), niciodată nu se micșorează ca să încapă
-  toată — deci raportul capturii trebuie să fie chiar raportul casetei. Caseta
-  a fost întâi 16/10 și s-a mutat pe 16/9 dintr-un motiv care n-are legătură
-  cu designul: 16/10 nu există ca presetare în uneltele de decupat din Windows
-  (Photos, Paint, editorul din Snipping Tool), 16/9 e în toate. Proprietarul
-  pierdea de fiecare dată marginea de jos a capturii. Tot de-aici: captura se
-  face pe FEREASTRĂ (`Alt + PrtScn`), nu cu dreptunghi tras cu mâna — un
-  decupaj din ochi taie marginea albă din stânga a paginii, și se vede;
-- dacă o poză tot nu e fix 16/9, se trage în panou (punct focal,
-  `object-position`) ca să se aleagă ce rămâne în cadru;
+- captura se face pe FEREASTRĂ (`Alt + PrtScn`), nu cu dreptunghi tras cu
+  mâna — un decupaj din ochi taie marginea albă din stânga a paginii, și se
+  vede pe cartonaș;
 - **fără nicio bară deasupra pozei.** A existat o vreme o ramă care imita o
   fereastră de browser (trei puncte + bară de adresă cu domeniul scos din
   `buton.href`). A căzut în două trepte, amândouă cerute de proprietar:
@@ -2437,6 +2430,48 @@ niciun semn că e link nu se apasă.
    „Buton" → adresa (ex. `https://cosmin-caldura.vercel.app`). Textul butonului
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
+
+### Caseta după poză, nu poza după casetă (22 sept. 2026)
+
+Trei încercări de raport fix, fiecare tăind altă margine din capturile
+proprietarului: 3/2 la început, apoi 16/10, apoi 16/9. La a treia a spus, pe
+bună dreptate: „fă în așa fel încât odată ce încarc poza să se randeze automat
+pe dimensiunea potrivită și să încapă toată."
+
+Avea dreptate, și greșeala e de recunoscut ca atare: am schimbat raportul de
+două ori deducând din capturile lui de ecran cum arată fișierul, fără să-i cer
+niciodată măsurile adevărate. A doua schimbare a înrăutățit lucrurile. Un
+raport fix taie orice captură care nu e chiar pe el, iar a cere cuiva să
+decupeze la milimetru înainte de fiecare încărcare e o unealtă care-și mută
+munca pe om.
+
+**Cum e acum.** `ImageValue` are `latime` și `inaltime`, în pixeli, citite din
+fișier la încărcare (`measureImage`, care exista deja — măsurile se scriau în
+`uploads`, dar nu ajungeau mai departe). Stau LÂNGĂ poză, în conținutul
+secțiunii, din exact motivul pentru care stă și `url` acolo: site-ul public
+randează imaginile fără să întrebe tabelul `uploads`, deci pagina unui client
+nu capătă o a doua interogare.
+
+Cu ele, cartonașul „vitrina" își pune `aspect-ratio` egal cu raportul pozei:
+nimic tăiat, nicio dungă goală pe margini, și fără sărituri de așezare — regula
+din `SectionImage` („`aspectRatio` e obligatoriu, altfel conținutul de dedesubt
+sare") se respectă, doar că numărul vine din poză, nu din cod. Grila primește
+`align-items: start` doar la „vitrina": cu raporturi diferite, întinderea
+obișnuită ar lăsa o fâșie de fundal gol sub pozele mai scunde.
+
+**Rezervă:** fără măsuri — poze încărcate înainte de 22 sept. 2026, sau un SVG
+fără dimensiuni scrise în el — rămâne 16/9, adică purtarea de dinainte. Se
+repară fără să fie încărcat fișierul din nou: se alege poza încă o dată din
+bibliotecă, de unde își aduce măsurile (`uploads.width/height` erau scrise de
+la bun început).
+
+**Trei locuri enumeră câmpurile unei imagini pe nume**, deci pot pierde
+măsurile în tăcere: reconstrucția din `campuri-sectiune.tsx`, alegerea din
+`biblioteca-imagini.tsx` și răspunsul lui `uploadImage`. Pierdute, poza nu
+cade și nu arată rupt — doar se întoarce tăcut la caseta de rezervă, iar
+nimeni n-ar lega asta de o salvare făcută cu o oră înainte. De-aia
+`e2e/masuri-imagine.proba.mjs` ține și dus-întorsul prin formular, și o probă
+pe sursă că locurile alea pomenesc `latime`/`inaltime`.
 
 ### Linkul fără text dispărea la salvare (22 sept. 2026)
 

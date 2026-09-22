@@ -93,6 +93,9 @@ export async function uploadImage(formData: FormData): Promise<UploadImageResult
   const focalX = px !== null && py !== null ? px : null;
   const focalY = px !== null && py !== null ? py : null;
 
+  const latime = parsePixelDimension(formData.get("width"));
+  const inaltime = parsePixelDimension(formData.get("height"));
+
   const { data: upload, error: insertError } = await supabase
     .from("uploads")
     .insert({
@@ -101,8 +104,8 @@ export async function uploadImage(formData: FormData): Promise<UploadImageResult
       filename: file.name,
       mime_type: file.type,
       size_bytes: file.size,
-      width: parsePixelDimension(formData.get("width")),
-      height: parsePixelDimension(formData.get("height")),
+      width: latime,
+      height: inaltime,
       alt_text: altText || null,
       focal_x: focalX,
       focal_y: focalY,
@@ -131,6 +134,10 @@ export async function uploadImage(formData: FormData): Promise<UploadImageResult
       url: adresaImaginii(upload.id),
       altText,
       ...(focalX !== null && focalY !== null ? { pozitie: { x: focalX, y: focalY } } : {}),
+      // Măsurile merg cu poza în conținutul secțiunii, ca o secțiune care o
+      // arată întreagă să-și poată potrivi caseta după ea. Amândouă sau
+      // niciuna: o singură latură nu dă un raport.
+      ...(latime !== null && inaltime !== null ? { latime, inaltime } : {}),
     },
   };
 }

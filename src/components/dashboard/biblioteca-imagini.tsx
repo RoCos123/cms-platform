@@ -126,6 +126,14 @@ export function BibliotecaImagini({ children }: { children: ReactNode }) {
             url: aleasa.url,
             altText: aleasa.altText,
             ...(originala?.pozitie ? { pozitie: originala.pozitie } : {}),
+            // Și măsurile, din același motiv: o poză pusă într-o secțiune care
+            // o arată întreagă trebuie să-și ducă raportul cu ea. Pe drumul
+            // ăsta își recapătă măsurile și pozele încărcate înainte ca ele să
+            // se salveze în secțiune — se alege din nou din bibliotecă, fără
+            // să mai fie încărcat fișierul.
+            ...(originala?.latime && originala?.inaltime
+              ? { latime: originala.latime, inaltime: originala.inaltime }
+              : {}),
           });
         }}
       />
