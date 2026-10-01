@@ -2431,6 +2431,38 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Adresa brută a platformei duce în panou (1 oct. 2026)
+
+Proprietarul a deschis `cms-platform-delta.vercel.app` și a primit pagina
+„Platformă sitepsihologi.ro — preview de platformă, fără tenant asociat", fără
+nicio ieșire. Întrebarea lui: de ce nu mă duce direct în panou?
+
+Răspunsul cinstit: **nimeni n-a scris regula.** Pagina `/site-unavailable` a
+fost făcută pentru alt caz — un domeniu de client cumpărat, dar încă nelegat de
+niciun site — unde chiar e util să scrie CE domeniu lipsește din tabel. Adresa
+platformei a căzut în aceeași ramură fiindcă și ea e un host care nu duce la
+niciun cabinet. N-a fost o decizie, a fost aceeași plasă prinzând două lucruri
+diferite.
+
+Acum se deosebesc trei cazuri, printr-o funcție pură în `src/lib/rute.ts`
+(`destinatieFaraTenant`), nu printr-un `if` în proxy — proxy-ul nu se poate
+rula cu Node fără Supabase, deci o regulă scrisă acolo n-ar avea nicio probă:
+
+- rădăcina adresei platformei → redirect la `/proprietar`;
+- orice ALTĂ cale pe adresa platformei → pagina de platformă, ca înainte (cine
+  cere `…vercel.app/servicii` căuta o pagină de site, nu panoul);
+- un domeniu de client nelegat încă → pagina cu numele domeniului, ca înainte.
+
+**Ce NU s-a făcut, și de ce:** adresa platformei tot nu e trecută în `sites`.
+Legată de un cabinet, orice preview al platformei ar începe să arate site-ul
+acelui client — capcana `DEV_TENANT_DOMAIN` de la §izolare. Redirectul rezolvă
+problema omului fără să atingă regula care ține clienții separați.
+
+**Costul, știut și acceptat:** adresa brută a platformei scoate acum la iveală
+ecranul de conectare al administratorului (nelogat, `/proprietar` redirectează
+la `/proprietar/login`). Cere oricum parolă, iar `robots.ts` refuză gazdele
+platformei, deci adresa nu ajunge în căutări.
+
 ### Panoul proprietarului, pe telefon (22 sept. 2026)
 
 Proprietarul a deschis `/proprietar` pe telefon și a văzut doar două coloane

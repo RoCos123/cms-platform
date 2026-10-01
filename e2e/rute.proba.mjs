@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { readdirSync } from "node:fs";
 import path from "node:path";
-import { DISALLOW_ROBOTS, estePanou, esteConectare } from "@/lib/rute";
+import { DISALLOW_ROBOTS, estePanou, esteConectare, destinatieFaraTenant } from "@/lib/rute";
 import { ADRESE_REZERVATE } from "@/lib/pagini";
 
 /**
@@ -130,4 +130,32 @@ test("orice rută de nivel întâi e trecută în adresele rezervate", () => {
       "Un client își poate face o pagină cu adresa asta, iar pagina lui n-ar fi citită de nimeni.\n" +
       "Se adaugă în ADRESE_REZERVATE din src/lib/pagini.ts.\n",
   );
+});
+
+/*
+ * Unde duce o cerere al cărei host nu e al niciunui site.
+ *
+ * Până pe 1 oct. 2026, toate trei cazurile arătau la fel: o pagină „fără tenant
+ * asociat", fără nicio ieșire. Proprietarul a nimerit pe adresa brută a
+ * platformei și a rămas blocat acolo, deși singurul lucru pe care îl voia —
+ * panoul — era la un pas. Regula de acum deosebește cele trei cazuri, iar
+ * proba o ține, fiindcă proxy-ul în sine nu se poate rula cu Node fără
+ * Supabase.
+ */
+test("rădăcina adresei platformei duce în panoul proprietarului", () => {
+  assert.equal(destinatieFaraTenant(true, "/"), "panouProprietar");
+});
+
+test("altă cale pe adresa platformei rămâne pe pagina de platformă", () => {
+  for (const cale of ["/servicii", "/blog", "/contact", "/despre"]) {
+    assert.equal(destinatieFaraTenant(true, cale), "platforma");
+  }
+});
+
+test("un domeniu de client nelegat încă NU duce în panoul proprietarului", () => {
+  // Inima probei: pagina aia trebuie să-i spună proprietarului CE domeniu
+  // lipsește din tabel. Dusă în panou, nu s-ar mai vedea ce nu e configurat.
+  for (const cale of ["/", "/servicii"]) {
+    assert.equal(destinatieFaraTenant(false, cale), "domeniuNeconfigurat");
+  }
 });

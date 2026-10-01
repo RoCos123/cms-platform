@@ -45,6 +45,37 @@ export function estePanouProprietar(cale: string): boolean {
 }
 
 /**
+ * Unde duce o cerere al cărei host nu e al niciunui site.
+ *
+ * Trei cazuri, care arătau înainte la fel și erau tratate la fel:
+ *
+ * - `"panouProprietar"` — rădăcina adresei brute a platformei
+ *   (`cms-platform-….vercel.app/`). Adresa aia nu e și nu trebuie să fie a
+ *   vreunui cabinet (dacă ar fi legată de unul, orice preview al platformei ar
+ *   arăta site-ul acelui client — capcana `DEV_TENANT_DOMAIN`), dar singurul om
+ *   care ajunge pe ea e proprietarul, iar singurul lucru de făcut acolo e
+ *   panoul. Până pe 1 oct. 2026 arăta o pagină fără nicio ieșire.
+ *
+ * - `"platforma"` — orice ALTĂ cale pe adresa platformei. Cine cere
+ *   `…vercel.app/servicii` căuta o pagină de site, nu panoul; aruncat în panou,
+ *   n-ar înțelege nimic.
+ *
+ * - `"domeniuNeconfigurat"` — un domeniu adevărat, al cuiva, care încă nu e
+ *   legat de niciun site. Ăsta e cazul pentru care s-a făcut pagina: scrie ce
+ *   domeniu a cerut, ca să se vadă ce lipsește.
+ *
+ * Stă aici, pură, nu în proxy: proxy-ul nu se poate rula cu Node fără Supabase,
+ * deci regula n-ar avea nicio probă.
+ */
+export function destinatieFaraTenant(
+  gazdaPlatformei: boolean,
+  cale: string,
+): "panouProprietar" | "platforma" | "domeniuNeconfigurat" {
+  if (!gazdaPlatformei) return "domeniuNeconfigurat";
+  return cale === "/" ? "panouProprietar" : "platforma";
+}
+
+/**
  * Paginile de resetare a parolei, sub `/login`.
  *
  * Stau separat de `esteConectare` dinadins. `esteConectare` hotărăște și

@@ -4,7 +4,12 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { resolveTenant, isPlatformHost } from "@/lib/tenant";
 import { seServesteNepublicat } from "@/lib/lansare";
-import { estePanou, esteConectare, estePanouProprietar } from "@/lib/rute";
+import {
+  destinatieFaraTenant,
+  esteConectare,
+  estePanou,
+  estePanouProprietar,
+} from "@/lib/rute";
 
 /**
  * Fallback de rezolvare a tenantului pentru host-uri care nu aparțin niciunui
@@ -126,9 +131,36 @@ export async function proxy(request: NextRequest) {
   }
 
   if (tenant.kind === "unresolved") {
-    const url = tenant.isPlatformHost
-      ? new URL("/site-unavailable", request.url)
-      : new URL(`/site-unavailable?host=${encodeURIComponent(requestHost)}`, request.url);
+    /*
+      Rădăcina adresei brute a platformei duce în panoul proprietarului.
+
+      Adresa `*.vercel.app` a proiectului nu e și nu trebuie să fie a vreunui
+      cabinet — dacă ar fi legată de unul, orice preview al platformei ar
+      începe să arate site-ul acelui client (capcana `DEV_TENANT_DOMAIN`, vezi
+      CONTEXT.md §izolare). Dar singurul om care ajunge vreodată pe ea ești tu,
+      iar singurul lucru de făcut acolo e panoul. Până pe 1 oct. 2026 pica în
+      aceeași plasă ca un domeniu de client neconfigurat și arăta o pagină fără
+      nicio ieșire.
+
+      DOAR rădăcina. O cale oarecare pe adresa platformei
+      (`…vercel.app/servicii`) rămâne pe pagina de mai jos: acolo omul căuta o
+      pagină de site, nu panoul, iar o aruncare în panou n-ar lămuri pe nimeni.
+
+      Nelogat, `/proprietar` redirectează singur la `/proprietar/login`
+      (`verificaProprietar`). Deci adresa platformei scoate la iveală ecranul de
+      conectare al administratorului — știut și acceptat: cere oricum parolă,
+      iar adresa nu e indexată (`robots.ts` refuză gazdele platformei).
+    */
+    const incotro = destinatieFaraTenant(tenant.isPlatformHost, request.nextUrl.pathname);
+
+    if (incotro === "panouProprietar") {
+      return respond(NextResponse.redirect(new URL("/proprietar", request.url)));
+    }
+
+    const url =
+      incotro === "platforma"
+        ? new URL("/site-unavailable", request.url)
+        : new URL(`/site-unavailable?host=${encodeURIComponent(requestHost)}`, request.url);
     return respond(NextResponse.rewrite(url));
   }
 
