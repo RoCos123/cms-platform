@@ -30,6 +30,7 @@ export function AboutTeaser({
   data,
   tone,
   pozaRotunda,
+  pozaDreapta,
   pozaStivuita,
   friendly,
   reperCard,
@@ -39,6 +40,11 @@ export function AboutTeaser({
   tone?: SectionTone;
   /** Poza în cerc, nu ramă verticală. Hotărât de șablon (doar „Claritate"). */
   pozaRotunda?: boolean;
+  /**
+   * Oglindește cele două coloane: poza la dreapta, textul la stânga. Doar pe
+   * ecran lat — vezi `.coloane-oglindite` în `globals.css`.
+   */
+  pozaDreapta?: boolean;
   /** Poza peste un card colorat decalat („stivuită"). Doar „Apropiere". */
   pozaStivuita?: boolean;
   /**
@@ -142,6 +148,7 @@ export function AboutTeaser({
       </h2>
 
       <div
+        className={pozaDreapta ? "coloane-oglindite" : undefined}
         style={{
           display: "grid",
           gap: "clamp(32px, 5vw, 72px)",

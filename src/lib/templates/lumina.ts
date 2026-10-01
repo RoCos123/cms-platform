@@ -50,5 +50,7 @@ export const lumina: Template = {
     spatiereSectiune: "clamp(80px, 10vw, 140px)",
   },
 
-  asezari: { hero: "textPozaDreapta" },
+  // Pagina alternează părțile: heroul cu poza la stânga, „Despre mine" cu poza
+  // la dreapta. Cerut de proprietar pe 1 oct. 2026, doar aici.
+  asezari: { hero: "textPozaDreapta", heroPozaStanga: true, desprePozaDreapta: true },
 };

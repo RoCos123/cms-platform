@@ -40,6 +40,7 @@ export function Hero({
   data,
   tone,
   asezare = "textPozaDreapta",
+  pozaStanga,
   faraArcada,
   titluFriendly,
   blob,
@@ -48,6 +49,12 @@ export function Hero({
   data: HeroData;
   tone?: SectionTone;
   asezare?: AsezareHero;
+  /**
+   * Oglindește cele două coloane: poza la stânga, textul la dreapta. Doar pe
+   * ecran lat — vezi `.coloane-oglindite` în `globals.css`. Are efect numai la
+   * așezarea pe două coloane (`textPozaDreapta`).
+   */
+  pozaStanga?: boolean;
   /** Poza fără arcadă în cap — dreptunghi rotunjit simplu (doar „Apropiere"). */
   faraArcada?: boolean;
   /**
@@ -436,6 +443,7 @@ export function Hero({
         poate exprima.
       */}
       <div
+        className={pozaStanga ? "coloane-oglindite" : undefined}
         style={{
           display: "grid",
           gap: "clamp(32px, 4vw, 56px)",

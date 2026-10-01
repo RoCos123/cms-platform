@@ -458,3 +458,27 @@ body {
     transform: translateY(-4px);
   }
 }
+
+/*
+ * Oglindirea unei secțiuni pe două coloane: ce stă în cod primul ajunge al
+ * doilea pe ecran. Folosită de prima secțiune și de „Despre mine" la Lumină,
+ * ca pagina să alterneze părțile în loc să repete aceeași.
+ *
+ * NUMAI pe ecran lat. Sub prag, grilele astea (`auto-fit` cu minim de 320–340px)
+ * se stivuiesc într-o coloană, iar acolo ordinea din cod e cea bună: titlul
+ * întâi, poza sub el. Răsturnată, poza ar împinge titlul în jos — și tocmai
+ * titlul e elementul după care se măsoară viteza paginii.
+ *
+ * Pragul, 760px, e cât îi trebuie unei asemenea grile ca să încapă pe două
+ * coloane: 2 × 340 + spațiul dintre ele + marginile secțiunii. Peste el
+ * oglindirea are ce oglindi; sub el n-ar face decât rău.
+ */
+@media (min-width: 760px) {
+  .coloane-oglindite > *:first-child {
+    order: 2;
+  }
+
+  .coloane-oglindite > *:last-child {
+    order: 1;
+  }
+}

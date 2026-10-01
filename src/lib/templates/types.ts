@@ -124,6 +124,15 @@ export type TemplateAsezari = {
    */
   desprePozaRotunda?: boolean;
   /**
+   * Oglindește cele două coloane de la „Despre mine": poza la DREAPTA, textul
+   * la stânga. Fără el, poza stă la stânga. Doar „Lumină", cerut odată cu
+   * `heroPozaStanga` — acolo heroul are poza la stânga, deci „Despre mine" o
+   * trece la dreapta, ca pagina să alterneze în loc să repete aceeași parte.
+   *
+   * Numai pe ecran lat, din același motiv ca la hero.
+   */
+  desprePozaDreapta?: boolean;
+  /**
    * Poza din „Despre mine" așezată peste un card colorat decalat („stivuită"),
    * tiparul jucăuș din „Apropiere". Doar acolo — restul rămân cu poza simplă.
    */
@@ -147,6 +156,16 @@ export type TemplateAsezari = {
    * „Liniște"; la restul portretul stă singur. Fără poză nu apare.
    */
   heroCercDecor?: boolean;
+  /**
+   * Oglindește cele două coloane ale primei secțiuni: poza la STÂNGA, textul la
+   * dreapta. Fără el, așezarea `textPozaDreapta` ține textul la stânga. Doar
+   * „Lumină", cerut de proprietar pe 1 oct. 2026.
+   *
+   * Numai pe ecran lat. Pe telefon coloanele se stivuiesc oricum, iar acolo
+   * ordinea rămâne text-apoi-poză la toate șabloanele: titlul trebuie citit
+   * întâi, și e tocmai elementul după care se măsoară viteza paginii (LCP).
+   */
+  heroPozaStanga?: boolean;
   /**
    * Banda de citat centrată, mare, în serif italic, fără ghilimeaua-ornament din
    * față — respiro-ul editorial al referinței „Liniște". Doar „Liniște"; la

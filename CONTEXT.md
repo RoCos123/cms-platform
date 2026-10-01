@@ -2431,6 +2431,34 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Lumină: coloanele oglindite la hero și la „Despre mine" (1 oct. 2026)
+
+Cerut de proprietar, doar la Lumină: în prima secțiune poza trece la STÂNGA și
+textul la dreapta; la „Despre mine" invers, poza la DREAPTA și textul la
+stânga. Așa pagina alternează părțile în loc să repete aceeași, iar ochiul are
+unde să se odihnească între secțiuni.
+
+Două comutatoare noi în `TemplateAsezari`, `heroPozaStanga` și
+`desprePozaDreapta`, aprinse numai în `lumina.ts`. Celelalte patru șabloane
+rămân cum erau — verificat prin măsurare, nu din ochi: la Liniște și Apropiere
+poza stă în continuare dreapta la hero și stânga la „Despre mine".
+
+Oglindirea se face cu o singură regulă de CSS, `.coloane-oglindite` (`order` pe
+cei doi copii ai grilei), nu prin mutarea elementelor în cod. Motivul e cel de
+mai jos.
+
+**NUMAI pe ecran lat (prag 760px).** Sub prag, grilele astea se stivuiesc într-o
+coloană, iar acolo ordinea din cod e singura bună: titlul întâi, poza sub el.
+Oglindită, poza ar împinge titlul sub ea pe telefon — iar titlul e tocmai
+elementul după care se măsoară viteza paginii (LCP), problema pe care am
+rezolvat-o în septembrie. Pragul de 760px e cât îi trebuie grilei ca să încapă
+pe două coloane: 2 × 340px plus spațiul dintre ele și marginile secțiunii; sub
+el oglindirea n-ar avea ce oglindi.
+
+Măsurat la randare: pe 1280px, Lumină are poza stânga la hero și dreapta la
+„Despre mine"; pe 390px, titlul rămâne deasupra pozei și nu apare derulare
+laterală.
+
 ### Adresa brută a platformei duce în panou (1 oct. 2026)
 
 Proprietarul a deschis `cms-platform-delta.vercel.app` și a primit pagina
