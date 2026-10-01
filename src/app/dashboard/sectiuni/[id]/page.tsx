@@ -26,12 +26,21 @@ export default async function EditorSectiunePage({
   const session = await verifySession();
   const supabase = await createClient();
 
-  const { data: rand } = await supabase
-    .from("site_content")
-    .select("id, key, variant, tone, data")
-    .eq("id", id)
-    .eq("site_id", session.siteId)
-    .maybeSingle();
+  /*
+    PRIMA RUNDĂ. Rândul secțiunii și rândul site-ului se cer ÎMPREUNĂ: nu depind
+    unul de altul, iar cerute pe rând ar fi însemnat două drumuri până la bază
+    în loc de unul. Rândul site-ului e nevoie mai jos, la programări, și tot
+    aici se ia ca runda a doua să-l aibă deja.
+  */
+  const [{ data: rand }, { data: site }] = await Promise.all([
+    supabase
+      .from("site_content")
+      .select("id, key, variant, tone, data")
+      .eq("id", id)
+      .eq("site_id", session.siteId)
+      .maybeSingle(),
+    supabase.from("sites").select(`template, ${COLOANE_MODULE}`).eq("id", session.siteId).single(),
+  ]);
 
   // `.eq("site_id", …)` peste RLS: nu e redundant, e explicit. O secțiune a
   // altui client dispare aici la fel ca una inexistentă — 404, nu „interzis”,
@@ -68,15 +77,25 @@ export default async function EditorSectiunePage({
     );
   }
 
+  /*
+    A DOUA RUNDĂ, și ultima. Tot ce mai trebuie paginii se cere deodată —
+    inclusiv documentele și orele, care înainte veneau după, fiecare cu drumul
+    lui. Orele au nevoie de rândul site-ului, dar acela e luat deja în prima
+    rundă, deci nu mai e nimeni de așteptat.
+
+    De ce contează: fiecare rundă înseamnă un drum dus-întors până la Supabase.
+    Patru runde una după alta se adunau într-o secundă bună în care clientul
+    apăsa „Editează" și nu se întâmpla nimic (1 oct. 2026).
+  */
   const [
-    { data: site },
     articole,
     servicii,
     { data: setari },
     { data: sectiuniVizibile },
     { data: paginiPublicate },
+    documente,
+    oreProgramare,
   ] = await Promise.all([
-    supabase.from("sites").select(`template, ${COLOANE_MODULE}`).eq("id", session.siteId).single(),
     // Previzualizarea „Articolelor recente” arată articole adevărate, nu
     // exemple: altfel clientul n-ar avea cum să vadă că secțiunea dispare
     // singură când nu există niciun articol publicat.
@@ -94,21 +113,16 @@ export default async function EditorSectiunePage({
       .eq("site_id", session.siteId)
       .eq("status", "published")
       .order("position", { ascending: true }),
+    // Documentele din bibliotecă, pentru alegătorul de materiale de sub un program.
+    documenteleBibliotecii(session.siteId),
+    // Aceleași ore ca pe site: previzualizarea secțiunii de programare trebuie
+    // să arate exact ce vede un vizitator — inclusiv că se stinge fără ore libere.
+    oreDeAratatPePrimaPagina(session.siteId, moduleleSiteului(site).programari),
   ]);
 
   const destinatii = construiesteDestinatii(
     (sectiuniVizibile ?? []).map((rand) => rand.key as string),
     (paginiPublicate ?? []).map((rand) => ({ slug: rand.slug as string, titlu: rand.title as string })),
-  );
-
-  // Documentele din bibliotecă, pentru alegătorul de materiale de sub un program.
-  const documente = await documenteleBibliotecii(session.siteId);
-
-  // Aceleași ore ca pe site: previzualizarea secțiunii de programare trebuie să
-  // arate exact ce vede un vizitator — inclusiv că se stinge fără ore libere.
-  const oreProgramare = await oreDeAratatPePrimaPagina(
-    session.siteId,
-    moduleleSiteului(site).programari,
   );
 
   // Secțiunile trăiesc toate pe prima pagină; butonul sare la ancora ei, dacă

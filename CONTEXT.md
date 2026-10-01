@@ -2431,6 +2431,46 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### De ce dura editarea, și ce s-a scurtat (1 oct. 2026)
+
+Proprietarul: de la clic pe „Editează" până apare pagina trece prea mult, și e
+la fel la fiecare. Observația lui e mai importantă decât pare — **panoul E
+produsul**: un client care îl simte greoi n-o să-și schimbe singur textele și
+pozele, iar atunci cade tot ce s-a construit în jurul lui.
+
+Două cauze, deosebite una de alta:
+
+**1. Nu exista niciun ecran de așteptare.** Fără `loading.tsx`, Next ține
+browserul pe pagina VECHE cât timp serverul își adună datele, și abia apoi
+navighează. Deci nu se întâmplă nimic vizibil — arată a panou înțepenit, nu a
+pagină care se încarcă. Adăugat `src/app/dashboard/loading.tsx`, la rădăcina
+panoului, deci acoperă orice ecran de dedesubt care n-are unul al lui.
+
+Mai face ceva, mai puțin vizibil: Next nu preîncarcă rutele dinamice dincolo
+de cea mai apropiată graniță de așteptare. Fără fișierul ăla, un link spre un
+ecran de editare nu se putea pregăti dinainte DELOC. Cu el, pregătirea începe
+de când linkul intră în ecran — iar „Editează" e un `<Link>`, deci chiar
+profită.
+
+**2. Patru runde la bază, una după alta.** Editorul de secțiuni cerea: rândul
+secțiunii → apoi șase interogări deodată → apoi documentele → apoi orele.
+Fiecare săgeată e un drum dus-întors până la Supabase. Dintre ele, doar una era
+o dependență adevărată (orele au nevoie de rândul site-ului, ca să știe dacă
+modulul Programări e cumpărat).
+
+Rescris în DOUĂ runde: întâi rândul secțiunii ÎMPREUNĂ cu rândul site-ului
+(nu depind unul de altul), apoi tot restul deodată, documentele și orele
+incluse. De la patru drumuri la două.
+
+Celelalte ecrane de editare (blog, servicii) erau deja strânse într-o singură
+rundă — verificat, nu presupus. Doar secțiunile aveau șirul lung, fiindcă au
+cele mai multe date de adunat pentru previzualizare.
+
+**Ce NU s-a atins:** `verifySession()` face două drumuri (verificarea contului,
+apoi rândul din `users`). E memorată pe cerere (`cache`), deci se face o
+singură dată per pagină, dar tot sunt două. Se poate scurta, dar atinge
+autentificarea — se face separat, cu probe, nu într-o reparație de viteză.
+
 ### Mărirea pozei, ca să se poată mișca pe amândouă axele (1 oct. 2026)
 
 Chiar și cu rama potrivită (vezi mai jos), proprietarul tot nu putea muta poza
