@@ -72,3 +72,59 @@ test("tragerea se oprește la margini (0–100)", () => {
     { x: 50, y: 0 },
   );
 });
+
+/*
+ * Mărirea pozei (1 oct. 2026). Fără ea, `object-fit: cover` potrivește fix una
+ * dintre axe, iar pe aia surplusul e zero — poza nu se poate trage deloc în
+ * acea direcție. Proprietarul avea o poză lată într-o ramă verticală și nu
+ * putea s-o miște sus-jos; nimic nu-i spunea de ce, fiindcă nu era nimic de
+ * spus: deasupra și dedesubt nu exista nimic.
+ */
+const { surplusulPozei, normalizeazaZoom, scaraImaginii } = await import("@/lib/punct-focal");
+
+// Poză lată (1500×1000) în rama verticală de la „Despre mine" (4/5).
+const LATA_IN_RAMA_INALTA = {
+  latimeRama: 380,
+  inaltimeRama: 475,
+  latimeFisier: 1500,
+  inaltimeFisier: 1000,
+};
+
+test("nemărită, o poză lată n-are ce muta pe verticală", () => {
+  const { surplusX, surplusY } = surplusulPozei(LATA_IN_RAMA_INALTA);
+
+  assert.ok(surplusX > 0, "pe orizontală trebuie să prisosească");
+  assert.equal(Math.round(surplusY), 0, "pe verticală nu există nimic de adus în cadru");
+});
+
+test("mărită, aceeași poză se poate mișca în amândouă direcțiile", () => {
+  const { surplusX, surplusY } = surplusulPozei({ ...LATA_IN_RAMA_INALTA, zoom: 1.5 });
+
+  assert.ok(surplusX > 0);
+  assert.ok(surplusY > 0, "asta e chiar rostul măririi");
+});
+
+test("mărirea se curăță: lipsă, text sau peste limită", () => {
+  assert.equal(normalizeazaZoom(undefined), 1);
+  assert.equal(normalizeazaZoom("2"), 1);
+  assert.equal(normalizeazaZoom(Number.NaN), 1);
+  assert.equal(normalizeazaZoom(0.2), 1, "sub 1 ar lăsa rama goală pe margini");
+  assert.equal(normalizeazaZoom(99), 3);
+  assert.equal(normalizeazaZoom(1.234), 1.23);
+});
+
+test("fără mărire nu se pune niciun transform", () => {
+  assert.equal(scaraImaginii({ x: 50, y: 50 }), undefined);
+  assert.equal(scaraImaginii({ x: 50, y: 50, zoom: 1 }), undefined);
+  assert.equal(scaraImaginii({ x: 50, y: 50, zoom: 1.5 }), "scale(1.5)");
+});
+
+test("tragerea nu pierde mărirea", () => {
+  const dupa = dupaTragere(
+    { x: 50, y: 50, zoom: 1.5 },
+    { dx: -40, dy: -40, surplusX: 200, surplusY: 200 },
+  );
+
+  assert.equal(dupa.zoom, 1.5);
+  assert.ok(dupa.x > 50 && dupa.y > 50);
+});

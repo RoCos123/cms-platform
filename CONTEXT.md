@@ -2431,6 +2431,44 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Mărirea pozei, ca să se poată mișca pe amândouă axele (1 oct. 2026)
+
+Chiar și cu rama potrivită (vezi mai jos), proprietarul tot nu putea muta poza
+sus-jos la „Despre mine". Și avea dreptate să insiste, dar nu era o
+defecțiune: `object-fit: cover` micșorează poza exact cât s-o încapă în ramă,
+deci pe una dintre axe o potrivește FIX. O poză lată (1500×1000) într-o ramă
+verticală (4/5) umple exact înălțimea — deasupra și dedesubt nu există nimic
+de adus în cadru. Nu era nimic de reparat acolo; nu era nimic de mutat.
+
+Singurul fel în care „mișcă-o în sus" capătă sens e ca poza să poată fi
+MĂRITĂ. Din clipa în care e mai mare decât rama, îi prisosește pe amândouă
+axele, deci se poate trage în toate direcțiile. De-aia panoul are acum un
+glisor „Mărime", 1×–3×, sub rama de poziționare.
+
+**Unde stă mărirea:** în `PunctFocal`, lângă `x` și `y`, nu într-un câmp
+paralel. Motivul e practic: `pozitie` e deja dusă până la fiecare ramă de pe
+site (zece locuri). Un câmp nou, separat, ar fi cerut atinse toate zece și
+uitat la al unsprezecelea. Așa, zero locuri de atins — mărirea ajunge singură
+peste tot unde ajunge și punctul focal.
+
+**Cum se desenează:** `transform: scale(z)` cu `transform-origin` pus CHIAR pe
+punctul focal. Originea contează: așa punctul ales rămâne pe loc când poza se
+mărește, în loc să fugă din cadru. Și tot de-aici vine mișcarea pe verticală —
+la o poză lată, `object-position` pe verticală n-are efect (surplus zero), dar
+originea de sus în jos chiar plimbă cadrul.
+
+**Nemărită, nimic nu se schimbă:** `zoom` lipsește din date când e 1, iar
+`scaraImaginii` întoarce `undefined`, deci nu se pune niciun `transform`. Toate
+pozele de până acum arată exact ca înainte.
+
+Mărirea stă în conținutul secțiunii, nu pe rândul din `uploads` ca punctul
+focal — și e corect așa: cât trebuie mărită o poză depinde de RAMA în care e
+pusă, iar aceeași poză poate sta în rame de forme diferite.
+
+Măsurat pe drumul complet al panoului: la 1×, trasul în sus nu schimbă nimic
+(`y` rămâne 50); la 1,6×, același tras duce `y` la 100 și previzualizarea se
+mișcă odată cu el.
+
 ### Rama de poziționare ia forma locului de pe site (1 oct. 2026)
 
 Proprietarul trăgea de poză la „Despre mine" pe Lumină și nu se întâmpla

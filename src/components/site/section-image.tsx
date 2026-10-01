@@ -1,5 +1,9 @@
 import Image from "next/image";
-import { pozitiaImaginii, type PunctFocal } from "@/lib/punct-focal";
+import {
+  pozitiaImaginii,
+  scaraImaginii,
+  type PunctFocal,
+} from "@/lib/punct-focal";
 
 /**
  * Prin optimizator trec DOAR adresele relative — adică fișierele servite de noi,
@@ -56,11 +60,29 @@ export function SectionImage({
   };
 
   const objectPosition = pozitiaImaginii(pozitie);
+  /*
+    Mărirea pozei, dacă s-a cerut una din panou. `transform-origin` e CHIAR
+    punctul focal: așa, punctul ales rămâne pe loc când poza se mărește, în loc
+    să fugă din cadru. Tot de-aici vine mișcarea pe verticală la o poză lată
+    într-o ramă înaltă: nemărită, ea umple exact înălțimea și n-are ce muta;
+    mărită, originea de sus în jos chiar plimbă cadrul.
+  */
+  const transform = scaraImaginii(pozitie);
+  const stilScalare: React.CSSProperties = transform
+    ? { transform, transformOrigin: objectPosition }
+    : {};
 
   return (
     <div style={stilInvelis}>
       {poateFiOptimizata(src) ? (
-        <Image src={src} alt={alt} fill sizes={sizes} priority={priority} style={{ objectFit: "cover", objectPosition }} />
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes={sizes}
+          priority={priority}
+          style={{ objectFit: "cover", objectPosition, ...stilScalare }}
+        />
       ) : (
         // eslint-disable-next-line @next/next/no-img-element -- vezi comentariul de mai sus: gazdă necunoscută.
         <img
@@ -68,7 +90,15 @@ export function SectionImage({
           alt={alt}
           loading={priority ? "eager" : "lazy"}
           decoding="async"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition }}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition,
+            ...stilScalare,
+          }}
         />
       )}
     </div>
