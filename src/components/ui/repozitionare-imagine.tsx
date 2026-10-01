@@ -32,11 +32,17 @@ export function RepozitionareImagine({
   value,
   onChange,
   onCommit,
+  raport,
 }: {
   src: string;
   value: PunctFocal;
   onChange: (punct: PunctFocal) => void;
   onCommit?: (punct: PunctFocal) => void;
+  /**
+   * Forma ramei, ca `aspect-ratio` („4 / 5"). Vine din locul de pe site unde
+   * ajunge poza (`raportRamei`). Lipsă → pătrat, purtarea de dinainte.
+   */
+  raport?: string;
 }) {
   const ramaRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -140,8 +146,19 @@ export function RepozitionareImagine({
       onPointerUp={laRidicare}
       onPointerCancel={laRidicare}
       onKeyDown={laTasta}
-      className="relative mx-auto aspect-square w-full max-w-[320px] select-none overflow-hidden rounded-base border border-border bg-surface-muted outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-      style={{ touchAction: "none", cursor: trage ? "grabbing" : "grab" }}
+      className="relative mx-auto w-full max-w-[320px] select-none overflow-hidden rounded-base border border-border bg-surface-muted outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      style={{
+        touchAction: "none",
+        cursor: trage ? "grabbing" : "grab",
+        /*
+          Forma ramei e a LOCULUI de pe site unde ajunge poza, nu un pătrat ales
+          de noi. Altfel ce încadrezi aici nu e ce iese acolo — și, mai rău,
+          `object-fit: cover` lasă poza să se miște doar pe axa pe care îi
+          prisosește ceva, iar axa aia diferă de la o ramă la alta. Pătratul a
+          rămas doar ca rezervă, pentru un câmp a cărui formă n-o știm.
+        */
+        aspectRatio: raport ?? "1 / 1",
+      }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- previzualizare locală în panou, orice gazdă */}
       <img

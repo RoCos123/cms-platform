@@ -35,6 +35,7 @@ export function CampuriSectiune({
   destinatii = [],
   documente = [],
   prefix = "",
+  raportPentru,
 }: {
   campuri: CampSchema[];
   valoare: ValoareEditor;
@@ -51,6 +52,11 @@ export function CampuriSectiune({
   documente?: OptiuneDocument[];
   /** Drumul până aici, pentru căutarea erorilor. Gol la nivelul de sus. */
   prefix?: string;
+  /**
+   * Ce formă are rama de pe site pentru câmpul de imagine de la drumul dat
+   * (`raportRamei`). Lipsă (galeria de componente) → rama rămâne pătrată.
+   */
+  raportPentru?: (drum: string) => string | undefined;
 }) {
   // `null` în afara panoului (galeria de componente): atunci `ImageField` nu mai
   // arată butonul „Alege din bibliotecă", iar restul câmpului merge la fel.
@@ -192,6 +198,11 @@ export function CampuriSectiune({
                 // iar biblioteca s-ar fi umplut de copii ale aceluiași fișier —
                 // fiecare cu descrierea ei, fiecare de întreținut separat.
                 onPickFromLibrary={biblioteca ? biblioteca.deschide : undefined}
+                // Forma ramei de poziționare e a locului de pe site unde ajunge
+                // poza, nu un pătrat. Vine de sus, fiindcă depinde de șablon și
+                // de varianta rândului — lucruri pe care descrierea câmpului nu
+                // le știe.
+                raport={raportPentru?.(drum)}
               />
             );
           }
@@ -271,6 +282,7 @@ export function CampuriSectiune({
                       destinatii={destinatii}
                       documente={documente}
                       prefix={`${drum}.${index}`}
+                      raportPentru={raportPentru}
                       onChange={(nou) =>
                         seteaza(
                           camp.cheie,

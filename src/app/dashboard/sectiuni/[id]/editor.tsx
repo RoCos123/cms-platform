@@ -6,6 +6,7 @@ import { SaveBar } from "@/components/ui/save-bar";
 import { useToast } from "@/components/ui/toast";
 import { CampuriSectiune } from "@/components/dashboard/campuri-sectiune";
 import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare";
+import { raportRamei } from "@/lib/rame-poze";
 import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import type { OreDePrimaPagina } from "@/components/site/sections/programare";
 import { RenderSections, type SectionRow } from "@/components/site/render-sections";
@@ -138,6 +139,14 @@ export function EditorSectiune({
           erori={erori}
           destinatii={destinatii}
           documente={documente}
+          /*
+            Rama în care se trage poza ia forma locului de pe site unde ajunge
+            — depinde și de șablon („Despre mine" e cerc la Claritate,
+            dreptunghi vertical la restul), și de varianta rândului (galeria de
+            șabloane față de un program obișnuit). Amândouă se știu abia aici,
+            nu în descrierea câmpului.
+          */
+          raportPentru={(drum) => raportRamei(meta.cheie, drum, { asezari: template.asezari, variant })}
         />
 
         <PanouPrevizualizare

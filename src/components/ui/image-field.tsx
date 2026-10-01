@@ -66,6 +66,12 @@ export type ImageFieldProps = {
    * de imagini, iar componenta nu se leagă de o acțiune anume.
    */
   onReposition?: (uploadId: string, pozitie: PunctFocal) => void;
+  /**
+   * Forma ramei în care se trage poza, ca `aspect-ratio`. Vine din locul de pe
+   * site unde ajunge poza (`raportRamei`), ca ce încadrezi aici să fie ce iese
+   * acolo. Lipsă → pătrat.
+   */
+  raport?: string;
   className?: string;
 };
 
@@ -114,6 +120,7 @@ export function ImageField({
   error,
   cuRepozitionare,
   onReposition,
+  raport,
   className,
 }: ImageFieldProps) {
   const labelId = useId();
@@ -375,6 +382,7 @@ export function ImageField({
                   value={normalizeazaPunctFocal(value.pozitie)}
                   onChange={(pozitie) => onChange({ ...value, pozitie })}
                   onCommit={(pozitie) => onReposition?.(value.uploadId, pozitie)}
+                  raport={raport}
                 />
                 <p className="text-xs text-muted-foreground">
                   Trage poza ca s-o poziționezi. Se salvează pe poză și apare la fel peste tot unde e pusă.

@@ -2431,6 +2431,41 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Rama de poziționare ia forma locului de pe site (1 oct. 2026)
+
+Proprietarul trăgea de poză la „Despre mine" pe Lumină și nu se întâmpla
+nimic. Măsurat, trăgând efectiv din Playwright pe drumul COMPLET al
+editorului (câmp → `catreStocare` → previzualizare), nu doar pe componentă:
+mecanismul era întreg — stânga-dreapta mergea, 50% → 100%, și ajungea și în
+previzualizare. Sus-jos nu mișca nimic.
+
+Cauza: rama în care se trage poza era PĂTRATĂ peste tot, iar pe site sunt
+șapte forme diferite („Despre mine" 4/5, galeria de șabloane 16/9, cartonașul
+unui program 3/2, coperta de articol 16/9…). Două urmări, amândouă rele:
+ce încadrai nu era ce ieșea; și, fiindcă `object-fit: cover` lasă poza să se
+miște DOAR pe axa pe care îi prisosește ceva, axa blocată din pătrat nu era
+aceeași cu cea blocată pe site. O poză lată într-o ramă verticală n-are joc pe
+înălțime — deci trasul în sus era degeaba, fără ca ceva s-o spună.
+
+Acum rama ia forma locului. `raportRamei` (`src/lib/rame-poze.ts`) întoarce
+forma după cheia secțiunii, drumul câmpului, AȘEZĂRILE șablonului și VARIANTA
+rândului — forma depinde de amândouă: „Despre mine" e cerc la Claritate și
+dreptunghi vertical la restul; galeria de șabloane e 16/9, un program obișnuit
+3/2. Se calculează în editor, fiindcă descrierea câmpului din `sectiuni.ts` nu
+știe nici șablonul, nici varianta.
+
+Măsurat după reparație: rama din panou 320×400 (0,80), rama de pe site 380×475
+(0,80) — aceeași formă.
+
+**Capcana de ținut minte:** `raportRamei` repetă, pentru panou, valori scrise
+în componentele site-ului. Două locuri cu același adevăr se despart cu timpul,
+iar despărțirea e TĂCUTĂ — panoul ar arăta o ramă, site-ul alta, și nimic n-ar
+cădea. De-aia `e2e/rame-poze.proba.mjs` citește `aspectRatio`-urile chiar din
+componente și le compară cu ce întoarce funcția.
+
+O formă necunoscută întoarce `undefined`, iar rama rămâne pătrată: un câmp nou
+nu strică panoul fiindcă nimeni nu l-a trecut în listă.
+
 ### Lumină: coloanele oglindite la hero și la „Despre mine" (1 oct. 2026)
 
 Cerut de proprietar, doar la Lumină: în prima secțiune poza trece la STÂNGA și
