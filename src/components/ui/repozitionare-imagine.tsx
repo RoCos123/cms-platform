@@ -38,6 +38,7 @@ export function RepozitionareImagine({
   onChange,
   onCommit,
   raport,
+  cuMarire = true,
 }: {
   src: string;
   value: PunctFocal;
@@ -48,6 +49,19 @@ export function RepozitionareImagine({
    * ajunge poza (`raportRamei`). Lipsă → pătrat, purtarea de dinainte.
    */
   raport?: string;
+  /**
+   * Arată glisorul de mărire. Pornit peste tot unde mărirea chiar se SALVEAZĂ —
+   * adică în formulare, de unde pleacă în conținutul secțiunii odată cu punctul
+   * focal.
+   *
+   * Stins în Bibliotecă (`panou-imagine.tsx`): acolo se scrie doar pe rândul
+   * din `uploads`, care ține `focal_x`/`focal_y` și atât. Un glisor care n-are
+   * unde să-și ducă valoarea ar fi mai rău decât lipsa lui — omul l-ar mișca,
+   * ar vedea poza schimbându-se, și ar pierde totul la reîncărcare. Nici n-ar
+   * însemna ceva: mărirea depinde de RAMA în care e pusă poza, iar în
+   * bibliotecă poza nu e pusă nicăieri anume.
+   */
+  cuMarire?: boolean;
 }) {
   const ramaRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -204,31 +218,33 @@ export function RepozitionareImagine({
         și dedesubt nu există nimic de adus în cadru. Mărită, îi prisosește pe
         amândouă axele — și abia atunci are rost să tragi în toate direcțiile.
       */}
-      <label className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
-        <span className="shrink-0">Mărime</span>
-        <input
-          type="range"
-          min={ZOOM_MINIM}
-          max={ZOOM_MAXIM}
-          step={0.05}
-          value={zoom}
-          aria-label="Cât de mare e poza în ramă"
-          onChange={(e) => {
-            const nou = normalizeazaZoom(Number(e.target.value));
-            const punct = normalizeazaPunctFocal({ ...value, zoom: nou });
-            ultima.current = punct;
-            onChange(punct);
-          }}
-          // Mărirea se salvează la ridicarea degetului, nu la fiecare pixel de
-          // glisare: altfel ar pleca zeci de scrieri pentru o singură reglare.
-          onPointerUp={() => onCommit?.(ultima.current)}
-          onKeyUp={() => onCommit?.(ultima.current)}
-          className="h-1 w-full cursor-pointer appearance-none rounded-full bg-border accent-primary"
-        />
-        <span className="w-10 shrink-0 text-right tabular-nums">
-          {zoom.toFixed(1)}×
-        </span>
-      </label>
+      {cuMarire && (
+        <label className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+          <span className="shrink-0">Mărime</span>
+          <input
+            type="range"
+            min={ZOOM_MINIM}
+            max={ZOOM_MAXIM}
+            step={0.05}
+            value={zoom}
+            aria-label="Cât de mare e poza în ramă"
+            onChange={(e) => {
+              const nou = normalizeazaZoom(Number(e.target.value));
+              const punct = normalizeazaPunctFocal({ ...value, zoom: nou });
+              ultima.current = punct;
+              onChange(punct);
+            }}
+            // Mărirea se salvează la ridicarea degetului, nu la fiecare pixel de
+            // glisare: altfel ar pleca zeci de scrieri pentru o singură reglare.
+            onPointerUp={() => onCommit?.(ultima.current)}
+            onKeyUp={() => onCommit?.(ultima.current)}
+            className="h-1 w-full cursor-pointer appearance-none rounded-full bg-border accent-primary"
+          />
+          <span className="w-10 shrink-0 text-right tabular-nums">
+            {zoom.toFixed(1)}×
+          </span>
+        </label>
+      )}
     </div>
   );
 }

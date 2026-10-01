@@ -73,3 +73,28 @@ test("un câmp necunoscut nu primește nicio formă, deci rama rămâne pătrat�
   assert.equal(raportRamei("secțiuneInventată", "imagine", { asezari }), undefined);
   assert.equal(raportRamei("aboutTeaser", "altCamp", { asezari }), undefined);
 });
+
+/*
+ * Glisorul de mărire apare DOAR unde mărirea se poate salva.
+ *
+ * În formulare, pleacă în conținutul secțiunii odată cu punctul focal — deci e
+ * pornit, pe toate șabloanele și la toate secțiunile (panoul e același pentru
+ * toți). În Bibliotecă se scrie doar pe rândul din `uploads`, care ține
+ * `focal_x`/`focal_y` și atât: acolo un glisor ar lăsa omul să miște poza, s-o
+ * vadă schimbându-se, și să piardă totul la reîncărcare.
+ *
+ * Probă pe sursă: o scăpare aici nu dă nicio eroare, doar pierdere tăcută.
+ */
+test("Biblioteca nu oferă mărire, fiindcă n-ar avea unde s-o salveze", () => {
+  const panou = readFileSync("src/app/dashboard/imagini/panou-imagine.tsx", "utf8");
+
+  assert.match(panou, /cuMarire=\{false\}/);
+});
+
+test("formularele oferă mărire, pe orice șablon și orice secțiune", () => {
+  const campuri = readFileSync("src/components/dashboard/campuri-sectiune.tsx", "utf8");
+
+  // Nimic nu stinge glisorul pe drumul formularelor — nici direct, nici
+  // condiționat de șablon.
+  assert.doesNotMatch(campuri, /cuMarire/);
+});

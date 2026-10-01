@@ -2469,6 +2469,19 @@ Măsurat pe drumul complet al panoului: la 1×, trasul în sus nu schimbă nimic
 (`y` rămâne 50); la 1,6×, același tras duce `y` la 100 și previzualizarea se
 mișcă odată cu el.
 
+**Pe ce șabloane apare:** pe toate, fără nimic de făcut. Panoul nu e al unui
+șablon anume — secțiuni, blog, servicii și setări trec toate prin
+`CampuriSectiune` → `ImageField` → `RepozitionareImagine`.
+
+**Un singur loc l-a primit greșit, și s-a scos:** Biblioteca
+(`panou-imagine.tsx`) folosește direct componenta de poziționare, dar scrie pe
+rândul din `uploads`, care ține `focal_x`/`focal_y` și atât. Acolo glisorul ar
+fi lăsat omul să miște poza, s-o vadă schimbându-se, și să piardă totul la
+reîncărcare — pierdere tăcută, genul cel mai greu de depanat. Stins cu
+`cuMarire={false}`, ținut de o probă pe sursă. Nici n-ar fi însemnat ceva:
+mărirea depinde de rama în care e pusă poza, iar în bibliotecă poza nu e pusă
+nicăieri anume.
+
 ### Rama de poziționare ia forma locului de pe site (1 oct. 2026)
 
 Proprietarul trăgea de poză la „Despre mine" pe Lumină și nu se întâmpla

@@ -162,6 +162,12 @@ function Detalii({
           value={pozitie}
           onChange={setPozitie}
           onCommit={salveazaPozitia}
+          // Fără glisorul de mărire: aici se scrie pe rândul din `uploads`, care
+          // ține doar punctul focal. Mărirea n-ar avea unde să se salveze — și
+          // nici n-ar însemna ceva, fiindcă depinde de rama în care e pusă poza,
+          // iar în bibliotecă poza nu e pusă nicăieri anume. Se reglează în
+          // formularul secțiunii, acolo unde se vede rama adevărată.
+          cuMarire={false}
         />
         <p className="text-xs text-muted-foreground">
           Trage poza ca s-o poziționezi. Se salvează pe poză și apare la fel peste tot unde e pusă.
