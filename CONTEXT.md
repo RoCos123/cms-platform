@@ -2459,6 +2459,18 @@ reale de pe demo-uri nu le-am putut vedea.
 Doar secțiunile au liste cu câmpuri, deci blogul, serviciile, paginile și
 setările nu sunt atinse.
 
+**Ce NU acoperă (corectat în aceeași zi, după ce proprietarul a cerut să i se
+explice simplu):** verificarea stă în codul aplicației, deci oprește doar cererile
+care trec prin el — salvarea din panou sau o cerere trimisă de mână serverului.
+O copie făcută din SQL scrie DIRECT în baza de date și nu trece pe acolo, deci
+tot nu e oprită: site-ul ar afișa toate elementele, iar singurul efect ar fi că
+la următoarea salvare din panou clientul ar fi oprit până șterge cele în plus.
+Rândurile de mai sus pomenesc „o copie din SQL" ca drum pe care limita nu era
+ținută; asta era adevărat înainte și rămâne adevărat. Câștigul real al
+modificării e deci mic: închide o ușă laterală pentru cereri trimise altfel decât
+din panou, lucru pe care un client obișnuit nu-l face. O limită care să țină și
+la SQL ar trebui pusă în baza de date însăși (o constrângere Postgres), nu aici.
+
 Proba (`e2e/limita-liste.proba.mjs`) a fost scrisă ÎNAINTE de reparație și a
 picat exact unde trebuia (peste limită, mesajul, lista imbricată), apoi a trecut.
 
