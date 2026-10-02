@@ -69,7 +69,10 @@ export function BandaServicii({
           alignItems: "center",
           whiteSpace: "nowrap",
           willChange: "transform",
-          opacity: discreta ? 0.55 : undefined,
+          // 0,7 din 2 oct. 2026 (cerut de proprietar: „un grad mai vizibilă").
+          // A fost 0,55, măsurat pe referința „Liniște" — numărul de mutat dacă
+          // se cere iar mai mult sau mai puțin. Același pentru toate șabloanele.
+          opacity: discreta ? 0.7 : undefined,
         }}
       >
         {track.map((titlu, i) => (

@@ -2447,8 +2447,13 @@ vrea accentul plin, iar fără comutator ar trebui desfăcută componenta.
 Liniște" — adică pe fundalul paginii, estompată — nu ca „fără fundal deloc".
 Diferența contează puțin: fundalul benzii e chiar culoarea paginii (măsurat, la
 fiecare șablon, pixel cu pixel), deci vizual banda stă direct pe pagină. Dacă
-vreodată se cere „și mai estompată", singurul număr de mutat e `opacity: 0.55`
-din `banda-servicii.tsx`.
+vreodată se cere „și mai estompată", singurul număr de mutat e `opacity` din
+`banda-servicii.tsx`. **Același număr pentru toate cinci**, deci o schimbare se
+vede și la Liniște, unde 0,55 fusese măsurat pe referință.
+
+**Ajustat apoi (2 oct. 2026), cerut de proprietar: „un grad mai vizibilă”.**
+0,55 → 0,7. Un pas mic, nu un salt: la 0,7 cuvintele se citesc mai bine pe
+toate cele cinci fundaluri, iar banda tot nu devine o bară.
 
 Verificat vizual pe toate cinci, cu aceleași servicii. Fiecare ia fontul
 secundar al șablonului (serif italic la Căldură/Liniște/Lumină, scris de mână la
