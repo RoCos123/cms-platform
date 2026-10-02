@@ -2468,8 +2468,14 @@ deasupra și nu se mai citea ca o fâșie aparte. Măsurat pe pixeli, la Linișt
 diferența dintre bandă și hero e 3 (din 765) — practic nulă.
 
 **Fix:** un al doilea steag, `bandaServiciiDelimitata`, separat de
-`bandaServiciiDiscreta`. Banda ia o tintă ușoară de accent (8%) și câte o linie
-fină sus și jos. Aprins la Căldură, Lumină, Apropiere și Claritate — **nu la
+`bandaServiciiDiscreta`. Banda ia o tintă ușoară de accent (8%).
+
+**Liniile fine de sus și de jos s-au scos a doua zi, cerut explicit de
+proprietar („să nu aibă dungă pe margine”).** Le pusesem ca plasă de siguranță
+pentru șabloanele reci, dar desprinderea o face singură culoarea: măsurat fără
+linii, banda diferă de hero cu 36–40 pe toate patru. Cea mai apropiată de
+secțiunea de jos e Lumină (18), dar în randare se deosebește clar. Dacă vreodată
+o tintă prea slabă cere iar linii, tinta e cea de mutat, nu liniile de readus. Aprins la Căldură, Lumină, Apropiere și Claritate — **nu la
 Liniște**, unde banda a fost potrivită pe referință și n-a fost contestată.
 Diferența față de hero: 37–43, față de 3 înainte.
 

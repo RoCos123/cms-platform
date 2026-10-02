@@ -219,7 +219,7 @@ export type TemplateAsezari = {
   bandaServiciiDiscreta?: boolean;
   /**
    * Banda cu servicii se DESPRINDE de vecini: fundal tintat ușor cu accentul
-   * șablonului și câte o linie fină sus și jos.
+   * șablonului, fără linii pe margini (cerut explicit de proprietar).
    *
    * Cerut de proprietar pe 2 oct. 2026, uitându-se la Lumină: varianta discretă
    * lua exact culoarea paginii, deci banda se confunda cu hero-ul de deasupra și

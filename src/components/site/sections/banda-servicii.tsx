@@ -36,8 +36,8 @@ export function BandaServicii({
    */
   discreta?: boolean;
   /**
-   * Banda se desprinde de vecini: fundal tintat cu accentul și câte o linie fină
-   * sus și jos. Are efect doar împreună cu `discreta` — la banda plină pe accent
+   * Banda se desprinde de vecini printr-un fundal tintat cu accentul, FĂRĂ linii
+   * pe margini. Are efect doar împreună cu `discreta` — la banda plină pe accent
    * se desprinde oricum. Vezi `bandaServiciiDelimitata` în tipurile șablonului.
    */
   delimitata?: boolean;
@@ -60,12 +60,9 @@ export function BandaServicii({
             ? "color-mix(in oklab, var(--t-accent) 8%, var(--t-fundal))"
             : "var(--t-fundal)"
           : "var(--t-accent)",
-        // Liniile fine marchează marginile unde tinta singură ar fi prea slabă,
-        // mai ales pe șabloanele reci (Claritate).
-        borderBlock:
-          discreta && delimitata
-            ? "1px solid color-mix(in oklab, var(--t-accent) 18%, transparent)"
-            : undefined,
+        // FĂRĂ linii pe margini (cerut de proprietar, 2 oct. 2026: „să nu aibă
+        // dungă pe margine"). Au existat o zi; desprinderea de vecini o face doar
+        // culoarea tintată.
         color: discreta ? "var(--t-text-secundar)" : "var(--t-accent-text)",
         overflow: "hidden",
         paddingBlock: "clamp(14px, 1.7vw, 22px)",
