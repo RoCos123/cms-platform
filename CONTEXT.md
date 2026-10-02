@@ -2431,6 +2431,37 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Limita listelor, verificată și pe server (2 oct. 2026)
+
+Proprietarul a întrebat câte „Apariții și acreditări” se pot adăuga. Răspunsul din
+cod: 12 (`max: 12` la lista `aparitii` din `src/lib/sectiuni.ts`). Citind cum se
+aplică, a ieșit la iveală o scăpare: limita ținea DOAR în panou, prin butonul
+„+ Adaugă” care se oprea (`RepeaterList`). Serverul verifica numărul de elemente
+doar la listele de rânduri simple (`listaText`), nu și la cele cu câmpuri
+(`lista`). O limită pusă doar în interfață e o sugestie: conținutul venit pe
+altă cale (o cerere făcută de mână, o copie din SQL între site-uri) trecea de ea,
+iar site-ul îl afișa întreg, fără nicio tăiere.
+
+Acum `valideaza` (`src/lib/sectiuni-editare.ts`) o verifică și la `lista`, cu
+același mesaj în română ca la `listaText`, dar cu pluralul corect („13 elemente”,
+„20 de elemente”). Merge și la liste din interiorul altor liste („materiale”
+dintr-un program). `valideaza` rulează și în formular, și la salvare, deci e
+același cod în ambele locuri.
+
+**Efect de știut:** un conținut care DEJA depășește limita (turnat din SQL înainte
+de regula asta) nu se mai poate salva până nu se șterg elementele în plus.
+Ecranul spune care listă și câte elemente are, iar ștergerea e o apăsare. Am ales
+asta în loc de o excepție „pentru conținutul vechi”, care ar fi rămas permanentă
+și uitată. Din datele pe care le controlez, nimic nu trece peste limită (conținutul
+site-ului de vânzări: 4 pași din 6, 2 pachete din 4, 5 programe din 8); datele
+reale de pe demo-uri nu le-am putut vedea.
+
+Doar secțiunile au liste cu câmpuri, deci blogul, serviciile, paginile și
+setările nu sunt atinse.
+
+Proba (`e2e/limita-liste.proba.mjs`) a fost scrisă ÎNAINTE de reparație și a
+picat exact unde trebuia (peste limită, mesajul, lista imbricată), apoi a trecut.
+
 ### Banda cu servicii: varianta discretă, la toate șabloanele (2 oct. 2026)
 
 Cerut de proprietar: banda de servicii „mai transparentă, pe toate șabloanele

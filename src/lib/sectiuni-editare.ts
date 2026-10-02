@@ -240,6 +240,26 @@ export function valideaza(
         erori[drum] = `Cel mult ${camp.max} rânduri. Acum sunt ${lista.length}.`;
       }
 
+      /*
+        Limita listelor cu câmpuri (apariții, programe, întrebări…), verificată
+        și pe SERVER. Până pe 2 oct. 2026 o ținea doar panoul, prin butonul
+        „+ Adaugă” care se oprea la limită; o limită pusă doar în interfață e o
+        sugestie, nu o limită — conținutul venit pe altă cale (o cerere făcută de
+        mână, o copie din SQL între site-uri) trecea de ea și apărea pe site.
+
+        Funcția asta rulează și în formular, și la salvare, deci un conținut care
+        DEJA depășește limita (turnat din SQL înainte de regula asta) nu se mai
+        poate salva până nu se șterg elementele în plus. E dinadins: ecranul
+        spune care listă și câte elemente are, iar ștergerea e o apăsare.
+        Alternativa — să lăsăm limita să treacă „pentru conținutul vechi” — ar fi
+        însemnat o excepție permanentă pe care nimeni n-ar mai ține-o minte.
+      */
+      if (camp.tip === "lista" && camp.max && lista.length > camp.max) {
+        erori[drum] =
+          `Cel mult ${numara(camp.max, "element", "elemente")}. ` +
+          `Acum sunt ${numara(lista.length, "element", "elemente")}.`;
+      }
+
       if (camp.tip === "lista") {
         (lista as ElementListaEditor[]).forEach((element, i) => {
           Object.assign(erori, valideaza(element, camp.campuri, `${drum}.${i}`));
