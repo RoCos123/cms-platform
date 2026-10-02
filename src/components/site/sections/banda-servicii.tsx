@@ -21,6 +21,7 @@ import type { Serviciu } from "@/lib/servicii";
 export function BandaServicii({
   servicii,
   discreta,
+  delimitata,
 }: {
   servicii: Serviciu[];
   tone?: SectionTone;
@@ -34,6 +35,12 @@ export function BandaServicii({
    * păstrat ca prop: un șablon cu fundal închis ar putea vrea accentul plin.
    */
   discreta?: boolean;
+  /**
+   * Banda se desprinde de vecini: fundal tintat cu accentul și câte o linie fină
+   * sus și jos. Are efect doar împreună cu `discreta` — la banda plină pe accent
+   * se desprinde oricum. Vezi `bandaServiciiDelimitata` în tipurile șablonului.
+   */
+  delimitata?: boolean;
 }) {
   const nume = servicii.map((s) => s.titlu).filter((t) => t?.trim());
   if (nume.length === 0) return null;
@@ -48,7 +55,17 @@ export function BandaServicii({
     <div
       style={{
         position: "relative",
-        background: discreta ? "var(--t-fundal)" : "var(--t-accent)",
+        background: discreta
+          ? delimitata
+            ? "color-mix(in oklab, var(--t-accent) 8%, var(--t-fundal))"
+            : "var(--t-fundal)"
+          : "var(--t-accent)",
+        // Liniile fine marchează marginile unde tinta singură ar fi prea slabă,
+        // mai ales pe șabloanele reci (Claritate).
+        borderBlock:
+          discreta && delimitata
+            ? "1px solid color-mix(in oklab, var(--t-accent) 18%, transparent)"
+            : undefined,
         color: discreta ? "var(--t-text-secundar)" : "var(--t-accent-text)",
         overflow: "hidden",
         paddingBlock: "clamp(14px, 1.7vw, 22px)",
@@ -70,9 +87,14 @@ export function BandaServicii({
           whiteSpace: "nowrap",
           willChange: "transform",
           // 0,7 din 2 oct. 2026 (cerut de proprietar: „un grad mai vizibilă").
-          // A fost 0,55, măsurat pe referința „Liniște" — numărul de mutat dacă
-          // se cere iar mai mult sau mai puțin. Același pentru toate șabloanele.
-          opacity: discreta ? 0.7 : undefined,
+          // A fost 0,55, măsurat pe referința „Liniște".
+          //
+          // La varianta `delimitata`, 0,95. Fundalul tintat e mai închis decât
+          // pagina, deci același text pierde contrast: măsurat, la 0,7 Căldură și
+          // Apropiere cădeau la 2,8:1 — MAI SLAB decât înainte de a cere
+          // proprietarul „mai vizibilă". La 0,95 ies 4,3–8,2:1. Banda rămâne
+          // discretă prin culoare (tinta ușoară), nu prin text greu de citit.
+          opacity: discreta ? (delimitata ? 0.95 : 0.7) : undefined,
         }}
       >
         {track.map((titlu, i) => (

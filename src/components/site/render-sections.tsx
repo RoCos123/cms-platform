@@ -119,6 +119,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       servicii={ctx.servicii}
       tone={row.tone}
       discreta={ctx.asezari.bandaServiciiDiscreta}
+      delimitata={ctx.asezari.bandaServiciiDelimitata}
     />
   ),
   aboutTeaser: (row, ctx) => (

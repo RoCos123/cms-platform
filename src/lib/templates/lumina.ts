@@ -57,5 +57,6 @@ export const lumina: Template = {
     heroPozaStanga: true,
     desprePozaDreapta: true,
     bandaServiciiDiscreta: true,
+    bandaServiciiDelimitata: true,
   },
 };

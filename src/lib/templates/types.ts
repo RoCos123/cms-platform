@@ -218,6 +218,21 @@ export type TemplateAsezari = {
    */
   bandaServiciiDiscreta?: boolean;
   /**
+   * Banda cu servicii se DESPRINDE de vecini: fundal tintat ușor cu accentul
+   * șablonului și câte o linie fină sus și jos.
+   *
+   * Cerut de proprietar pe 2 oct. 2026, uitându-se la Lumină: varianta discretă
+   * lua exact culoarea paginii, deci banda se confunda cu hero-ul de deasupra și
+   * nu se mai citea ca o fâșie aparte. Nu putem alege pur și simplu tonul
+   * „nuanțat" al șablonului: banda stă între hero (culoarea paginii) și o
+   * secțiune care poate fi pe ton nuanțat — iar un ton nuanțat s-ar contopi cu
+   * a doua. O tintă ușoară de accent se deosebește de AMBELE.
+   *
+   * Aprins la Căldură, Lumină, Apropiere și Claritate. NU la „Liniște": acolo
+   * banda a fost potrivită pe referință și n-a fost contestată.
+   */
+  bandaServiciiDelimitata?: boolean;
+  /**
    * Titlul acestei secțiuni ia fontul de titlu al șablonului (`--t-font-titlu`
    * / `--t-greutate-titlu`), ca la `SectionHeading`. Secțiunile astea cinci
    * (`aboutTeaser`, `faq`, `howItWorks`, `newsletter`, `testimonials`) au

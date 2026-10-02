@@ -2459,6 +2459,38 @@ Verificat vizual pe toate cinci, cu aceleași servicii. Fiecare ia fontul
 secundar al șablonului (serif italic la Căldură/Liniște/Lumină, scris de mână la
 Apropiere, sans italic la Claritate) și accentul lui la stea.
 
+### Banda cu servicii se desprinde de vecini (2 oct. 2026)
+
+Proprietarul, uitându-se la Lumină: „banda se confunda cu culoarea hero-ului".
+Avea dreptate, și greșeala e a interpretării mele: „transparentă" o citisem ca
+„exact culoarea paginii", ceea ce însemna că banda dispărea în hero-ul de
+deasupra și nu se mai citea ca o fâșie aparte. Măsurat pe pixeli, la Liniște
+diferența dintre bandă și hero e 3 (din 765) — practic nulă.
+
+**Fix:** un al doilea steag, `bandaServiciiDelimitata`, separat de
+`bandaServiciiDiscreta`. Banda ia o tintă ușoară de accent (8%) și câte o linie
+fină sus și jos. Aprins la Căldură, Lumină, Apropiere și Claritate — **nu la
+Liniște**, unde banda a fost potrivită pe referință și n-a fost contestată.
+Diferența față de hero: 37–43, față de 3 înainte.
+
+**De ce o tintă de accent și nu tonul „nuanțat" al șablonului:** banda stă
+între hero (culoarea paginii) și o secțiune care poate fi pe ton nuanțat. Tonul
+nuanțat s-ar contopi cu a doua. O tintă ușoară de accent se deosebește de
+amândouă — măsurat și față de secțiunea de jos.
+
+**Capcana găsită prin măsurare, nu din ochi:** fundalul tintat e mai închis
+decât pagina, deci același text pierde contrast. La opacitatea de 0,7 (pusă cu
+o zi înainte, la cererea „un grad mai vizibilă") Căldură și Apropiere cădeau la
+2,8:1 — MAI SLAB decât înainte de a cere proprietarul „mai vizibilă". Cele două
+au textul secundar deschis din start: chiar la 100% ajung doar la 5,1 și 4,8.
+De-aia varianta delimitată folosește opacitate 0,95 (contrast 4,3–8,2:1), iar
+cea nedelimitată (Liniște) rămâne la 0,7. Banda e discretă prin culoare, nu prin
+text greu de citit.
+
+**Lecția, a doua oară în aceeași zi:** o schimbare de fundal schimbă și
+contrastul textului de pe el. Orice ajustare de culoare la un element cu text
+se verifică și pe contrast, nu doar pe cum arată.
+
 ### De ce dura editarea, și ce s-a scurtat (1 oct. 2026)
 
 Proprietarul: de la clic pe „Editează" până apare pagina trece prea mult, și e
