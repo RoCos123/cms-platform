@@ -59,5 +59,5 @@ export const caldura: Template = {
   // Titlul lat, poza LATĂ (peisaj) pe toată lățimea sub el, iar textul și butonul
   // dedesubt. Cerut de proprietar (21 sept. 2026): poza din hero e cabinetul /
   // spațiul de terapie, care are nevoie de lățime, nu un portret lângă text.
-  asezari: { hero: "pozaLata" },
+  asezari: { hero: "pozaLata", bandaServiciiDiscreta: true },
 };

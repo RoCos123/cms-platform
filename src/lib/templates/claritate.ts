@@ -86,5 +86,5 @@ export const claritate: Template = {
   // șabloanelor păstrează dreptunghiul.
   // Poza LATĂ (peisaj) pe toată lățimea, cu textul și butonul dedesubt. Cerut de
   // proprietar (21 sept. 2026): poza din hero e cabinetul, nu un portret.
-  asezari: { hero: "pozaLata", desprePozaRotunda: true },
+  asezari: { hero: "pozaLata", desprePozaRotunda: true, bandaServiciiDiscreta: true },
 };

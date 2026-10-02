@@ -52,5 +52,10 @@ export const lumina: Template = {
 
   // Pagina alternează părțile: heroul cu poza la stânga, „Despre mine" cu poza
   // la dreapta. Cerut de proprietar pe 1 oct. 2026, doar aici.
-  asezari: { hero: "textPozaDreapta", heroPozaStanga: true, desprePozaDreapta: true },
+  asezari: {
+    hero: "textPozaDreapta",
+    heroPozaStanga: true,
+    desprePozaDreapta: true,
+    bandaServiciiDiscreta: true,
+  },
 };

@@ -208,8 +208,13 @@ export type TemplateAsezari = {
    * referința „Liniște" (cuvinte în serif italic, punctate de „✦"). Fără ea,
    * banda rămâne mereu pe accent, „ca în șablonul-model" (decizia de la 16
    * sept.) — corectă pentru șablonul acela, greșită aici: pe fundal crem, un
-   * accent plin arată ca o bară verde fără legătură cu restul paginii. Doar
-   * „Liniște".
+   * accent plin arată ca o bară verde fără legătură cu restul paginii.
+   *
+   * Pornit la „Liniște" din 19 sept. 2026 și la restul de pe 2 oct. 2026, cerut
+   * de proprietar: „mai transparentă, pe toate șabloanele unde nu este". Deci
+   * acum e aprins la toate cinci. Rămâne totuși un comutator, nu o regulă
+   * scrisă în componentă: un șablon viitor, cu fundal închis, ar putea vrea
+   * accentul plin, iar fără comutator ar trebui desfăcută componenta.
    */
   bandaServiciiDiscreta?: boolean;
   /**

@@ -2431,6 +2431,29 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Banda cu servicii: varianta discretă, la toate șabloanele (2 oct. 2026)
+
+Cerut de proprietar: banda de servicii „mai transparentă, pe toate șabloanele
+unde nu este". Varianta discretă exista deja din 19 sept. (fundalul ia culoarea
+paginii, cuvintele sunt estompate la 55%, steaua ia accentul șablonului), dar
+era aprinsă doar la Liniște. Celelalte patru foloseau accentul plin.
+
+Aprinsă acum la Căldură, Lumină, Apropiere și Claritate — patru linii de
+`asezari`, nicio linie de componentă. Comutatorul `bandaServiciiDiscreta` rămâne
+în loc, deși acum e aprins peste tot: un șablon viitor cu fundal închis ar putea
+vrea accentul plin, iar fără comutator ar trebui desfăcută componenta.
+
+**Interpretare, spusă deschis:** „transparentă" l-am citit ca „la fel ca la
+Liniște" — adică pe fundalul paginii, estompată — nu ca „fără fundal deloc".
+Diferența contează puțin: fundalul benzii e chiar culoarea paginii (măsurat, la
+fiecare șablon, pixel cu pixel), deci vizual banda stă direct pe pagină. Dacă
+vreodată se cere „și mai estompată", singurul număr de mutat e `opacity: 0.55`
+din `banda-servicii.tsx`.
+
+Verificat vizual pe toate cinci, cu aceleași servicii. Fiecare ia fontul
+secundar al șablonului (serif italic la Căldură/Liniște/Lumină, scris de mână la
+Apropiere, sans italic la Claritate) și accentul lui la stea.
+
 ### De ce dura editarea, și ce s-a scurtat (1 oct. 2026)
 
 Proprietarul: de la clic pe „Editează" până apare pagina trece prea mult, și e

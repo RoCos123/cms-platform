@@ -29,7 +29,9 @@ export function BandaServicii({
    * cuvinte și steaua despărțitoare estompate uniform, ca banda decorativă din
    * josul hero-ului acolo. Corectat 19 sept. 2026 — decizia „mereu pe accent"
    * de mai sus era corectă pentru șablonul ei de origine, dar pe crem un accent
-   * plin arată ca o bară verde fără legătură cu restul paginii. Doar „Liniște".
+   * plin arată ca o bară verde fără legătură cu restul paginii. Aprins la toate
+   * cinci șabloanele (extins pe 2 oct. 2026, la cererea proprietarului), dar
+   * păstrat ca prop: un șablon cu fundal închis ar putea vrea accentul plin.
    */
   discreta?: boolean;
 }) {
