@@ -274,6 +274,13 @@ export type TemplateAsezari = {
    */
   testimonialeFriendly?: boolean;
   /**
+   * Secțiunea „Păreri" pe un fundal VERDE în gradient, cu textul deschis și
+   * cardurile translucide. Culoarea e măsurată pe o captură adusă de proprietar
+   * (3 oct. 2026): rgb(65,84,71), ușor mai deschisă spre stânga-sus și mai
+   * închisă în dreapta. Doar „Liniște".
+   */
+  testimonialeVerde?: boolean;
+  /**
    * Cardurile de servicii ca la modelul prietenos: titlu + descriere + preț mare
    * sub o linie punctată, unele colorate, fără poză și fără iconiță. Doar
    * „Apropiere".

@@ -2431,6 +2431,25 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Liniște: „Păreri" pe verde (3 oct. 2026)
+
+Cerut de proprietar, cu o captură a culorii dorite (o bandă verde cu „Un gând",
+cel mai probabil din model — în codul nostru nu există un asemenea fundal).
+Măsurat pe ea: baza rgb(65,84,71), ușor mai deschisă spre stânga-sus
+(71,90,77), mai închisă în dreapta (60,80,66); textul e chiar paleta Liniște
+(titlu #F3EDE2, etichetă #C3CFB7). Reprodus în `FundalVerde`
+(`testimonials.tsx`): diferă de captură cu cel mult 3–4 unități pe canal.
+
+Steag nou `testimonialeVerde`, aprins DOAR la Liniște. Secțiunea primește tonul
+închis (titlul deschis, `--s-*` de fundal închis) iar verdele se pune ca `decor`.
+
+**Cardurile sunt albe, ca pașii din „Cum decurge colaborarea"** (cerut de
+proprietar, cu o captură a unui pas): același fundal, chenar, rază și spațiu
+interior, text închis din șablon. O primă variantă, cu carduri translucide
+verzi, a fost înlocuită înainte de master; la ea textul mic ieșea la 4,1:1,
+sub pragul de 4,5:1 — pe alb problema dispare. Proba compară valorile cardului
+cu ale pasului, ca cele două să nu se depărteze în tăcere.
+
 ### Liniște: cardurile de servicii refăcute după model, măsurat pe pixeli (3 oct. 2026)
 
 Proprietarul a pus alături o captură a modelului și una de la noi. Diferențele,

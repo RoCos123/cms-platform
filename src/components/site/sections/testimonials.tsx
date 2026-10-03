@@ -25,6 +25,7 @@ export function Testimonials({
   data,
   tone,
   friendly,
+  verde,
   titluSerif,
 }: {
   data: TestimonialsData;
@@ -34,6 +35,11 @@ export function Testimonials({
    * ca la sursă. Doar „Apropiere"; restul rămân cu cardul-citat de dinainte.
    */
   friendly?: boolean;
+  /**
+   * Fundal verde în gradient, text deschis, carduri translucide. Doar „Liniște"
+   * — vezi `TemplateAsezari.testimonialeVerde`.
+   */
+  verde?: boolean;
   /**
    * Fontul de titlu al șablonului (`--t-font-titlu`), ca la `SectionHeading`.
    * Pornit DOAR pe „Liniește" (23 sept. 2026), cerut de proprietar — vezi
@@ -65,7 +71,13 @@ export function Testimonials({
   if (marturii.length === 0 && !data.titlu?.trim()) return null;
 
   return (
-    <Section tone={tone} id="pareri">
+    <Section
+      // Pe verde: tonul închis dă textul deschis și variabilele `--s-*` potrivite
+      // unui fundal închis; verdele propriu-zis e desenat de `decor`, peste el.
+      tone={verde ? "inchis" : tone}
+      id="pareri"
+      decor={verde ? <FundalVerde /> : undefined}
+    >
       {data.eyebrow && <SectionEyebrow>{data.eyebrow}</SectionEyebrow>}
 
       <h2
@@ -183,10 +195,23 @@ export function Testimonials({
               key={i}
               style={{
                 margin: 0,
-                padding: "32px",
                 borderRadius: "var(--t-raza)",
-                background: "color-mix(in oklab, var(--t-fundal-nuantat) 80%, transparent)",
-                border: "1px solid color-mix(in oklab, var(--t-chenar) 70%, transparent)",
+                // Pe verde, cardul e ALB, exact ca pașii din „Cum decurge
+                // colaborarea" la Liniște (cerut de proprietar, 3 oct. 2026): același
+                // fundal, chenar, rază și spațiu interior, iar textul își ia culorile
+                // din șablon (`--t-…`), nu din tonul închis al benzii.
+                ...(verde
+                  ? {
+                      padding: "clamp(28px, 3vw, 40px)",
+                      background: "var(--t-suprafata, #ffffff)",
+                      border: "1px solid var(--t-chenar)",
+                      color: "var(--t-text)",
+                    }
+                  : {
+                      padding: "32px",
+                      background: "color-mix(in oklab, var(--t-fundal-nuantat) 80%, transparent)",
+                      border: "1px solid color-mix(in oklab, var(--t-chenar) 70%, transparent)",
+                    }),
                 display: "flex",
                 flexDirection: "column",
                 gap: "20px",
@@ -205,7 +230,14 @@ export function Testimonials({
               >
                 {marturie.text}
               </blockquote>
-              <figcaption style={{ fontSize: "14px", color: "var(--s-text-secundar)" }}>
+              <figcaption
+                style={{
+                  fontSize: "14px",
+                  // Pe verde cardul e alb, deci textul secundar e al șablonului
+                  // (`--t-`), nu cel deschis al benzii închise (`--s-`).
+                  color: verde ? "var(--t-text-secundar)" : "var(--s-text-secundar)",
+                }}
+              >
                 <span style={{ fontWeight: 600, color: "inherit" }}>{marturie.autor}</span>
                 {marturie.context && <span> · {marturie.context}</span>}
               </figcaption>
@@ -214,5 +246,25 @@ export function Testimonials({
         })}
       </div>
     </Section>
+  );
+}
+
+/**
+ * Verdele din spatele „Păreri" la Liniște, măsurat pe captura adusă de
+ * proprietar (3 oct. 2026): baza rgb(65,84,71); spre stânga-sus urcă la
+ * rgb(71,90,77), în dreapta coboară la rgb(60,80,66). Un gradient liniar pe
+ * orizontală pentru bază, plus o lumină largă și slabă sus.
+ */
+function FundalVerde() {
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        inset: 0,
+        background:
+          "radial-gradient(ellipse 55% 70% at 33% 0%, rgba(80, 100, 86, 0.55), transparent 70%), linear-gradient(90deg, #415447 0%, #415548 50%, #3c5042 100%)",
+      }}
+    />
   );
 }

@@ -147,6 +147,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       data={row.data as TestimonialsData}
       tone={row.tone}
       friendly={ctx.asezari.testimonialeFriendly}
+      verde={ctx.asezari.testimonialeVerde}
       titluSerif={ctx.asezari.titluSerif}
     />
   ),
