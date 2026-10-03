@@ -8,6 +8,7 @@ import { paginaEsteActiva, type Pagini } from "@/lib/setari";
 import { adresaImaginii } from "@/lib/imagini-adrese";
 import { serviciiPublicate } from "@/lib/servicii-publice";
 import type { SectionTone } from "@/lib/templates";
+import { normalizeazaPunctFocal, type PunctFocal } from "@/lib/punct-focal";
 import { EditorServiciu } from "./editor";
 
 export default async function EditorServiciuPage({
@@ -63,20 +64,29 @@ export default async function EditorServiciuPage({
   // Coperta stă în bază ca referință; formularul lucrează cu adresa. Traducerea
   // se face la citire (aici) și la scriere (`coloanaCoperta`), exact ca la
   // articolele de blog — în restul panoului imaginea are o singură formă.
-  let coperta: { uploadId: string; url: string; altText: string } | null = null;
+  let coperta: { uploadId: string; url: string; altText: string; pozitie?: PunctFocal } | null =
+    null;
 
   if (serviciu.cover_upload_id) {
     const { data: incarcare } = await supabase
       .from("uploads")
       // Interogarea confirmă că poza există ȘI e a acestui cabinet, nu doar că
-      // rândul serviciului o pomenește.
-      .select("id")
+      // rândul serviciului o pomenește. `focal_x/focal_y`: punctul focal ales
+      // prin tragere, ca editorul să arate la redeschidere poziția salvată — ca
+      // la articolele de blog. Fără el, poza revenea la centru în panou la
+      // redeschidere, deși pe site stătea unde fusese pusă.
+      .select("id, focal_x, focal_y")
       .eq("id", serviciu.cover_upload_id as string)
       .eq("site_id", session.siteId)
-      .maybeSingle<{ id: string }>();
+      .maybeSingle<{ id: string; focal_x: number | null; focal_y: number | null }>();
 
     if (incarcare) {
-      coperta = { uploadId: incarcare.id, url: adresaImaginii(incarcare.id), altText: "" };
+      coperta = {
+        uploadId: incarcare.id,
+        url: adresaImaginii(incarcare.id),
+        altText: "",
+        pozitie: normalizeazaPunctFocal({ x: incarcare.focal_x, y: incarcare.focal_y }),
+      };
     }
   }
 
