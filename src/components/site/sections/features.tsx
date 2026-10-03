@@ -1,5 +1,6 @@
 import type { SectionTone } from "@/lib/templates";
 import { RANDURI_CARTONAS, textCartonas, type Serviciu } from "@/lib/servicii";
+import type { PunctFocal } from "@/lib/punct-focal";
 import { Section, SectionActionButton } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
@@ -500,7 +501,14 @@ function ServiciiImagine({
                   marginBottom: "28px",
                 }}
               >
-                <SectionImage src={serviciu.coperta.url} alt="" aspectRatio="1 / 1" sizes="200px" />
+                <SectionImage
+                  src={serviciu.coperta.url}
+                  alt=""
+                  aspectRatio="1 / 1"
+                  sizes="200px"
+                  // Punctul focal ales prin tragere; lipsă → centru, ca înainte.
+                  pozitie={serviciu.coperta.pozitie}
+                />
               </div>
             )}
 
@@ -676,7 +684,7 @@ function Card({
   children,
 }: {
   link?: string;
-  cover?: { url: string } | null;
+  cover?: { url: string; pozitie?: PunctFocal } | null;
   children: React.ReactNode;
 }) {
   const stil: React.CSSProperties = {
@@ -701,6 +709,8 @@ function Card({
           alt=""
           aspectRatio="3 / 2"
           sizes="(max-width: 720px) 100vw, (max-width: 1040px) 50vw, 33vw"
+          // Punctul focal ales prin tragere; lipsă → centru, ca înainte.
+          pozitie={cover.pozitie}
         />
       )}
       <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "32px", flex: 1 }}>

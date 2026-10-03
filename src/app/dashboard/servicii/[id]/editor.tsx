@@ -12,6 +12,7 @@ import { Section } from "@/components/site/section";
 import { Features, type FeaturesData } from "@/components/site/sections/features";
 import { Button } from "@/components/ui/button";
 import type { SectionTone, Template } from "@/lib/templates";
+import type { PunctFocal } from "@/lib/punct-focal";
 import {
   CAMPURI_SERVICIU,
   rezumatServiciu,
@@ -57,10 +58,13 @@ export function EditorServiciu({
   const date = catreStocare(valoare, CAMPURI_SERVICIU);
 
   // Coperta, ca s-o arate previzualizarea: câmpul de imagine o ține ca
-  // `{ uploadId, url, altText }`, iar blocul de serviciu cere doar adresa.
+  // `{ uploadId, url, altText, pozitie }`, iar blocul de serviciu cere adresa și
+  // punctul focal. Fără `pozitie`, previzualizarea nu se mișca la tragerea pozei,
+  // deși câmpul din stânga da (prins de proprietar, 3 oct. 2026) — ca la blog,
+  // care îl trimite deja.
   const copertaPreview = (() => {
-    const c = date.coperta as { url?: unknown } | null | undefined;
-    return typeof c?.url === "string" && c.url ? { url: c.url } : null;
+    const c = date.coperta as { url?: unknown; pozitie?: PunctFocal } | null | undefined;
+    return typeof c?.url === "string" && c.url ? { url: c.url, pozitie: c.pozitie } : null;
   })();
 
   const serviciuPreview: Serviciu = {
