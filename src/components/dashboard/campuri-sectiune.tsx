@@ -191,7 +191,7 @@ export function CampuriSectiune({
                 // secțiuni. Dacă scrierea asta pică, poziția din câmp tot se
                 // salvează la salvarea secțiunii — deci nu blocăm nimic pe ea.
                 onReposition={(uploadId, pozitie) => {
-                  void pozitioneazaImagine(uploadId, pozitie.x, pozitie.y).catch(() => {});
+                  void pozitioneazaImagine(uploadId, pozitie.x, pozitie.y, pozitie.zoom).catch(() => {});
                 }}
                 // Aceeași poză a cabinetului se pune în mai multe secțiuni. Fără
                 // butonul ăsta ar fi trebuit încărcată din nou de fiecare dată,

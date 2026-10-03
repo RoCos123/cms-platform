@@ -42,7 +42,8 @@ async function coperti(
     // există — un articol a cărui copertă a fost ștearsă trebuie să se citească
     // fără copertă, nu cu o poză ruptă. `focal_x/focal_y`: punctul focal ales la
     // tragere (corectat 19 sept. 2026 — până acum nu se citea deloc de aici).
-    .select("id, focal_x, focal_y")
+    // `focal_zoom`: mărimea aleasă (3 oct. 2026 — vezi migrarea `zoom_coperti`).
+    .select("id, focal_x, focal_y, focal_zoom")
     .in("id", iduri);
 
   if (error) {
@@ -56,7 +57,7 @@ async function coperti(
       rand.id as string,
       {
         url: adresaImaginii(rand.id as string),
-        pozitie: normalizeazaPunctFocal({ x: rand.focal_x, y: rand.focal_y }),
+        pozitie: normalizeazaPunctFocal({ x: rand.focal_x, y: rand.focal_y, zoom: rand.focal_zoom }),
       },
     ]),
   );
