@@ -87,6 +87,8 @@ export function BlocServiciu({ serviciu, primul = true }: { serviciu: Serviciu; 
             alt=""
             aspectRatio="16 / 7"
             sizes="(max-width: 960px) 100vw, 900px"
+            // Punctul focal ales prin tragere; lipsă → centru, ca înainte.
+            pozitie={serviciu.coperta.pozitie}
           />
         </div>
       )}

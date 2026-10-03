@@ -10,6 +10,7 @@ import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { BlocServiciu } from "@/components/site/sections/servicii-detaliate";
 import { Section } from "@/components/site/section";
 import type { Template } from "@/lib/templates";
+import type { PunctFocal } from "@/lib/punct-focal";
 import { CAMPURI_SERVICIU, rezumatServiciu } from "@/lib/servicii";
 import { catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 import { salveazaServiciu } from "../actions";
@@ -37,10 +38,13 @@ export function EditorServiciu({
   const date = catreStocare(valoare, CAMPURI_SERVICIU);
 
   // Coperta, ca s-o arate previzualizarea: câmpul de imagine o ține ca
-  // `{ uploadId, url, altText }`, iar blocul de serviciu cere doar adresa.
+  // `{ uploadId, url, altText, pozitie }`, iar blocul de serviciu cere adresa și
+  // punctul focal. Fără `pozitie`, previzualizarea nu se mișca la tragerea pozei,
+  // deși câmpul din stânga da (prins de proprietar, 3 oct. 2026) — ca la blog,
+  // care îl trimite deja.
   const copertaPreview = (() => {
-    const c = date.coperta as { url?: unknown } | null | undefined;
-    return typeof c?.url === "string" && c.url ? { url: c.url } : null;
+    const c = date.coperta as { url?: unknown; pozitie?: PunctFocal } | null | undefined;
+    return typeof c?.url === "string" && c.url ? { url: c.url, pozitie: c.pozitie } : null;
   })();
 
   async function salveaza() {
