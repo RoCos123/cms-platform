@@ -43,17 +43,26 @@ export default async function EditorArticolPage({
       // tragere — corectat 19 sept. 2026: fără el, câmpul pornea mereu din
       // centru, ca și cum poza n-ar fi fost repoziționată niciodată, iar
       // previzualizarea vie din panou nu avea cum să arate poziția reală.
-      .select("id, focal_x, focal_y")
+      .select("id, focal_x, focal_y, focal_zoom")
       .eq("id", articol.cover_upload_id as string)
       .eq("site_id", session.siteId)
-      .maybeSingle<{ id: string; focal_x: number | null; focal_y: number | null }>();
+      .maybeSingle<{
+        id: string;
+        focal_x: number | null;
+        focal_y: number | null;
+        focal_zoom: number | null;
+      }>();
 
     if (incarcare) {
       coperta = {
         uploadId: articol.cover_upload_id as string,
         url: adresaImaginii(incarcare.id),
         altText: (articol.cover_alt as string | null) ?? "",
-        pozitie: normalizeazaPunctFocal({ x: incarcare.focal_x, y: incarcare.focal_y }),
+        pozitie: normalizeazaPunctFocal({
+          x: incarcare.focal_x,
+          y: incarcare.focal_y,
+          zoom: incarcare.focal_zoom,
+        }),
       };
     }
   }

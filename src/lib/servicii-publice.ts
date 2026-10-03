@@ -26,7 +26,7 @@ async function pozitiileCopertilor(
 
   const { data, error } = await service
     .from("uploads")
-    .select("id, focal_x, focal_y")
+    .select("id, focal_x, focal_y, focal_zoom")
     .in("id", iduri);
 
   if (error) {
@@ -39,7 +39,7 @@ async function pozitiileCopertilor(
   return new Map(
     (data ?? []).map((rand) => [
       rand.id as string,
-      normalizeazaPunctFocal({ x: rand.focal_x, y: rand.focal_y }),
+      normalizeazaPunctFocal({ x: rand.focal_x, y: rand.focal_y, zoom: rand.focal_zoom }),
     ]),
   );
 }

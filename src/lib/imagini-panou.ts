@@ -4,6 +4,7 @@ import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { adresaImaginii, adresaFisierului } from "@/lib/imagini-adrese";
 import { esteMimeDocument } from "@/lib/uploads";
+import { normalizeazaPunctFocal } from "@/lib/punct-focal";
 import {
   folosirileImaginilor,
   type ImagineBiblioteca,
@@ -40,7 +41,7 @@ export const imaginileBibliotecii = cache(
     const [{ data: incarcari, error }, { data: sectiuni }, { data: articole }] = await Promise.all([
       supabase
         .from("uploads")
-        .select("id, storage_path, filename, mime_type, size_bytes, width, height, alt_text, focal_x, focal_y, created_at")
+        .select("id, storage_path, filename, mime_type, size_bytes, width, height, alt_text, focal_x, focal_y, focal_zoom, created_at")
         .eq("site_id", siteId)
         .order("created_at", { ascending: false }),
       // Cele două locuri din care se referă imagini: conținutul secțiunilor și
@@ -83,7 +84,11 @@ export const imaginileBibliotecii = cache(
         inaltime: (rand.height as number | null) ?? null,
         pozitie:
           rand.focal_x != null && rand.focal_y != null
-            ? { x: rand.focal_x as number, y: rand.focal_y as number }
+            ? normalizeazaPunctFocal({
+                x: rand.focal_x as number,
+                y: rand.focal_y as number,
+                zoom: rand.focal_zoom as number | null,
+              })
             : undefined,
         incarcataLa: rand.created_at as string,
         folosiri: folosiri.get(rand.id as string) ?? [],
