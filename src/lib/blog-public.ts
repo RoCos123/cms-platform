@@ -14,57 +14,21 @@ type RandListat = {
   published_at: string | null;
   cover_upload_id: string | null;
   cover_alt: string | null;
+  // Încadrarea coperții stă pe rândul articolului, nu pe poză: aceeași poză poate
+  // fi încadrată altfel în alt articol (decizie 3 oct. 2026). Deci se citește de
+  // aici, într-o singură interogare, nu dintr-o a doua pe `uploads`.
+  cover_focal_x: number | null;
+  cover_focal_y: number | null;
+  cover_focal_zoom: number | null;
 };
 
 type RandArticol = RandListat & { content: string };
 
-/**
- * Adresele publice ale coperților, într-o singură interogare.
- *
- * Două cereri în loc de o îmbinare: `cover_upload_id` chiar e o cheie externă,
- * deci PostgREST ar putea aduce coperta odată cu articolul — dar forma aia de
- * interogare se rupe tăcut dacă vreodată se schimbă numele constrângerii, iar
- * ce se rupe aici e pagina publică a unui client. Două interogări simple nu au
- * cum să surprindă pe nimeni.
- */
-type CopertaInfo = { url: string; pozitie: ReturnType<typeof normalizeazaPunctFocal> };
-
-async function coperti(
-  service: ReturnType<typeof createServiceClient>,
-  randuri: RandListat[],
-): Promise<Map<string, CopertaInfo>> {
-  const iduri = [...new Set(randuri.map((r) => r.cover_upload_id).filter((id): id is string => Boolean(id)))];
-  if (iduri.length === 0) return new Map();
-
-  const { data, error } = await service
-    .from("uploads")
-    // `id`: adresa se derivă din el, iar interogarea confirmă că imaginea mai
-    // există — un articol a cărui copertă a fost ștearsă trebuie să se citească
-    // fără copertă, nu cu o poză ruptă. `focal_x/focal_y`: punctul focal ales la
-    // tragere (corectat 19 sept. 2026 — până acum nu se citea deloc de aici).
-    // `focal_zoom`: mărimea aleasă (3 oct. 2026 — vezi migrarea `zoom_coperti`).
-    .select("id, focal_x, focal_y, focal_zoom")
-    .in("id", iduri);
-
-  if (error) {
-    // Un articol fără copertă se citește la fel de bine. O pagină căzută, nu.
-    console.error("Citirea coperților a eșuat:", error);
-    return new Map();
-  }
-
-  return new Map(
-    (data ?? []).map((rand) => [
-      rand.id as string,
-      {
-        url: adresaImaginii(rand.id as string),
-        pozitie: normalizeazaPunctFocal({ x: rand.focal_x, y: rand.focal_y, zoom: rand.focal_zoom }),
-      },
-    ]),
-  );
-}
-
-function catreListat(rand: RandListat, adrese: Map<string, CopertaInfo>): ArticolListat {
-  const info = rand.cover_upload_id ? adrese.get(rand.cover_upload_id) : undefined;
+function catreListat(rand: RandListat): ArticolListat {
+  // `on delete set null` pe `cover_upload_id`: o poză ștearsă îl pune pe NULL,
+  // deci un `id` prezent înseamnă că poza mai există — articolul se citește fără
+  // copertă, nu cu o poză ruptă, fără o interogare în plus care s-o confirme.
+  const coverId = rand.cover_upload_id;
 
   return {
     id: rand.id,
@@ -72,11 +36,22 @@ function catreListat(rand: RandListat, adrese: Map<string, CopertaInfo>): Artico
     titlu: rand.title,
     extras: rand.excerpt ?? "",
     publicatLa: rand.published_at,
-    coperta: info ? { url: info.url, altText: rand.cover_alt ?? "", pozitie: info.pozitie } : null,
+    coperta: coverId
+      ? {
+          url: adresaImaginii(coverId),
+          altText: rand.cover_alt ?? "",
+          pozitie: normalizeazaPunctFocal({
+            x: rand.cover_focal_x,
+            y: rand.cover_focal_y,
+            zoom: rand.cover_focal_zoom,
+          }),
+        }
+      : null,
   };
 }
 
-const CAMPURI_LISTA = "id, slug, title, excerpt, published_at, cover_upload_id, cover_alt";
+const CAMPURI_LISTA =
+  "id, slug, title, excerpt, published_at, cover_upload_id, cover_alt, cover_focal_x, cover_focal_y, cover_focal_zoom";
 const CAMPURI_INTREG = `${CAMPURI_LISTA}, content`;
 
 /**
@@ -104,10 +79,7 @@ export const articolePublicate = cache(async (siteId: string): Promise<ArticolLi
     return [];
   }
 
-  const randuri = (data ?? []) as unknown as RandListat[];
-  const adrese = await coperti(service, randuri);
-
-  return randuri.map((rand) => catreListat(rand, adrese));
+  return ((data ?? []) as unknown as RandListat[]).map(catreListat);
 });
 
 /**
@@ -132,8 +104,6 @@ export const articolDupaSlug = cache(
     }
 
     const rand = data as unknown as RandArticol;
-    const adrese = await coperti(service, [rand]);
-
-    return { ...catreListat(rand, adrese), continut: rand.content ?? "" };
+    return { ...catreListat(rand), continut: rand.content ?? "" };
   },
 );

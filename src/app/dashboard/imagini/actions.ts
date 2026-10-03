@@ -229,17 +229,12 @@ export async function pozitioneazaImagine(
     return { ok: false, mesaj: "Nu am putut salva poziția. Mai încearcă o dată." };
   }
 
-  const propagat = await rescrieInSectiuni(supabase, session.siteId, (data) =>
-    rescrieImaginea(data, uploadId, (imagine) => ({ ...imagine, pozitie: punct })),
-  );
-
-  if (!propagat) {
-    return {
-      ok: false,
-      mesaj:
-        "Poziția s-a salvat pe poză, dar nu în toate locurile de pe site. Reîncarcă pagina și salvează din nou.",
-    };
-  }
+  // Nu mai propagăm în secțiuni (3 oct. 2026): încadrarea e acum a LOCULUI, nu a
+  // pozei, iar fiecare loc și-o ține singur (în conținutul secțiunii sau pe
+  // rândul coperții). Reglajul de aici, din bibliotecă, e doar încadrarea „de
+  // pornire" a pozei — moștenită când o pui într-un loc nou, nu împinsă peste
+  // locurile existente. Altfel, o reglare în bibliotecă ar fi schimbat tăcut
+  // toate secțiunile care folosesc poza — exact ce nu mai vrem.
 
   await scrieInJurnal({
     siteId: session.siteId,

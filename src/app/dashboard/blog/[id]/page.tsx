@@ -20,7 +20,9 @@ export default async function EditorArticolPage({
   const [{ data: articol }, { data: site }] = await Promise.all([
     supabase
       .from("blog_articles")
-      .select("id, slug, title, excerpt, content, status, published_at, cover_upload_id, cover_alt")
+      .select(
+        "id, slug, title, excerpt, content, status, published_at, cover_upload_id, cover_alt, cover_focal_x, cover_focal_y, cover_focal_zoom",
+      )
       .eq("id", id)
       .eq("site_id", session.siteId)
       .maybeSingle(),
@@ -31,40 +33,25 @@ export default async function EditorArticolPage({
   // „interzis", ca să nu confirmăm nici măcar că id-ul există undeva.
   if (!articol) notFound();
 
-  // Coperta stă în bază ca referință către bibliotecă; formularul lucrează cu
-  // adresa publică. Traducerea se face aici, la citire, și în acțiunea de
-  // salvare, la scriere — în restul panoului imaginea are o singură formă.
+  // Coperta stă în bază ca referință către bibliotecă (`cover_upload_id`) plus
+  // propria încadrare (`cover_focal_*`, pe rândul articolului — a LOCULUI, nu a
+  // pozei); formularul lucrează cu adresa și punctul focal. `on delete set null`
+  // pe cheia externă face ca un `cover_upload_id` prezent să însemne că poza mai
+  // există, deci adresa se semnează direct din id, fără o interogare în plus.
   let coperta: { uploadId: string; url: string; altText: string; pozitie?: PunctFocal } | null = null;
 
   if (articol.cover_upload_id) {
-    const { data: incarcare } = await supabase
-      .from("uploads")
-      // Adresa se derivă din `id`. `focal_x/focal_y` — punctul focal ales la
-      // tragere — corectat 19 sept. 2026: fără el, câmpul pornea mereu din
-      // centru, ca și cum poza n-ar fi fost repoziționată niciodată, iar
-      // previzualizarea vie din panou nu avea cum să arate poziția reală.
-      .select("id, focal_x, focal_y, focal_zoom")
-      .eq("id", articol.cover_upload_id as string)
-      .eq("site_id", session.siteId)
-      .maybeSingle<{
-        id: string;
-        focal_x: number | null;
-        focal_y: number | null;
-        focal_zoom: number | null;
-      }>();
-
-    if (incarcare) {
-      coperta = {
-        uploadId: articol.cover_upload_id as string,
-        url: adresaImaginii(incarcare.id),
-        altText: (articol.cover_alt as string | null) ?? "",
-        pozitie: normalizeazaPunctFocal({
-          x: incarcare.focal_x,
-          y: incarcare.focal_y,
-          zoom: incarcare.focal_zoom,
-        }),
-      };
-    }
+    const coverId = articol.cover_upload_id as string;
+    coperta = {
+      uploadId: coverId,
+      url: adresaImaginii(coverId),
+      altText: (articol.cover_alt as string | null) ?? "",
+      pozitie: normalizeazaPunctFocal({
+        x: articol.cover_focal_x,
+        y: articol.cover_focal_y,
+        zoom: articol.cover_focal_zoom,
+      }),
+    };
   }
 
   return (

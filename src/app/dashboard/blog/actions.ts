@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
 import { CAMPURI_ARTICOL } from "@/lib/blog";
 import { catreEditor, catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
+import { normalizeazaPunctFocal } from "@/lib/punct-focal";
 import { MAXIM_ARTICOLE, EROARE_PREA_MULTE } from "@/lib/limite-panou";
 
 export type RezultatArticol =
@@ -31,13 +32,41 @@ function reimprospateaza(slug?: string) {
  * ar fi rămas cu adresa unui fișier care nu mai există, iar cititorii ar fi
  * văzut o imagine ruptă.
  */
-function coloaneleCopertii(valoare: unknown): { cover_upload_id: string | null; cover_alt: string | null } {
-  const coperta = valoare as { uploadId?: unknown; altText?: unknown } | null | undefined;
+function coloaneleCopertii(valoare: unknown): {
+  cover_upload_id: string | null;
+  cover_alt: string | null;
+  cover_focal_x: number | null;
+  cover_focal_y: number | null;
+  cover_focal_zoom: number | null;
+} {
+  const coperta = valoare as
+    | { uploadId?: unknown; altText?: unknown; pozitie?: unknown }
+    | null
+    | undefined;
 
   const uploadId = typeof coperta?.uploadId === "string" && coperta.uploadId ? coperta.uploadId : null;
   const altText = typeof coperta?.altText === "string" ? coperta.altText.trim() : "";
 
-  return { cover_upload_id: uploadId, cover_alt: uploadId && altText ? altText : null };
+  // Încadrarea e a LOCULUI (a articolului), nu a pozei (3 oct. 2026): pe rândul
+  // articolului, nu pe `uploads`. Fără poză, n-are rost nicio încadrare.
+  if (!uploadId) {
+    return {
+      cover_upload_id: null,
+      cover_alt: null,
+      cover_focal_x: null,
+      cover_focal_y: null,
+      cover_focal_zoom: null,
+    };
+  }
+
+  const p = normalizeazaPunctFocal(coperta?.pozitie);
+  return {
+    cover_upload_id: uploadId,
+    cover_alt: altText ? altText : null,
+    cover_focal_x: p.x,
+    cover_focal_y: p.y,
+    cover_focal_zoom: p.zoom ?? null,
+  };
 }
 
 export async function creeazaArticol(): Promise<never> {
