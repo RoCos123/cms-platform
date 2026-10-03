@@ -13,6 +13,11 @@ import { blocuriText } from "@/lib/blocuri-text";
  * casete de descriere l-au încurcat la primul lui site.
  */
 
+const HINT_POZA_FARA_CARTONAS =
+  "Opțională. Apare sus, la serviciul acesta, pe pagina de servicii. Pe prima pagină, cartonașele sunt fără poză.";
+const HINT_POZA_CU_CARTONAS =
+  "Opțională. Apare pe cartonașul din prima pagină, într-un cerc, și sus, la serviciul acesta, pe pagina de servicii.";
+
 export const CAMPURI_SERVICIU: CampSchema[] = [
   {
     tip: "text",
@@ -71,9 +76,30 @@ export const CAMPURI_SERVICIU: CampSchema[] = [
     tip: "imagine",
     cheie: "coperta",
     eticheta: "Poză",
-    hint: "Opțională. Apare sus, la serviciul acesta, pe pagina de servicii. Pe prima pagină cartonașele sunt fără poză (excepție: la șablonul Liniște apare mică, într-un cerc).",
+    // Textul pentru șabloanele fără poză pe cartonaș. Cel potrivit șablonului
+    // clientului îl pune `campuriServiciuPentru`.
+    hint: HINT_POZA_FARA_CARTONAS,
   },
 ];
+
+/**
+ * Câmpurile serviciului cu textul de sub „Poză" potrivit ȘABLONULUI clientului.
+ *
+ * Poza apare pe cartonașul din prima pagină doar la Liniște (medalionul rotund);
+ * la restul, doar pe pagina de servicii. Clientul vede numai ce e adevărat pentru
+ * site-ul LUI — un text care pomenea „șablonul Liniște" unui client de pe
+ * Apropiere îl încurca cu ceva ce nu-l privește (3 oct. 2026).
+ *
+ * Doar textul de ajutor diferă; validarea și salvarea folosesc în continuare
+ * `CAMPURI_SERVICIU`, aceleași la toate șabloanele.
+ */
+export function campuriServiciuPentru(pozaPeCartonas: boolean): CampSchema[] {
+  if (!pozaPeCartonas) return CAMPURI_SERVICIU;
+
+  return CAMPURI_SERVICIU.map((camp) =>
+    camp.cheie === "coperta" ? { ...camp, hint: HINT_POZA_CU_CARTONAS } : camp,
+  );
+}
 
 /** Un serviciu, așa cum îl citește site-ul public. */
 export type Serviciu = {

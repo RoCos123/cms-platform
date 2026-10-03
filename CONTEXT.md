@@ -2489,7 +2489,12 @@ recomandat fără poză, iar proprietarul a hotărât așa:
 - cartonașele de pe prima pagină sunt fără poză la Căldură, Lumină, Claritate,
   Apropiere; poza apare sus, pe pagina de servicii, la toate șabloanele;
 - **Liniște rămâne cu medalionul rotund** („Liniște e bine așa cum e");
-- textul de sub câmpul „Poză" spune acum exact asta.
+- textul de sub câmpul „Poză" spune acum exact asta — și e cel al ȘABLONULUI
+  clientului (`campuriServiciuPentru`): pe Liniște „apare pe cartonaș, într-un
+  cerc", pe restul „pe prima pagină, cartonașele sunt fără poză". O primă
+  variantă pomenea „șablonul Liniște" tuturor; proprietarul a oprit-o pe bună
+  dreptate — un client de pe Apropiere n-are ce face cu numele altui șablon.
+  Regula, ținută de probă: textele din panou nu pomenesc niciun șablon.
 
 Motivele, ca să nu se redeschidă din reflex: prima pagină are deja poze (hero,
 „Despre mine", coperți de articol); pozele de serviciu ale unui psiholog sunt

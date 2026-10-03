@@ -15,6 +15,7 @@ import type { SectionTone, Template } from "@/lib/templates";
 import type { PunctFocal } from "@/lib/punct-focal";
 import {
   CAMPURI_SERVICIU,
+  campuriServiciuPentru,
   rezumatServiciu,
   serviciiPentruPrevizualizare,
   type Serviciu,
@@ -143,7 +144,8 @@ export function EditorServiciu({
 
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)] lg:gap-8">
         <CampuriSectiune
-          campuri={CAMPURI_SERVICIU}
+          // Textele de ajutor potrivite șablonului (unde apare poza).
+          campuri={campuriServiciuPentru(Boolean(template.asezari.serviciiImagine))}
           valoare={valoare}
           onChange={setValoare}
           erori={erori}

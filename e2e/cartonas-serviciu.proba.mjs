@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { readFileSync } from "node:fs";
-import { RANDURI_CARTONAS, serviciiPentruPrevizualizare, textCartonas } from "@/lib/servicii";
+import {
+  CAMPURI_SERVICIU,
+  RANDURI_CARTONAS,
+  campuriServiciuPentru,
+  serviciiPentruPrevizualizare,
+  textCartonas,
+} from "@/lib/servicii";
 
 /**
  * Proba cartonașului de serviciu de pe prima pagină. `pnpm test:logica`.
@@ -120,10 +126,27 @@ test("pe prima pagină, poza serviciului apare DOAR la Liniște (medalionul rotu
     assert.doesNotMatch(bucata, /coperta|cover|SectionImage/, `${nume} nu are voie să deseneze poza`);
   }
 
-  // Panoul spune adevărul despre unde apare poza.
-  const campuri = readFileSync("src/lib/servicii.ts", "utf8");
-  assert.doesNotMatch(campuri, /Apare pe cartonașul serviciului/);
-  assert.match(campuri, /pe pagina de servicii/);
+});
+
+test("textul de sub „Poză” e cel al șablonului clientului și nu pomenește alte șabloane", () => {
+  const hint = (campuri) => campuri.find((c) => c.cheie === "coperta").hint;
+
+  // Apropiere, Căldură, Lumină, Claritate: fără poză pe cartonaș.
+  assert.equal(
+    hint(campuriServiciuPentru(false)),
+    "Opțională. Apare sus, la serviciul acesta, pe pagina de servicii. Pe prima pagină, cartonașele sunt fără poză.",
+  );
+  // Liniște: medalionul rotund.
+  assert.match(hint(campuriServiciuPentru(true)), /într-un cerc/);
+
+  // Niciun client nu citește numele altui șablon (cerut pe 3 oct. 2026).
+  for (const campuri of [campuriServiciuPentru(false), campuriServiciuPentru(true), CAMPURI_SERVICIU]) {
+    assert.doesNotMatch(JSON.stringify(campuri), /Liniște|Apropiere|Căldură|Lumină|Claritate|șablon/i);
+  }
+
+  // Editorul chiar folosește varianta potrivită șablonului.
+  const editor = readFileSync("src/app/dashboard/servicii/[id]/editor.tsx", "utf8");
+  assert.match(editor, /campuriServiciuPentru\(Boolean\(template\.asezari\.serviciiImagine\)\)/);
 });
 
 test("poza serviciului apare pe pagina de servicii, la toate șabloanele", () => {
