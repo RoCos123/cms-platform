@@ -189,6 +189,7 @@ export async function pozitioneazaImagine(
   uploadId: string,
   x: number,
   y: number,
+  zoom?: number,
 ): Promise<RezultatImagine> {
   const session = await verifySession();
 
@@ -198,7 +199,9 @@ export async function pozitioneazaImagine(
 
   // Curățat înainte de bază: o valoare din afara intervalului ar cădea altfel
   // constrângerea `uploads_focal_pereche_in_interval` cu o eroare de Postgres.
-  const punct = normalizeazaPunctFocal({ x, y });
+  // `zoom` (mărimea) merge la pereche cu punctul, pe aceeași poză — vezi
+  // migrarea `20261003120000_zoom_coperti.sql`.
+  const punct = normalizeazaPunctFocal({ x, y, zoom });
   const supabase = await createClient();
 
   const { data: existenta } = await supabase
@@ -214,7 +217,10 @@ export async function pozitioneazaImagine(
 
   const { error } = await supabase
     .from("uploads")
-    .update({ focal_x: punct.x, focal_y: punct.y })
+    // `focal_zoom` NULL când mărimea e 1 (nemărit): `normalizeazaPunctFocal`
+    // scoate `zoom` din rezultat la 1, deci pozele nemărite rămân în bază exact
+    // ca înainte.
+    .update({ focal_x: punct.x, focal_y: punct.y, focal_zoom: punct.zoom ?? null })
     .eq("id", uploadId)
     .eq("site_id", session.siteId);
 

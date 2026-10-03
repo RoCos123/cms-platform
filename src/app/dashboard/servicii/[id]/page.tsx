@@ -75,17 +75,26 @@ export default async function EditorServiciuPage({
       // prin tragere, ca editorul să arate la redeschidere poziția salvată — ca
       // la articolele de blog. Fără el, poza revenea la centru în panou la
       // redeschidere, deși pe site stătea unde fusese pusă.
-      .select("id, focal_x, focal_y")
+      .select("id, focal_x, focal_y, focal_zoom")
       .eq("id", serviciu.cover_upload_id as string)
       .eq("site_id", session.siteId)
-      .maybeSingle<{ id: string; focal_x: number | null; focal_y: number | null }>();
+      .maybeSingle<{
+        id: string;
+        focal_x: number | null;
+        focal_y: number | null;
+        focal_zoom: number | null;
+      }>();
 
     if (incarcare) {
       coperta = {
         uploadId: incarcare.id,
         url: adresaImaginii(incarcare.id),
         altText: "",
-        pozitie: normalizeazaPunctFocal({ x: incarcare.focal_x, y: incarcare.focal_y }),
+        pozitie: normalizeazaPunctFocal({
+          x: incarcare.focal_x,
+          y: incarcare.focal_y,
+          zoom: incarcare.focal_zoom,
+        }),
       };
     }
   }
