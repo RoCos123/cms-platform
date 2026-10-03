@@ -133,6 +133,11 @@ export function EditorArticol({
           valoare={valoare}
           onChange={setValoare}
           erori={erori}
+          // Rama de tragere = rama coperții din previzualizare (pagina
+          // articolului, 16/9), ca tragerea să miște exact ce vezi. Fără asta
+          // rama rămânea pătrată, iar tragerea muta altă axă decât taie bannerul,
+          // deci previzualizarea nu se mișca.
+          raportPentru={() => "16 / 9"}
         />
 
         <PanouPrevizualizare
