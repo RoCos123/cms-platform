@@ -2475,9 +2475,21 @@ mai mult (să las deoparte propoziția terminată în „:”). Proprietarul a r
 amândouă, pe bună dreptate: prima rupea regula „titlurile secțiunilor se
 editează la Pagina principală”, a doua făcea invers decât cerea.
 
-Ținute de `e2e/cartonas-serviciu.proba.mjs` (10 probe). Verificat vizual pe
-paginile reale, cu Supabase fals (vezi mai jos): site-ul pe trei șabloane și
-editorul serviciului.
+Ținute de `e2e/cartonas-serviciu.proba.mjs`. Verificat vizual pe paginile
+reale, cu Supabase fals (vezi mai jos): site-ul pe trei șabloane și editorul
+serviciului.
+
+**Poza serviciului, repusă pe cartonașele Apropiere (3 oct. 2026).** Proprietarul
+a pus o poză la un serviciu și n-a văzut-o pe prima pagină: „nu era așa înainte".
+Istoricul arată că lipsea din 18 sept. (PR #41, cartonașele „Friendly", scrise
+„fără poză și fără iconiță"), nu de la modificarea de azi — dar avea dreptate pe
+fond: panoul spunea „apare pe cartonașul serviciului", iar pe Apropiere nu
+apărea nicăieri pe prima pagină. Acum stă lată în capul cartonașului (3/2, cu
+punctul focal), ca la cartonașul obișnuit. Măsurat: 335×224 pe 1280px.
+
+**Efect de știut:** cu toate cartonașele de aceeași mărime, unul cu poză le
+face pe toate la fel de înalte, deci cele fără poză au un gol între text și
+preț. Arată uniform când fiecare serviciu are poză (sau niciunul).
 
 ### Mesajul de limită la blog, servicii și pagini (3 oct. 2026)
 
