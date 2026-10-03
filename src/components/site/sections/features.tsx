@@ -1,5 +1,5 @@
 import type { SectionTone } from "@/lib/templates";
-import type { Serviciu } from "@/lib/servicii";
+import { RANDURI_CARTONAS, textCartonas, type Serviciu } from "@/lib/servicii";
 import { Section, SectionActionButton } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
@@ -125,6 +125,9 @@ export function Features({
             padding: 0,
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(min(288px, 100%), 1fr))",
+            // Toate rândurile cât cel mai înalt cartonaș: aceeași mărime pe toată
+            // grila, nu doar în același rând (cerut pe 3 oct. 2026).
+            gridAutoRows: "1fr",
             gap: "20px",
           }}
         >
@@ -133,7 +136,7 @@ export function Features({
               {/*
                 Cardul întreg e link, nu doar rândul de jos: pe telefon, o țintă de
                 opt pixeli înălțime e greu de nimerit, iar oricine vede un card cu
-                „Află mai multe" încearcă oricum să apese oriunde pe el.
+                „Citește mai mult" încearcă oricum să apese oriunde pe el.
 
                 Fără pagina detaliată n-are unde să ducă, deci nu e link deloc: un
                 card care pare apăsabil și nu face nimic e mai rău decât unul
@@ -147,17 +150,12 @@ export function Features({
                   {serviciu.titlu}
                 </h3>
 
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "16px",
-                    lineHeight: 1.7,
-                    color: "var(--t-text-secundar)",
-                    textWrap: "pretty",
-                  }}
-                >
-                  {serviciu.descriereScurta}
-                </p>
+                <TextCartonas
+                  serviciu={serviciu}
+                  taiat={paginaDetaliata}
+                  inaltimeRand={1.7}
+                  style={{ fontSize: "16px", color: "var(--t-text-secundar)" }}
+                />
 
                 {(serviciu.durata || serviciu.pret) && (
                   <p style={{ margin: 0, fontSize: "14px", color: "var(--t-text-secundar)" }}>
@@ -175,7 +173,7 @@ export function Features({
                       color: "var(--t-accent)",
                     }}
                   >
-                    Află mai multe →
+                    Citește mai mult →
                   </span>
                 )}
               </Card>
@@ -271,17 +269,22 @@ function Linie({
               )}
             </h3>
 
-            <p
-              style={{
-                margin: 0,
-                fontSize: "16px",
-                lineHeight: 1.7,
-                color: "var(--s-text-secundar)",
-                textWrap: "pretty",
-              }}
-            >
-              {serviciu.descriereScurta}
-            </p>
+            <TextCartonas
+              serviciu={serviciu}
+              taiat={paginaDetaliata}
+              inaltimeRand={1.7}
+              style={{ fontSize: "16px", color: "var(--s-text-secundar)" }}
+            />
+
+            {paginaDetaliata && (
+              // Ancoră simplă, nu `next/link` — vezi explicația de la cartonașe.
+              <a
+                href={`/servicii#${serviciu.slug}`}
+                style={{ fontSize: "15px", fontWeight: 600, color: "var(--s-accent)", textDecoration: "none" }}
+              >
+                Citește mai mult →
+              </a>
+            )}
 
             {(serviciu.durata || serviciu.pret) && (
               <p style={{ margin: 0, fontSize: "14px", color: "var(--s-text-secundar)" }}>
@@ -318,6 +321,7 @@ function ServiciiFriendly({
         padding: 0,
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(min(288px, 100%), 1fr))",
+        gridAutoRows: "1fr",
         gap: "20px",
       }}
     >
@@ -352,12 +356,20 @@ function ServiciiFriendly({
         const continut = (
           <>
             <h3 style={{ margin: 0, fontSize: "21px", fontWeight: 700, textWrap: "pretty" }}>{serviciu.titlu}</h3>
-            <p style={{ margin: 0, flex: 1, fontSize: "15px", lineHeight: 1.6, color: "var(--t-text-secundar)", textWrap: "pretty" }}>
-              {serviciu.descriereScurta}
-            </p>
+            <TextCartonas
+              serviciu={serviciu}
+              taiat={paginaDetaliata}
+              inaltimeRand={1.6}
+              style={{ fontSize: "15px", color: "var(--t-text-secundar)" }}
+            />
+            {paginaDetaliata && (
+              <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--t-accent)" }}>Citește mai mult</span>
+            )}
             {serviciu.pret && (
               <div
                 style={{
+                  // Prețul stă mereu jos, oricât text are cartonașul de deasupra.
+                  marginTop: "auto",
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
@@ -426,6 +438,7 @@ function ServiciiImagine({
         padding: 0,
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
+        gridAutoRows: "1fr",
         gap: "24px",
       }}
     >
@@ -435,6 +448,7 @@ function ServiciiImagine({
             style={{
               position: "relative",
               minHeight: "260px",
+              height: "100%",
               padding: "clamp(28px, 3vw, 36px)",
             }}
           >
@@ -512,26 +526,38 @@ function ServiciiImagine({
                 >
                   {serviciu.titlu}
                 </h3>
-                {serviciu.descriereScurta?.trim() && (
-                  <p
+                {textCartonas(serviciu) && (
+                  <TextCartonas
+                    serviciu={serviciu}
+                    taiat={paginaDetaliata}
+                    inaltimeRand={1.55}
                     style={{
                       margin: "8px 0 0",
                       fontSize: "15px",
-                      lineHeight: 1.55,
                       maxWidth: "30ch",
                       color: "color-mix(in oklab, var(--t-text-pe-inchis) 78%, transparent)",
-                      textWrap: "pretty",
+                    }}
+                  />
+                )}
+                {paginaDetaliata && (
+                  <span
+                    style={{
+                      display: "block",
+                      marginTop: "10px",
+                      fontSize: "15px",
+                      fontWeight: 600,
+                      color: "var(--t-text-pe-inchis)",
                     }}
                   >
-                    {serviciu.descriereScurta}
-                  </p>
+                    Citește mai mult
+                  </span>
                 )}
               </div>
 
               {/*
                 Săgeata rotundă, doar când cardul chiar duce undeva (pagina
                 detaliată pornită). Un cerc apăsabil pe un card care nu face nimic
-                ar minți, ca „Află mai multe" din cardurile obișnuite.
+                ar minți, ca „Citește mai mult" din cardurile obișnuite.
               */}
               {paginaDetaliata && (
                 <span
@@ -557,6 +583,7 @@ function ServiciiImagine({
 
         const stil: React.CSSProperties = {
           display: "block",
+          height: "100%",
           position: "relative",
           borderRadius: "var(--t-raza)",
           overflow: "hidden",
@@ -582,6 +609,56 @@ function ServiciiImagine({
         );
       })}
     </ul>
+  );
+}
+
+/**
+ * Descrierea de pe cartonaș, tăiată la `RANDURI_CARTONAS` rânduri.
+ *
+ * Cu pagina de servicii pornită, textul are mereu ACEEAȘI înălțime (patru
+ * rânduri, chiar dacă descrierea e mai scurtă), iar ce nu încape se termină în
+ * „…" — restul se citește pe pagina de servicii, prin „Citește mai mult". Așa
+ * toate cartonașele ies de aceeași mărime.
+ *
+ * Cu pagina oprită nu se taie nimic: n-ar mai exista niciun loc unde să se
+ * citească restul. Cartonașele rămân totuși egale, prin `gridAutoRows: 1fr` pe
+ * grilă — toate cât cel mai lung.
+ *
+ * Rândurile noi ale clientului se păstrează (`pre-line`): o listă scrisă rând
+ * sub rând rămâne listă, nu se lipește într-un singur șir.
+ */
+function TextCartonas({
+  serviciu,
+  taiat,
+  inaltimeRand,
+  style,
+}: {
+  serviciu: Serviciu;
+  taiat: boolean;
+  /** `line-height`, ca număr — din el se calculează înălțimea celor patru rânduri. */
+  inaltimeRand: number;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <p
+      style={{
+        margin: 0,
+        lineHeight: inaltimeRand,
+        whiteSpace: "pre-line",
+        textWrap: "pretty",
+        ...(taiat && {
+          display: "-webkit-box",
+          WebkitBoxOrient: "vertical",
+          WebkitLineClamp: RANDURI_CARTONAS,
+          overflow: "hidden",
+          // În `em`, deci pe mărimea literei din `style` — patru rânduri exact.
+          height: `${RANDURI_CARTONAS * inaltimeRand}em`,
+        }),
+        ...style,
+      }}
+    >
+      {textCartonas(serviciu)}
+    </p>
   );
 }
 

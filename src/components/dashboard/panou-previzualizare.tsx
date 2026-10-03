@@ -30,7 +30,8 @@ export function PanouPrevizualizare({
   template: Template;
   /** Se schimbă odată cu conținutul — repornește previzualizarea după o eroare. */
   cheie: unknown;
-  titlu?: string;
+  /** De obicei un text; poate fi și un comutator (ex. „Prima pagină / Pagina de servicii"). */
+  titlu?: ReactNode;
   nota: ReactNode;
   children: ReactNode;
 }) {
@@ -43,7 +44,7 @@ export function PanouPrevizualizare({
     // scrie fără s-o vadă nimeni.
     <div className="sticky top-0 z-10 order-first bg-background pb-4 lg:order-none lg:top-6 lg:pb-0">
       <div className="mb-3 flex items-center justify-between gap-4">
-        <p className="text-sm font-medium text-foreground">{titlu}</p>
+        <div className="text-sm font-medium text-foreground">{titlu}</div>
         <div className="flex gap-1" role="group" aria-label="Lățimea previzualizării">
           {LATIMI.map((optiune) => (
             <Button

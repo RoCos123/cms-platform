@@ -9,8 +9,15 @@ import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare
 import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { BlocServiciu } from "@/components/site/sections/servicii-detaliate";
 import { Section } from "@/components/site/section";
-import type { Template } from "@/lib/templates";
-import { CAMPURI_SERVICIU, rezumatServiciu } from "@/lib/servicii";
+import { Features, type FeaturesData } from "@/components/site/sections/features";
+import { Button } from "@/components/ui/button";
+import type { SectionTone, Template } from "@/lib/templates";
+import {
+  CAMPURI_SERVICIU,
+  rezumatServiciu,
+  serviciiPentruPrevizualizare,
+  type Serviciu,
+} from "@/lib/servicii";
 import { catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 import { salveazaServiciu } from "../actions";
 
@@ -19,14 +26,27 @@ export function EditorServiciu({
   valoareInitiala,
   template,
   hrefPeSite,
+  primaPagina,
 }: {
   id: string;
   valoareInitiala: ValoareEditor;
   template: Template;
   /** Adresa serviciului pe site, calculată din starea salvată. `null` la ciornă. */
   hrefPeSite?: string | null;
+  /** Ce trebuie ca să se arate secțiunea „Serviciile mele" exact ca pe prima pagină. */
+  primaPagina: {
+    sectiune: { variant: string | null; tone: SectionTone; data: unknown; vizibila: boolean } | null;
+    servicii: Serviciu[];
+    paginaServiciiActiva: boolean;
+  };
 }) {
   const [valoare, setValoare] = useState(valoareInitiala);
+  /*
+    Previzualizarea arată implicit PRIMA PAGINĂ: acolo se taie textul, deci acolo
+    trebuie să vadă clientul cât încape cât scrie (cerut pe 3 oct. 2026). Pagina
+    de servicii, cu descrierea întreagă, e la un clic.
+  */
+  const [vedere, setVedere] = useState<"primaPagina" | "paginaServicii">("primaPagina");
   const [referinta, setReferinta] = useState(valoareInitiala);
   const [erori, setErori] = useState<Record<string, string>>({});
   const [seSalveaza, setSeSalveaza] = useState(false);
@@ -42,6 +62,35 @@ export function EditorServiciu({
     const c = date.coperta as { url?: unknown } | null | undefined;
     return typeof c?.url === "string" && c.url ? { url: c.url } : null;
   })();
+
+  const serviciuPreview: Serviciu = {
+    id,
+    slug: String(date.slug ?? ""),
+    titlu: String(date.title ?? "") || "Numele serviciului",
+    descriereScurta: rezumatServiciu(String(date.content ?? "")),
+    descriereCompleta: String(date.content ?? ""),
+    pret: String(date.price_label ?? "") || null,
+    durata: String(date.duration_label ?? "") || null,
+    coperta: copertaPreview,
+  };
+
+  const dateSectiune = (primaPagina.sectiune?.data ?? { titlu: "Serviciile mele" }) as FeaturesData;
+  // „Câte se văd" contează doar cu pagina de servicii pornită — exact ca în `Features`.
+  const numar = primaPagina.paginaServiciiActiva ? dateSectiune.numar : undefined;
+  const { servicii: serviciiPrimaPagina, motiv } = serviciiPentruPrevizualizare(
+    primaPagina.servicii,
+    serviciuPreview,
+    numar,
+  );
+
+  // De ce cartonașul din previzualizare NU e acum pe prima pagină, dacă nu e.
+  const avertisment = !primaPagina.sectiune?.vizibila
+    ? "Secțiunea „Serviciile mele” e ascunsă acum, deci pe prima pagină nu se vede niciun cartonaș."
+    : motiv === "ciorna"
+      ? "Serviciul nu e publicat încă: așa va arăta cartonașul după ce îl publici."
+      : motiv === "dincoloDeNumar"
+        ? `Pe prima pagină se văd doar primele ${numar} servicii, iar acesta nu e printre ele. Așa ar arăta cartonașul lui.`
+        : null;
 
   async function salveaza() {
     const gasite = valideaza(valoare, CAMPURI_SERVICIU);
@@ -79,8 +128,8 @@ export function EditorServiciu({
             {String(valoare.title ?? "") || "Serviciu"}
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-            Se vede pe pagina de servicii, iar pe cartonașul din prima pagină apar numele și
-            primul rând al descrierii.
+            Pe cartonașul din prima pagină apar numele și începutul descrierii, cât încape;
+            descrierea întreagă, pe pagina de servicii. Le vezi pe amândouă în dreapta.
           </p>
         </div>
 
@@ -98,24 +147,53 @@ export function EditorServiciu({
 
         <PanouPrevizualizare
           template={template}
-          cheie={JSON.stringify(date)}
-          titlu="Cum arată pe pagina de servicii"
-          nota="Se actualizează pe măsură ce scrii. Modificările ajung pe site abia după ce apeși Salvează."
+          cheie={JSON.stringify(date) + vedere}
+          titlu={
+            <div className="flex gap-1" role="group" aria-label="Ce pagină arată previzualizarea">
+              <Button
+                size="sm"
+                variant={vedere === "primaPagina" ? "secondary" : "ghost"}
+                aria-pressed={vedere === "primaPagina"}
+                onClick={() => setVedere("primaPagina")}
+              >
+                Prima pagină
+              </Button>
+              <Button
+                size="sm"
+                variant={vedere === "paginaServicii" ? "secondary" : "ghost"}
+                aria-pressed={vedere === "paginaServicii"}
+                onClick={() => setVedere("paginaServicii")}
+              >
+                Pagina de servicii
+              </Button>
+            </div>
+          }
+          nota={
+            <>
+              {vedere === "primaPagina" &&
+                "Cartonașul arată doar cât încape din descriere; textul care nu încape se termină în „…”. "}
+              {vedere === "primaPagina" && avertisment && (
+                <span className="block font-medium text-foreground">{avertisment}</span>
+              )}
+              Se actualizează pe măsură ce scrii. Modificările ajung pe site abia după ce apeși Salvează.
+            </>
+          }
         >
-          <Section tone="deschis">
-            <BlocServiciu
-              serviciu={{
-                id,
-                slug: String(date.slug ?? ""),
-                titlu: String(date.title ?? "") || "Numele serviciului",
-                descriereScurta: rezumatServiciu(String(date.content ?? "")),
-                descriereCompleta: String(date.content ?? ""),
-                pret: String(date.price_label ?? "") || null,
-                durata: String(date.duration_label ?? "") || null,
-                coperta: copertaPreview,
-              }}
+          {vedere === "primaPagina" ? (
+            <Features
+              data={dateSectiune}
+              servicii={serviciiPrimaPagina}
+              paginaDetaliata={primaPagina.paginaServiciiActiva}
+              variant={primaPagina.sectiune?.variant}
+              tone={primaPagina.sectiune?.tone}
+              friendly={template.asezari.serviciiFriendly}
+              imagine={template.asezari.serviciiImagine}
             />
-          </Section>
+          ) : (
+            <Section tone="deschis">
+              <BlocServiciu serviciu={serviciuPreview} />
+            </Section>
+          )}
         </PanouPrevizualizare>
       </div>
 

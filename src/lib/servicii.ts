@@ -35,7 +35,7 @@ export const CAMPURI_SERVICIU: CampSchema[] = [
     tip: "textLung",
     cheie: "content",
     eticheta: "Descriere",
-    hint: "Cui se adresează, cum decurge, la ce să se aștepte. Primul rând apare pe cartonașul din prima pagină; textul întreg, pe pagina de servicii.",
+    hint: "Cui se adresează, cum decurge, la ce să se aștepte. Începutul apare pe cartonașul din prima pagină (cât încape în patru rânduri — îl vezi în dreapta); textul întreg, pe pagina de servicii.",
     obligatoriu: true,
     randuri: 10,
     /**
@@ -112,4 +112,86 @@ export function rezumatServiciu(descriere: string, maxCaractere = 200): string {
 
   const taiat = text.slice(0, maxCaractere).replace(/\s+\S*$/, "").trimEnd();
   return `${taiat}…`;
+}
+
+/**
+ * Câte rânduri de descriere încap pe cartonașul din prima pagină.
+ *
+ * DE CE UN NUMĂR FIX DE RÂNDURI. Până pe 3 oct. 2026 cartonașul arăta doar
+ * PRIMUL RÂND al descrierii — iar o descriere care începea cu „…depistarea
+ * următoarelor:" și continua cu o listă se oprea în aer, la două puncte.
+ * Proprietarul a cerut: cartonașele de aceeași mărime, textul tăiat, „Citește
+ * mai mult" sub el, și tăierea VIZIBILĂ în panou cât scrii, ca să știi cât
+ * încape. Un număr fix de rânduri face toate trei: aceeași înălțime pentru
+ * text pe fiecare cartonaș, iar tăierea e aceeași în previzualizare și pe site,
+ * fiindcă o face browserul, pe lățimea reală a cartonașului.
+ */
+export const RANDURI_CARTONAS = 4;
+
+/**
+ * Textul de pe cartonaș: TOATĂ descrierea, rând sub rând, cum a scris-o
+ * clientul — fără rândurile goale dintre paragrafe, care ar mânca din cele
+ * patru rânduri fără să arate nimic. Tăierea propriu-zisă la `RANDURI_CARTONAS`
+ * o face CSS-ul, pe lățimea cartonașului.
+ *
+ * Plafonul în caractere e doar ca să nu ajungă în pagină o descriere de 12.000
+ * de caractere din care se văd patru rânduri. E mult peste ce încape în patru
+ * rânduri chiar pe un cartonaș lat cât tot ecranul.
+ *
+ * Descrierea lungă lipsește la conținutul vechi, scris doar ca rezumat — atunci
+ * se ia rezumatul.
+ */
+export function textCartonas(
+  serviciu: Pick<Serviciu, "descriereCompleta" | "descriereScurta">,
+  maxCaractere = 800,
+): string {
+  const sursa = serviciu.descriereCompleta?.trim() ? serviciu.descriereCompleta : serviciu.descriereScurta ?? "";
+  const text = blocuriText(sursa, { subtitluri: false })
+    .map((b) => b.text.trim())
+    .filter(Boolean)
+    .join("\n");
+
+  if (text.length <= maxCaractere) return text;
+
+  return `${text.slice(0, maxCaractere).replace(/\s+\S*$/, "").trimEnd()}…`;
+}
+
+/**
+ * Lista de servicii pentru previzualizarea „Cum arată pe prima pagină" din
+ * editorul unui serviciu: cele publicate, cu serviciul editat pus în locul lui —
+ * cu ce e scris ACUM în formular, nesalvat.
+ *
+ * Lățimea unui cartonaș depinde de câte sunt pe rând, iar unde se taie textul
+ * depinde de lățime. De-aia se arată toată secțiunea, cu vecinii adevărați, nu
+ * un cartonaș singur: unul singur s-ar întinde pe tot rândul și ar tăia altfel
+ * decât pe site.
+ *
+ * Când serviciul NU apare pe prima pagină (e ciornă, sau e dincolo de „câte se
+ * văd"), ia locul ultimului cartonaș vizibil — numărul de cartonașe rămâne,
+ * deci și lățimea lor — iar `motiv` spune de ce pe site nu e acolo.
+ */
+export function serviciiPentruPrevizualizare(
+  publicate: Serviciu[],
+  editat: Serviciu,
+  /** Câte se văd pe prima pagină; `undefined` = toate. */
+  numar: number | undefined,
+): { servicii: Serviciu[]; motiv: "ciorna" | "dincoloDeNumar" | null } {
+  const index = publicate.findIndex((s) => s.id === editat.id);
+
+  if (index === -1) {
+    const vizibile = numar ? publicate.slice(0, numar) : publicate;
+    // Ciornă: n-are încă loc pe site. Ia locul ultimului vizibil, sau se adaugă
+    // dacă mai e loc.
+    const servicii =
+      numar && vizibile.length >= numar ? [...vizibile.slice(0, numar - 1), editat] : [...vizibile, editat];
+    return { servicii, motiv: "ciorna" };
+  }
+
+  const servicii = publicate.map((s) => (s.id === editat.id ? editat : s));
+
+  if (numar && index >= numar) {
+    return { servicii: [...servicii.slice(0, numar - 1), editat], motiv: "dincoloDeNumar" };
+  }
+
+  return { servicii, motiv: null };
 }

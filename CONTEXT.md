@@ -2431,6 +2431,54 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Cartonașele de servicii: aceeași mărime, „Citește mai mult”, tăierea văzută în panou (3 oct. 2026)
+
+Proprietarul, uitându-se la Apropiere: cartonașul „Evaluare psihologică” se
+oprea la „…depistarea următoarelor:”. Cauza: cartonașul arăta doar PRIMUL RÂND
+al descrierii (regula din 10 sept.), iar acolo primul rând anunța o listă
+scrisă dedesubt. Clientul n-avea de unde ști, fiindcă editorul serviciului îi
+arăta doar pagina de servicii, cu textul întreg.
+
+Cerut, în cuvintele lui: „mărimea cartonașelor trebuie să fie aceeași. Adaugă
+doar un citește mai mult, și utilizatorul trebuie să vadă când editează cum se
+va vedea trunchierea, ca să știe cât să scrie.”
+
+**Cum e acum:**
+- cartonașul ia TOATĂ descrierea, rând sub rând (`textCartonas` din
+  `src/lib/servicii.ts`), și o taie la 4 rânduri (`RANDURI_CARTONAS`) cu
+  `line-clamp` — browserul taie, pe lățimea reală, cu „…”;
+- caseta de text are mereu înălțimea a 4 rânduri, iar grila are
+  `gridAutoRows: 1fr`, deci toate cartonașele ies la fel de mari. Măsurat:
+  3 × 337×300 (Apropiere), 3 × 335×282 (Liniște), 3 × 337×298 (Căldură) pe
+  1280px; la fel între ele pe 390px;
+- „Citește mai mult” pe toate patru așezările (cartonaș simplu — unde înlocuiește
+  „Află mai multe →” —, linie, Apropiere, Liniște). E text, nu link separat,
+  pentru că tot cartonașul e deja link;
+- editorul serviciului are în previzualizare comutatorul **Prima pagină / Pagina
+  de servicii**, implicit Prima pagină. Arată toată secțiunea, cu vecinii
+  adevărați și cu ce e scris acum în formular — fiindcă unde se taie depinde de
+  lățimea cartonașului, iar lățimea, de câte sunt pe rând. Un serviciu care nu e
+  pe prima pagină (ciornă, sau dincolo de „câte se văd”) ia locul ultimului
+  cartonaș, cu o notă care spune de ce (`serviciiPentruPrevizualizare`).
+
+**Cu pagina de servicii OPRITĂ nu se taie nimic** — n-ar exista alt loc unde să
+se citească restul. Cartonașele rămân egale prin `1fr` (toate cât cel mai lung).
+Înainte, în cazul ăsta, restul descrierii nu apărea nicăieri.
+
+**De știut:** tăierea depinde de lățimea ecranului, deci în previzualizarea
+„Laptop” (1180px) rândurile se pot rupe puțin altfel decât pe un monitor de
+1280px. Ce se vede în panou e corect ca ordin de mărime, nu la cuvânt pe orice
+ecran.
+
+Am propus întâi, greșit, să mut titlul secțiunii la Servicii și apoi să tai și
+mai mult (să las deoparte propoziția terminată în „:”). Proprietarul a respins
+amândouă, pe bună dreptate: prima rupea regula „titlurile secțiunilor se
+editează la Pagina principală”, a doua făcea invers decât cerea.
+
+Ținute de `e2e/cartonas-serviciu.proba.mjs` (10 probe). Verificat vizual pe
+paginile reale, cu Supabase fals (vezi mai jos): site-ul pe trei șabloane și
+editorul serviciului.
+
 ### Mesajul de limită la blog, servicii și pagini (3 oct. 2026)
 
 Proprietarul a cerut harta tuturor limitelor din panou. Căutând-o, am găsit un
@@ -2461,10 +2509,22 @@ Acum fiecare pagină de listă afișează „Ai ajuns la limita de 40 de servici
 Mesajul e componenta `src/components/dashboard/mesaj-limita.tsx`; o valoare
 necunoscută în adresă nu produce niciun mesaj.
 
-**Ce NU s-a putut verifica:** paginile întregi (cer baza de date). S-au verificat
-componenta, randată pe ecran lat și pe 390px, și legătura dintre capete prin
-probă. Ce n-a fost văzut cu ochii e mesajul pe pagina reală, după un clic real pe
-„+ Adaugă” la limită.
+**Văzut apoi pe paginile reale (3 oct. 2026), cerut de proprietar („testează să
+vezi mesajul cu ochii tăi”).** Cu un Supabase FALS local (un server Node care
+răspunde ca el, cu exact 40 / 500 / 50 de rânduri) și panoul adevărat în
+`pnpm dev`: clic real pe „+ Serviciu nou”, „+ Articol nou”, „+ Pagină nouă” →
+acțiunea refuză → `?eroare=prea-multe` → mesajul, pe 1280px și pe 390px. Înainte
+de clic mesajul lipsește, iar cu `?eroare=altceva` nu apare nimic. Ce rămâne
+neverificat: baza adevărată (numărătoarea e a serverului fals).
+
+**Cum se face proba asta din nou** (pentru orice ecran din panou, nu doar
+pentru limită): serverul fals pe portul 54321 răspunde la `/auth/v1/user` și la
+`/rest/v1/<tabel>` (cu `content-range` pentru numărători, cu filtre `col=eq.val`
+— `maybeSingle()` cere un singur rând, altfel pagina dă 404); `pnpm dev` pornit cu
+`NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321` și chei false DOAR prin
+variabile de mediu, nu în `.env.local`; `src/proxy.ts` dat deoparte; din
+Playwright antetele `x-site-id`/`x-site-domain` și cookie-ul `sb-127-auth-token`
+(`base64-` + JSON-ul sesiunii). Serverul fals nu intră în repo.
 
 ### Limita listelor, verificată și pe server (2 oct. 2026)
 

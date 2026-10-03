@@ -163,7 +163,7 @@ export async function salveazaServiciu(
  *
  * Oprită, `/servicii` nu mai există (răspunde „pagina nu există", nu o pagină
  * goală), iar cartonașele de pe prima pagină rămân cartonașe fără link. Un card
- * care scrie „Află mai multe" și nu duce nicăieri e mai rău decât unul simplu.
+ * care scrie „Citește mai mult" și nu duce nicăieri e mai rău decât unul simplu.
  */
 export async function comutaPaginaServicii(activa: boolean): Promise<RezultatServiciu> {
   const session = await verifySession();

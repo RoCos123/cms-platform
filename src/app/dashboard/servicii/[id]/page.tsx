@@ -6,6 +6,8 @@ import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate } from "@/lib/templates";
 import { paginaEsteActiva, type Pagini } from "@/lib/setari";
 import { adresaImaginii } from "@/lib/imagini-adrese";
+import { serviciiPublicate } from "@/lib/servicii-publice";
+import type { SectionTone } from "@/lib/templates";
 import { EditorServiciu } from "./editor";
 
 export default async function EditorServiciuPage({
@@ -17,7 +19,7 @@ export default async function EditorServiciuPage({
   const session = await verifySession();
   const supabase = await createClient();
 
-  const [{ data: serviciu }, { data: site }, { data: setari }] = await Promise.all([
+  const [{ data: serviciu }, { data: site }, { data: setari }, { data: sectiuneServicii }, publicate] = await Promise.all([
     supabase
       .from("services")
       .select("id, slug, title, excerpt, content, price_label, duration_label, cover_upload_id, status")
@@ -26,6 +28,19 @@ export default async function EditorServiciuPage({
       .maybeSingle(),
     supabase.from("sites").select("template").eq("id", session.siteId).single(),
     supabase.from("site_settings").select("pagini").eq("site_id", session.siteId).maybeSingle(),
+    // Pentru previzualizarea „Cum arată pe prima pagină": secțiunea „Serviciile
+    // mele" (titlul, câte se văd, așezarea) și vecinii serviciului, ca
+    // cartonașul să iasă la lățimea și cu tăierea de pe site. În aceeași rundă,
+    // ca să nu adauge încă un drum până la bază (vezi `dashboard/loading.tsx`).
+    supabase
+      .from("site_content")
+      .select("variant, tone, data, visible")
+      .eq("site_id", session.siteId)
+      .eq("key", "features")
+      .order("position", { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+    serviciiPublicate(session.siteId),
   ]);
 
   // Un serviciu al altui client dispare aici la fel ca unul inexistent — 404,
@@ -37,9 +52,10 @@ export default async function EditorServiciuPage({
   // de servicii — cu ea pornită are pagina lui, fără ea stă pe prima pagină.
   // Draft → niciun link, fiindcă n-are ce vedea pe site.
   const slug = serviciu.slug as string;
+  const paginaServiciiActiva = paginaEsteActiva((setari?.pagini ?? {}) as Pagini, "servicii");
   const hrefPeSite =
     serviciu.status === "published" && slug
-      ? paginaEsteActiva((setari?.pagini ?? {}) as Pagini, "servicii")
+      ? paginaServiciiActiva
         ? `/servicii#${slug}`
         : "/#servicii"
       : null;
@@ -70,6 +86,18 @@ export default async function EditorServiciuPage({
       valoareInitiala={catreEditor({ ...serviciu, coperta }, CAMPURI_SERVICIU)}
       template={getTemplate(site?.template as string | null)}
       hrefPeSite={hrefPeSite}
+      primaPagina={{
+        sectiune: sectiuneServicii
+          ? {
+              variant: sectiuneServicii.variant as string | null,
+              tone: ((sectiuneServicii.tone as SectionTone) ?? "deschis"),
+              data: sectiuneServicii.data,
+              vizibila: sectiuneServicii.visible !== false,
+            }
+          : null,
+        servicii: publicate,
+        paginaServiciiActiva,
+      }}
     />
   );
 }

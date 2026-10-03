@@ -61,7 +61,7 @@ export default async function ServiciiPage({
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             Fiecare serviciu se scrie o singură dată, aici. Pe cartonașul din
-            prima pagină apar numele și primul rând al descrierii; pagina de
+            prima pagină apar numele și începutul descrierii, cât încape; pagina de
             servicii arată descrierea întreagă.
           </p>
         </div>
