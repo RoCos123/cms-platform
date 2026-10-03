@@ -79,6 +79,22 @@ export function EditorServiciu({
     coperta: copertaPreview,
   };
 
+  /*
+    Rama în care tragi poza trebuie să fie EXACT rama din previzualizarea pe care
+    o vezi — altfel tragi degeaba. `object-fit: cover` lasă poza să se miște doar
+    pe axa pe care îi prisosește ceva, iar axa aia diferă de la o ramă la alta: la
+    bannerul lat de pe pagina de servicii (16/7) se trage sus-jos, la cartonașul
+    de pe prima pagină (pătrat la Liniște, 3/2 la rest) se trage stânga-dreapta.
+    Fără asta, rama rămânea pătrată și tragerea muta tocmai axa pe care cealaltă
+    ramă n-o taie, deci previzualizarea nu se mișca (prins de proprietar, 3 oct.).
+  */
+  const raportCoperta =
+    vedere === "paginaServicii"
+      ? "16 / 7"
+      : template.asezari.serviciiImagine
+        ? "1 / 1"
+        : "3 / 2";
+
   const dateSectiune = (primaPagina.sectiune?.data ?? { titlu: "Serviciile mele" }) as FeaturesData;
   // „Câte se văd" contează doar cu pagina de servicii pornită — exact ca în `Features`.
   const numar = primaPagina.paginaServiciiActiva ? dateSectiune.numar : undefined;
@@ -149,6 +165,9 @@ export function EditorServiciu({
           valoare={valoare}
           onChange={setValoare}
           erori={erori}
+          // Serviciul are un singur câmp de imagine (coperta), deci rama din
+          // previzualizarea aleasă, indiferent de drum.
+          raportPentru={() => raportCoperta}
         />
 
         <PanouPrevizualizare

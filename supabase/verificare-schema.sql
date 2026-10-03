@@ -33,7 +33,7 @@
 -- coloanele alăturate, care arată amândouă textele. Rândurile „LIPSEȘTE" și „ÎN
 -- PLUS" nu au ambiguitatea asta.
 --
--- 263 lucruri verificate: tabele, coloane, constrângeri, indecși, politici
+-- 273 lucruri verificate: tabele, coloane, constrângeri, indecși, politici
 -- RLS, funcții (cu drepturile lor de execuție), declanșatori, drepturi pe tabel
 -- și pe coloană, și steagul de public al depozitului de fișiere.
 -- ============================================================================
@@ -237,6 +237,9 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('coloana', 'public.blog_articles.category_id', 'uuid poate fi gol', '—')
 ,  ('coloana', 'public.blog_articles.content', 'text not null implicit ''''::text', '—')
 ,  ('coloana', 'public.blog_articles.cover_alt', 'text poate fi gol', '—')
+,  ('coloana', 'public.blog_articles.cover_focal_x', 'smallint poate fi gol', '—')
+,  ('coloana', 'public.blog_articles.cover_focal_y', 'smallint poate fi gol', '—')
+,  ('coloana', 'public.blog_articles.cover_focal_zoom', 'real poate fi gol', '—')
 ,  ('coloana', 'public.blog_articles.cover_upload_id', 'uuid poate fi gol', '—')
 ,  ('coloana', 'public.blog_articles.created_at', 'timestamp with time zone not null implicit now()', '—')
 ,  ('coloana', 'public.blog_articles.excerpt', 'text not null implicit ''''::text', '—')
@@ -288,6 +291,9 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('coloana', 'public.platform_owners.email', 'text poate fi gol', '—')
 ,  ('coloana', 'public.platform_owners.user_id', 'uuid not null', '—')
 ,  ('coloana', 'public.services.content', 'text not null implicit ''''::text', '—')
+,  ('coloana', 'public.services.cover_focal_x', 'smallint poate fi gol', '—')
+,  ('coloana', 'public.services.cover_focal_y', 'smallint poate fi gol', '—')
+,  ('coloana', 'public.services.cover_focal_zoom', 'real poate fi gol', '—')
 ,  ('coloana', 'public.services.cover_upload_id', 'uuid poate fi gol', '—')
 ,  ('coloana', 'public.services.created_at', 'timestamp with time zone not null implicit now()', '—')
 ,  ('coloana', 'public.services.duration_label', 'text poate fi gol', '—')
@@ -356,6 +362,8 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('constrangere', 'public.audit_log.audit_log_site_id_fkey', 'FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE', '—')
 ,  ('constrangere', 'public.blog_articles.blog_articles_author_id_fkey', 'FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL', '—')
 ,  ('constrangere', 'public.blog_articles.blog_articles_category_id_fkey', 'FOREIGN KEY (category_id) REFERENCES blog_categories(id) ON DELETE SET NULL', '—')
+,  ('constrangere', 'public.blog_articles.blog_articles_cover_focal_pereche', 'CHECK ((((cover_focal_x IS NULL) AND (cover_focal_y IS NULL)) OR (((cover_focal_x >= 0) AND (cover_focal_x <= 100)) AND ((cover_focal_y >= 0) AND (cover_focal_y <= 100)))))', '20261003130000_coperta_focal_pe_loc.sql')
+,  ('constrangere', 'public.blog_articles.blog_articles_cover_focal_zoom', 'CHECK (((cover_focal_zoom IS NULL) OR ((cover_focal_zoom >= (1)::double precision) AND (cover_focal_zoom <= (3)::double precision))))', '20261003130000_coperta_focal_pe_loc.sql')
 ,  ('constrangere', 'public.blog_articles.blog_articles_cover_upload_id_fkey', 'FOREIGN KEY (cover_upload_id) REFERENCES uploads(id) ON DELETE SET NULL', '20260825120000_init_schema.sql')
 ,  ('constrangere', 'public.blog_articles.blog_articles_pkey', 'PRIMARY KEY (id)', '—')
 ,  ('constrangere', 'public.blog_articles.blog_articles_site_id_fkey', 'FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE', '—')
@@ -378,6 +386,8 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('constrangere', 'public.pages.pages_status_check', 'CHECK ((status = ANY (ARRAY[''draft''::text, ''published''::text, ''unpublished''::text])))', '—')
 ,  ('constrangere', 'public.platform_owners.platform_owners_pkey', 'PRIMARY KEY (user_id)', '—')
 ,  ('constrangere', 'public.platform_owners.platform_owners_user_id_fkey', 'FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE', '—')
+,  ('constrangere', 'public.services.services_cover_focal_pereche', 'CHECK ((((cover_focal_x IS NULL) AND (cover_focal_y IS NULL)) OR (((cover_focal_x >= 0) AND (cover_focal_x <= 100)) AND ((cover_focal_y >= 0) AND (cover_focal_y <= 100)))))', '20261003130000_coperta_focal_pe_loc.sql')
+,  ('constrangere', 'public.services.services_cover_focal_zoom', 'CHECK (((cover_focal_zoom IS NULL) OR ((cover_focal_zoom >= (1)::double precision) AND (cover_focal_zoom <= (3)::double precision))))', '20261003130000_coperta_focal_pe_loc.sql')
 ,  ('constrangere', 'public.services.services_cover_upload_id_fkey', 'FOREIGN KEY (cover_upload_id) REFERENCES uploads(id) ON DELETE SET NULL', '20260825120000_init_schema.sql')
 ,  ('constrangere', 'public.services.services_pkey', 'PRIMARY KEY (id)', '—')
 ,  ('constrangere', 'public.services.services_site_id_fkey', 'FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE', '—')

@@ -23,7 +23,9 @@ export default async function EditorServiciuPage({
   const [{ data: serviciu }, { data: site }, { data: setari }, { data: sectiuneServicii }, publicate] = await Promise.all([
     supabase
       .from("services")
-      .select("id, slug, title, excerpt, content, price_label, duration_label, cover_upload_id, status")
+      .select(
+        "id, slug, title, excerpt, content, price_label, duration_label, cover_upload_id, cover_focal_x, cover_focal_y, cover_focal_zoom, status",
+      )
       .eq("id", id)
       .eq("site_id", session.siteId)
       .maybeSingle(),
@@ -61,42 +63,26 @@ export default async function EditorServiciuPage({
         : "/#servicii"
       : null;
 
-  // Coperta stă în bază ca referință; formularul lucrează cu adresa. Traducerea
-  // se face la citire (aici) și la scriere (`coloanaCoperta`), exact ca la
-  // articolele de blog — în restul panoului imaginea are o singură formă.
+  // Coperta stă în bază ca referință (`cover_upload_id`) plus propria încadrare
+  // (`cover_focal_*`, pe rândul serviciului — a LOCULUI, nu a pozei); formularul
+  // lucrează cu adresa și punctul focal. `on delete set null` pe cheia externă
+  // face ca un `cover_upload_id` prezent să însemne că poza mai există, deci
+  // adresa se semnează direct din id, fără o interogare care s-o confirme.
   let coperta: { uploadId: string; url: string; altText: string; pozitie?: PunctFocal } | null =
     null;
 
   if (serviciu.cover_upload_id) {
-    const { data: incarcare } = await supabase
-      .from("uploads")
-      // Interogarea confirmă că poza există ȘI e a acestui cabinet, nu doar că
-      // rândul serviciului o pomenește. `focal_x/focal_y`: punctul focal ales
-      // prin tragere, ca editorul să arate la redeschidere poziția salvată — ca
-      // la articolele de blog. Fără el, poza revenea la centru în panou la
-      // redeschidere, deși pe site stătea unde fusese pusă.
-      .select("id, focal_x, focal_y, focal_zoom")
-      .eq("id", serviciu.cover_upload_id as string)
-      .eq("site_id", session.siteId)
-      .maybeSingle<{
-        id: string;
-        focal_x: number | null;
-        focal_y: number | null;
-        focal_zoom: number | null;
-      }>();
-
-    if (incarcare) {
-      coperta = {
-        uploadId: incarcare.id,
-        url: adresaImaginii(incarcare.id),
-        altText: "",
-        pozitie: normalizeazaPunctFocal({
-          x: incarcare.focal_x,
-          y: incarcare.focal_y,
-          zoom: incarcare.focal_zoom,
-        }),
-      };
-    }
+    const coverId = serviciu.cover_upload_id as string;
+    coperta = {
+      uploadId: coverId,
+      url: adresaImaginii(coverId),
+      altText: "",
+      pozitie: normalizeazaPunctFocal({
+        x: serviciu.cover_focal_x,
+        y: serviciu.cover_focal_y,
+        zoom: serviciu.cover_focal_zoom,
+      }),
+    };
   }
 
   return (
