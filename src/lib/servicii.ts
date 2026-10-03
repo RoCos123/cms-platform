@@ -41,7 +41,7 @@ export const CAMPURI_SERVICIU: CampSchema[] = [
     tip: "textLung",
     cheie: "content",
     eticheta: "Descriere",
-    hint: "Cui se adresează, cum decurge, la ce să se aștepte. Începutul apare pe cartonașul din prima pagină (cât încape în patru rânduri — îl vezi în dreapta); textul întreg, pe pagina de servicii.",
+    hint: "Cui se adresează, cum decurge, la ce să se aștepte. Începutul apare pe cartonașul din prima pagină (cât încape — îl vezi în dreapta); textul întreg, pe pagina de servicii.",
     obligatoriu: true,
     randuri: 10,
     /**

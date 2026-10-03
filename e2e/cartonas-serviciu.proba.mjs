@@ -95,7 +95,8 @@ test("toate cele patru așezări de pe prima pagină folosesc textul tăiat și 
   assert.equal(sursa.match(/<TextCartonas/g)?.length, 4, "cartonașe, linie, Apropiere, Liniște");
   // Rânduri egale în cele trei grile de cartonașe (linia nu are cartonașe).
   assert.equal(sursa.match(/gridAutoRows: "1fr"/g)?.length, 3);
-  assert.match(sursa, /WebkitLineClamp: RANDURI_CARTONAS/);
+  assert.match(sursa, /randuri = RANDURI_CARTONAS/);
+  assert.match(sursa, /WebkitLineClamp: randuri/);
 });
 
 test("editorul serviciului arată prima pagină, cu aceeași componentă ca site-ul", () => {
@@ -153,4 +154,25 @@ test("poza serviciului apare pe pagina de servicii, la toate șabloanele", () =>
   const bloc = readFileSync("src/components/site/sections/servicii-detaliate.tsx", "utf8");
   assert.match(bloc, /serviciu\.coperta &&/);
   assert.match(bloc, /pozitie=\{serviciu\.coperta\.pozitie\}/);
+});
+
+test("Liniște: cardul de servicii ca la model (măsurat pe pixeli, 3 oct. 2026)", () => {
+  const sursa = readFileSync("src/components/site/sections/features.tsx", "utf8");
+  // Fără comentarii: contează ce se DESENEAZĂ, nu ce explică un comentariu.
+  const liniste = sursa
+    .slice(sursa.indexOf("function ServiciiImagine"), sursa.indexOf("function TextCartonas"))
+    .replace(/\/\*[\s\S]*?\*\//g, "");
+
+  // Secțiunea e mereu închisă la Liniște.
+  assert.match(sursa, /<Section tone=\{imagine \? "inchis" : tone\}/);
+  // Cercul mare, centrat, ieșit peste marginea de sus.
+  assert.match(liniste, /width: "83%"/);
+  assert.match(liniste, /margin: "-12\.4% auto 0"/);
+  // Gradientul de sus în jos, peste poză.
+  assert.match(liniste, /linear-gradient\(to bottom/);
+  // Mărimile se scalează cu lățimea CARDULUI.
+  assert.match(liniste, /containerType: "inline-size"/);
+  assert.match(liniste, /cqw/);
+  // Fără „Citește mai mult": săgeata face asta, ca la model.
+  assert.doesNotMatch(liniste, /Citește mai mult/);
 });

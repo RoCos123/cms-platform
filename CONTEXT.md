@@ -2431,6 +2431,36 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Liniște: cardurile de servicii refăcute după model, măsurat pe pixeli (3 oct. 2026)
+
+Proprietarul a pus alături o captură a modelului și una de la noi. Diferențele,
+toate măsurate pe pixelii capturii, nu citite din ochi:
+
+- **cercul**: la model ~83% din lățimea cardului, centrat, cu ~15% ieșit peste
+  marginea de sus; la noi avea cel mult 200px, în colț. Pe 19 sept. măsurasem
+  chiar noi cele ~82%, dar plafonul de 200px le anula;
+- **gradientul** (observat de proprietar): cardul e uniform pe prima treime,
+  apoi se închide treptat până jos, iar umbra trece și peste poză și inel.
+  Măsurat pe model: rgb(43,52,49) sus → (19,26,21) jos; opacitatea umbrei ~0 la
+  35%, ~0,3 la 50%, ~0,6 la 65%, ~0,8 la 85%. La noi: o singură culoare;
+- **secțiunea** e închisă la model (rgb(30,43,36) = `--t-fundal-inchis` al
+  Liniște); la noi era crem — acum forțată la ton închis, doar la Liniște;
+- **titlul** mare, peste partea de jos a cercului; descrierea 2–3 rânduri;
+  săgeata ~70px; **fără „Citește mai mult"** (săgeata face asta);
+- **textul-fantomă** de jos: literă dreaptă și groasă, centrat (la noi era cu
+  serife, aliniat stânga).
+
+Două carduri pe rând pe ecran lat, ca la model. Mărimile sunt în `cqw` (procente
+din lățimea CARDULUI): cardurile noastre ies mai înguste decât la model, iar un
+titlu de 46px fix se rupea pe două rânduri — cu `cqw` totul se scalează împreună,
+în proporțiile modelului.
+
+Verificat după: gradientul nostru, la aceleași fracții de înălțime, diferă de
+model cu cel mult 3 unități pe canal. Văzut pe 1485px și pe 390px, cu Supabase
+fals și o poză de probă. Cardul fără poză păstrează gradientul și textul jos,
+la aceeași mărime ca vecinii (`gridAutoRows: 1fr`), deci are mult spațiu gol
+sus — arată uniform când fiecare serviciu are poză.
+
 ### Cartonașele de servicii: aceeași mărime, „Citește mai mult”, tăierea văzută în panou (3 oct. 2026)
 
 Proprietarul, uitându-se la Apropiere: cartonașul „Evaluare psihologică” se

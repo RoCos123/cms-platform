@@ -71,7 +71,9 @@ export function Features({
   const maiSunt = servicii.length > afisate.length;
 
   return (
-    <Section tone={tone} id="servicii">
+    // La Liniște secțiunea e mereu închisă, ca la model: cardurile închise cu
+    // gradient se sting în ea (măsurat: fundal rgb(30,43,36) = `--t-fundal-inchis`).
+    <Section tone={imagine ? "inchis" : tone} id="servicii">
       <SectionHeading
         eyebrow={data.eyebrow}
         titlu={data.titlu}
@@ -405,20 +407,30 @@ function ServiciiFriendly({
 /**
  * Cardurile de servicii ale referinței „Liniște".
  *
- * Corectat 19 sept. 2026: prima variantă (aici) punea poza pe TOT cardul, sub
- * un voal întunecat — citită din CSS-ul sursei, nu dintr-o captură a ei. Pe o
- * captură a site-ului adevărat, proprietarul a arătat altceva: fiecare card e
- * un dreptunghi ÎNCHIS, cu poza doar ca un MEDALION rotund sus, textul dedesubt.
- * Cerut chiar așa: „același ton al culorii" (cardul rămâne închis, poza nu-i
- * schimbă culoarea) „și spațiu pentru poze în cerc". Fără poză, cardul rămâne
- * un dreptunghi închis doar cu titlul.
+ * Refăcut pe 3 oct. 2026 după o captură a modelului, MĂSURATĂ pe pixeli (nu
+ * citită din ochi). Ce arată modelul și ce făceam noi greșit:
  *
- * Titlul repetat, uriaș și aproape stins, tăiat de marginea cardului, e
- * flourish-ul tipografic de la sursă — o aproximare rezonabilă, nu o măsurătoare
- * exactă (captura nu dă mărimea la pixel).
+ * - CERCUL e uriaș: ~83% din lățimea cardului, centrat, iar sus iese peste
+ *   marginea cardului (~15% din cerc e tăiat). Noi îl țineam la cel mult 200px,
+ *   în colț — deși pe 19 sept. măsurasem chiar noi cele ~82%.
+ * - GRADIENTUL: cardul e uniform pe prima treime, apoi se închide treptat până
+ *   jos — rgb(43,52,49) sus, rgb(19,26,21) la margine. Umbra trece și peste
+ *   poză și peste inel, de-aia poza „se stinge" spre jos și titlul alb se
+ *   citește peste ea. Măsurat: opacitatea umbrei e ~0 la 35% din înălțime,
+ *   ~0,3 la 50%, ~0,6 la 65%, ~0,8 la 85%.
+ * - TITLUL e mare, PESTE partea de jos a cercului; descrierea, două-trei rânduri
+ *   scurte; săgeata, un cerc de ~70px. Fără „Citește mai mult": săgeata face asta.
+ * - TEXTUL-FANTOMĂ de jos e literă dreaptă, groasă (fontul principal), CENTRAT,
+ *   tăiat de marginea de jos.
+ * - SECȚIUNEA e închisă (ton forțat în `Features`), cu două carduri pe rând.
  *
- * Culorile vin din nivelul ȘABLONULUI (`--t-…`): cardul e mereu închis, iar
- * textul mereu deschis, oricare ar fi tonul benzii.
+ * Fără poză, cardul e un dreptunghi închis cu gradientul și textul jos — aceeași
+ * mărime ca vecinii, prin `gridAutoRows: 1fr`.
+ *
+ * MĂRIMILE SUNT ÎN `cqw` (procente din lățimea CARDULUI, nu a ecranului): modelul
+ * are carduri de ~720px, ale noastre ies mai înguste (containerul e mai strâmt),
+ * iar un titlu de 46px fix se rupea pe două rânduri. Cu `cqw`, tot cardul se
+ * scalează împreună, în proporțiile modelului; `clamp` ține minimele pe telefon.
  */
 function ServiciiImagine({
   servicii,
@@ -427,6 +439,13 @@ function ServiciiImagine({
   servicii: Serviciu[];
   paginaDetaliata: boolean;
 }) {
+  // Umbra de jos: culoarea închisă a șablonului, adâncită. Opacitățile sunt cele
+  // măsurate pe model (vezi mai sus).
+  const umbra = "color-mix(in oklab, var(--t-fundal-inchis) 72%, #000)";
+  const pas = (opacitate: number, unde: string) =>
+    `color-mix(in oklab, ${umbra} ${opacitate}%, transparent) ${unde}`;
+  const gradient = `linear-gradient(to bottom, ${pas(0, "34%")}, ${pas(30, "50%")}, ${pas(60, "65%")}, ${pas(80, "85%")}, ${pas(87, "100%")})`;
+
   return (
     <ul
       style={{
@@ -434,38 +453,63 @@ function ServiciiImagine({
         margin: "56px 0 0",
         padding: 0,
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
+        // Două carduri pe rând pe ecran lat, ca la model; unul pe telefon.
+        gridTemplateColumns: "repeat(auto-fit, minmax(min(440px, 100%), 1fr))",
         gridAutoRows: "1fr",
-        gap: "24px",
+        gap: "28px",
       }}
     >
       {servicii.map((serviciu) => {
         const continut = (
-          <div
-            style={{
-              position: "relative",
-              minHeight: "260px",
-              height: "100%",
-              padding: "clamp(28px, 3vw, 36px)",
-            }}
-          >
+          <>
+            {serviciu.coperta && (
+              <div
+                style={{
+                  position: "relative",
+                  width: "83%",
+                  aspectRatio: "1",
+                  // Procent din LĂȚIMEA cardului (așa se calculează marginile în
+                  // CSS): cercul iese ~15% peste marginea de sus.
+                  margin: "-12.4% auto 0",
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  // Inel gros, ~2,5% din cerc la model.
+                  border: "clamp(4px, 2cqw, 16px) solid var(--t-text-pe-inchis)",
+                  flexShrink: 0,
+                }}
+              >
+                <SectionImage
+                  src={serviciu.coperta.url}
+                  alt=""
+                  aspectRatio="1 / 1"
+                  sizes="(max-width: 980px) 90vw, 45vw"
+                  // Punctul focal ales prin tragere; lipsă → centru, ca înainte.
+                  pozitie={serviciu.coperta.pozitie}
+                />
+              </div>
+            )}
+
+            {/* Umbra, peste poză și inel, sub text. */}
+            <div aria-hidden style={{ position: "absolute", inset: 0, background: gradient, pointerEvents: "none" }} />
+
             {/*
               Titlul repetat, ca fundal decorativ. `aria-hidden`: cititoarele de
-              ecran au deja titlul adevărat, de mai jos — ăsta e doar desen.
-              Tăiat de `overflow: hidden` al cardului (mai jos), nu de aici.
+              ecran au deja titlul adevărat. Tăiat de `overflow: hidden` al
+              cardului.
             */}
             <span
               aria-hidden
               style={{
                 position: "absolute",
-                left: "clamp(24px, 3vw, 36px)",
-                bottom: "-0.18em",
-                fontFamily: "var(--t-font-titlu)",
-                fontWeight: "var(--t-greutate-titlu)" as unknown as number,
-                fontSize: "clamp(52px, 7.5vw, 88px)",
+                left: "50%",
+                bottom: "-0.32em",
+                transform: "translateX(-50%)",
+                fontFamily: "var(--t-font-principal)",
+                fontWeight: 700,
+                fontSize: "clamp(36px, 8.3cqw, 64px)",
                 lineHeight: 1,
                 color: "var(--t-text-pe-inchis)",
-                opacity: 0.05,
+                opacity: 0.06,
                 whiteSpace: "nowrap",
                 pointerEvents: "none",
               }}
@@ -473,48 +517,17 @@ function ServiciiImagine({
               {serviciu.titlu}
             </span>
 
-            {serviciu.coperta && (
-              <div
-                style={{
-                  position: "relative",
-                  // Procent din lățimea cardului, nu un plafon fix în px —
-                  // corectat 19 sept. 2026, găsit prin măsurătoare pe pixeli:
-                  // medalionul de la referință e ~82% din card (dominant),
-                  // plafonul vechi (132px) ieșea la doar ~39% pe cardurile
-                  // noastre, mai late. Clampul ține un minim/maxim rezonabil,
-                  // dar procentul crește cu cardul, nu rămâne în urmă pe ecran
-                  // lat.
-                  width: "clamp(130px, 58%, 200px)",
-                  aspectRatio: "1",
-                  borderRadius: "50%",
-                  overflow: "hidden",
-                  // Inel aproape opac, deschis — corectat 19 sept. 2026: 25%
-                  // amestec ieșea prea șters (aproape confundabil cu fundalul
-                  // cardului); la referință inelul e aproape alb, clar. Culoarea
-                  // „text pe închis" a șablonului e deja crem-deschis, deci
-                  // merge direct, fără amestec.
-                  border: "3px solid var(--t-text-pe-inchis)",
-                  marginBottom: "28px",
-                }}
-              >
-                <SectionImage
-                  src={serviciu.coperta.url}
-                  alt=""
-                  aspectRatio="1 / 1"
-                  sizes="200px"
-                  // Punctul focal ales prin tragere; lipsă → centru, ca înainte.
-                  pozitie={serviciu.coperta.pozitie}
-                />
-              </div>
-            )}
-
             <div
               style={{
                 position: "relative",
+                // Jos în card: cu poză, urcă peste partea de jos a cercului
+                // (~18% din cerc la model); fără, stă jos ca la vecini.
+                marginTop: serviciu.coperta ? "-15%" : "auto",
+                padding: "0 clamp(22px, 7.9cqw, 60px) clamp(40px, 8.3cqw, 64px)",
                 display: "flex",
                 alignItems: "flex-end",
                 justifyContent: "space-between",
-                gap: "16px",
+                gap: "20px",
               }}
             >
               <div style={{ minWidth: 0 }}>
@@ -523,9 +536,10 @@ function ServiciiImagine({
                     margin: 0,
                     fontFamily: "var(--t-font-titlu)",
                     fontWeight: "var(--t-greutate-titlu)" as unknown as number,
-                    fontSize: "clamp(21px, 2vw, 26px)",
+                    fontSize: "clamp(26px, 6.4cqw, 50px)",
+                    lineHeight: 1.15,
                     color: "var(--t-text-pe-inchis)",
-                    textWrap: "pretty",
+                    textWrap: "balance",
                   }}
                 >
                   {serviciu.titlu}
@@ -534,76 +548,63 @@ function ServiciiImagine({
                   <TextCartonas
                     serviciu={serviciu}
                     taiat={paginaDetaliata}
+                    randuri={3}
                     inaltimeRand={1.55}
                     style={{
-                      margin: "8px 0 0",
-                      fontSize: "15px",
-                      maxWidth: "30ch",
-                      color: "color-mix(in oklab, var(--t-text-pe-inchis) 78%, transparent)",
+                      margin: "12px 0 0",
+                      fontSize: "clamp(15px, 2.5cqw, 19px)",
+                      maxWidth: "26em",
+                      color: "color-mix(in oklab, var(--t-text-pe-inchis) 94%, transparent)",
                     }}
                   />
-                )}
-                {paginaDetaliata && (
-                  <span
-                    style={{
-                      display: "block",
-                      marginTop: "10px",
-                      fontSize: "15px",
-                      fontWeight: 600,
-                      color: "var(--t-text-pe-inchis)",
-                    }}
-                  >
-                    Citește mai mult
-                  </span>
                 )}
               </div>
 
               {/*
                 Săgeata rotundă, doar când cardul chiar duce undeva (pagina
                 detaliată pornită). Un cerc apăsabil pe un card care nu face nimic
-                ar minți, ca „Citește mai mult" din cardurile obișnuite.
+                ar minți.
               */}
               {paginaDetaliata && (
                 <span
                   aria-hidden
                   style={{
                     flexShrink: 0,
-                    width: "44px",
-                    height: "44px",
+                    width: "clamp(46px, 9.7cqw, 72px)",
+                    height: "clamp(46px, 9.7cqw, 72px)",
                     borderRadius: "999px",
                     display: "grid",
                     placeItems: "center",
                     background: "var(--t-fundal)",
                     color: "var(--t-text)",
-                    fontSize: "16px",
+                    fontSize: "18px",
                   }}
                 >
                   →
                 </span>
               )}
             </div>
-          </div>
+          </>
         );
 
         const stil: React.CSSProperties = {
-          display: "block",
+          display: "flex",
+          flexDirection: "column",
           height: "100%",
+          minHeight: "320px",
           position: "relative",
           borderRadius: "var(--t-raza)",
           overflow: "hidden",
-          // „Același ton al culorii": cardul rămâne pe fundalul șablonului —
-          // o treaptă peste banda secțiunii — INDIFERENT de culorile pozei, care
-          // acum nu-i mai atinge deloc fundalul (e doar medalionul rotund).
-          // 95%, nu 88% — corectat 19 sept. 2026, măsurat pe pixeli din
-          // referință: acolo cardul e doar cu ~5% alb amestecat, nu 12%.
+          // Partea de sus a cardului, măsurată: ~5% alb peste fundalul închis.
           background: "color-mix(in oklab, var(--t-fundal-inchis) 95%, #ffffff)",
           textDecoration: "none",
         };
 
         return (
-          <li key={serviciu.id}>
+          // `inline-size`: lățimea cardului devine unitatea `cqw` pentru tot ce e înăuntru.
+          <li key={serviciu.id} style={{ containerType: "inline-size" }}>
             {paginaDetaliata ? (
-              <a href={`/servicii#${serviciu.slug}`} style={stil}>
+              <a href={`/servicii#${serviciu.slug}`} style={stil} aria-label={serviciu.titlu}>
                 {continut}
               </a>
             ) : (
@@ -635,11 +636,14 @@ function TextCartonas({
   serviciu,
   taiat,
   inaltimeRand,
+  randuri = RANDURI_CARTONAS,
   style,
 }: {
   serviciu: Serviciu;
   taiat: boolean;
-  /** `line-height`, ca număr — din el se calculează înălțimea celor patru rânduri. */
+  /** Câte rânduri încap; implicit `RANDURI_CARTONAS`. Liniște are trei, ca la model. */
+  randuri?: number;
+  /** `line-height`, ca număr — din el se calculează înălțimea rândurilor. */
   inaltimeRand: number;
   style?: React.CSSProperties;
 }) {
@@ -653,10 +657,10 @@ function TextCartonas({
         ...(taiat && {
           display: "-webkit-box",
           WebkitBoxOrient: "vertical",
-          WebkitLineClamp: RANDURI_CARTONAS,
+          WebkitLineClamp: randuri,
           overflow: "hidden",
-          // În `em`, deci pe mărimea literei din `style` — patru rânduri exact.
-          height: `${RANDURI_CARTONAS * inaltimeRand}em`,
+          // În `em`, deci pe mărimea literei din `style` — rândurile exact.
+          height: `${randuri * inaltimeRand}em`,
         }),
         ...style,
       }}
