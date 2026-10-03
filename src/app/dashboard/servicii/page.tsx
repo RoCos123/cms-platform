@@ -7,10 +7,18 @@ import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { ComutatorPaginaServicii } from "./comutator-pagina";
 import { ListaServicii, type RandServiciuLista } from "./lista-servicii";
 import { creeazaServiciu } from "./actions";
+import { MesajLimita } from "@/components/dashboard/mesaj-limita";
+import { MAXIM_SERVICII } from "@/lib/limite-panou";
 
 export const metadata = { title: "Servicii" };
 
-export default async function ServiciiPage() {
+export default async function ServiciiPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ eroare?: string }>;
+}) {
+  const { eroare } = await searchParams;
+
   const session = await verifySession();
   const supabase = await createClient();
 
@@ -20,12 +28,19 @@ export default async function ServiciiPage() {
       .select("id, title, excerpt, status")
       .eq("site_id", session.siteId)
       .order("position", { ascending: true }),
-    supabase.from("site_settings").select("pagini").eq("site_id", session.siteId).maybeSingle(),
+    supabase
+      .from("site_settings")
+      .select("pagini")
+      .eq("site_id", session.siteId)
+      .maybeSingle(),
   ]);
 
   if (error) console.error("Citirea serviciilor a eșuat:", error);
 
-  const paginaActiva = paginaEsteActiva((setari?.pagini ?? {}) as Pagini, "servicii");
+  const paginaActiva = paginaEsteActiva(
+    (setari?.pagini ?? {}) as Pagini,
+    "servicii",
+  );
 
   const randuri: RandServiciuLista[] = (data ?? []).map((rand) => ({
     id: rand.id as string,
@@ -41,17 +56,21 @@ export default async function ServiciiPage() {
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Panou
           </p>
-          <h1 className="mt-1 text-2xl font-semibold text-foreground">Servicii</h1>
+          <h1 className="mt-1 text-2xl font-semibold text-foreground">
+            Servicii
+          </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Fiecare serviciu se scrie o singură dată, aici. Pe cartonașul din prima pagină
-            apar numele și primul rând al descrierii; pagina de servicii arată descrierea
-            întreagă.
+            Fiecare serviciu se scrie o singură dată, aici. Pe cartonașul din
+            prima pagină apar numele și primul rând al descrierii; pagina de
+            servicii arată descrierea întreagă.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Linkul apare doar când pagina există — altfel ar duce în perete. */}
-          {paginaActiva && <LinkVeziPeSite href="/servicii" eticheta="Vezi pagina pe site" />}
+          {paginaActiva && (
+            <LinkVeziPeSite href="/servicii" eticheta="Vezi pagina pe site" />
+          )}
 
           {/* Formular, nu link: creează un rând în baza de date, deci e o acțiune. */}
           <form action={creeazaServiciu}>
@@ -59,6 +78,13 @@ export default async function ServiciiPage() {
           </form>
         </div>
       </div>
+
+      <MesajLimita
+        eroare={eroare}
+        maxim={MAXIM_SERVICII}
+        singular="serviciu"
+        plural="servicii"
+      />
 
       {randuri.length === 0 ? (
         <Card className="max-w-xl">
@@ -68,8 +94,8 @@ export default async function ServiciiPage() {
           />
           <CardBody>
             <p className="text-sm text-muted-foreground">
-              Începe cu unul singur, scris bine. E mai bine decât șase scrise pe fugă —
-              cine caută un psiholog citește, nu numără.
+              Începe cu unul singur, scris bine. E mai bine decât șase scrise pe
+              fugă — cine caută un psiholog citește, nu numără.
             </p>
           </CardBody>
         </Card>

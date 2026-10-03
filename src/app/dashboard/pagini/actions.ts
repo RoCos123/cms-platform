@@ -7,12 +7,11 @@ import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
 import { CAMPURI_PAGINA, esteLocMeniu, type LocMeniu } from "@/lib/pagini";
 import { catreEditor, catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
+import { MAXIM_PAGINI, EROARE_PREA_MULTE } from "@/lib/limite-panou";
 
 export type RezultatPagina =
   | { ok: true }
   | { ok: false; mesaj: string; erori?: Record<string, string> };
-
-const MAXIM_PAGINI = 50;
 
 /**
  * Cadrul site-ului (antet și subsol) e pe FIECARE pagină publică, iar linkurile
@@ -34,7 +33,7 @@ export async function creeazaPagina(): Promise<never> {
     .eq("site_id", session.siteId);
 
   if ((count ?? 0) >= MAXIM_PAGINI) {
-    redirect("/dashboard/pagini?eroare=prea-multe");
+    redirect(`/dashboard/pagini?eroare=${EROARE_PREA_MULTE}`);
   }
 
   const { data: ultima } = await supabase

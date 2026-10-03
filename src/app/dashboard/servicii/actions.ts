@@ -7,12 +7,11 @@ import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
 import { CAMPURI_SERVICIU, rezumatServiciu } from "@/lib/servicii";
 import { catreEditor, catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
+import { MAXIM_SERVICII, EROARE_PREA_MULTE } from "@/lib/limite-panou";
 
 export type RezultatServiciu =
   | { ok: true }
   | { ok: false; mesaj: string; erori?: Record<string, string> };
-
-const MAXIM_SERVICII = 40;
 
 /**
  * Coperta stă în bază ca `cover_upload_id` (o referință), dar formularul o dă ca
@@ -54,7 +53,7 @@ export async function creeazaServiciu(): Promise<never> {
     .eq("site_id", session.siteId);
 
   if ((count ?? 0) >= MAXIM_SERVICII) {
-    redirect("/dashboard/servicii?eroare=prea-multe");
+    redirect(`/dashboard/servicii?eroare=${EROARE_PREA_MULTE}`);
   }
 
   const { data: ultimul } = await supabase

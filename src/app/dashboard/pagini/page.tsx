@@ -6,6 +6,8 @@ import type { StatusValue } from "@/components/ui/feedback";
 import { esteLocMeniu } from "@/lib/pagini";
 import { ListaPagini, type RandPaginaLista } from "./lista";
 import { creeazaPagina } from "./actions";
+import { MesajLimita } from "@/components/dashboard/mesaj-limita";
+import { MAXIM_PAGINI } from "@/lib/limite-panou";
 
 export const metadata = { title: "Pagini" };
 
@@ -36,11 +38,18 @@ const SUGESTII = [
   },
   {
     titlu: "Cabinetul",
-    de_ce: "Cum arată locul, cum ajungi, unde parchezi. Liniștește pe cineva care vine prima oară.",
+    de_ce:
+      "Cum arată locul, cum ajungi, unde parchezi. Liniștește pe cineva care vine prima oară.",
   },
 ];
 
-export default async function PaginiPage() {
+export default async function PaginiPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ eroare?: string }>;
+}) {
+  const { eroare } = await searchParams;
+
   const session = await verifySession();
   const supabase = await createClient();
 
@@ -67,11 +76,13 @@ export default async function PaginiPage() {
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Panou
           </p>
-          <h1 className="mt-1 text-2xl font-semibold text-foreground">Pagini</h1>
+          <h1 className="mt-1 text-2xl font-semibold text-foreground">
+            Pagini
+          </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Pagini de sine stătătoare, în afara primei pagini: tarife, cabinetul, politica de
-            confidențialitate. Fiecare are adresa ei și poate fi legată din meniul de sus sau
-            din subsol.
+            Pagini de sine stătătoare, în afara primei pagini: tarife,
+            cabinetul, politica de confidențialitate. Fiecare are adresa ei și
+            poate fi legată din meniul de sus sau din subsol.
           </p>
         </div>
 
@@ -81,19 +92,34 @@ export default async function PaginiPage() {
         </form>
       </div>
 
+      <MesajLimita
+        eroare={eroare}
+        maxim={MAXIM_PAGINI}
+        singular="pagină"
+        plural="pagini"
+      />
+
       {randuri.length > 0 && <ListaPagini initiale={randuri} />}
 
       <Card className="max-w-2xl">
         <CardHeader
-          title={randuri.length === 0 ? "Nicio pagină încă" : "Ce mai are de obicei un cabinet"}
+          title={
+            randuri.length === 0
+              ? "Nicio pagină încă"
+              : "Ce mai are de obicei un cabinet"
+          }
           description="Trei pagini care lipsesc cel mai des."
         />
         <CardBody>
           <dl className="space-y-4">
             {SUGESTII.map((sugestie) => (
               <div key={sugestie.titlu}>
-                <dt className="text-sm font-medium text-foreground">{sugestie.titlu}</dt>
-                <dd className="mt-0.5 text-sm text-muted-foreground">{sugestie.de_ce}</dd>
+                <dt className="text-sm font-medium text-foreground">
+                  {sugestie.titlu}
+                </dt>
+                <dd className="mt-0.5 text-sm text-muted-foreground">
+                  {sugestie.de_ce}
+                </dd>
               </div>
             ))}
           </dl>

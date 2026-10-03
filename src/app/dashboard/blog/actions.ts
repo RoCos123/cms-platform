@@ -7,12 +7,11 @@ import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
 import { CAMPURI_ARTICOL } from "@/lib/blog";
 import { catreEditor, catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
+import { MAXIM_ARTICOLE, EROARE_PREA_MULTE } from "@/lib/limite-panou";
 
 export type RezultatArticol =
   | { ok: true }
   | { ok: false; mesaj: string; erori?: Record<string, string> };
-
-const MAXIM_ARTICOLE = 500;
 
 /** Toate rutele care arată articole, reîmprospătate împreună. */
 function reimprospateaza(slug?: string) {
@@ -51,7 +50,7 @@ export async function creeazaArticol(): Promise<never> {
     .eq("site_id", session.siteId);
 
   if ((count ?? 0) >= MAXIM_ARTICOLE) {
-    redirect("/dashboard/blog?eroare=prea-multe");
+    redirect(`/dashboard/blog?eroare=${EROARE_PREA_MULTE}`);
   }
 
   // Slug provizoriu, unic: coloana are `unique (site_id, slug)`, iar un articol

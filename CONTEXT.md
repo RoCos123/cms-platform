@@ -2431,6 +2431,41 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Mesajul de limită la blog, servicii și pagini (3 oct. 2026)
+
+Proprietarul a cerut harta tuturor limitelor din panou. Căutând-o, am găsit un
+defect: la 500 de articole, 40 de servicii sau 50 de pagini, „+ Adaugă” trimitea
+omul înapoi pe listă cu `?eroare=prea-multe` — iar niciuna dintre cele trei
+pagini de listă nu citea parametrul. Pentru client, butonul părea că nu face
+nimic. Nicio eroare, nicio tăiere: doar tăcere.
+
+Acum fiecare pagină de listă afișează „Ai ajuns la limita de 40 de servicii.
+Șterge unul ca să poți adăuga altul.” (cu pluralul corect: „500 de articole”,
+„50 de pagini”).
+
+**Două lucruri făcute dinadins, ca defectul să nu se poată întoarce:**
+
+1. **Limitele au un singur loc**, `src/lib/limite-panou.ts`, nu constante private
+   în fiecare `actions.ts`. Fișierele de acțiuni sunt `"use server”`, care nu pot
+   exporta decât funcții asincrone — deci paginile nu aveau de unde să afle
+   numărul, și un număr scris de mână în mesaj ar fi ajuns să mintă la prima
+   schimbare. Tot acolo stă și valoarea parametrului (`EROARE_PREA_MULTE`).
+   Defectul original era o nepotrivire între două capete (acțiunea trimitea,
+   pagina nu asculta); acum capetele citesc din aceeași sursă.
+2. **Proba citește sursa** (`e2e/limite-panou.proba.mjs`), fiindcă paginile cer
+   Supabase și nu pot rula în Node: pentru fiecare ecran verifică că pagina
+   citește `searchParams`, randează `<MesajLimita>` și folosește ACEEAȘI limită pe
+   care o verifică acțiunea. Verificată că prinde: scoasă înadins linia din
+   pagina blogului, a picat exact testul acela; restaurată, trece.
+
+Mesajul e componenta `src/components/dashboard/mesaj-limita.tsx`; o valoare
+necunoscută în adresă nu produce niciun mesaj.
+
+**Ce NU s-a putut verifica:** paginile întregi (cer baza de date). S-au verificat
+componenta, randată pe ecran lat și pe 390px, și legătura dintre capete prin
+probă. Ce n-a fost văzut cu ochii e mesajul pe pagina reală, după un clic real pe
+„+ Adaugă” la limită.
+
 ### Limita listelor, verificată și pe server (2 oct. 2026)
 
 Proprietarul a întrebat câte „Apariții și acreditări” se pot adăuga. Răspunsul din

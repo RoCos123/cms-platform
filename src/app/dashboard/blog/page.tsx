@@ -8,6 +8,8 @@ import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { ListaArticolePanou, type RandArticol } from "./lista";
 import { ComutatorBlog } from "./comutator-blog";
 import { creeazaArticol } from "./actions";
+import { MesajLimita } from "@/components/dashboard/mesaj-limita";
+import { MAXIM_ARTICOLE } from "@/lib/limite-panou";
 
 export const metadata = { title: "Blog" };
 
@@ -17,7 +19,13 @@ function stare(brut: unknown): StatusValue {
   return STARI.includes(brut as StatusValue) ? (brut as StatusValue) : "draft";
 }
 
-export default async function BlogPage() {
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ eroare?: string }>;
+}) {
+  const { eroare } = await searchParams;
+
   const session = await verifySession();
   const supabase = await createClient();
 
@@ -29,7 +37,11 @@ export default async function BlogPage() {
       // După ultima atingere, nu după data publicării: în panou cauți articolul
       // la care lucrai, nu pe cel mai nou de pe site.
       .order("updated_at", { ascending: false }),
-    supabase.from("site_settings").select("pagini").eq("site_id", session.siteId).maybeSingle(),
+    supabase
+      .from("site_settings")
+      .select("pagini")
+      .eq("site_id", session.siteId)
+      .maybeSingle(),
   ]);
 
   if (error) console.error("Citirea articolelor a eșuat:", error);
@@ -55,8 +67,8 @@ export default async function BlogPage() {
           </p>
           <h1 className="mt-1 text-2xl font-semibold text-foreground">Blog</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Articolele tale. Fiecare are pagina lui, iar cele mai noi apar și pe prima
-            pagină, la „Articole recente”.
+            Articolele tale. Fiecare are pagina lui, iar cele mai noi apar și pe
+            prima pagină, la „Articole recente”.
           </p>
         </div>
 
@@ -73,6 +85,13 @@ export default async function BlogPage() {
         </div>
       </div>
 
+      <MesajLimita
+        eroare={eroare}
+        maxim={MAXIM_ARTICOLE}
+        singular="articol"
+        plural="articole"
+      />
+
       {randuri.length === 0 ? (
         <Card className="max-w-xl">
           <CardHeader
@@ -81,8 +100,9 @@ export default async function BlogPage() {
           />
           <CardBody>
             <p className="text-sm text-muted-foreground">
-              Un blog ajută cel mai mult când răspunde la ce te întreabă oamenii oricum, în
-              prima ședință. Începe cu o singură întrebare de-asta, scrisă pe îndelete.
+              Un blog ajută cel mai mult când răspunde la ce te întreabă oamenii
+              oricum, în prima ședință. Începe cu o singură întrebare de-asta,
+              scrisă pe îndelete.
             </p>
           </CardBody>
         </Card>
