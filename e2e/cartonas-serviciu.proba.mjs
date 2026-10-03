@@ -176,3 +176,15 @@ test("Liniște: cardul de servicii ca la model (măsurat pe pixeli, 3 oct. 2026)
   // Fără „Citește mai mult": săgeata face asta, ca la model.
   assert.doesNotMatch(liniste, /Citește mai mult/);
 });
+
+test("rama în care se trage coperta e cea a unui loc unde poza chiar apare", () => {
+  // Pe prima pagină poza apare doar la Liniște (cerc → pătrat); în rest, singura
+  // ei ramă e bannerul de pe pagina de servicii (16/7). O ramă 3/2 pentru un
+  // cartonaș care nu mai are poză ar muta poza degeaba.
+  const editor = readFileSync("src/app/dashboard/servicii/[id]/editor.tsx", "utf8");
+  assert.match(
+    editor,
+    /vedere === "primaPagina" && template\.asezari\.serviciiImagine \? "1 \/ 1" : "16 \/ 7"/,
+  );
+  assert.doesNotMatch(editor, /"3 \/ 2"/);
+});
