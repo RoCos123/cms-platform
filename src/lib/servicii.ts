@@ -1,4 +1,5 @@
 import type { CampSchema } from "@/lib/sectiuni";
+import type { PunctFocal } from "@/lib/punct-focal";
 import { blocuriText } from "@/lib/blocuri-text";
 
 /**
@@ -86,8 +87,12 @@ export type Serviciu = {
   /**
    * Poza serviciului, dacă are una. Adresa e semnată din `cover_upload_id` la
    * citire (ca la coperțile de blog); lipsă = cartonașul rămâne doar text.
+   *
+   * `pozitie` (punctul focal) hotărăște ce rămâne în cadru când poza e tăiată,
+   * la fel ca la coperțile de blog. Se salvează pe poză (`uploads.focal_x/
+   * focal_y`) când omul o trage în ramă; lipsă → centru, ca înainte.
    */
-  coperta?: { url: string } | null;
+  coperta?: { url: string; pozitie?: PunctFocal } | null;
 };
 
 /**
