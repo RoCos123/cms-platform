@@ -2479,17 +2479,28 @@ editează la Pagina principală”, a doua făcea invers decât cerea.
 reale, cu Supabase fals (vezi mai jos): site-ul pe trei șabloane și editorul
 serviciului.
 
-**Poza serviciului, repusă pe cartonașele Apropiere (3 oct. 2026).** Proprietarul
-a pus o poză la un serviciu și n-a văzut-o pe prima pagină: „nu era așa înainte".
-Istoricul arată că lipsea din 18 sept. (PR #41, cartonașele „Friendly", scrise
-„fără poză și fără iconiță"), nu de la modificarea de azi — dar avea dreptate pe
-fond: panoul spunea „apare pe cartonașul serviciului", iar pe Apropiere nu
-apărea nicăieri pe prima pagină. Acum stă lată în capul cartonașului (3/2, cu
-punctul focal), ca la cartonașul obișnuit. Măsurat: 335×224 pe 1280px.
+**Poza serviciului: pe prima pagină NU, cu excepția Liniște (3 oct. 2026).**
+Pornit de la proprietar: a pus o poză la un serviciu pe Apropiere și n-a văzut-o
+pe prima pagină, deși panoul scria „apare pe cartonașul serviciului". Starea
+reală era amestecată: Căldură/Lumină/Claritate o puneau lată pe cartonaș,
+Liniște într-un cerc mic, Apropiere deloc (din 18 sept., cartonașele
+„Friendly"). Întrebat ce e mai bine din punct de vedere al designului, am
+recomandat fără poză, iar proprietarul a hotărât așa:
+- cartonașele de pe prima pagină sunt fără poză la Căldură, Lumină, Claritate,
+  Apropiere; poza apare sus, pe pagina de servicii, la toate șabloanele;
+- **Liniște rămâne cu medalionul rotund** („Liniște e bine așa cum e");
+- textul de sub câmpul „Poză" spune acum exact asta.
 
-**Efect de știut:** cu toate cartonașele de aceeași mărime, unul cu poză le
-face pe toate la fel de înalte, deci cele fără poză au un gol între text și
-preț. Arată uniform când fiecare serviciu are poză (sau niciunul).
+Motivele, ca să nu se redeschidă din reflex: prima pagină are deja poze (hero,
+„Despre mine", coperți de articol); pozele de serviciu ale unui psiholog sunt
+de obicei de stoc și seamănă între ele; o poză pusă la UN singur serviciu făcea
+toate cartonașele la fel de înalte, cu gol în cele fără poză (văzut în
+capturi); pe telefon, fiecare poză adăuga ~230px de derulat. Când un cabinet
+are poze proprii, bune și unitare pentru fiecare serviciu, decizia merită
+reluată.
+
+O reparație intermediară (poza pusă pe cartonașele Apropiere) a fost anulată
+înainte de master, odată cu hotărârea de mai sus.
 
 ### Mesajul de limită la blog, servicii și pagini (3 oct. 2026)
 

@@ -101,13 +101,33 @@ test("editorul serviciului arată prima pagină, cu aceeași componentă ca site
   assert.match(editor, /imagine=\{template\.asezari\.serviciiImagine\}/);
 });
 
-test("poza serviciului apare pe cartonaș la toate cele trei grile de cartonașe, Apropiere inclusiv", () => {
-  // Din 18 sept. până pe 3 oct. 2026, cartonașele Apropiere (`ServiciiFriendly`)
-  // nu desenau poza deloc, deși panoul spunea „apare pe cartonașul serviciului”.
-  // Proprietarul a pus o poză și n-a văzut-o nicăieri pe prima pagină.
+test("pe prima pagină, poza serviciului apare DOAR la Liniște (medalionul rotund)", () => {
+  // Hotărât cu proprietarul pe 3 oct. 2026: cartonașele de servicii de pe prima
+  // pagină sunt fără poză; poza apare pe pagina de servicii. Excepția e Liniște,
+  // unde poza e un cerc mic pe cartonașul închis, parte din designul șablonului.
   const sursa = readFileSync("src/components/site/sections/features.tsx", "utf8");
-  const friendly = sursa.slice(sursa.indexOf("function ServiciiFriendly"), sursa.indexOf("function ServiciiImagine"));
+  const parte = (de, pana) => sursa.slice(sursa.indexOf(de), pana ? sursa.indexOf(pana) : undefined);
 
-  assert.match(friendly, /serviciu\.coperta &&/, "Apropiere trebuie să deseneze poza, când există");
-  assert.match(friendly, /pozitie=\{serviciu\.coperta\.pozitie\}/, "cu punctul focal ales prin tragere");
+  const liniste = parte("function ServiciiImagine", "function TextCartonas");
+  assert.match(liniste, /serviciu\.coperta &&/, "Liniște își păstrează medalionul");
+
+  for (const [nume, bucata] of [
+    ["cartonașul obișnuit (Căldură, Lumină, Claritate)", parte("export function Features", "function Linie")],
+    ["linia", parte("function Linie", "function ServiciiFriendly")],
+    ["Apropiere", parte("function ServiciiFriendly", "function ServiciiImagine")],
+    ["Card", parte("function Card(")],
+  ]) {
+    assert.doesNotMatch(bucata, /coperta|cover|SectionImage/, `${nume} nu are voie să deseneze poza`);
+  }
+
+  // Panoul spune adevărul despre unde apare poza.
+  const campuri = readFileSync("src/lib/servicii.ts", "utf8");
+  assert.doesNotMatch(campuri, /Apare pe cartonașul serviciului/);
+  assert.match(campuri, /pe pagina de servicii/);
+});
+
+test("poza serviciului apare pe pagina de servicii, la toate șabloanele", () => {
+  const bloc = readFileSync("src/components/site/sections/servicii-detaliate.tsx", "utf8");
+  assert.match(bloc, /serviciu\.coperta &&/);
+  assert.match(bloc, /pozitie=\{serviciu\.coperta\.pozitie\}/);
 });

@@ -71,7 +71,7 @@ export const CAMPURI_SERVICIU: CampSchema[] = [
     tip: "imagine",
     cheie: "coperta",
     eticheta: "Poză",
-    hint: "Opțională. Apare pe cartonașul serviciului și sus pe pagina lui. Fără ea, cartonașul arată ca înainte, doar cu text.",
+    hint: "Opțională. Apare sus, la serviciul acesta, pe pagina de servicii. Pe prima pagină cartonașele sunt fără poză (excepție: la șablonul Liniște apare mică, într-un cerc).",
   },
 ];
 

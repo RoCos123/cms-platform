@@ -1,6 +1,5 @@
 import type { SectionTone } from "@/lib/templates";
 import { RANDURI_CARTONAS, textCartonas, type Serviciu } from "@/lib/servicii";
-import type { PunctFocal } from "@/lib/punct-focal";
 import { Section, SectionActionButton } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
@@ -40,9 +39,8 @@ export function Features({
   tone?: SectionTone;
   /**
    * Cardurile de servicii ca la modelul prietenos: titlu + descriere + preț
-   * mare sub o linie punctată, unele colorate (verde/piersică), fără iconiță;
-   * poza serviciului, dacă are, sus. Doar „Apropiere"; restul rămân cu
-   * cardurile de dinainte.
+   * mare sub o linie punctată, unele colorate (verde/piersică), fără poză și
+   * fără iconiță. Doar „Apropiere"; restul rămân cu cardurile de dinainte.
    */
   friendly?: boolean;
   /**
@@ -144,10 +142,7 @@ export function Features({
                 card care pare apăsabil și nu face nimic e mai rău decât unul
                 simplu.
               */}
-              <Card
-                link={paginaDetaliata ? `/servicii#${serviciu.slug}` : undefined}
-                cover={serviciu.coperta}
-              >
+              <Card link={paginaDetaliata ? `/servicii#${serviciu.slug}` : undefined}>
                 <h3 style={{ margin: 0, fontSize: "21px", fontWeight: 600, textWrap: "pretty" }}>
                   {serviciu.titlu}
                 </h3>
@@ -303,8 +298,7 @@ function Linie({
 /**
  * Cardurile de servicii ale modelului prietenos: titlu, descriere, iar sub o
  * linie punctată prețul mare. Unele carduri sunt colorate (verde/piersică),
- * după un tipar fix — fără iconiță (cerut). Poza serviciului, dacă are una,
- * stă lată în capul cartonașului (repusă pe 3 oct. 2026). Doar „Apropiere".
+ * după un tipar fix — fără poză și fără iconiță (cerut). Doar „Apropiere".
  *
  * Culorile cardurilor vin din nivelul ȘABLONULUI (`--t-…`): rămân deschise
  * oricare ar fi tonul secțiunii, ca la celelalte carduri prietenoase.
@@ -348,9 +342,9 @@ function ServiciiFriendly({
           display: "flex",
           flexDirection: "column",
           height: "100%",
+          gap: "14px",
+          padding: "28px",
           borderRadius: "var(--t-raza)",
-          // Taie poza la colțurile rotunjite.
-          overflow: "hidden",
           background: fundal,
           border: `1px solid ${chenar}`,
           color: "var(--t-text)",
@@ -358,56 +352,38 @@ function ServiciiFriendly({
         };
         const continut = (
           <>
-            {/*
-              Poza serviciului, lată, în capul cartonașului — ca la cartonașul
-              obișnuit. Pusă înapoi pe 3 oct. 2026, la cererea proprietarului: din
-              18 sept. cartonașele Apropiere n-o mai arătau deloc, deși panoul
-              spunea că apare pe cartonaș. Fără poză, cartonașul arată ca înainte.
-            */}
-            {serviciu.coperta && (
-              <SectionImage
-                src={serviciu.coperta.url}
-                // Decor: numele serviciului, chiar sub poză, spune ce e.
-                alt=""
-                aspectRatio="3 / 2"
-                sizes="(max-width: 720px) 100vw, (max-width: 1040px) 50vw, 33vw"
-                pozitie={serviciu.coperta.pozitie}
-              />
+            <h3 style={{ margin: 0, fontSize: "21px", fontWeight: 700, textWrap: "pretty" }}>{serviciu.titlu}</h3>
+            <TextCartonas
+              serviciu={serviciu}
+              taiat={paginaDetaliata}
+              inaltimeRand={1.6}
+              style={{ fontSize: "15px", color: "var(--t-text-secundar)" }}
+            />
+            {paginaDetaliata && (
+              <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--t-accent)" }}>Citește mai mult</span>
             )}
-            <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: "14px", padding: "28px" }}>
-              <h3 style={{ margin: 0, fontSize: "21px", fontWeight: 700, textWrap: "pretty" }}>{serviciu.titlu}</h3>
-              <TextCartonas
-                serviciu={serviciu}
-                taiat={paginaDetaliata}
-                inaltimeRand={1.6}
-                style={{ fontSize: "15px", color: "var(--t-text-secundar)" }}
-              />
-              {paginaDetaliata && (
-                <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--t-accent)" }}>Citește mai mult</span>
-              )}
-              {serviciu.pret && (
-                <div
-                  style={{
-                    // Prețul stă mereu jos, oricât text are cartonașul de deasupra.
-                    marginTop: "auto",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    paddingTop: "16px",
-                    // Linie punctată vizibilă pe orice fundal de card (alb, salvie,
-                    // piersică): din culoarea textului, nu din `--t-chenar`.
-                    borderTop: "1px dashed color-mix(in oklab, var(--t-text) 20%, transparent)",
-                  }}
-                >
-                  <span style={{ fontSize: "22px", fontWeight: 800 }}>{serviciu.pret}</span>
-                  {paginaDetaliata && (
-                    <span aria-hidden style={{ fontSize: "18px", color: "var(--t-accent)" }}>
-                      →
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
+            {serviciu.pret && (
+              <div
+                style={{
+                  // Prețul stă mereu jos, oricât text are cartonașul de deasupra.
+                  marginTop: "auto",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  paddingTop: "16px",
+                  // Linie punctată vizibilă pe orice fundal de card (alb, salvie,
+                  // piersică): din culoarea textului, nu din `--t-chenar`.
+                  borderTop: "1px dashed color-mix(in oklab, var(--t-text) 20%, transparent)",
+                }}
+              >
+                <span style={{ fontSize: "22px", fontWeight: 800 }}>{serviciu.pret}</span>
+                {paginaDetaliata && (
+                  <span aria-hidden style={{ fontSize: "18px", color: "var(--t-accent)" }}>
+                    →
+                  </span>
+                )}
+              </div>
+            )}
           </>
         );
         return (
@@ -694,19 +670,15 @@ function TextCartonas({
  * Cardul unui serviciu. Link doar când există unde să ducă — un `<a>` fără
  * `href` nu e focusabil și e anunțat ca link stricat de cititoarele de ecran.
  *
- * Cu poză, cardul o poartă lată în cap (`overflow: hidden` o taie la colțurile
- * rotunjite), iar textul stă într-un strat cu marginile lui dedesubt. Fără poză,
- * arată exact ca înainte — un card doar cu text.
+ * FĂRĂ POZĂ, dinadins (hotărât cu proprietarul pe 3 oct. 2026). Poza
+ * serviciului apare pe pagina de servicii, nu aici. Prima pagină are deja poze
+ * (hero, „Despre mine", coperțile de articol); cartonașele de servicii se citesc
+ * mai bine ca listă — ce ofer, cât costă. Și o poză pusă doar la UN serviciu
+ * făcea toate cartonașele la fel de înalte, cu gol în cele fără poză. Singura
+ * excepție e Liniște (`ServiciiImagine`), unde poza e un medalion mic, rotund,
+ * parte din designul ei.
  */
-function Card({
-  link,
-  cover,
-  children,
-}: {
-  link?: string;
-  cover?: { url: string; pozitie?: PunctFocal } | null;
-  children: React.ReactNode;
-}) {
+function Card({ link, children }: { link?: string; children: React.ReactNode }) {
   const stil: React.CSSProperties = {
     display: "flex",
     flexDirection: "column",
@@ -720,23 +692,9 @@ function Card({
   };
 
   const continut = (
-    <>
-      {cover && (
-        <SectionImage
-          src={cover.url}
-          // Decor: numele serviciului, chiar sub poză, spune ce e — deci poza nu
-          // repetă informația pentru cititoarele de ecran.
-          alt=""
-          aspectRatio="3 / 2"
-          sizes="(max-width: 720px) 100vw, (max-width: 1040px) 50vw, 33vw"
-          // Punctul focal ales prin tragere; lipsă → centru, ca înainte.
-          pozitie={cover.pozitie}
-        />
-      )}
-      <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "32px", flex: 1 }}>
-        {children}
-      </div>
-    </>
+    <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "32px", flex: 1 }}>
+      {children}
+    </div>
   );
 
   if (!link) return <div style={stil}>{continut}</div>;
