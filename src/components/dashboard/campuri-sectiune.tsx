@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useBibliotecaImagini } from "@/components/dashboard/biblioteca-imagini";
-import { pozitioneazaImagine } from "@/app/dashboard/imagini/actions";
 import { SelectField, TextAreaField, TextField } from "@/components/ui/field";
 import { ImageField, type ImageValue } from "@/components/ui/image-field";
 import { RepeaterList } from "@/components/ui/repeater-list";
@@ -185,14 +184,12 @@ export function CampuriSectiune({
                 // Toate pozele de secțiune se afișează tăiate (`object-fit:
                 // cover`), deci toate se pot repoziționa (trase în ramă).
                 cuRepozitionare
-                // Poziția e a POZEI, nu a acestui loc: o salvăm și pe poză, ca să
-                // apară la fel peste tot unde e pusă. În câmp se vede imediat
-                // (`onChange`), iar aici se scrie și-n bibliotecă și-n celelalte
-                // secțiuni. Dacă scrierea asta pică, poziția din câmp tot se
-                // salvează la salvarea secțiunii — deci nu blocăm nimic pe ea.
-                onReposition={(uploadId, pozitie) => {
-                  void pozitioneazaImagine(uploadId, pozitie.x, pozitie.y, pozitie.zoom).catch(() => {});
-                }}
+                // Încadrarea e a LOCULUI, nu a pozei (3 oct. 2026): rămâne în
+                // valoarea câmpului (`onChange`) și se salvează cu locul — în
+                // conținutul secțiunii sau pe rândul coperții. Nu scriem pe poză
+                // (`onReposition` lipsește dinadins), ca o reglare aici să nu se
+                // reflecte în altă secțiune care folosește aceeași poză. Locurile
+                // noi pleacă din încadrarea „de pornire" a pozei (din bibliotecă).
                 // Aceeași poză a cabinetului se pune în mai multe secțiuni. Fără
                 // butonul ăsta ar fi trebuit încărcată din nou de fiecare dată,
                 // iar biblioteca s-ar fi umplut de copii ale aceluiași fișier —

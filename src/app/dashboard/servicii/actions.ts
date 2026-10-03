@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
 import { CAMPURI_SERVICIU, rezumatServiciu } from "@/lib/servicii";
 import { catreEditor, catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
+import { normalizeazaPunctFocal } from "@/lib/punct-focal";
 import { MAXIM_SERVICII, EROARE_PREA_MULTE } from "@/lib/limite-panou";
 
 export type RezultatServiciu =
@@ -14,18 +15,40 @@ export type RezultatServiciu =
   | { ok: false; mesaj: string; erori?: Record<string, string> };
 
 /**
- * Coperta stă în bază ca `cover_upload_id` (o referință), dar formularul o dă ca
- * imagine (`{ uploadId, url, altText }`). Aici scoatem doar id-ul.
+ * Coperta stă în bază ca `cover_upload_id` (o referință) plus propria încadrare
+ * (`cover_focal_*`), dar formularul o dă ca imagine (`{ uploadId, url, pozitie }`).
+ * Aici scoatem id-ul și punctul focal.
+ *
+ * Încadrarea e a LOCULUI, nu a pozei (3 oct. 2026): se salvează pe rândul
+ * serviciului, nu pe `uploads`, ca aceeași poză să poată fi încadrată altfel în
+ * alt loc. Lipsă → centru, nemărit.
  *
  * Serviciile n-au coloană de text alternativ (spre deosebire de articole):
  * poza cartonașului e ilustrativă, iar numele serviciului, chiar lângă ea, spune
  * ce e — deci se randează ca decor (`alt=""`), nu se cere o descriere în plus.
  */
-function coloanaCoperta(valoare: unknown): { cover_upload_id: string | null } {
-  const coperta = valoare as { uploadId?: unknown } | null | undefined;
+function coloanaCoperta(valoare: unknown): {
+  cover_upload_id: string | null;
+  cover_focal_x: number | null;
+  cover_focal_y: number | null;
+  cover_focal_zoom: number | null;
+} {
+  const coperta = valoare as { uploadId?: unknown; pozitie?: unknown } | null | undefined;
   const uploadId =
     typeof coperta?.uploadId === "string" && coperta.uploadId ? coperta.uploadId : null;
-  return { cover_upload_id: uploadId };
+
+  // Fără poză, n-are rost nicio încadrare.
+  if (!uploadId) {
+    return { cover_upload_id: null, cover_focal_x: null, cover_focal_y: null, cover_focal_zoom: null };
+  }
+
+  const p = normalizeazaPunctFocal(coperta?.pozitie);
+  return {
+    cover_upload_id: uploadId,
+    cover_focal_x: p.x,
+    cover_focal_y: p.y,
+    cover_focal_zoom: p.zoom ?? null,
+  };
 }
 
 /**
