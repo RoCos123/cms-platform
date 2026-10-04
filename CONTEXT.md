@@ -2507,6 +2507,18 @@ Acum:
 - ține cont de partea din fereastră care e pe ecran și de bara „Ai modificări
   nesalvate" de jos, care altfel acoperea poza.
 
+**Al doilea pâlpâit (5 oct. 2026, tot de la proprietar, în Edge).** După
+repararea buclei barei (mai jos), în Edge tot pâlpâia la derularea PAGINII, deși
+fereastra nu mai avea bara ei. În Chromium-ul probelor n-a putut fi reprodus
+(zero schimbări de mărime la derulare, măsurat cadru cu cadru la 1875×963), deci
+cauza exactă rămâne neconfirmată — cel mai probabil felul în care Edge
+redesenează, la derulare, o fereastră derulabilă cu un iframe micșorat înăuntru.
+Reparat prin scoaterea ferestrei derulabile de pe ecran lat: `overflow-y:
+hidden`, fără bară deloc, exact ca înainte de 4 oct. — dar derulabilă DIN COD
+(`scrollTo` merge pe `hidden`), deci aducerea pozei în vedere rămâne (verificat:
+27% → 100% la apăsarea pe ramă). Ce se pierde: derularea cu rotița ÎN
+previzualizare, care exista doar de pe 4 oct.
+
 **Pâlpâitul care a urmat (5 oct. 2026, prins de proprietar).** Fereastra
 derulabilă a adus o buclă: la anumite înălțimi de ecran, conținutul era cât
 fereastra; apărea bara de derulare, lățimea scădea, previzualizarea se micșora

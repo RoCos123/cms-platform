@@ -127,7 +127,13 @@ export function PanouPrevizualizare({
         // cadru. Reprodus la ferestre de 876–884px înălțime: lățimea se schimba
         // în 29 din 30 de cadre. Cu locul rezervat, lățimea nu mai depinde de
         // bară, deci bucla n-are de unde porni.
-        className="max-h-[52vh] overflow-y-auto overscroll-contain rounded-base [scrollbar-gutter:stable] lg:max-h-[calc(100vh-10rem)] lg:pb-24"
+        // Pe ecran lat, `overflow-y-HIDDEN`, nu `auto` (5 oct. 2026, Edge):
+        // chiar cu locul barei rezervat, derularea paginii peste fereastra
+        // derulabilă cu iframe-ul micșorat pâlpâia la proprietar. `hidden` scoate
+        // bara cu totul — exact ca înainte de 4 oct., când nu pâlpâia — dar
+        // rămâne derulabil DIN COD (`scrollTo` merge pe `hidden`), deci
+        // aducerea pozei în vedere nu se pierde.
+        className="max-h-[52vh] overflow-y-auto overscroll-contain rounded-base [scrollbar-gutter:stable] lg:max-h-[calc(100vh-10rem)] lg:overflow-y-hidden lg:[scrollbar-gutter:auto] lg:pb-24"
       >
         <LimitaEroare
           cheie={cheie}

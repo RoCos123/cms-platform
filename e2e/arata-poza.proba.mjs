@@ -48,10 +48,15 @@ test("legăturile: rama cere, poza e marcată, previzualizarea ascultă și se d
   assert.match(panou, /\[data-bara-salvare\]/);
 });
 
-test("fereastra previzualizării își rezervă locul barei de derulare (fără pâlpâit)", () => {
-  // Fără loc rezervat, la anumite înălțimi de ecran bara apărea și dispărea la
-  // fiecare cadru (lățimea → scara → înălțimea → bara → lățimea…). Reprodus pe
-  // 5 oct. 2026 la 876–884px: 29 de schimbări de lățime în 30 de cadre; după, 0.
+test("fereastra previzualizării nu are bară de derulare pe ecran lat (fără pâlpâit)", () => {
+  // Două rânduri de pâlpâit, amândouă prinse de proprietar pe 5 oct. 2026:
+  // 1) bara apărea și dispărea la fiecare cadru (lățimea → scara → bara…) —
+  //    oprit cu locul barei rezervat pe ecran îngust;
+  // 2) în Edge, pâlpâia și la derularea PAGINII peste fereastra derulabilă —
+  //    oprit cu `overflow-y: hidden` pe ecran lat: fără bară deloc, ca înainte
+  //    de 4 oct., dar tot derulabil DIN COD (`scrollTo` merge pe `hidden`),
+  //    deci aducerea pozei în vedere rămâne. Măsurat: poza 27% → 100% vizibilă.
   const panou = readFileSync("src/components/dashboard/panou-previzualizare.tsx", "utf8");
   assert.match(panou, /overflow-y-auto[^"]*\[scrollbar-gutter:stable\]/);
+  assert.match(panou, /lg:overflow-y-hidden/);
 });
