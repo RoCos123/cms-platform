@@ -527,3 +527,46 @@ body {
     grid-template-columns: repeat(var(--repere, 3), minmax(0, 1fr));
   }
 }
+
+/*
+ * Zilele din grila de programare („Apropiere", `programare-rapida.tsx`).
+ *
+ * Până pe 5 oct. 2026 coloanele erau `repeat(auto-fill, minmax(90px, 1fr))`. Cu
+ * șase zile, grila (~577px la maximum) are loc doar pentru cinci, deci a șasea cădea
+ * SINGURĂ pe un rând nou, sub celelalte — „Luni" atârnând sub „Marți" (prins de
+ * proprietar). Regula nu știa că 5 + 1 arată prost.
+ *
+ * Acum așezarea știe câte zile sunt (`--zile`, 1–6): toate pe UN rând cât timp
+ * încap cu cel puțin ~76px fiecare; când nu mai încap, se împart egal pe două
+ * rânduri (3 + 3, 3 + 2, 2 + 2), niciodată 5 + 1. Pragurile sunt lățimea
+ * containerului la care N coloane de 76px (cu 10px între ele) nu mai încap:
+ * 4 zile → 334px, 5 → 420px, 6 → 506px. Cu 3 zile sau mai puține încap oricând.
+ */
+.zile-grila {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  grid-template-columns: repeat(var(--zile, 6), minmax(0, 1fr));
+  /* O zi nu se întinde peste ~140px: cu una sau două zile, coloanele rămân coloane
+     (lipite la stânga), nu benzi cât tot cardul. La 6 zile plafonul e mai larg
+     decât grila, deci nu se simte. */
+  max-width: calc(var(--zile, 6) * 140px + (var(--zile, 6) - 1) * 10px);
+}
+
+@container zile (max-width: 505px) {
+  .zile-grila[data-zile="6"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container zile (max-width: 419px) {
+  .zile-grila[data-zile="5"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container zile (max-width: 333px) {
+  .zile-grila[data-zile="4"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

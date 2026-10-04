@@ -267,7 +267,15 @@ function SaptamanaGrila({
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <div style={stilCard}>
+        {/*
+          Două straturi: `stilGrila` e CONTAINERUL (îi măsoară lățimea
+          `@container` din `globals.css`), iar `.zile-grila` e grila propriu-zisă —
+          o regulă `@container` nu poate stiliza chiar containerul, doar ce e în el.
+          `data-zile`/`--zile`: câte zile sunt, ca așezarea să știe când o zi ar rămâne
+          singură pe rândul al doilea.
+        */}
         <div style={stilGrila}>
+          <div className="zile-grila" data-zile={zile.length} style={{ ["--zile" as string]: zile.length }}>
           {zile.map((z) => (
             <div key={z.zi} style={stilColoana}>
               <div style={stilCapZi}>
@@ -291,6 +299,7 @@ function SaptamanaGrila({
               })}
             </div>
           ))}
+          </div>
         </div>
 
         <aside style={stilSumar}>
@@ -352,14 +361,13 @@ const stilCard: CSSProperties = {
 };
 
 const stilGrila: CSSProperties = {
-  // Grila e mai lată decât rezumatul, ca la sursă. Coloanele se strâng singure
-  // pe telefon (auto-fill), fără media query — pe care un `style` nu-l exprimă.
+  // Grila e mai lată decât rezumatul, ca la sursă. Coloanele le hotărăște
+  // `.zile-grila` din `globals.css`, după lățimea acestui container.
   flex: "1.7 1 300px",
   minWidth: 0,
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(90px, 1fr))",
-  gap: "10px",
-  alignContent: "start",
+  alignSelf: "flex-start",
+  containerType: "inline-size",
+  containerName: "zile",
 };
 
 const stilColoana: CSSProperties = {

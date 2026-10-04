@@ -2493,6 +2493,29 @@ pe „X" pe o poză folosită → avertizarea apare, poza nu se selectează; „
 nu șterge nimic; pe una nefolosită, „Șterge definitiv" o scoate din bază și din
 grilă. Văzut pe 1280px și 390px. Rămâne neverificat pe baza reală.
 
+### Apropiere: zilele din programare nu mai rămân singure pe un rând (5 oct. 2026)
+
+Proprietarul: „așezarea pe zile nu e corectă" — cu șase zile, „Luni" cădea SINGURĂ
+sub celelalte cinci, iar în dreapta rămânea gol. Reprodus pe o rută temporară de
+probă (zile inventate, fără bază): la TOATE lățimile 6 zile ieșeau pe 2 rânduri.
+Cauza: coloanele erau `repeat(auto-fill, minmax(90px, 1fr))`, iar grila are cel
+mult ~577px (coloana din stânga e mai îngustă decât rezumatul) — încap 5 coloane
+de 90px, nu 6. Regula nu știa că 5 + 1 arată prost.
+
+Acum așezarea știe câte zile sunt (`--zile`, `data-zile`) și lățimea containerului
+(`@container zile`, în `globals.css`): toate pe UN rând cât încap cu ~76px fiecare;
+altfel se împart egal pe două rânduri, niciodată 5 + 1. Pragurile sunt lățimea la
+care N coloane nu mai încap: 4 zile → 333px, 5 → 419px, 6 → 505px. O zi nu se
+întinde peste 140px (cu una sau două zile, coloanele rămân coloane, nu benzi).
+
+Măsurat pe pagină, la 1–6 zile și 1326/1000/390px: 6 zile → 6 pe laptop, 3 + 3 pe
+telefon; 5 → 5 / 3 + 2; 4 → 4 / 2 + 2; nicio zi singură, nicăieri; nimic nu iese din
+coloană (cea mai îngustă zi: 88px pe laptop). Selectarea unei ore și rezumatul din
+dreapta merg ca înainte. Doar Apropiere are grila pe zile (`saptamana`).
+
+**Neatins, dar vizibil:** sub zilele cu două ore rămâne gol când o zi are cinci
+(sâmbăta); e natura unei grile pe coloane și n-a fost cerut.
+
 ### Căldură: „Întrebări frecvente" pe fundalul „relief" (5 oct. 2026)
 
 Cerut de proprietar, cu o mostră: rgb(223,216,209) = #DFD8D1 = `fundalRelief` al
