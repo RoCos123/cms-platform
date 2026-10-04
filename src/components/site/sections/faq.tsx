@@ -43,6 +43,17 @@ export function Faq({
     mele" și „Pachete": un titlu urmat de nimic arată a site stricat.
   */
   const intrebari = data.intrebari ?? [];
+
+  /*
+    Liniile dintre întrebări. De obicei `--t-chenar`, dar pe fundalul „relief" el
+    ar fi INVIZIBIL: la Căldură chenarul și fundalul relief sunt aceeași culoare
+    (#DFD8D1), la Liniște aproape la fel. Pe relief liniile se fac din culoarea
+    textului, ca în alte locuri unde chenarul n-are contrast cu fundalul.
+  */
+  const linie =
+    tone === "relief"
+      ? "color-mix(in oklab, currentColor 20%, transparent)"
+      : "var(--t-chenar)";
   /*
     Titlul singur e de ajuns ca să se vadă secțiunea, chiar fără nimic sub el.
 
@@ -95,8 +106,8 @@ export function Faq({
           <details
             key={i}
             style={{
-              borderTop: "1px solid var(--t-chenar)",
-              borderBottom: i === intrebari.length - 1 ? "1px solid var(--t-chenar)" : undefined,
+              borderTop: `1px solid ${linie}`,
+              borderBottom: i === intrebari.length - 1 ? `1px solid ${linie}` : undefined,
             }}
           >
             <summary

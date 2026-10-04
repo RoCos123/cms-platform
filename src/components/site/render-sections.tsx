@@ -162,7 +162,13 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
     <Pricing data={row.data as PricingData} tone={row.tone} friendly={ctx.asezari.pricingFriendly} />
   ),
   faq: (row, ctx) => (
-    <Faq data={row.data as FaqData} tone={row.tone} titluSerif={ctx.asezari.titluSerif} />
+    <Faq
+      data={row.data as FaqData}
+      // La Căldură secțiunea stă mereu pe „relief", ca în mostra proprietarului;
+      // altfel, tonul rândului, ca până acum.
+      tone={ctx.asezari.faqRelief ? "relief" : row.tone}
+      titluSerif={ctx.asezari.titluSerif}
+    />
   ),
   latestPosts: (row, ctx) => (
     <LatestPosts

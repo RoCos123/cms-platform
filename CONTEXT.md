@@ -2493,6 +2493,24 @@ pe „X" pe o poză folosită → avertizarea apare, poza nu se selectează; „
 nu șterge nimic; pe una nefolosită, „Șterge definitiv" o scoate din bază și din
 grilă. Văzut pe 1280px și 390px. Rămâne neverificat pe baza reală.
 
+### Căldură: „Întrebări frecvente" pe fundalul „relief" (5 oct. 2026)
+
+Cerut de proprietar, cu o mostră: rgb(223,216,209) = #DFD8D1 = `fundalRelief` al
+Căldurii (captura lui avea fundalul rgb(248,241,234) = `fundal` al Căldurii, deci
+șablonul e Căldură — dedus din culori, nu spus de el). Steag nou `faqRelief`,
+aprins DOAR la Căldură; celelalte șabloane își păstrează tonul rândului.
+
+**Capcana prinsă la măsurare:** liniile dintre întrebări erau `--t-chenar`, care
+la Căldură e IDENTIC cu fundalul relief (#DFD8D1) — pe noul fundal ar fi dispărut,
+fără ca ceva să pară stricat. Acum, când secțiunea e pe relief, liniile se fac
+din culoarea textului (`currentColor` 20%), ca în alte locuri unde chenarul n-are
+contrast cu fundalul. Regula stă pe `tone === "relief"`, nu pe șablon: un rând
+pus pe relief din altă parte ar fi avut aceeași problemă (la Liniște chenarul e
+doar cu o treaptă mai deschis).
+
+Măsurat pe pagină: fundal rgb(223,216,209); contrast text 11,4:1, text secundar și
+„+" 4,5:1 (paleta Căldurii e făcută să treacă pe acest fundal). Liniște neschimbat.
+
 ### Banda cu citat pe fundalul „relief" — Căldură, Apropiere, Claritate, Lumină (5 oct. 2026)
 
 Cerut de proprietar, cu o mostră de culoare. Măsurat pe ea: rgb(223,216,209) =
