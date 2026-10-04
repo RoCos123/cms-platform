@@ -79,11 +79,48 @@ export function PanouPrevizualizare({
         derulareAcum: fereastra.scrollTop + ascunsSus,
         inaltimeFereastra: Math.max(0, vizibilJos - ascunsSus),
       });
-      if (tinta !== null) fereastra.scrollTo({ top: Math.max(0, tinta - ascunsSus), behavior: "smooth" });
+      if (tinta !== null) {
+        // Sincronizarea cu pagina tace cât ține mișcarea, ca să n-o anuleze.
+        fereastra.dataset.sincronDupa = String(Date.now() + 1500);
+        fereastra.scrollTo({ top: Math.max(0, tinta - ascunsSus), behavior: "smooth" });
+      }
     }
 
     window.addEventListener(EVENIMENT_ARATA_POZA, arata);
     return () => window.removeEventListener(EVENIMENT_ARATA_POZA, arata);
+  }, []);
+
+  /*
+    Fereastra previzualizării se derulează ÎMPREUNĂ CU PAGINA (5 oct. 2026).
+
+    De ce: pe ecran lat fereastra n-are bară proprie (pâlpâia în Edge — vezi
+    clasa de mai jos), iar o secțiune mai înaltă decât ecranul rămânea cu partea
+    de jos de nevăzut: proprietarul a pus a doua bulină, jos pe poză, și n-o
+    vedea nicăieri. Acum, cât derulezi pagina (formularul), fereastra alunecă
+    proporțional prin secțiune: cu pagina sus vezi începutul, cu pagina jos
+    capătul — orice loc al previzualizării se poate vedea, fără nicio bară.
+
+    După o derulare cerută de o poză (`arata`, mai sus), sincronizarea tace o
+    vreme, ca să nu tragă fereastra înapoi din mișcarea abia făcută.
+  */
+  useEffect(() => {
+    const fereastra = fereastraRef.current;
+    if (!fereastra) return;
+
+    const sincronizeaza = () => {
+      if (Date.now() < +(fereastra.dataset.sincronDupa ?? 0)) return;
+      const deDerulatPagina = document.documentElement.scrollHeight - window.innerHeight;
+      const deDerulatFereastra = fereastra.scrollHeight - fereastra.clientHeight;
+      if (deDerulatPagina <= 0 || deDerulatFereastra <= 0) return;
+      fereastra.scrollTop = (window.scrollY / deDerulatPagina) * deDerulatFereastra;
+    };
+
+    window.addEventListener("scroll", sincronizeaza, { passive: true });
+    window.addEventListener("resize", sincronizeaza);
+    return () => {
+      window.removeEventListener("scroll", sincronizeaza);
+      window.removeEventListener("resize", sincronizeaza);
+    };
   }, []);
 
   return (

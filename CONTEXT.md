@@ -2507,6 +2507,16 @@ Acum:
 - ține cont de partea din fereastră care e pe ecran și de bara „Ai modificări
   nesalvate" de jos, care altfel acoperea poza.
 
+**Fereastra fără bară a lăsat capătul secțiunii de nevăzut (5 oct. 2026).**
+După scoaterea barei (mai jos), o secțiune mai înaltă decât ecranul rămânea cu
+partea de jos inaccesibilă: proprietarul a pus a doua bulină, jos pe poza din
+hero-ul Claritate, și n-o vedea nicăieri. Acum fereastra se derulează ÎMPREUNĂ
+CU PAGINA, proporțional: cu formularul sus vezi începutul secțiunii, cu
+formularul jos capătul ei — tot conținutul e accesibil, fără nicio bară.
+Derularea cerută de o poză (`arata`) amuțește sincronizarea 1,5s, ca să nu fie
+călcată. Măsurat pe Claritate: derulat la câmpul bulinei a doua, bulina a
+trecut de la 0% la 100% vizibilă; tragerea pozei rămâne la 100%.
+
 **Al doilea pâlpâit (5 oct. 2026, tot de la proprietar, în Edge).** După
 repararea buclei barei (mai jos), în Edge tot pâlpâia la derularea PAGINII, deși
 fereastra nu mai avea bara ei. În Chromium-ul probelor n-a putut fi reprodus

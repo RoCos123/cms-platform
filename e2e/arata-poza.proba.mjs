@@ -60,3 +60,15 @@ test("fereastra previzualizării nu are bară de derulare pe ecran lat (fără p
   assert.match(panou, /overflow-y-auto[^"]*\[scrollbar-gutter:stable\]/);
   assert.match(panou, /lg:overflow-y-hidden/);
 });
+
+test("fereastra previzualizării se derulează împreună cu pagina", () => {
+  // Fără bară proprie (Edge, mai sus), partea de jos a unei secțiuni înalte nu
+  // se mai putea vedea deloc: proprietarul a pus a doua bulină, jos pe poză, și
+  // n-o vedea nicăieri (5 oct. 2026). Acum fereastra alunecă proporțional cu
+  // pagina. Măsurat pe Claritate: la câmpul bulinei a doua, bulina 0% → 100%.
+  const panou = readFileSync("src/components/dashboard/panou-previzualizare.tsx", "utf8");
+  assert.match(panou, /window\.addEventListener\("scroll", sincronizeaza, \{ passive: true \}\)/);
+  assert.match(panou, /window\.scrollY \/ deDerulatPagina\) \* deDerulatFereastra/);
+  // Derularea cerută de o poză nu e călcată de sincronizare.
+  assert.match(panou, /sincronDupa/);
+});
