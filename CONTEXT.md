@@ -2493,14 +2493,19 @@ pe „X" pe o poză folosită → avertizarea apare, poza nu se selectează; „
 nu șterge nimic; pe una nefolosită, „Șterge definitiv" o scoate din bază și din
 grilă. Văzut pe 1280px și 390px. Rămâne neverificat pe baza reală.
 
-### Căldură: banda cu citat pe fundalul „relief" (5 oct. 2026)
+### Căldură și Apropiere: banda cu citat pe fundalul „relief" (5 oct. 2026)
 
 Cerut de proprietar, cu o mostră de culoare. Măsurat pe ea: rgb(223,216,209) =
 #DFD8D1 — exact `fundalRelief` al Căldurii, adică o culoare care exista deja în
 șablon (o folosesc și testimonialele). Steag nou `citatRelief`, aprins DOAR la
 Căldură: banda de citat stă mereu pe „relief", oricare ar fi tonul rândului;
-celelalte patru șabloane își păstrează tonul. Măsurat pe pagină: fundal
+celelalte șabloane își păstrează tonul. Măsurat pe pagină: fundal
 rgb(223,216,209), text rgb(42,31,26), contrast 11,4:1.
+
+**Apoi și Apropiere (5 oct. 2026), tot la cererea proprietarului, cu mostra
+lui:** rgb(232,220,200) = #E8DCC8 = `fundalRelief` al Apropierii. Același steag,
+aprins și acolo; măsurat pe pagină fundal rgb(232,220,200), contrast 8,9:1.
+Rămân pe tonul rândului Liniște, Lumină și Claritate.
 
 ### Bulinele de peste poză plutesc (4–5 oct. 2026; întâi Căldură, apoi toate)
 

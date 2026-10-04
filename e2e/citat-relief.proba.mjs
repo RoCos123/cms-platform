@@ -4,17 +4,21 @@ import { readFileSync } from "node:fs";
 import { getTemplate } from "@/lib/templates";
 
 /**
- * Banda cu citat pe fundalul „relief", doar la Căldură. `pnpm test:logica`.
+ * Banda cu citat pe fundalul „relief", doar la Căldură și Apropiere. `pnpm test:logica`.
  *
  * Cerut de proprietar pe 5 oct. 2026, cu o mostră de culoare: rgb(223,216,209),
  * adică chiar `fundalRelief` al Căldurii (#DFD8D1). Tratament vizual → doar unde
  * s-a cerut.
  */
 
-test("aprins doar la Căldură, iar mostra proprietarului e fundalul „relief” al ei", () => {
-  assert.equal(getTemplate("caldura").asezari.citatRelief, true);
-  assert.equal(getTemplate("caldura").paleta.fundalRelief.toUpperCase(), "#DFD8D1");
-  for (const id of ["liniste", "lumina", "apropiere", "claritate"]) {
+test("aprins doar la Căldură și Apropiere; mostra proprietarului = fundalul „relief” al fiecăreia", () => {
+  // Mostrele, măsurate pe capturile proprietarului (5 oct. 2026).
+  const mostre = { caldura: "#DFD8D1", apropiere: "#E8DCC8" };
+  for (const [id, culoare] of Object.entries(mostre)) {
+    assert.equal(getTemplate(id).asezari.citatRelief, true, `${id} are citatul pe relief`);
+    assert.equal(getTemplate(id).paleta.fundalRelief.toUpperCase(), culoare, `${id}: mostra`);
+  }
+  for (const id of ["liniste", "lumina", "claritate"]) {
     assert.ok(!getTemplate(id).asezari.citatRelief, `${id} își păstrează tonul rândului`);
   }
 });

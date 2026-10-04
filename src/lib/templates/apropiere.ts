@@ -90,5 +90,6 @@ export const apropiere: Template = {
     bandaServiciiDiscreta: true,
     bandaServiciiDelimitata: true,
     heroBulinePlutitoare: true,
+    citatRelief: true,
   },
 };
