@@ -183,8 +183,9 @@ export type TemplateAsezari = {
    * Banda cu citat pe fundalul „relief" al șablonului (treapta cea mai închisă
    * dintre cele deschise), indiferent de tonul rândului. Cerut de proprietar pe
    * 5 oct. 2026, cu o mostră de culoare: rgb(223,216,209) = `fundalRelief` la
-   * Căldură; apoi la Apropiere, rgb(232,220,200) = `fundalRelief` al ei. Doar
-   * „Căldură" și „Apropiere".
+   * Căldură; apoi la Apropiere, rgb(232,220,200), și la Claritate,
+   * rgb(223,230,238) — de fiecare dată `fundalRelief` al șablonului. Nu și la
+   * Liniște și Lumină (nicio mostră primită).
    */
   citatRelief?: boolean;
   /**

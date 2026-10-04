@@ -92,5 +92,6 @@ export const claritate: Template = {
     bandaServiciiDiscreta: true,
     bandaServiciiDelimitata: true,
     heroBulinePlutitoare: true,
+    citatRelief: true,
   },
 };

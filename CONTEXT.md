@@ -2493,7 +2493,7 @@ pe „X" pe o poză folosită → avertizarea apare, poza nu se selectează; „
 nu șterge nimic; pe una nefolosită, „Șterge definitiv" o scoate din bază și din
 grilă. Văzut pe 1280px și 390px. Rămâne neverificat pe baza reală.
 
-### Căldură și Apropiere: banda cu citat pe fundalul „relief" (5 oct. 2026)
+### Căldură, Apropiere și Claritate: banda cu citat pe fundalul „relief" (5 oct. 2026)
 
 Cerut de proprietar, cu o mostră de culoare. Măsurat pe ea: rgb(223,216,209) =
 #DFD8D1 — exact `fundalRelief` al Căldurii, adică o culoare care exista deja în
@@ -2505,7 +2505,11 @@ rgb(223,216,209), text rgb(42,31,26), contrast 11,4:1.
 **Apoi și Apropiere (5 oct. 2026), tot la cererea proprietarului, cu mostra
 lui:** rgb(232,220,200) = #E8DCC8 = `fundalRelief` al Apropierii. Același steag,
 aprins și acolo; măsurat pe pagină fundal rgb(232,220,200), contrast 8,9:1.
-Rămân pe tonul rândului Liniște, Lumină și Claritate.
+
+**Și Claritate (5 oct. 2026), tot cu mostră:** rgb(223,230,238) = #DFE6EE =
+`fundalRelief` al ei; măsurat pe pagină exact rgb(223,230,238), contrast 14,7:1.
+Rămân pe tonul rândului **Liniște și Lumină** (nicio mostră primită pentru ele —
+dacă vor aceeași schimbare, e o linie de `asezari` și o mostră).
 
 ### Bulinele de peste poză plutesc (4–5 oct. 2026; întâi Căldură, apoi toate)
 
