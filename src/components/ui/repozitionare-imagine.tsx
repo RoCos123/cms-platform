@@ -17,6 +17,7 @@ import {
   surplusulPozei,
   type PunctFocal,
 } from "@/lib/punct-focal";
+import { cereSaSeVadaPoza } from "@/lib/arata-poza";
 
 /**
  * Repoziționarea unei poze, ca la Facebook: o vezi într-o ramă, o tragi cu
@@ -103,6 +104,8 @@ export function RepozitionareImagine({
     inceput.current = { x: e.clientX, y: e.clientY, punct: value };
     ultima.current = value;
     setTrage(true);
+    // Previzualizarea aduce poza în vedere, ca mișcarea să se vadă cât tragi.
+    cereSaSeVadaPoza(src);
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {
@@ -147,6 +150,7 @@ export function RepozitionareImagine({
     if (!m) return;
 
     e.preventDefault();
+    cereSaSeVadaPoza(src);
     const { surplusX, surplusY } = surplus();
     const nou = normalizeazaPunctFocal({
       x: surplusX > 0 ? value.x + m[0] : value.x,
@@ -229,6 +233,7 @@ export function RepozitionareImagine({
             value={zoom}
             aria-label="Cât de mare e poza în ramă"
             onChange={(e) => {
+              cereSaSeVadaPoza(src);
               const nou = normalizeazaZoom(Number(e.target.value));
               const punct = normalizeazaPunctFocal({ ...value, zoom: nou });
               ultima.current = punct;

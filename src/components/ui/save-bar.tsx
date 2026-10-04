@@ -68,7 +68,8 @@ export function SaveBar({
     <>
       {/* Învelișul lipit nu prinde click-uri, doar bara din el: altfel banda transparentă
           de deasupra barei ar înghiți click-uri din conținutul de dedesubt. */}
-      <div className={cn("pointer-events-none sticky bottom-0 z-30 pt-3", className)}>
+      {/* `data-bara-salvare`: previzualizarea nu ascunde sub bară poza pe care o aduce în vedere. */}
+      <div data-bara-salvare className={cn("pointer-events-none sticky bottom-0 z-30 pt-3", className)}>
         {/*
          * Bara rămâne în flux și ascunsă, ca să-și rezerve din start înălțimea: dacă ar
          * fi montată abia la prima modificare, conținutul ar sări sau ultimul câmp din

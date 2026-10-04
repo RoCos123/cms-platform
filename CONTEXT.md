@@ -2431,6 +2431,33 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Previzualizarea aduce în vedere poza pe care o așezi (4 oct. 2026)
+
+Proprietarul, pe Căldură: trăgea de poza din hero și n-o vedea mișcându-se în
+previzualizare. Cauza nu era rama (e 16/9 și în panou, și pe site — verificat),
+ci FEREASTRA previzualizării: pe ecran lat stă lipită sus cât derulezi
+formularul, iar hero-ul Căldură (titlu mare, apoi poza lată dedesubt) o făcea
+mai înaltă decât ecranul. Poza rămânea sub marginea de jos, iar o fereastră
+lipită sus nu se putea derula până la ea.
+
+Acum:
+- fereastra are cel mult înălțimea ecranului și se derulează în interior (și
+  cu rotița, verificat — pagina nu se mișcă);
+- când apeși pe ramă, muți poza cu săgețile sau schimbi „Mărime", fereastra se
+  derulează singură până la poză (`src/lib/arata-poza.ts`), DOAR dacă poza nu
+  se vede deja întreagă, ca să nu sară la fiecare pixel;
+- ține cont de partea din fereastră care e pe ecran și de bara „Ai modificări
+  nesalvate" de jos, care altfel acoperea poza.
+
+Legătura e un eveniment pe `window`: rama și previzualizarea stau în ramuri
+diferite ale paginii, iar formularul e folosit în patru editoare (secțiuni,
+servicii, blog, setări) — merge în toate fără să treacă prin fiecare. Poza e
+găsită în previzualizare după `data-poza`, pus pe `SectionImage`.
+
+Măsurat pe drumul complet (editorul hero Căldură, Supabase fals, tras cu mouse-ul):
+cu pagina sus, poza a trecut de la 60% vizibilă la 100%; cu pagina derulată, ca
+în captura proprietarului, de la 76% la 100%, toată deasupra barei de salvare.
+
 ### Liniște: „Păreri" pe verde (3 oct. 2026)
 
 Cerut de proprietar, cu o captură a culorii dorite (o bandă verde cu „Un gând",

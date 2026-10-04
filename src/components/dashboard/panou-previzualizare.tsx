@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { EVENIMENT_ARATA_POZA, tintaDerulare } from "@/lib/arata-poza";
 import { Button } from "@/components/ui/button";
 import { CadruPrevizualizare } from "./cadru-previzualizare";
 import { LimitaEroare } from "./limita-eroare";
@@ -36,6 +37,54 @@ export function PanouPrevizualizare({
   children: ReactNode;
 }) {
   const [latime, setLatime] = useState<number>(LATIMI[0].valoare);
+  const fereastraRef = useRef<HTMLDivElement>(null);
+
+  /*
+    Când tragi de o poză în formular (sau îi schimbi mărimea), previzualizarea
+    se derulează până la ea — altfel, la un hero înalt, poza stătea sub marginea
+    ecranului și n-o vedeai mișcându-se (4 oct. 2026). Vezi `arata-poza.ts`.
+  */
+  useEffect(() => {
+    function arata(e: Event) {
+      const src = (e as CustomEvent<{ src?: string }>).detail?.src;
+      const fereastra = fereastraRef.current;
+      const iframe = fereastra?.querySelector("iframe");
+      const doc = iframe?.contentDocument;
+      if (!src || !fereastra || !iframe || !doc) return;
+
+      const poza = Array.from(doc.querySelectorAll<HTMLElement>("[data-poza]")).find(
+        (el) => el.dataset.poza === src,
+      );
+      if (!poza) return;
+
+      // Iframe-ul e micșorat cu `transform`: dimensiunile din el se înmulțesc cu
+      // scara ca să ajungă în pixelii ferestrei.
+      const scara = iframe.getBoundingClientRect().width / (iframe.offsetWidth || 1);
+      const r = poza.getBoundingClientRect();
+      const susIframe =
+        iframe.getBoundingClientRect().top - fereastra.getBoundingClientRect().top + fereastra.scrollTop;
+
+      // Contează doar partea din fereastră care e pe ECRAN: până se lipește
+      // sus, fereastra poate coborî sub marginea de jos a ecranului — iar jos
+      // stă bara „Ai modificări nesalvate", care acoperă ce e sub ea.
+      const f = fereastra.getBoundingClientRect();
+      const bara = document.querySelector("[data-bara-salvare]")?.getBoundingClientRect();
+      const josEcran = Math.min(window.innerHeight, bara && bara.top > 0 ? bara.top : window.innerHeight);
+      const ascunsSus = Math.max(0, -f.top);
+      const vizibilJos = Math.min(f.height, josEcran - f.top);
+
+      const tinta = tintaDerulare({
+        sus: susIframe + r.top * scara,
+        inaltime: r.height * scara,
+        derulareAcum: fereastra.scrollTop + ascunsSus,
+        inaltimeFereastra: Math.max(0, vizibilJos - ascunsSus),
+      });
+      if (tinta !== null) fereastra.scrollTo({ top: Math.max(0, tinta - ascunsSus), behavior: "smooth" });
+    }
+
+    window.addEventListener(EVENIMENT_ARATA_POZA, arata);
+    return () => window.removeEventListener(EVENIMENT_ARATA_POZA, arata);
+  }, []);
 
   return (
     // Pe ecran lat stă în dreapta formularului și rămâne lipită sus cât derulezi.
@@ -60,7 +109,17 @@ export function PanouPrevizualizare({
         </div>
       </div>
 
-      <div className="max-h-[52vh] overflow-hidden rounded-base lg:max-h-none lg:overflow-visible">
+      {/*
+        Fereastra previzualizării nu trece de marginea ecranului: pe ecran lat stă
+        lipită sus, deci tot ce ieșea sub ea (poza unui hero înalt) nu se mai
+        vedea deloc. Acum se derulează în interior.
+      */}
+      <div
+        ref={fereastraRef}
+        // `pb-24` pe ecran lat: loc liber sub previzualizare, ca o poză aflată
+        // chiar la capătul ei să poată fi derulată deasupra barei de salvare.
+        className="max-h-[52vh] overflow-y-auto overscroll-contain rounded-base lg:max-h-[calc(100vh-10rem)] lg:pb-24"
+      >
         <LimitaEroare
           cheie={cheie}
           fallback={

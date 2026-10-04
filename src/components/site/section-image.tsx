@@ -73,7 +73,9 @@ export function SectionImage({
     : {};
 
   return (
-    <div style={stilInvelis}>
+    // `data-poza`: după el găsește panoul poza în previzualizare, ca s-o aducă în
+    // vedere cât o așezi (vezi `src/lib/arata-poza.ts`).
+    <div style={stilInvelis} data-poza={src}>
       {poateFiOptimizata(src) ? (
         <Image
           src={src}
