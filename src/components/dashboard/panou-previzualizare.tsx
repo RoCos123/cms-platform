@@ -118,7 +118,16 @@ export function PanouPrevizualizare({
         ref={fereastraRef}
         // `pb-24` pe ecran lat: loc liber sub previzualizare, ca o poză aflată
         // chiar la capătul ei să poată fi derulată deasupra barei de salvare.
-        className="max-h-[52vh] overflow-y-auto overscroll-contain rounded-base lg:max-h-[calc(100vh-10rem)] lg:pb-24"
+        //
+        // `scrollbar-gutter: stable` — locul barei de derulare e rezervat MEREU.
+        // Fără el, previzualizarea pâlpâia (5 oct. 2026, prins de proprietar):
+        // când conținutul era cât fereastra, apărea bara, lățimea scădea cu
+        // ~15px, previzualizarea se micșora (scara urmează lățimea), încăpea,
+        // bara dispărea, lățimea creștea la loc, nu mai încăpea — la fiecare
+        // cadru. Reprodus la ferestre de 876–884px înălțime: lățimea se schimba
+        // în 29 din 30 de cadre. Cu locul rezervat, lățimea nu mai depinde de
+        // bară, deci bucla n-are de unde porni.
+        className="max-h-[52vh] overflow-y-auto overscroll-contain rounded-base [scrollbar-gutter:stable] lg:max-h-[calc(100vh-10rem)] lg:pb-24"
       >
         <LimitaEroare
           cheie={cheie}

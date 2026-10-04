@@ -2507,6 +2507,18 @@ Acum:
 - ține cont de partea din fereastră care e pe ecran și de bara „Ai modificări
   nesalvate" de jos, care altfel acoperea poza.
 
+**Pâlpâitul care a urmat (5 oct. 2026, prins de proprietar).** Fereastra
+derulabilă a adus o buclă: la anumite înălțimi de ecran, conținutul era cât
+fereastra; apărea bara de derulare, lățimea scădea, previzualizarea se micșora
+(scara urmează lățimea) și încăpea, bara dispărea, lățimea creștea, nu mai
+încăpea — la fiecare cadru. Reprodus cu Playwright cu bare de derulare reale
+(fără `--hide-scrollbars`, pus implicit de Playwright — de-aia nu se văzuse la
+prima probă): la 876–884px înălțime, 29 de schimbări de lățime în 30 de cadre.
+Reparat cu `scrollbar-gutter: stable` (locul barei e rezervat mereu); după, 0
+schimbări pe toate înălțimile 600–1100px. **De ținut minte:** o probă vizuală
+cu Playwright ascunde barele de derulare; când contează lățimea, se pornește cu
+`ignoreDefaultArgs: ["--hide-scrollbars"]`.
+
 Legătura e un eveniment pe `window`: rama și previzualizarea stau în ramuri
 diferite ale paginii, iar formularul e folosit în patru editoare (secțiuni,
 servicii, blog, setări) — merge în toate fără să treacă prin fiecare. Poza e

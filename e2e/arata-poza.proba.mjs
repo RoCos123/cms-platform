@@ -47,3 +47,11 @@ test("legăturile: rama cere, poza e marcată, previzualizarea ascultă și se d
   assert.match(bara, /data-bara-salvare/);
   assert.match(panou, /\[data-bara-salvare\]/);
 });
+
+test("fereastra previzualizării își rezervă locul barei de derulare (fără pâlpâit)", () => {
+  // Fără loc rezervat, la anumite înălțimi de ecran bara apărea și dispărea la
+  // fiecare cadru (lățimea → scara → înălțimea → bara → lățimea…). Reprodus pe
+  // 5 oct. 2026 la 876–884px: 29 de schimbări de lățime în 30 de cadre; după, 0.
+  const panou = readFileSync("src/components/dashboard/panou-previzualizare.tsx", "utf8");
+  assert.match(panou, /overflow-y-auto[^"]*\[scrollbar-gutter:stable\]/);
+});
