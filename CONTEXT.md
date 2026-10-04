@@ -2475,6 +2475,24 @@ Măsurat cu reperele din captura proprietarului, pe toate cinci șabloanele, la
 1280px și 390px: niciun text nu iese din reperul lui. La Căldură, cu cuvântul de
 14 litere, textul mare ajunge la 22,6px; cu cuvinte obișnuite rămâne mai mare.
 
+### Biblioteca: „X" pe fiecare poză, pentru ștergere rapidă (5 oct. 2026)
+
+Cerut de proprietar, pe toate șabloanele: ștergerea unei poze să nu mai ceară
+deschiderea ei întâi (clic pe poză → „Șterge imaginea"). Fiecare miniatură din
+grilă are acum un „×" în colț, mereu vizibil (pe telefon nu există hover).
+
+**Nu șterge pe loc.** O poză folosită pe site e scoasă și de acolo, iar asta
+trebuie spus înainte. „X"-ul duce la ACELAȘI dialog ca butonul din panou
+(`dialog-stergere-imagine.tsx`, scos din `panou-imagine.tsx`): „Folosită în
+Despre mine… O scoatem și de acolo". Dacă cele două locuri și-ar fi avut fiecare
+dialogul, unul ar fi ajuns, la prima schimbare, să șteargă fără avertizare.
+
+„X"-ul e FRATE al butonului cardului, nu copil (buton în buton e HTML invalid, și
+un clic pe „X" ar fi selectat și poza). Verificat pe pagină, cu server fals: clic
+pe „X" pe o poză folosită → avertizarea apare, poza nu se selectează; „Păstrează"
+nu șterge nimic; pe una nefolosită, „Șterge definitiv" o scoate din bază și din
+grilă. Văzut pe 1280px și 390px. Rămâne neverificat pe baza reală.
+
 ### Căldură: banda cu citat pe fundalul „relief" (5 oct. 2026)
 
 Cerut de proprietar, cu o mostră de culoare. Măsurat pe ea: rgb(223,216,209) =

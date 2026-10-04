@@ -17,6 +17,7 @@ import {
 } from "@/lib/uploads";
 import { normalizeazaPentruCautare, type ImagineBiblioteca } from "@/lib/imagini";
 import { PanouImagine } from "./panou-imagine";
+import { DialogStergereImagine } from "./dialog-stergere-imagine";
 
 /** De la câte imagini încolo căutarea ajută mai mult decât încurcă. */
 const PRAG_CAUTARE = 8;
@@ -34,6 +35,9 @@ export function Galerie({ imagini }: { imagini: ImagineBiblioteca[] }) {
   const panouRef = useRef<HTMLDivElement>(null);
 
   const [alesId, setAlesId] = useState<string | null>(null);
+  // Poza pentru care s-a apăsat „X"-ul din colț; dialogul de confirmare e același
+  // cu al butonului din panou (`dialog-stergere-imagine.tsx`).
+  const [deStersId, setDeStersId] = useState<string | null>(null);
   const [cautare, setCautare] = useState("");
   const [seTrage, setSeTrage] = useState(false);
   const [progres, setProgres] = useState<{ facute: number; total: number } | null>(null);
@@ -54,6 +58,7 @@ export function Galerie({ imagini }: { imagini: ImagineBiblioteca[] }) {
   // Selecția trăiește ca `id`, nu ca index: căutarea și ștergerile rearanjează
   // lista, iar un index ar arăta brusc altă imagine decât cea apăsată.
   const aleasa = imagini.find((imagine) => imagine.id === alesId) ?? null;
+  const deSters = imagini.find((imagine) => imagine.id === deStersId) ?? null;
 
   /**
    * Pe ecran îngust panoul stă sub grilă, deci o poză apăsată de la mijlocul
@@ -297,7 +302,7 @@ export function Galerie({ imagini }: { imagini: ImagineBiblioteca[] }) {
             ) : (
               <ul className="grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-3 xl:grid-cols-4">
                 {gasite.map((imagine) => (
-                  <li key={imagine.id}>
+                  <li key={imagine.id} className="relative">
                     {/*
                       Buton adevărat, nu un `div` cu rol: sunt câteva zeci de
                       imagini, deci parcurgerea cu Tab e rezonabilă, iar tastatura
@@ -343,6 +348,30 @@ export function Galerie({ imagini }: { imagini: ImagineBiblioteca[] }) {
                         )}
                       </p>
                     </button>
+
+                    {/*
+                      „X" în colțul miniaturii: ștergerea fără să mai deschizi întâi
+                      poza (cerut de proprietar, 5 oct. 2026). FRATE al butonului
+                      cardului, nu copil: un buton în alt buton e HTML invalid și
+                      un clic pe „X" ar fi selectat și poza. Mereu vizibil, nu doar
+                      la hover — pe telefon nu există hover. Nu șterge pe loc: duce
+                      la același dialog ca butonul din panou, care spune dacă poza
+                      e pusă pe site și că va fi scoasă și de acolo.
+                    */}
+                    <button
+                      type="button"
+                      aria-label={`Șterge imaginea ${imagine.numeFisier}`}
+                      title="Șterge imaginea"
+                      onClick={() => setDeStersId(imagine.id)}
+                      className={cn(
+                        "absolute right-3.5 top-3.5 grid size-8 place-items-center rounded-full",
+                        "bg-black/60 text-lg leading-none text-white shadow-sm backdrop-blur-sm",
+                        "transition-colors hover:bg-danger focus-visible:bg-danger",
+                        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                      )}
+                    >
+                      <span aria-hidden>×</span>
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -372,6 +401,15 @@ export function Galerie({ imagini }: { imagini: ImagineBiblioteca[] }) {
           </div>
         </div>
       )}
+
+      <DialogStergereImagine
+        imagine={deSters}
+        onSters={(id) => {
+          // Selecția dispare odată cu poza; altfel panoul ar arăta o imagine ștearsă.
+          if (id === alesId) setAlesId(null);
+        }}
+        onInchis={() => setDeStersId(null)}
+      />
 
       <p aria-live="polite" className="sr-only">
         {anunt}

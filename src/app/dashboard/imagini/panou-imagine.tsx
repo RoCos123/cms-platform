@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { TextAreaField } from "@/components/ui/field";
 import { useToast } from "@/components/ui/toast";
 import { RepozitionareImagine } from "@/components/ui/repozitionare-imagine";
@@ -15,7 +14,8 @@ import {
   type ImagineBiblioteca,
 } from "@/lib/imagini";
 import { normalizeazaPunctFocal, type PunctFocal } from "@/lib/punct-focal";
-import { pozitioneazaImagine, salveazaDescriereaImaginii, stergeImaginea } from "./actions";
+import { pozitioneazaImagine, salveazaDescriereaImaginii } from "./actions";
+import { DialogStergereImagine } from "./dialog-stergere-imagine";
 
 /**
  * Detaliile imaginii alese: ce e, unde e pusă, cum se descrie și cum se șterge.
@@ -63,7 +63,6 @@ function Detalii({
   const [descriere, setDescriere] = useState(imagine.descriere);
   const [pozitie, setPozitie] = useState<PunctFocal>(normalizeazaPunctFocal(imagine.pozitie));
   const [eroare, setEroare] = useState<string | null>(null);
-  const [eroareStergere, setEroareStergere] = useState<string | null>(null);
   const [deSters, setDeSters] = useState(false);
   const [seSalveaza, porneste] = useTransition();
   const [, pornestePozitia] = useTransition();
@@ -112,44 +111,6 @@ function Detalii({
       );
     });
   }
-
-  /**
-   * Aruncă la eșec, ca ConfirmDialog să țină dialogul deschis: mesajul se
-   * citește acolo, sub întrebare, iar butonul poate fi apăsat din nou. Închis,
-   * eroarea ar rămâne pe un panou pe care omul nu se mai uită.
-   */
-  async function sterge() {
-    setEroareStergere(null);
-
-    const rezultat = await stergeImaginea(imagine.id).catch(() => null);
-
-    if (!rezultat) {
-      setEroareStergere(
-        "Nu am putut șterge. Verifică legătura la internet și mai încearcă o dată.",
-      );
-      throw new Error("Ștergerea imaginii nu a ajuns la server.");
-    }
-    if (!rezultat.ok) {
-      setEroareStergere(rezultat.mesaj);
-      throw new Error(rezultat.mesaj);
-    }
-
-    onSters();
-    show("Imaginea a fost ștearsă.", "success");
-  }
-
-  const consecinta =
-    locuri.length > 0
-      ? `${descrieFolosirile(locuri)} O scoatem și de acolo, ca pe site să nu rămână o imagine ruptă.`
-      : null;
-
-  const avertisment =
-    eroareStergere || consecinta ? (
-      <>
-        {eroareStergere && <span className="block font-medium">{eroareStergere}</span>}
-        {consecinta && <span className={eroareStergere ? "mt-1 block" : undefined}>{consecinta}</span>}
-      </>
-    ) : undefined;
 
   return (
     <aside
@@ -245,20 +206,11 @@ function Detalii({
         Șterge imaginea
       </Button>
 
-      <ConfirmDialog
-        open={deSters}
-        onOpenChange={(deschis) => {
-          if (deschis) return;
-          setDeSters(false);
-          setEroareStergere(null);
-        }}
-        title="Ștergi imaginea?"
-        description={`„${imagine.numeFisier}” dispare din bibliotecă și nu mai poate fi recuperată.`}
-        warning={avertisment}
-        confirmLabel="Șterge definitiv"
-        cancelLabel="Păstrează"
-        tone="danger"
-        onConfirm={sterge}
+      {/* Dialogul e comun cu „X"-ul din grila bibliotecii — vezi `dialog-stergere-imagine.tsx`. */}
+      <DialogStergereImagine
+        imagine={deSters ? imagine : null}
+        onSters={onSters}
+        onInchis={() => setDeSters(false)}
       />
     </aside>
   );
