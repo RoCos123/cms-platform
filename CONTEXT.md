@@ -2431,6 +2431,20 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Căldură: bulinele de peste poză plutesc (4 oct. 2026)
+
+Cerut de proprietar, arătând bulina „Online și offline" din hero-ul Căldură:
+„să se deplaseze ușor sus-jos, așa cum e la Dragoș Geamănă". Steag nou
+`heroBulinePlutitoare`, aprins DOAR la Căldură (tratament vizual → doar unde s-a
+cerut); celelalte șabloane cu buline îl pot primi cu o linie.
+
+Mișcarea de la referință n-a putut fi măsurată (site-ul nu se deschide din
+mediul de lucru), deci valorile sunt alese, nu copiate: 8px, un ciclu de 4,5s,
+lin la capete; a doua bulină pornește de la jumătatea ciclului, ca să nu urce
+amândouă deodată. Doar `transform` — nu mișcă nimic din jur. Sub
+`prefers-reduced-motion` stă pe loc. Măsurat pe pagină: 777–785px, adică 8px,
+în opoziție de fază; cu mișcare redusă, fixă.
+
 ### Previzualizarea aduce în vedere poza pe care o așezi (4 oct. 2026)
 
 Proprietarul, pe Căldură: trăgea de poza din hero și n-o vedea mișcându-se în

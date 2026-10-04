@@ -157,6 +157,12 @@ export type TemplateAsezari = {
    */
   heroCercDecor?: boolean;
   /**
+   * Bulinele de peste poza din hero plutesc ușor sus-jos, ca la referința
+   * „Dragoș Geamănă". Cerut de proprietar pe 4 oct. 2026, arătând Căldură.
+   * Doar „Căldură" deocamdată.
+   */
+  heroBulinePlutitoare?: boolean;
+  /**
    * Oglindește cele două coloane ale primei secțiuni: poza la STÂNGA, textul la
    * dreapta. Fără el, așezarea `textPozaDreapta` ține textul la stânga. Doar
    * „Lumină", cerut de proprietar pe 1 oct. 2026.

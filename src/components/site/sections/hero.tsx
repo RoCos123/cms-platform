@@ -45,6 +45,7 @@ export function Hero({
   titluFriendly,
   blob,
   cercDecor,
+  bulinePlutitoare,
 }: {
   data: HeroData;
   tone?: SectionTone;
@@ -62,6 +63,8 @@ export function Hero({
    * — semnătura editorială a referinței „Liniște". Doar „Liniște".
    */
   cercDecor?: boolean;
+  /** Bulinele de peste poză plutesc ușor sus-jos (`.bulina-plutitoare`). Doar „Căldură". */
+  bulinePlutitoare?: boolean;
   /**
    * Tratamentul de titlu al modelului prietenos (doar „Apropiere"): ultimul
    * cuvânt din titlu are o dungă piersică pe dedesubt (ca „tu" la sursă), iar
@@ -381,8 +384,18 @@ export function Hero({
         )}
       </div>
 
-      {buline[0] && <Bulina bulina={buline[0]} pozitie={{ top: "26px", right: "-10px" }} />}
-      {buline[1] && <Bulina bulina={buline[1]} pozitie={{ bottom: "30px", left: "-10px" }} />}
+      {buline[0] && (
+        <Bulina bulina={buline[0]} pozitie={{ top: "26px", right: "-10px" }} plutitoare={bulinePlutitoare} />
+      )}
+      {buline[1] && (
+        <Bulina
+          bulina={buline[1]}
+          pozitie={{ bottom: "30px", left: "-10px" }}
+          plutitoare={bulinePlutitoare}
+          // A doua pornește din alt punct al mișcării, ca să nu urce amândouă deodată.
+          decalaj
+        />
+      )}
     </div>
   );
 
@@ -473,13 +486,21 @@ export function Hero({
 function Bulina({
   bulina,
   pozitie,
+  plutitoare,
+  decalaj,
 }: {
   bulina: { emoji?: string; mic?: string; mare: string };
   pozitie: CSSProperties;
+  /** Plutește ușor sus-jos — vezi `.bulina-plutitoare` în `globals.css`. */
+  plutitoare?: boolean;
+  /** Pornește mișcarea de la jumătate, ca două buline să nu urce deodată. */
+  decalaj?: boolean;
 }) {
   return (
     <div
+      className={plutitoare ? "bulina-plutitoare" : undefined}
       style={{
+        ...(plutitoare && decalaj ? { animationDelay: "-2.25s" } : {}),
         position: "absolute",
         ...pozitie,
         display: "inline-flex",

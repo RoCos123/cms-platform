@@ -482,3 +482,30 @@ body {
     order: 1;
   }
 }
+
+/*
+ * Bulinele de peste poza din hero, care plutesc ușor sus-jos (`hero.tsx`, steagul
+ * `heroBulinePlutitoare`). Cerut de proprietar pe 4 oct. 2026, „ca la Dragoș
+ * Geamănă". Mișcarea de acolo n-a putut fi măsurată (site-ul nu se deschide din
+ * mediul de lucru), deci valorile sunt alese: 8px, un ciclu de 4,5s, lin la
+ * capete — destul cât să se observe, prea puțin cât să distragă de la titlu.
+ * Doar `transform`: nu mută nimic din jur și nu cere reașezarea paginii.
+ *
+ * Sub `prefers-reduced-motion` nu se mișcă deloc: cine a cerut mai puțină
+ * mișcare vede bulina pe loc, cu același conținut.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .bulina-plutitoare {
+    animation: plutire-bulina 4.5s ease-in-out infinite;
+  }
+}
+
+@keyframes plutire-bulina {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}

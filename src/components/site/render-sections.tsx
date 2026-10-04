@@ -98,6 +98,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       titluFriendly={ctx.asezari.heroTitluFriendly}
       blob={ctx.asezari.heroBlob}
       cercDecor={ctx.asezari.heroCercDecor}
+      bulinePlutitoare={ctx.asezari.heroBulinePlutitoare}
     />
   ),
   quote: (row, ctx) => (
