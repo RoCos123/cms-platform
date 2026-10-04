@@ -2475,12 +2475,14 @@ Măsurat cu reperele din captura proprietarului, pe toate cinci șabloanele, la
 1280px și 390px: niciun text nu iese din reperul lui. La Căldură, cu cuvântul de
 14 litere, textul mare ajunge la 22,6px; cu cuvinte obișnuite rămâne mai mare.
 
-### Căldură: bulinele de peste poză plutesc (4 oct. 2026)
+### Bulinele de peste poză plutesc (4–5 oct. 2026; întâi Căldură, apoi toate)
 
 Cerut de proprietar, arătând bulina „Online și offline" din hero-ul Căldură:
 „să se deplaseze ușor sus-jos, așa cum e la Dragoș Geamănă". Steag nou
-`heroBulinePlutitoare`, aprins DOAR la Căldură (tratament vizual → doar unde s-a
-cerut); celelalte șabloane cu buline îl pot primi cu o linie.
+`heroBulinePlutitoare`, aprins întâi DOAR la Căldură (tratament vizual → doar
+unde s-a cerut). **A doua zi proprietarul a cerut explicit „pe toate
+șabloanele"** — aprins la toate cinci; verificat pe Claritate că se mișcă, în
+contratimp. Steagul rămâne, pentru un șablon viitor mai static.
 
 Mișcarea de la referință n-a putut fi măsurată (site-ul nu se deschide din
 mediul de lucru), deci valorile sunt alese, nu copiate: 8px, un ciclu de 4,5s,

@@ -89,5 +89,6 @@ export const apropiere: Template = {
     contactFriendly: true,
     bandaServiciiDiscreta: true,
     bandaServiciiDelimitata: true,
+    heroBulinePlutitoare: true,
   },
 };

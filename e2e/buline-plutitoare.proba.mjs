@@ -11,10 +11,9 @@ import { getTemplate } from "@/lib/templates";
  * „mai puțină mișcare" cerută din sistem, stau pe loc.
  */
 
-test("aprins doar la Căldură, unde s-a cerut", () => {
-  assert.equal(getTemplate("caldura").asezari.heroBulinePlutitoare, true);
-  for (const id of ["liniste", "lumina", "apropiere", "claritate"]) {
-    assert.ok(!getTemplate(id).asezari.heroBulinePlutitoare, `${id} nu are buline plutitoare`);
+test("aprins la toate șabloanele (cerut întâi la Căldură, apoi peste tot, 5 oct. 2026)", () => {
+  for (const id of ["caldura", "liniste", "lumina", "apropiere", "claritate"]) {
+    assert.equal(getTemplate(id).asezari.heroBulinePlutitoare, true, `${id} are buline plutitoare`);
   }
 });
 

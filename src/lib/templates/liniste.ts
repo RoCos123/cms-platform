@@ -73,6 +73,7 @@ export const liniste: Template = {
     testimonialeVerde: true,
     blogCurat: true,
     bandaServiciiDiscreta: true,
+    heroBulinePlutitoare: true,
     titluSerif: true,
   },
 };

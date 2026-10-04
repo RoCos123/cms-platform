@@ -91,5 +91,6 @@ export const claritate: Template = {
     desprePozaRotunda: true,
     bandaServiciiDiscreta: true,
     bandaServiciiDelimitata: true,
+    heroBulinePlutitoare: true,
   },
 };

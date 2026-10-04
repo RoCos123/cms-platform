@@ -158,8 +158,9 @@ export type TemplateAsezari = {
   heroCercDecor?: boolean;
   /**
    * Bulinele de peste poza din hero plutesc ușor sus-jos, ca la referința
-   * „Dragoș Geamănă". Cerut de proprietar pe 4 oct. 2026, arătând Căldură.
-   * Doar „Căldură" deocamdată.
+   * „Dragoș Geamănă". Cerut pe 4 oct. 2026 la Căldură, apoi pe 5 oct. pe toate
+   * șabloanele. Rămâne steag, nu purtare fixă: un șablon viitor mai static îl
+   * poate lăsa stins.
    */
   heroBulinePlutitoare?: boolean;
   /**
