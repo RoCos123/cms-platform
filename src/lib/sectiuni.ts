@@ -207,14 +207,9 @@ const LISTA: MetaSectiune[] = [
         rezumatDin: "mare",
         max: 2,
         hint: "Mici etichete care plutesc peste poză, ca „Răspund în / sub 24h”. Cel mult două, opționale. Fără ele, poza rămâne curată.",
+        // Fără câmp de emoji: scos pe 4 oct. 2026, la cererea proprietarului —
+        // nu era clar cum se pune unul (`:)` apărea ca atare pe poză).
         campuri: [
-          {
-            tip: "text",
-            cheie: "emoji",
-            eticheta: "Emoji",
-            hint: "Un singur semn, ex.: 💬 sau 💚. Opțional.",
-            max: 4,
-          },
           {
             tip: "text",
             cheie: "mic",

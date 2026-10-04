@@ -23,7 +23,7 @@ export type HeroData = {
    * Buline mici care plutesc peste poză („Răspund în / sub 24h"). Cel mult două,
    * opționale. Fără poză nu apar — n-au peste ce sta.
    */
-  bulinePoza?: { emoji?: string; mic?: string; mare: string }[];
+  bulinePoza?: { mic?: string; mare: string }[];
 };
 
 /**
@@ -475,8 +475,11 @@ export function Hero({
 }
 
 /**
- * O bulină care plutește peste poză: emoji într-un cerc, un rând mic deasupra și
- * unul mare dedesubt. Tiparul prietenos din șablonul-sursă.
+ * O bulină care plutește peste poză: un rând mic deasupra și unul mare dedesubt.
+ *
+ * Avea și un emoji într-un cerc, în stânga; scos pe 4 oct. 2026, la cererea
+ * proprietarului — nu era clar cum se pune unul, iar `:)` apărea ca atare pe
+ * poză. Un emoji rămas în conținutul vechi nu se mai afișează.
  *
  * Culorile vin din nivelul ȘABLONULUI (`--t-…`), nu al secțiunii (`--s-…`):
  * fundalul bulinei e mereu crem-deschis, deci și textul trebuie să rămână închis
@@ -489,7 +492,7 @@ function Bulina({
   plutitoare,
   decalaj,
 }: {
-  bulina: { emoji?: string; mic?: string; mare: string };
+  bulina: { mic?: string; mare: string };
   pozitie: CSSProperties;
   /** Plutește ușor sus-jos — vezi `.bulina-plutitoare` în `globals.css`. */
   plutitoare?: boolean;
@@ -507,30 +510,13 @@ function Bulina({
         alignItems: "center",
         gap: "10px",
         maxWidth: "min(240px, 66%)",
-        padding: "10px 18px 10px 12px",
+        padding: "10px 18px",
         borderRadius: "999px",
         background: "var(--t-fundal-nuantat)",
         border: "1px solid var(--t-chenar)",
         boxShadow: "0 16px 36px -16px rgba(0, 0, 0, 0.45)",
       }}
     >
-      {bulina.emoji?.trim() && (
-        <span
-          aria-hidden
-          style={{
-            display: "grid",
-            placeItems: "center",
-            width: "36px",
-            height: "36px",
-            flexShrink: 0,
-            borderRadius: "999px",
-            background: "color-mix(in oklab, var(--t-accent) 22%, transparent)",
-            fontSize: "17px",
-          }}
-        >
-          {bulina.emoji}
-        </span>
-      )}
       <span style={{ minWidth: 0, lineHeight: 1.25 }}>
         {bulina.mic?.trim() && (
           <span style={{ display: "block", fontSize: "12px", color: "var(--t-text-secundar)" }}>

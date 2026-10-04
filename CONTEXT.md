@@ -2431,6 +2431,14 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Bulinele de peste poză: fără emoji (4 oct. 2026)
+
+Proprietarul n-a înțeles cum se pune un emoji în bulină (a scris `:)`, care a
+apărut ca atare pe poză), apoi a cerut să fie scos. Câmpul „Emoji" e scos din
+panou, iar cercul cu emoji din bulină nu se mai desenează, pe toate șabloanele;
+un emoji rămas în conținutul vechi nu mai apare. Bulina rămâne cu rândul mic și
+rândul mare. Verificat pe pagină cu o bulină care avea `:)` salvat.
+
 ### Reperele de sub „Despre mine": cel mult trei, pe un rând (4 oct. 2026)
 
 Proprietarul, pe Căldură: a adăugat un al treilea reper și nu apărea; apoi, cu

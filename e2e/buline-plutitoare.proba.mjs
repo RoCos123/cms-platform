@@ -36,3 +36,13 @@ test("steagul ajunge de la șablon la bulină", () => {
     /className=\{plutitoare \? "bulina-plutitoare" : undefined\}/,
   );
 });
+
+test("bulinele n-au câmp de emoji și nu desenează unul (scos pe 4 oct. 2026)", async () => {
+  // Proprietarul n-a înțeles cum se pune un emoji, iar `:)` apărea ca atare pe
+  // poză. Scos din panou ȘI din randare: un emoji rămas în conținutul vechi nu
+  // mai apare.
+  const { metaSectiune } = await import("@/lib/sectiuni");
+  const buline = metaSectiune("hero").campuri.find((c) => c.cheie === "bulinePoza");
+  assert.deepEqual(buline.campuri.map((c) => c.cheie), ["mic", "mare"]);
+  assert.doesNotMatch(readFileSync("src/components/site/sections/hero.tsx", "utf8"), /bulina\.emoji/);
+});
