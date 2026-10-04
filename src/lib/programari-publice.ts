@@ -6,6 +6,7 @@ import { citesteProgramul, oreLibere, primesteProgramari, type Program, type ZiC
 import { lunaScrisa, momentLa, ziuaNume, ziuaScrisa, ziuaScurta } from "@/lib/zile";
 import { luniDeAles } from "@/lib/calendar";
 import type { OreDePrimaPagina } from "@/components/site/sections/programare";
+import { cheileSaptamanii } from "@/lib/saptamana-programare";
 
 /**
  * Ce trebuie ca să se poată cere o oră pe site.
@@ -113,7 +114,29 @@ export async function oreDeAratatPePrimaPagina(
     // Lunile se socotesc odată cu zilele, nu în componentă: sunt derivate din
     // ele, iar două calcule separate ar putea ajunge să nu mai fie de acord.
     // Numele lunii cere oricum `Intl` cu fusul cabinetului.
-    return { zile, luni: luniDeAles(zile.map((z) => z.zi), lunaScrisa) };
+    // Săptămâna Luni–Sâmbătă pentru grila de la „Apropiere" (cerut pe 5 oct. 2026:
+    // luni prima, sâmbăta ultima). O zi fără ore libere se scrie la fel ca una cu
+    // ore, doar cu lista de ore goală — numele și data tot în fusul cabinetului.
+    const dupaCheie = new Map(zile.map((z) => [z.zi, z]));
+    const chei = cheileSaptamanii(zile.map((z) => z.zi));
+    const saptamana = chei.map((cheie) => {
+      const libera = dupaCheie.get(cheie);
+      if (libera) return libera;
+      const moment = momentLa(cheie, "12:00");
+      return {
+        zi: cheie,
+        scris: ziuaScrisa(moment),
+        nume: ziuaNume(moment),
+        dataScurta: ziuaScurta(moment),
+        ore: [],
+      };
+    });
+
+    return {
+      zile,
+      luni: luniDeAles(zile.map((z) => z.zi), lunaScrisa),
+      ...(saptamana.length > 0 && { saptamana }),
+    };
   } catch {
     return NIMIC;
   }

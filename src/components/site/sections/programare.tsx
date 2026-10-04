@@ -21,7 +21,17 @@ export type ZiCuOreScrise = { zi: string; scris: string; nume: string; dataScurt
  * previzualizarea din panou). Un `import type` s-ar șterge la compilare, dar
  * direcția asta e cea pe care o are deja `ZiCuOreScrise`.
  */
-export type OreDePrimaPagina = { zile: ZiCuOreScrise[]; luni: LunaCalendar[] };
+export type OreDePrimaPagina = {
+  zile: ZiCuOreScrise[];
+  luni: LunaCalendar[];
+  /**
+   * Săptămâna Luni → Sâmbătă a primei zile libere, pentru grila de la „Apropiere":
+   * șase zile mereu în ordinea asta, cu `ore: []` la cele fără nimic liber (se
+   * arată estompate). Lipsă = nicio zi liberă între luni și sâmbătă; grila cade
+   * atunci pe `zile`. Vezi `src/lib/saptamana-programare.ts`.
+   */
+  saptamana?: ZiCuOreScrise[];
+};
 
 export type ProgramareData = {
   eyebrow?: string;
@@ -48,12 +58,15 @@ export function Programare({
   data,
   zile,
   luni,
+  zileSaptamana,
   tone = "deschis",
   saptamana,
 }: {
   data: ProgramareData;
   zile: ZiCuOreScrise[];
   luni: LunaCalendar[];
+  /** Săptămâna Luni–Sâmbătă pentru grila „Apropiere" (vezi `OreDePrimaPagina`). */
+  zileSaptamana?: ZiCuOreScrise[];
   tone?: SectionTone;
   /**
    * Grila pe zile a modelului prietenos, în loc de calendarul lunar. Doar
@@ -79,6 +92,7 @@ export function Programare({
         <ProgramareRapida
           zile={zile}
           luni={luni}
+          zileSaptamana={zileSaptamana}
           saptamana={saptamana}
           textButon={data.textButon}
           siteKey={process.env.NEXT_PUBLIC_CAPTCHA_SITE_KEY || null}

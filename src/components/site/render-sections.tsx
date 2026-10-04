@@ -196,6 +196,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       data={row.data as ProgramareData}
       zile={ctx.oreProgramare.zile}
       luni={ctx.oreProgramare.luni}
+      zileSaptamana={ctx.oreProgramare.saptamana}
       tone={row.tone}
       saptamana={ctx.asezari.programareSaptamana}
     />

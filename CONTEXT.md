@@ -2493,6 +2493,35 @@ pe „X" pe o poză folosită → avertizarea apare, poza nu se selectează; „
 nu șterge nimic; pe una nefolosită, „Șterge definitiv" o scoate din bază și din
 grilă. Văzut pe 1280px și 390px. Rămâne neverificat pe baza reală.
 
+### Apropiere: programarea pe săptămână Luni–Sâmbătă (5 oct. 2026)
+
+Cerut de proprietar după ce zilele nu mai cădeau singure pe rând: „luni trebuie să
+fie prima, iar ultima zi sâmbăta". Până atunci grila arăta „următoarele șase zile
+cu ore libere", cronologic — cu zilele lui, marți 6 … sâmbătă 10, apoi LUNI 12 —
+deci Luni ajungea la sfârșit. Cererea avea mai multe înțelesuri (săptămână
+calendaristică, zile sortate după ziua săptămânii cu date amestecate, sau tăiat
+la sâmbătă); am întrebat, iar proprietarul a ales **săptămâna Luni–Sâmbătă**.
+
+Acum grila arată mereu șase coloane în ordinea Luni → Sâmbătă. Săptămâna e cea a
+PRIMEI zile libere (`cheileSaptamanii`, `src/lib/saptamana-programare.ts`, funcție
+pură, cu 7 probe); zilele fără ore libere rămân în coloană, ESTOMPATE, cu „Fără
+ore" — ordinea nu se strică, iar omul vede că ziua chiar n-are nimic. Serverul
+construiește săptămâna (numele zilelor se scriu în fusul cabinetului, ca și
+celelalte) și o trece prin `OreDePrimaPagina.saptamana` până la grilă.
+
+Cu zilele din captura lui: Luni 5 (fără ore, estompată), Marți 6 … Sâmbătă 10;
+„Luni 12" iese din grilă și rămâne la „Vezi toate zilele libere →" (link-ul apare
+acum și când rămân zile libere în afara săptămânii, nu doar a șasea zi).
+
+**Decizii pe margini, spuse deschis:**
+- **Duminica** nu intră în grilă (ultima zi e sâmbăta, cerut). Duminica rămâne la
+  „Vezi toate zilele libere"; dacă singura zi liberă a unui interval e duminica, se
+  trece la următoarea săptămână care are o zi între luni și sâmbătă.
+- Fără nicio zi liberă luni–sâmbătă, grila cade pe lista simplă de până la șase zile.
+- Verificat pe pagină cu zile inventate (marți–sâmbătă + luni următoare), nu cu
+  calendarul real al unui cabinet; construirea de pe server o acoperă probele pe
+  sursă și funcția pură, nu un test cu baza de date.
+
 ### Apropiere: zilele din programare nu mai rămân singure pe un rând (5 oct. 2026)
 
 Proprietarul: „așezarea pe zile nu e corectă" — cu șase zile, „Luni" cădea SINGURĂ

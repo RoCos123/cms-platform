@@ -27,6 +27,7 @@ import type { ZiCuOreScrise } from "./programare";
 export function ProgramareRapida({
   zile,
   luni,
+  zileSaptamana,
   saptamana,
   textButon,
   siteKey,
@@ -35,6 +36,11 @@ export function ProgramareRapida({
 }: {
   zile: ZiCuOreScrise[];
   luni: LunaCalendar[];
+  /**
+   * Săptămâna Luni → Sâmbătă a primei zile libere, cu `ore: []` la zilele fără
+   * nimic liber. Lipsă = grila cade pe primele șase zile libere, cronologic.
+   */
+  zileSaptamana?: ZiCuOreScrise[];
   /** Grila pe zile a modelului prietenos, în loc de calendarul lunar. */
   saptamana?: boolean;
   textButon?: string;
@@ -51,9 +57,11 @@ export function ProgramareRapida({
   const ziAleasa = zile.find((z) => z.zi === zi);
   const etichete = Object.fromEntries(zile.map((z) => [z.zi, z.scris]));
 
-  // Grila prietenoasă arată doar zilele apropiate — lista conține oricum numai
-  // zile care au vreo oră liberă. Restul rămân pe pagina întreagă de programări.
-  const zileAfisate = zile.slice(0, 6);
+  // Grila prietenoasă arată o săptămână Luni–Sâmbătă (cerut pe 5 oct. 2026: luni
+  // prima, sâmbăta ultima); fără ea, primele șase zile libere. Restul zilelor
+  // libere rămân pe pagina întreagă de programări.
+  const zileAfisate = zileSaptamana ?? zile.slice(0, 6);
+  const afisateCuOre = zileAfisate.filter((z) => z.ore.length > 0).length;
 
   // Un slot din grilă alege ziua ȘI ora dintr-o mișcare. Schimbarea intervalului
   // cere din nou confirmarea, altfel formularul ar rămâne deschis pe alt interval.
@@ -86,7 +94,7 @@ export function ProgramareRapida({
       {saptamana ? (
         <SaptamanaGrila
           zile={zileAfisate}
-          maiSunt={zile.length > zileAfisate.length}
+          maiSunt={zile.length > afisateCuOre}
           zi={zi}
           ora={ora}
           ziAleasa={ziAleasa}
@@ -278,10 +286,17 @@ function SaptamanaGrila({
           <div className="zile-grila" data-zile={zile.length} style={{ ["--zile" as string]: zile.length }}>
           {zile.map((z) => (
             <div key={z.zi} style={stilColoana}>
-              <div style={stilCapZi}>
+              {/* O zi fără ore libere rămâne în coloană, estompată: săptămâna își păstrează
+                  ordinea Luni → Sâmbătă, iar omul vede că ziua chiar n-are nimic liber. */}
+              <div style={{ ...stilCapZi, ...(z.ore.length === 0 ? { opacity: 0.5 } : null) }}>
                 <div style={stilNumeZi}>{z.nume}</div>
                 <div style={stilDataZi}>{z.dataScurta}</div>
               </div>
+              {z.ore.length === 0 && (
+                <div style={{ textAlign: "center", fontSize: "12px", color: "var(--t-text-secundar)", opacity: 0.8 }}>
+                  Fără ore
+                </div>
+              )}
               {z.ore.map((o) => {
                 const ales = z.zi === zi && o === ora;
                 return (
