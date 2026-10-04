@@ -59,5 +59,6 @@ export const lumina: Template = {
     bandaServiciiDiscreta: true,
     bandaServiciiDelimitata: true,
     heroBulinePlutitoare: true,
+    citatRelief: true,
   },
 };
