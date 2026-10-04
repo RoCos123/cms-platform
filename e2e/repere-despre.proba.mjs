@@ -65,3 +65,9 @@ test("niciun text de ajutor din secțiuni nu pomenește un șablon", () => {
     assert.doesNotMatch(h, /Liniște|Apropiere|Căldură|Lumină|Claritate|șablon/i, h);
   }
 });
+
+test("textul de ajutor de la „Domenii / teme” spune limita, aceeași cu cea verificată", () => {
+  const camp = metaSectiune("aboutTeaser").campuri.find((c) => c.cheie === "teme");
+  assert.equal(camp.max, 6);
+  assert.match(camp.hint, new RegExp(`cel mult ${camp.max} domenii/teme`));
+});
