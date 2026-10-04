@@ -180,6 +180,13 @@ export type TemplateAsezari = {
    */
   citatCentrat?: boolean;
   /**
+   * Banda cu citat pe fundalul „relief" al șablonului (treapta cea mai închisă
+   * dintre cele deschise), indiferent de tonul rândului. Cerut de proprietar pe
+   * 5 oct. 2026, cu o mostră de culoare: rgb(223,216,209) = `fundalRelief` la
+   * Căldură. Doar „Căldură".
+   */
+  citatRelief?: boolean;
+  /**
    * „Cum lucrez" cu antetul centrat și pașii în carduri albe (cifră serif +
    * text), ca stâlpii din referința „Liniște". Fără iconițe. Doar „Liniște"; la
    * restul rămâne antetul la stânga și pașii ca un rând de coloane simple.

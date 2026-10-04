@@ -64,5 +64,6 @@ export const caldura: Template = {
     bandaServiciiDiscreta: true,
     bandaServiciiDelimitata: true,
     heroBulinePlutitoare: true,
+    citatRelief: true,
   },
 };

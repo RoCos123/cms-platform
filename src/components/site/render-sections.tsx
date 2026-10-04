@@ -102,7 +102,13 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
     />
   ),
   quote: (row, ctx) => (
-    <Quote data={row.data as QuoteData} tone={row.tone} centrat={ctx.asezari.citatCentrat} />
+    <Quote
+      data={row.data as QuoteData}
+      // La Căldură banda de citat stă mereu pe „relief", ca în mostra proprietarului;
+      // altfel, tonul rândului, ca până acum.
+      tone={ctx.asezari.citatRelief ? "relief" : row.tone}
+      centrat={ctx.asezari.citatCentrat}
+    />
   ),
   features: (row, ctx) => (
     <Features

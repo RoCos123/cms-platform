@@ -2475,6 +2475,15 @@ Măsurat cu reperele din captura proprietarului, pe toate cinci șabloanele, la
 1280px și 390px: niciun text nu iese din reperul lui. La Căldură, cu cuvântul de
 14 litere, textul mare ajunge la 22,6px; cu cuvinte obișnuite rămâne mai mare.
 
+### Căldură: banda cu citat pe fundalul „relief" (5 oct. 2026)
+
+Cerut de proprietar, cu o mostră de culoare. Măsurat pe ea: rgb(223,216,209) =
+#DFD8D1 — exact `fundalRelief` al Căldurii, adică o culoare care exista deja în
+șablon (o folosesc și testimonialele). Steag nou `citatRelief`, aprins DOAR la
+Căldură: banda de citat stă mereu pe „relief", oricare ar fi tonul rândului;
+celelalte patru șabloane își păstrează tonul. Măsurat pe pagină: fundal
+rgb(223,216,209), text rgb(42,31,26), contrast 11,4:1.
+
 ### Bulinele de peste poză plutesc (4–5 oct. 2026; întâi Căldură, apoi toate)
 
 Cerut de proprietar, arătând bulina „Online și offline" din hero-ul Căldură:
