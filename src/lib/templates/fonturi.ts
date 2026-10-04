@@ -104,6 +104,24 @@ export function familiaFontului(nume: string, rezerve: string): string {
   return `${familie}, ${rezerve}`;
 }
 
+/**
+ * Cât de lată e, în medie, o literă din fontul secundar, ca parte din mărimea
+ * fontului — cu o mică margine peste ce s-a măsurat. Măsurat pe 4 oct. 2026, în
+ * Chromium, pe cuvinte ca „Specializare", „Psihoterapie", „Supervizare",
+ * „Online": Caveat 0,33–0,37; Cormorant Garamond 0,39–0,46; Inter 0,47–0,52.
+ *
+ * Folosită de reperele de sub „Despre mine", ca textul mare să se micșoreze
+ * exact cât să încapă cel mai lung cuvânt — un singur factor pentru toate
+ * fonturile ori micșora prea mult scrisul îngust (Caveat), ori prea puțin
+ * scrisul lat (Inter). Un font nou fără valoare aici primește 0,53 — sigur
+ * pentru orice font obișnuit, doar puțin mai mic decât ar putea fi.
+ */
+const LATIME_LITERA: Record<string, number> = {
+  Caveat: 0.38,
+  "Cormorant Garamond": 0.47,
+  Inter: 0.53,
+};
+
 /** Numele declarate aici, pentru probe și pentru verificarea șabloanelor. */
 export const FONTURI_DECLARATE = Object.keys(FAMILII);
 
@@ -121,6 +139,7 @@ export function templateFontStyle(template: Template): CSSProperties {
   return {
     "--t-font-principal": familiaFontului(t.fontPrincipal, t.fallbackPrincipal),
     "--t-font-secundar": familiaFontului(t.fontSecundar, t.fallbackSecundar),
+    "--t-latime-litera-secundar": String(LATIME_LITERA[t.fontSecundar] ?? 0.53),
     "--t-font-titlu": t.titluriInSecundar
       ? familiaFontului(t.fontSecundar, t.fallbackSecundar)
       : familiaFontului(t.fontPrincipal, t.fallbackPrincipal),

@@ -2431,6 +2431,34 @@ niciun semn că e link nu se apasă.
    poate fi orice, nu se vede. Pașii pentru a da o adresă unui demo: vezi
    §„Cum dai o adresă unui șablon-demo".
 
+### Reperele de sub „Despre mine": cel mult trei, pe un rând (4 oct. 2026)
+
+Proprietarul, pe Căldură: a adăugat un al treilea reper și nu apărea; apoi, cu
+textul completat („fdgfddgfdgdfdf"), ieșea din pagină în dreapta. Două lucruri
+diferite:
+
+- **nu apărea** fiindcă „Textul mare" era gol — un reper fără el nu se afișează
+  (așa era și înainte). Textul de ajutor al câmpului spune acum asta;
+- **ieșea din pagină** fiindcă un cuvânt lung, fără spații, nu încăpea în
+  coloană la 38px, iar grila îl lăsa să depășească.
+
+Acum (la toate șabloanele — e așezare, nu înfățișare):
+- **cel mult 3** în panou (era 4), verificat și pe server; pe site se văd primele
+  trei chiar dacă un conținut vechi are patru (la următoarea salvare, panoul cere
+  ștergerea celui în plus);
+- pe ecran lat, **toate pe un rând** (`.repere-rand`, câte coloane sunt repere);
+  pe telefon, cât încap (două + unul);
+- **textul mare se micșorează** cât să încapă cel mai lung cuvânt din rând,
+  aceeași mărime la tot rândul: `min(mărimea de dinainte, lățimea reperului /
+  (litere × lățimea unei litere))`. Lățimea literei e a fontului șablonului,
+  măsurată (`--t-latime-litera-secundar` în `fonturi.ts`): un singur factor
+  micșora prea mult scrisul îngust de la Apropiere și prea puțin pe cel lat de
+  la Claritate.
+
+Măsurat cu reperele din captura proprietarului, pe toate cinci șabloanele, la
+1280px și 390px: niciun text nu iese din reperul lui. La Căldură, cu cuvântul de
+14 litere, textul mare ajunge la 22,6px; cu cuvinte obișnuite rămâne mai mare.
+
 ### Căldură: bulinele de peste poză plutesc (4 oct. 2026)
 
 Cerut de proprietar, arătând bulina „Online și offline" din hero-ul Căldură:

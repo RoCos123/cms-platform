@@ -279,15 +279,17 @@ const LISTA: MetaSectiune[] = [
         eticheta: "Repere scurte",
         etichetaElement: "reper",
         rezumatDin: "mare",
-        max: 4,
-        hint: "Câteva repere sub text, unul lângă altul, ca +5 / ani de experiență sau Atestat / liberă practică. Fără ele, nu apare nimic.",
+        // 3, nu 4: pe un rând sub text încap trei; al patrulea se rupea pe rândul
+        // următor, singur (cerut de proprietar, 4 oct. 2026).
+        max: 3,
+        hint: "Cel mult trei repere sub text, unul lângă altul, ca +5 / ani de experiență sau Atestat / liberă practică. Fără ele, nu apare nimic.",
         campuri: [
           {
             tip: "text",
             cheie: "mare",
             eticheta: "Textul mare",
             obligatoriu: true,
-            hint: "Cifra sau cuvântul scos în față. Ex.: +5, Atestat, Online.",
+            hint: "Cifra sau cuvântul scos în față. Ex.: +5, Atestat, Online. Fără el, reperul nu apare pe site.",
             max: 40,
           },
           {

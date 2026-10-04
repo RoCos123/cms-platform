@@ -94,7 +94,10 @@ export function AboutTeaser({
   // La „Liniște" (`reperCard`), primul reper devine un card închis suprapus pe
   // colțul portretului; restul, dacă mai sunt, rămân în rândul de sub text. Fără
   // poză n-are peste ce sta, deci cade în rândul obișnuit.
-  const eticheteValide = (data.etichete ?? []).filter((e) => e?.mare?.trim());
+  // Cel mult trei (limita din panou, din 4 oct. 2026): un conținut mai vechi, cu
+  // patru, nu strică rândul — se văd primele trei până la următoarea editare,
+  // când panoul cere ștergerea celui în plus.
+  const eticheteValide = (data.etichete ?? []).filter((e) => e?.mare?.trim()).slice(0, 3);
   const reperPeImagine = reperCard && poza ? eticheteValide[0] : undefined;
   const eticheteRand = reperPeImagine ? eticheteValide.slice(1) : eticheteValide;
 
@@ -384,9 +387,16 @@ export function AboutTeaser({
           */}
           {eticheteRand.length > 0 && (
             <dl
+              // Toate reperele pe UN rând, pe ecran lat (`.repere-rand` în
+              // `globals.css`): cel mult trei, fiecare cu a treia parte din lățime.
+              className="repere-rand"
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+                ["--repere" as string]: Math.min(eticheteRand.length, 3),
+                // Cel mai lung cuvânt din tot rândul — vezi mărimea de la `<dt>`.
+                ["--cuvant" as string]: Math.max(
+                  4,
+                  ...eticheteRand.flatMap((e) => e.mare.split(/\s+/).map((c) => c.length)),
+                ),
                 gap: friendly ? "14px" : "24px",
                 margin: friendly ? "20px 0 0" : "40px 0 0",
                 ...(friendly
@@ -401,22 +411,36 @@ export function AboutTeaser({
                 .map((eticheta, i) => (
                   <div
                     key={i}
-                    style={
-                      friendly
+                    style={{
+                      // Lățimea reperului devine unitatea `cqw` pentru textul mare.
+                      containerType: "inline-size",
+                      ...(friendly
                         ? {
                             padding: "18px 20px",
                             borderRadius: "16px",
                             background: "var(--t-suprafata, var(--t-fundal-nuantat))",
                             border: "1px solid var(--t-chenar)",
                           }
-                        : undefined
-                    }
+                        : {}),
+                    }}
                   >
                     <dt
                       style={{
                         fontFamily: "var(--t-font-secundar)",
-                        fontSize: "clamp(28px, 3vw, 38px)",
-                        lineHeight: 1,
+                        /*
+                          Mărimea de până acum, DAR micșorată cât să încapă cel mai
+                          lung cuvânt din rând pe lățimea reperului: cu trei repere
+                          pe un rând, „Specializare" la 38px se rupea în
+                          „Specializa-re" (măsurat, 4 oct. 2026). Lățimea unei litere
+                          vine din fontul șablonului (`--t-latime-litera-secundar`,
+                          măsurată — vezi `fonturi.ts`). Aceeași mărime la tot
+                          rândul, ca reperele să rămână egale. `break-word` rămâne
+                          plasa de dedesubt, pentru un cuvânt care tot n-ar încăpea.
+                        */
+                        fontSize:
+                          "min(clamp(28px, 3vw, 38px), calc(100cqw / (var(--cuvant) * var(--t-latime-litera-secundar, 0.53))))",
+                        lineHeight: 1.05,
+                        overflowWrap: "break-word",
                         color: friendly ? "var(--t-accent)" : "var(--s-accent)",
                       }}
                     >

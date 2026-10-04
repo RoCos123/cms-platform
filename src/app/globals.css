@@ -509,3 +509,21 @@ body {
     transform: translateY(-8px);
   }
 }
+
+/*
+ * Reperele de sub „Despre mine" (`about-teaser.tsx`): cel mult trei, pe UN rând.
+ * Pe ecran lat, câte coloane sunt repere (`--repere`, 1–3), fiecare cu partea
+ * ei egală — al treilea nu mai cade singur pe rândul următor. Pe telefon,
+ * coloana de text e prea îngustă pentru trei cuvinte mari unul lângă altul,
+ * deci se așază cât încap (cel puțin 120px fiecare).
+ */
+.repere-rand {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+@media (min-width: 760px) {
+  .repere-rand {
+    grid-template-columns: repeat(var(--repere, 3), minmax(0, 1fr));
+  }
+}
