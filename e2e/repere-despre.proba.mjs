@@ -48,3 +48,20 @@ test("textul mare se micșorează după cel mai lung cuvânt și fontul șablonu
     assert.match(fonturi, new RegExp(`${font}: 0\\.\\d+`), `${font} are lățimea măsurată`);
   }
 });
+
+test("„Domenii / teme” apar pe TOATE șabloanele, nu doar pe Apropiere", () => {
+  // Până pe 4 oct. 2026 apăreau doar pe Apropiere, deși câmpul e în panoul
+  // tuturor: proprietarul a scris „Traumă” pe Căldură și nu s-a întâmplat nimic.
+  const sursa = readFileSync("src/components/site/sections/about-teaser.tsx", "utf8");
+  assert.match(sursa, /\{data\.teme\?\.some\(\(t\) => t\?\.trim\(\)\) && \(/);
+  assert.doesNotMatch(sursa, /friendly && data\.teme/);
+});
+
+test("niciun text de ajutor din secțiuni nu pomenește un șablon", () => {
+  // Clientul își vede doar șablonul lui; „pe șablonul Apropiere” îl încurca.
+  const sectiuni = readFileSync("src/lib/sectiuni.ts", "utf8");
+  const hinturi = sectiuni.match(/hint:\s*"[^"]*"/g) ?? [];
+  for (const h of hinturi) {
+    assert.doesNotMatch(h, /Liniște|Apropiere|Căldură|Lumină|Claritate|șablon/i, h);
+  }
+});

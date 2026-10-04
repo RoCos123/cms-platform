@@ -337,11 +337,17 @@ export function AboutTeaser({
           )}
 
           {/*
-            Domeniile ca etichete-pastilă, sub text — semnătura prietenoasă, doar
-            pe „Apropiere". Fără iconițe (cerut). Pastila e mereu deschisă
-            (`--t-…`), ca bulina din hero, ca să rămână lizibilă pe orice ton.
+            Domeniile ca etichete-pastilă, sub text. Fără iconițe (cerut).
+
+            Până pe 4 oct. 2026 apăreau DOAR pe „Apropiere", deși câmpul era în
+            panoul tuturor — proprietarul a scris „Traumă" pe Căldură și nu s-a
+            întâmplat nimic. Acum apar peste tot; diferă doar înfățișarea:
+            - pe „Apropiere" (`friendly`), pastila plină, deschisă (`--t-…`), ca
+              bulina din hero — lizibilă pe orice ton;
+            - la restul, pastila doar conturată, în culorile tonului (`--s-…`,
+              chenarul din `currentColor`), mai sobră, ca reperele de dedesubt.
           */}
-          {friendly && data.teme?.some((t) => t?.trim()) && (
+          {data.teme?.some((t) => t?.trim()) && (
             <ul
               style={{
                 display: "flex",
@@ -360,11 +366,19 @@ export function AboutTeaser({
                     style={{
                       padding: "8px 16px",
                       borderRadius: "999px",
-                      background: "var(--t-suprafata, var(--t-fundal-nuantat))",
-                      border: "1px solid var(--t-chenar)",
-                      color: "var(--t-text)",
                       fontSize: "14px",
-                      fontWeight: 600,
+                      ...(friendly
+                        ? {
+                            background: "var(--t-suprafata, var(--t-fundal-nuantat))",
+                            border: "1px solid var(--t-chenar)",
+                            color: "var(--t-text)",
+                            fontWeight: 600,
+                          }
+                        : {
+                            border: "1px solid color-mix(in oklab, currentColor 22%, transparent)",
+                            color: "var(--s-text-secundar)",
+                            fontWeight: 500,
+                          }),
                     }}
                   >
                     {tema}

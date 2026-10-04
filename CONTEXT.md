@@ -2455,6 +2455,14 @@ Acum (la toate șabloanele — e așezare, nu înfățișare):
   micșora prea mult scrisul îngust de la Apropiere și prea puțin pe cel lat de
   la Claritate.
 
+**„Domenii / teme", tot atunci.** Proprietarul a scris „Traumă" pe Căldură și
+nu s-a întâmplat nimic: temele se afișau DOAR pe Apropiere, deși câmpul e în
+panoul tuturor (iar textul de ajutor chiar spunea „pe șablonul Apropiere").
+Acum apar peste tot, sub text: pe Apropiere pastila plină de dinainte, la
+restul pastila doar conturată, în culorile tonului. Contrast măsurat: 5,7–10,7:1.
+Textul de ajutor nu mai pomenește șablonul — regulă ținută de probă: niciun
+text de ajutor din secțiuni nu pomenește un șablon.
+
 Măsurat cu reperele din captura proprietarului, pe toate cinci șabloanele, la
 1280px și 390px: niciun text nu iese din reperul lui. La Căldură, cu cuvântul de
 14 litere, textul mare ajunge la 22,6px; cu cuvinte obișnuite rămâne mai mare.
