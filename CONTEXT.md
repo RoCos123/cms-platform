@@ -2493,10 +2493,13 @@ pe „X" pe o poză folosită → avertizarea apare, poza nu se selectează; „
 nu șterge nimic; pe una nefolosită, „Șterge definitiv" o scoate din bază și din
 grilă. Văzut pe 1280px și 390px. Rămâne neverificat pe baza reală.
 
-### Blog: articolele se pot muta mai sus sau mai jos (5 oct. 2026)
+### Blog: articolele se mută trăgând mânerul „⋯" (5 oct. 2026)
 
 Cerut de proprietar: „din meniul din care se scriu articolele, să apeși pe 3
-puncte la fiecare articol și să-l poți urca/coborî". Până atunci blogul se
+puncte la fiecare articol și să-l poți urca/coborî". Întâi am făcut un meniu cu
+„Mută mai sus / mai jos"; după ce l-a încercat, a cerut altceva: „ții apăsat pe
+cele trei puncte și muți sus sau jos, drag and drop" — deci meniul a fost scos și
+înlocuit cu tragere (componenta `meniu-actiuni.tsx` a fost ștearsă). Până atunci blogul se
 aranja singur, după data publicării, iar lista din panou fusese făcută FĂRĂ
 mutare tocmai pe motivul ăsta („ordinea într-un blog e cronologia"). Decizia e
 acum inversată, la cererea lui.
@@ -2514,29 +2517,39 @@ acum inversată, la cererea lui.
 - **Articolul nou** se pune primul (`poziția minimă − 10`), deci „cel mai nou
   primul" rămâne purtarea implicită. Publicarea unei ciorne scrise mai demult NU
   o mută în față (înainte o muta, fiindcă ordinea ieșea din data publicării).
-- **Mutarea** (`mutaArticolul`, acțiune de server): citește ordinea din bază, nu
-  de la browser, și renumerotează lista (10, 20, 30…) scriind doar rândurile care
-  se schimbă (de obicei două). Renumerotarea, nu schimbul între vecini, fiindcă la
-  poziții egale (rândurile seedate au toate 0) schimbul ar putea sări peste un
-  al treilea articol. Răspunde cu ordinea rezultată, iar panoul se potrivește cu ea.
-  Se salvează pe loc, fără bară de jos, ca publicarea de pe același rând.
-- **Meniul „⋯"** e o componentă nouă, `src/components/ui/meniu-actiuni.tsx`
-  (proiectul n-are bibliotecă de meniuri): click/Enter/Spațiu/↓ deschid, săgeți +
-  Home/End umblă, Escape închide și întoarce focusul, un click în afară îl
-  închide. Acțiuni: „Mută mai sus", „Mută mai jos" (stinse la capete). Cu un singur
-  articol meniul nu apare.
+- **Mutarea** (`mutaArticolul(id, inaintea)`, acțiune de server): „pune-l ÎNAINTEA
+  articolului X" (sau la coadă, cu `null`) — o țintă numită, nu un index, ca un
+  panou rămas deschis cu o listă veche să nu mute pe alt articol. Citește ordinea
+  din bază și renumerotează lista (10, 20, 30…), scriind doar rândurile care se
+  schimbă. Renumerotarea, nu schimbul între vecini, fiindcă la poziții egale
+  (rândurile seedate au toate 0) schimbul ar putea sări peste un al treilea
+  articol. Răspunde cu ordinea rezultată, iar panoul se potrivește cu ea. Se
+  salvează pe loc, fără bară de jos, ca publicarea de pe același rând.
+- **Tragerea** (`lista.tsx`): evenimente de pointer pe mânerul „⋯", nu `draggable`
+  nativ (acela nu merge pe telefon). `touch-none` pe mâner (altfel degetul
+  derulează pagina), `setPointerCapture`, rândul tras urmărește pointerul cu
+  `transform`, restul stau pe loc, o linie arată unde ajunge. Locul se alege după
+  MIJLOACELE celorlalte rânduri (`locDeLasare`), măsurate o dată la apăsare, în
+  coordonate de pagină; lângă marginea ecranului pagina derulează singură. Escape
+  anulează; o simplă apăsare fără mișcare nu mută nimic. Pentru cine nu poate trage:
+  același mâner răspunde la săgețile sus/jos (`tintaPentruPas`), iar focusul rămâne
+  pe el după mutare. Cu un singur articol mânerul nu apare.
 - **Secțiunea „Articole recente" de pe prima pagină** arată primele articole din
   AȘA ordine, nu neapărat cele mai noi. Numele ei a rămas; dacă proprietarul vrea,
   se poate schimba în „Articole" sau similar.
 
-**Verificat:** `e2e/ordine-articole.proba.mjs` (12 teste: aritmetica mutării, egalități,
-capete, mutări repetate, cele trei ordonări identice, migrarea; cade când se scoate
-ordonarea după poziție). În browser, cu Supabase fals care ține starea: meniu cu
-mouse și cu tastatura, focusul se întoarce pe „⋯" după mutare, capetele sunt stinse,
-ordinea persistă după reîncărcare, serverul care refuză → lista revine la loc cu
-mesajul „Nu am putut muta articolul". **Nevăzut:** baza reală (migrarea nu e rulată
-acolo) și blogul public randat — ordinea lui e probată doar pe sursă și pe cererea
-trimisă (`order=position.asc,…`), nu cu o pagină desenată.
+**Verificat:** `e2e/ordine-articole.proba.mjs` (15 teste: aritmetica mutării,
+egalități, liste vechi, săgeți, locul de lăsare, mutări repetate, cele trei ordonări
+identice, migrarea; cade când se scoate ordonarea după poziție). În browser, cu
+Supabase fals care ține starea: tragere cu mouse-ul în jos și în sus, o apăsare
+simplă nu mută nimic, Escape anulează, săgeata jos de la tastatură, ordinea persistă
+după reîncărcare, tragere cu degetul (evenimente touch prin CDP). Din prima variantă
+(meniu), verificat pe aceeași cale: serverul care refuză → lista revine la loc cu
+mesajul „Nu am putut muta articolul" (cod neschimbat de atunci). **Nevăzut:** tragerea
+pe un telefon adevărat (doar emulată), derularea automată lângă marginea ecranului
+(scrisă, neprobată). Migrarea a fost rulată de proprietar pe baza reală, iar meniul
+(prima variantă) l-a încercat acolo și a spus că merge; tragerea nu a fost încă
+încercată de el.
 
 ### Apropiere: programarea pe săptămână Luni–Sâmbătă (5 oct. 2026)
 

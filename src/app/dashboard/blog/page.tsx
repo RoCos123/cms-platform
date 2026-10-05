@@ -72,8 +72,8 @@ export default async function BlogPage({
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
             Articolele tale, în ordinea în care apar pe site: primul din listă e
             primul pe pagina de blog, iar cele de sus apar și pe prima pagină, la
-            „Articole recente”. Din meniul „⋯” de pe fiecare rând îl poți muta mai
-            sus sau mai jos.
+            „Articole recente”. Ca să muți un articol, ține apăsat pe „⋯” de pe
+            rând și trage-l în sus sau în jos.
           </p>
         </div>
 

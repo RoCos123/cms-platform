@@ -9,7 +9,7 @@ import { CAMPURI_ARTICOL } from "@/lib/blog";
 import { catreEditor, catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 import { normalizeazaPunctFocal } from "@/lib/punct-focal";
 import { MAXIM_ARTICOLE, EROARE_PREA_MULTE } from "@/lib/limite-panou";
-import { mutaArticol, pozitiaArticoluluiNou, type Directie } from "@/lib/ordine-articole";
+import { mutaInaintea, pozitiaArticoluluiNou } from "@/lib/ordine-articole";
 
 export type RezultatArticol =
   | { ok: true }
@@ -237,20 +237,24 @@ export type RezultatMutare =
   | { ok: false; mesaj: string };
 
 /**
- * Mută un articol cu o treaptă mai sus sau mai jos, în ordinea de pe site.
+ * Mută un articol în ordinea de pe site: înaintea articolului `inaintea`, sau la
+ * sfârșit dacă e `null`. Vine din tragerea rândului în panou sau din săgeți.
  *
  * Ordinea se ia din baza de date, nu de la browser: un panou rămas deschis de
- * mult are lista veche, iar „mută mai sus" trebuie să însemne mai sus în lista
- * de ACUM. Răspunsul poartă ordinea rezultată, ca panoul să se potrivească cu
- * ea dacă între timp a mai umblat cineva.
+ * mult are lista veche, iar mutarea trebuie să însemne ce a văzut omul — de-asta
+ * ținta e un articol numit, nu un index. Răspunsul poartă ordinea rezultată, ca
+ * panoul să se potrivească cu ea dacă între timp a mai umblat cineva.
  *
  * Se salvează pe loc, fără bară de jos — ca publicarea de pe același rând.
  */
-export async function mutaArticolul(id: string, directie: Directie): Promise<RezultatMutare> {
+export async function mutaArticolul(
+  id: string,
+  inaintea: string | null,
+): Promise<RezultatMutare> {
   const session = await verifySession();
   const supabase = await createClient();
 
-  if (directie !== "sus" && directie !== "jos") {
+  if (typeof id !== "string" || (inaintea !== null && typeof inaintea !== "string")) {
     return { ok: false, mesaj: "Nu am înțeles unde să mut articolul." };
   }
 
@@ -274,9 +278,9 @@ export async function mutaArticolul(id: string, directie: Directie): Promise<Rez
     return { ok: false, mesaj: "Articolul nu mai există. Reîncarcă pagina." };
   }
 
-  const mutare = mutaArticol(randuri, id, directie);
+  const mutare = mutaInaintea(randuri, id, inaintea);
 
-  // Deja primul (sau ultimul): nimic de scris, iar panoul primește ordinea reală.
+  // Deja la locul lui (sau ținta nu mai există): nimic de scris, iar panoul primește ordinea reală.
   if (!mutare) return { ok: true, ordine: randuri.map((rand) => rand.id) };
 
   const rezultate = await Promise.all(
