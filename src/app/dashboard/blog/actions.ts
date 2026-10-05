@@ -9,6 +9,7 @@ import { CAMPURI_ARTICOL } from "@/lib/blog";
 import { catreEditor, catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 import { normalizeazaPunctFocal } from "@/lib/punct-focal";
 import { MAXIM_ARTICOLE, EROARE_PREA_MULTE } from "@/lib/limite-panou";
+import { mutaArticol, pozitiaArticoluluiNou, type Directie } from "@/lib/ordine-articole";
 
 export type RezultatArticol =
   | { ok: true }
@@ -82,6 +83,16 @@ export async function creeazaArticol(): Promise<never> {
     redirect(`/dashboard/blog?eroare=${EROARE_PREA_MULTE}`);
   }
 
+  // Articolul nou se așază înaintea tuturor: „cel mai nou primul" rămâne purtarea
+  // implicită, iar cine vrea altfel îl mută din meniul „⋯" al rândului.
+  const { data: primul } = await supabase
+    .from("blog_articles")
+    .select("position")
+    .eq("site_id", session.siteId)
+    .order("position", { ascending: true })
+    .limit(1)
+    .maybeSingle<{ position: number }>();
+
   // Slug provizoriu, unic: coloana are `unique (site_id, slug)`, iar un articol
   // nou n-are încă titlu din care să-l genereze.
   const { data, error } = await supabase
@@ -91,6 +102,7 @@ export async function creeazaArticol(): Promise<never> {
       title: "Articol nou",
       slug: `articol-nou-${Date.now()}`,
       status: "draft",
+      position: pozitiaArticoluluiNou(primul?.position ?? null),
       // Autorul e cine scrie, luat din sesiune. Nu se afișează pe site (un
       // cabinet are un singur psiholog), dar jurnalul are nevoie de el.
       author_id: session.userId,
@@ -218,6 +230,73 @@ export async function comutaPublicareaArticolului(
 
   reimprospateaza(existent.slug);
   return { ok: true };
+}
+
+export type RezultatMutare =
+  | { ok: true; ordine: string[] }
+  | { ok: false; mesaj: string };
+
+/**
+ * Mută un articol cu o treaptă mai sus sau mai jos, în ordinea de pe site.
+ *
+ * Ordinea se ia din baza de date, nu de la browser: un panou rămas deschis de
+ * mult are lista veche, iar „mută mai sus" trebuie să însemne mai sus în lista
+ * de ACUM. Răspunsul poartă ordinea rezultată, ca panoul să se potrivească cu
+ * ea dacă între timp a mai umblat cineva.
+ *
+ * Se salvează pe loc, fără bară de jos — ca publicarea de pe același rând.
+ */
+export async function mutaArticolul(id: string, directie: Directie): Promise<RezultatMutare> {
+  const session = await verifySession();
+  const supabase = await createClient();
+
+  if (directie !== "sus" && directie !== "jos") {
+    return { ok: false, mesaj: "Nu am înțeles unde să mut articolul." };
+  }
+
+  // Aceeași ordine ca în panou și pe blogul public (vezi `ordine-articole.ts`).
+  const { data, error: eroareCitire } = await supabase
+    .from("blog_articles")
+    .select("id, position")
+    .eq("site_id", session.siteId)
+    .order("position", { ascending: true })
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
+
+  if (eroareCitire || !data) {
+    console.error("Citirea ordinii articolelor a eșuat:", eroareCitire);
+    return { ok: false, mesaj: "Nu am putut muta articolul. Încearcă din nou." };
+  }
+
+  const randuri = data as unknown as { id: string; position: number }[];
+
+  if (!randuri.some((rand) => rand.id === id)) {
+    return { ok: false, mesaj: "Articolul nu mai există. Reîncarcă pagina." };
+  }
+
+  const mutare = mutaArticol(randuri, id, directie);
+
+  // Deja primul (sau ultimul): nimic de scris, iar panoul primește ordinea reală.
+  if (!mutare) return { ok: true, ordine: randuri.map((rand) => rand.id) };
+
+  const rezultate = await Promise.all(
+    mutare.scrieri.map((rand) =>
+      supabase
+        .from("blog_articles")
+        .update({ position: rand.position })
+        .eq("id", rand.id)
+        .eq("site_id", session.siteId),
+    ),
+  );
+
+  const esuata = rezultate.find((rezultat) => rezultat.error);
+  if (esuata?.error) {
+    console.error("Mutarea articolului a eșuat:", esuata.error);
+    return { ok: false, mesaj: "Nu am putut muta articolul. Reîncarcă pagina și încearcă din nou." };
+  }
+
+  reimprospateaza();
+  return { ok: true, ordine: mutare.ordine };
 }
 
 export async function stergeArticol(id: string): Promise<RezultatArticol> {

@@ -2493,6 +2493,51 @@ pe „X" pe o poză folosită → avertizarea apare, poza nu se selectează; „
 nu șterge nimic; pe una nefolosită, „Șterge definitiv" o scoate din bază și din
 grilă. Văzut pe 1280px și 390px. Rămâne neverificat pe baza reală.
 
+### Blog: articolele se pot muta mai sus sau mai jos (5 oct. 2026)
+
+Cerut de proprietar: „din meniul din care se scriu articolele, să apeși pe 3
+puncte la fiecare articol și să-l poți urca/coborî". Până atunci blogul se
+aranja singur, după data publicării, iar lista din panou fusese făcută FĂRĂ
+mutare tocmai pe motivul ăsta („ordinea într-un blog e cronologia"). Decizia e
+acum inversată, la cererea lui.
+
+- **Migrare nouă, de rulat în Supabase:** `20261005120000_ordine_articole.sql` —
+  coloana `blog_articles.position` (`integer not null default 0`), umplută pentru
+  articolele existente cu EXACT ordinea de până acum (după dată, în pași de 10),
+  deci cine nu mută nimic nu vede nicio schimbare. Probată pe bancul local
+  (`proba-locala.sh`, apoi pe date cu două site-uri și o ciornă). Fără ea,
+  pagina Blog din panou dă eroare la citire.
+- **Ordinea**, în trei locuri identice (probat): `position` crescător, apoi
+  `published_at` descrescător (fără dată la coadă), apoi `created_at` descrescător.
+  Panoul n-o mai ia după „ultima atingere" — lista din panou și blogul public
+  trebuie să arate la fel, altfel mutarea n-ar avea un rezultat vizibil.
+- **Articolul nou** se pune primul (`poziția minimă − 10`), deci „cel mai nou
+  primul" rămâne purtarea implicită. Publicarea unei ciorne scrise mai demult NU
+  o mută în față (înainte o muta, fiindcă ordinea ieșea din data publicării).
+- **Mutarea** (`mutaArticolul`, acțiune de server): citește ordinea din bază, nu
+  de la browser, și renumerotează lista (10, 20, 30…) scriind doar rândurile care
+  se schimbă (de obicei două). Renumerotarea, nu schimbul între vecini, fiindcă la
+  poziții egale (rândurile seedate au toate 0) schimbul ar putea sări peste un
+  al treilea articol. Răspunde cu ordinea rezultată, iar panoul se potrivește cu ea.
+  Se salvează pe loc, fără bară de jos, ca publicarea de pe același rând.
+- **Meniul „⋯"** e o componentă nouă, `src/components/ui/meniu-actiuni.tsx`
+  (proiectul n-are bibliotecă de meniuri): click/Enter/Spațiu/↓ deschid, săgeți +
+  Home/End umblă, Escape închide și întoarce focusul, un click în afară îl
+  închide. Acțiuni: „Mută mai sus", „Mută mai jos" (stinse la capete). Cu un singur
+  articol meniul nu apare.
+- **Secțiunea „Articole recente" de pe prima pagină** arată primele articole din
+  AȘA ordine, nu neapărat cele mai noi. Numele ei a rămas; dacă proprietarul vrea,
+  se poate schimba în „Articole" sau similar.
+
+**Verificat:** `e2e/ordine-articole.proba.mjs` (12 teste: aritmetica mutării, egalități,
+capete, mutări repetate, cele trei ordonări identice, migrarea; cade când se scoate
+ordonarea după poziție). În browser, cu Supabase fals care ține starea: meniu cu
+mouse și cu tastatura, focusul se întoarce pe „⋯" după mutare, capetele sunt stinse,
+ordinea persistă după reîncărcare, serverul care refuză → lista revine la loc cu
+mesajul „Nu am putut muta articolul". **Nevăzut:** baza reală (migrarea nu e rulată
+acolo) și blogul public randat — ordinea lui e probată doar pe sursă și pe cererea
+trimisă (`order=position.asc,…`), nu cu o pagină desenată.
+
 ### Apropiere: programarea pe săptămână Luni–Sâmbătă (5 oct. 2026)
 
 Cerut de proprietar după ce zilele nu mai cădeau singure pe rând: „luni trebuie să

@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { InlineError, StatusBadge, type StatusValue } from "@/components/ui/feedback";
+import { MeniuActiuni } from "@/components/ui/meniu-actiuni";
 import { useToast } from "@/components/ui/toast";
 import { formateazaDataArticolului } from "@/lib/blog";
-import { comutaPublicareaArticolului, stergeArticol } from "./actions";
+import { mutaInLista, type Directie } from "@/lib/ordine-articole";
+import { comutaPublicareaArticolului, mutaArticolul, stergeArticol } from "./actions";
 
 export type RandArticol = {
   id: string;
@@ -20,9 +22,14 @@ export type RandArticol = {
 /**
  * Lista articolelor.
  *
- * Fără reordonare, spre deosebire de servicii: articolele se așază singure, de
- * la cel mai nou. Ordinea într-un blog e cronologia, nu o preferință — iar un
- * client care ar putea muta articolele ar sfârși mutându-le degeaba.
+ * Ordinea de aici e ordinea de pe site. Un articol nou se pune primul (deci „cel
+ * mai nou primul" rămâne purtarea implicită), iar din meniul „⋯" al rândului
+ * poate fi mutat mai sus sau mai jos — cerut de proprietar pe 5 oct. 2026. Până
+ * atunci blogul se aranja singur, după dată, iar lista fusese făcută fără
+ * mutare tocmai pe motivul ăsta.
+ *
+ * Mutarea se salvează pe loc, ca publicarea: nu e o modificare de adunat și
+ * trimis împreună cu altele.
  *
  * Publicarea se salvează pe loc, fără bară de jos: aici nu mai există altceva
  * de salvat împreună cu ea, deci o bară care așteaptă ar fi doar un pas în plus.
@@ -32,7 +39,64 @@ export function ListaArticolePanou({ initiale }: { initiale: RandArticol[] }) {
   const [eroare, setEroare] = useState<string | null>(null);
   const [deSters, setDeSters] = useState<RandArticol | null>(null);
   const [seLucreaza, porneste] = useTransition();
+  const [anunt, setAnunt] = useState("");
   const { show } = useToast();
+
+  // O singură mutare odată: două apăsări repezi ar pleca amândouă din aceeași
+  // listă veche, iar a doua ar strica rezultatul primeia. Un ref, nu o stare —
+  // starea ar ajunge prea târziu pentru a doua apăsare din același moment.
+  const seMuta = useRef(false);
+
+  // Rândul mutat își schimbă locul în listă, iar browserul își pierde focusul
+  // când i se mută nodul. Punem focusul înapoi pe butonul „⋯" al aceluiași
+  // articol, ca cine folosește tastatura să-și poată continua de unde a rămas.
+  const declansatoare = useRef(new Map<string, HTMLButtonElement | null>());
+  const dupaMutare = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (dupaMutare.current === null) return;
+    declansatoare.current.get(dupaMutare.current)?.focus();
+    dupaMutare.current = null;
+  }, [randuri]);
+
+  function muta(rand: RandArticol, directie: Directie) {
+    if (seMuta.current) return;
+
+    const urmatoare = mutaInLista(randuri, rand.id, directie);
+    if (!urmatoare) return;
+
+    seMuta.current = true;
+    setEroare(null);
+    const anterioare = randuri;
+
+    // Rândul se mută imediat; dacă serverul refuză, se întoarce la loc.
+    dupaMutare.current = rand.id;
+    setRanduri(urmatoare);
+    setAnunt(
+      `${rand.titlu}: poziția ${urmatoare.findIndex((r) => r.id === rand.id) + 1} din ${urmatoare.length}.`,
+    );
+
+    porneste(async () => {
+      const rezultat = await mutaArticolul(rand.id, directie).catch(() => null);
+      seMuta.current = false;
+
+      if (!rezultat || !rezultat.ok) {
+        dupaMutare.current = rand.id;
+        setRanduri(anterioare);
+        setEroare(rezultat?.mesaj ?? "Nu am putut salva. Verifică legătura la internet.");
+        return;
+      }
+
+      // Ordinea de pe server câștigă: dacă între timp s-a mai mutat ceva dintr-un
+      // alt panou, lista noastră se potrivește cu ea, nu invers. Rândurile
+      // dispărute între timp se pierd aici; cele apărute vin la următoarea încărcare.
+      setRanduri((curente) => {
+        const dupaId = new Map(curente.map((r) => [r.id, r]));
+        const potrivite = rezultat.ordine.flatMap((id) => dupaId.get(id) ?? []);
+        return potrivite.length === curente.length ? potrivite : curente;
+      });
+    });
+  }
 
   function comuta(rand: RandArticol, publicat: boolean) {
     setEroare(null);
@@ -67,10 +131,14 @@ export function ListaArticolePanou({ initiale }: { initiale: RandArticol[] }) {
 
   return (
     <>
+      <p aria-live="polite" className="sr-only">
+        {anunt}
+      </p>
+
       {eroare && <InlineError>{eroare}</InlineError>}
 
       <ul className="space-y-2">
-        {randuri.map((rand) => {
+        {randuri.map((rand, index) => {
           const data = formateazaDataArticolului(rand.publicatLa);
 
           return (
@@ -121,6 +189,30 @@ export function ListaArticolePanou({ initiale }: { initiale: RandArticol[] }) {
               >
                 <span aria-hidden>🗑</span>
               </Button>
+
+              {/* Cu un singur articol n-are ce muta: meniul ar avea doar acțiuni stinse. */}
+              {randuri.length > 1 && (
+                <MeniuActiuni
+                  eticheta={`Mută articolul ${rand.titlu}`}
+                  declansatorRef={(element) => {
+                    declansatoare.current.set(rand.id, element);
+                  }}
+                  actiuni={[
+                    {
+                      eticheta: "Mută mai sus",
+                      semn: "↑",
+                      dezactivata: index === 0,
+                      onAlege: () => muta(rand, "sus"),
+                    },
+                    {
+                      eticheta: "Mută mai jos",
+                      semn: "↓",
+                      dezactivata: index === randuri.length - 1,
+                      onAlege: () => muta(rand, "jos"),
+                    },
+                  ]}
+                />
+              )}
             </li>
           );
         })}

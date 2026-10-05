@@ -33,7 +33,7 @@
 -- coloanele alăturate, care arată amândouă textele. Rândurile „LIPSEȘTE" și „ÎN
 -- PLUS" nu au ambiguitatea asta.
 --
--- 273 lucruri verificate: tabele, coloane, constrângeri, indecși, politici
+-- 274 lucruri verificate: tabele, coloane, constrângeri, indecși, politici
 -- RLS, funcții (cu drepturile lor de execuție), declanșatori, drepturi pe tabel
 -- și pe coloană, și steagul de public al depozitului de fișiere.
 -- ============================================================================
@@ -244,6 +244,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('coloana', 'public.blog_articles.created_at', 'timestamp with time zone not null implicit now()', '—')
 ,  ('coloana', 'public.blog_articles.excerpt', 'text not null implicit ''''::text', '—')
 ,  ('coloana', 'public.blog_articles.id', 'uuid not null implicit gen_random_uuid()', '—')
+,  ('coloana', 'public.blog_articles.position', 'integer not null implicit 0', '—')
 ,  ('coloana', 'public.blog_articles.published_at', 'timestamp with time zone poate fi gol', '—')
 ,  ('coloana', 'public.blog_articles.seo', 'jsonb not null implicit ''{}''::jsonb', '—')
 ,  ('coloana', 'public.blog_articles.site_id', 'uuid not null', '—')

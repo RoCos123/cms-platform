@@ -34,9 +34,12 @@ export default async function BlogPage({
       .from("blog_articles")
       .select("id, title, excerpt, status, published_at")
       .eq("site_id", session.siteId)
-      // După ultima atingere, nu după data publicării: în panou cauți articolul
-      // la care lucrai, nu pe cel mai nou de pe site.
-      .order("updated_at", { ascending: false }),
+      // Ordinea de pe site, nu „după ultima atingere": lista din panou și blogul
+      // public trebuie să arate la fel, altfel „mută mai sus" n-ar avea un
+      // rezultat pe care să-l vezi (vezi `ordine-articole.ts`).
+      .order("position", { ascending: true })
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false }),
     supabase
       .from("site_settings")
       .select("pagini")
@@ -67,8 +70,10 @@ export default async function BlogPage({
           </p>
           <h1 className="mt-1 text-2xl font-semibold text-foreground">Blog</h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-            Articolele tale. Fiecare are pagina lui, iar cele mai noi apar și pe
-            prima pagină, la „Articole recente”.
+            Articolele tale, în ordinea în care apar pe site: primul din listă e
+            primul pe pagina de blog, iar cele de sus apar și pe prima pagină, la
+            „Articole recente”. Din meniul „⋯” de pe fiecare rând îl poți muta mai
+            sus sau mai jos.
           </p>
         </div>
 

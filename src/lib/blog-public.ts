@@ -55,14 +55,16 @@ const CAMPURI_LISTA =
 const CAMPURI_INTREG = `${CAMPURI_LISTA}, content`;
 
 /**
- * Articolele publicate ale unui site, cele mai noi întâi.
+ * Articolele publicate ale unui site, în ordinea aleasă din panou.
  *
  * `cache()` fiindcă le cer și pagina principală (secțiunea „Articole recente"),
  * și pagina de blog — uneori în aceeași cerere.
  *
- * Ordinea e după data publicării, nu după data creării: un articol scris acum
- * trei luni și publicat azi e cel nou pentru cititor. Cele fără dată (publicate
- * înainte ca noi să o setăm) cad la coadă, nu în față.
+ * Ordinea e `position` (mutat din meniul „⋯" al listei din panou; 5 oct. 2026).
+ * Un articol nou se pune la început, deci fără nicio mutare rămâne „cel mai nou
+ * primul". La poziții egale (rânduri seedate) se cade pe regula veche: data
+ * publicării, nu cea a creării — un articol scris acum trei luni și publicat azi
+ * e cel nou pentru cititor — iar cele fără dată la coadă, nu în față.
  */
 export const articolePublicate = cache(async (siteId: string): Promise<ArticolListat[]> => {
   const service = createServiceClient();
@@ -72,7 +74,9 @@ export const articolePublicate = cache(async (siteId: string): Promise<ArticolLi
     .select(CAMPURI_LISTA)
     .eq("site_id", siteId)
     .eq("status", "published")
-    .order("published_at", { ascending: false, nullsFirst: false });
+    .order("position", { ascending: true })
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.error("Citirea articolelor a eșuat:", error);

@@ -11,7 +11,7 @@
 --   comportament — chiar se încearcă: un client care caută datele altuia, un
 --                  vizitator anonim care scrie, o funcție a platformei chemată
 --                  de cine nu trebuie. Astea nu se pot deduce din schemă.
---   formă        — cele 273 de lucruri din schemă, față de migrări.
+--   formă        — cele 274 de lucruri din schemă, față de migrări.
 --   date         — ce nu poate opri nicio schemă, dar strică site-ul cuiva.
 --
 -- CE SCHIMBĂ. Aproape nimic, și nimic ce rămâne: `search_path`-ul sesiunii, o
@@ -827,6 +827,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('coloana', 'public.blog_articles.created_at', 'timestamp with time zone not null implicit now()', '—')
 ,  ('coloana', 'public.blog_articles.excerpt', 'text not null implicit ''''::text', '—')
 ,  ('coloana', 'public.blog_articles.id', 'uuid not null implicit gen_random_uuid()', '—')
+,  ('coloana', 'public.blog_articles.position', 'integer not null implicit 0', '—')
 ,  ('coloana', 'public.blog_articles.published_at', 'timestamp with time zone poate fi gol', '—')
 ,  ('coloana', 'public.blog_articles.seo', 'jsonb not null implicit ''{}''::jsonb', '—')
 ,  ('coloana', 'public.blog_articles.site_id', 'uuid not null', '—')
@@ -1102,7 +1103,7 @@ from diferente d
 
 union all
 
-select 'formă', 'toate cele 273 de lucruri din schemă', 'OK',
+select 'formă', 'toate cele 274 de lucruri din schemă', 'OK',
   'baza reală are exact ce scriu migrările'
 where not exists (select 1 from diferente)
 
