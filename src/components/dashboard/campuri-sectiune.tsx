@@ -35,6 +35,7 @@ export function CampuriSectiune({
   documente = [],
   prefix = "",
   raportPentru,
+  dimensiuniPentru,
 }: {
   campuri: CampSchema[];
   valoare: ValoareEditor;
@@ -56,6 +57,13 @@ export function CampuriSectiune({
    * (`raportRamei`). Lipsă (galeria de componente) → rama rămâne pătrată.
    */
   raportPentru?: (drum: string) => string | undefined;
+  /**
+   * Ce formă și mărime de poză să caute omul, pentru câmpul de imagine de la
+   * drumul dat (`dimensiuniPozaSectiune`), scrise în zona de încărcare. Are
+   * întâietate față de `dimensiuni` din descrierea câmpului — acela e același
+   * la toate șabloanele, iar forma pozei diferă de la un șablon la altul.
+   */
+  dimensiuniPentru?: (drum: string) => string | undefined;
 }) {
   // `null` în afara panoului (galeria de componente): atunci `ImageField` nu mai
   // arată butonul „Alege din bibliotecă", iar restul câmpului merge la fel.
@@ -177,7 +185,7 @@ export function CampuriSectiune({
                 key={camp.cheie}
                 label={camp.eticheta}
                 hint={camp.hint}
-                dimensiuni={camp.dimensiuni}
+                dimensiuni={dimensiuniPentru?.(drum) ?? camp.dimensiuni}
                 error={eroare}
                 value={imagine}
                 onChange={(noua) => seteaza(camp.cheie, noua)}
@@ -280,6 +288,7 @@ export function CampuriSectiune({
                       documente={documente}
                       prefix={`${drum}.${index}`}
                       raportPentru={raportPentru}
+                      dimensiuniPentru={dimensiuniPentru}
                       onChange={(nou) =>
                         seteaza(
                           camp.cheie,

@@ -197,7 +197,7 @@ const LISTA: MetaSectiune[] = [
         tip: "imagine",
         cheie: "imagine",
         eticheta: "Poza ta",
-        hint: "Opțională. Apare lângă text. Merge cel mai bine una pătrată sau verticală — una lată se taie pe margini.",
+        hint: "Opțională. Apare lângă text sau sub el, după cum e aranjat site-ul tău. Forma și mărimea potrivite le vezi mai jos, în chenarul de încărcare.",
       },
       {
         tip: "lista",

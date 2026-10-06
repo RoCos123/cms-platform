@@ -21,6 +21,7 @@ import {
   type Serviciu,
 } from "@/lib/servicii";
 import { catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
+import { textDimensiuni } from "@/lib/dimensiuni-poze";
 import { salveazaServiciu } from "../actions";
 
 export function EditorServiciu({
@@ -168,6 +169,11 @@ export function EditorServiciu({
           // Serviciul are un singur câmp de imagine (coperta), deci rama din
           // previzualizarea aleasă, indiferent de drum.
           raportPentru={() => raportCoperta}
+          // Poza e aceeași în ambele previzualizări, deci și textul: la șablonul cu
+          // cerc pe prima pagină spune și ce se întâmplă cu cercul.
+          dimensiuniPentru={() =>
+            textDimensiuni(template.asezari.serviciiImagine ? "serviciuRotund" : "serviciuBanda")
+          }
         />
 
         <PanouPrevizualizare

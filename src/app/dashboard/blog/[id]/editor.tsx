@@ -13,6 +13,7 @@ import { ArticolComplet } from "@/components/site/sections/articol-complet";
 import type { Template } from "@/lib/templates";
 import type { PunctFocal } from "@/lib/punct-focal";
 import { CAMPURI_ARTICOL } from "@/lib/blog";
+import { textDimensiuni } from "@/lib/dimensiuni-poze";
 import { catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 import { comutaPublicareaArticolului, salveazaArticol } from "../actions";
 
@@ -138,6 +139,7 @@ export function EditorArticol({
           // rama rămânea pătrată, iar tragerea muta altă axă decât taie bannerul,
           // deci previzualizarea nu se mișca.
           raportPentru={() => "16 / 9"}
+          dimensiuniPentru={() => textDimensiuni("articol")}
         />
 
         <PanouPrevizualizare

@@ -2493,6 +2493,40 @@ pe „X" pe o poză folosită → avertizarea apare, poza nu se selectează; „
 nu șterge nimic; pe una nefolosită, „Șterge definitiv" o scoate din bază și din
 grilă. Văzut pe 1280px și 390px. Rămâne neverificat pe baza reală.
 
+### Mărimea potrivită a pozelor, scrisă în panou (6 oct. 2026)
+
+Cerut de proprietar: „treci dimensiunile potrivite în secțiunea de hero și peste
+tot în panou", după ce a întrebat mai întâi care sunt. Panoul spunea doar „cel mult
+5 MB". Mai rău, la poza din hero scria „merge cel mai bine una pătrată sau
+verticală", deși la **Căldură și Claritate** poza de acolo e **lată (16:9)** — un
+text fals pentru două șabloane din cinci (și, probabil, rădăcina încadrării greșite
+din hero prinsă mai devreme).
+
+- **Un singur loc pentru cifre:** `src/lib/dimensiuni-poze.ts` (`DIMENSIUNI_POZE`,
+  `textDimensiuni`, `dimensiuniPozaSectiune`). Aceleași condiții ca `raportRamei`
+  din `rame-poze.ts` (forma ramei depinde de șablon și de varianta rândului).
+- **Cum s-au ales:** forma = cea de pe site; „recomandat" = lățimea maximă de pe
+  site × 2 (ecrane dense), rotunjită; „cel puțin" = lățimea de pe site la 1×. Peste
+  ~2000 px nu câștigi nimic (optimizatorul nu servește mai mult). Sunt
+  recomandări: nimic nu se respinge la încărcare.
+- **Valori:** hero lat 2000×1125 (min 1200×675); hero pătrat 1200×1200 (700×700);
+  „Despre mine" 4:5 → 800×1000 (500×625), cerc la Claritate 700×700 (400×400);
+  poza serviciului 16:7 → 1800×790 (1000×440); imaginea articolului 16:9 →
+  1600×900 (1000×563); apariții și vitrină 16:9 → 1200×675 (800×450); program 3:2
+  → 1200×800 (800×533). Logoul a rămas cu textul lui.
+- **Textul depinde de șablonul clientului și nu pomenește niciun nume de șablon**
+  (regula de la poza serviciului, 3 oct.). La șablonul cu cerc pe prima pagină,
+  textul serviciului spune și că cercul ia doar mijlocul pozei.
+- **Cablare:** `CampuriSectiune` primește `dimensiuniPentru` (are întâietate față
+  de `dimensiuni` din schemă); o dau editorul de secțiuni, cel de servicii și cel
+  de articole. Hintul de la poza din hero a fost făcut neutru.
+- **Probă:** `e2e/dimensiuni-poze.proba.mjs` (9 teste: forma cifrelor = forma ramei,
+  minim < recomandat ≤ 2048, urmează șablonul ca `raportRamei`, fără nume de
+  șabloane, cablarea); cade când se strică un raport sau se inversează hero-ul.
+  În panou, cu Supabase fals fără poze: textul potrivit apare la hero, „Despre
+  mine" și serviciu pe un șablon lat și unul pătrat. **Nevăzut:** câmpul din editorul
+  de articole (același mecanism, nerulat pe pagină) și baza reală.
+
 ### Blog: articolele se mută trăgând mânerul „⋯" (5 oct. 2026)
 
 Cerut de proprietar: „din meniul din care se scriu articolele, să apeși pe 3

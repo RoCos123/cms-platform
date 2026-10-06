@@ -6,6 +6,7 @@ import { SaveBar } from "@/components/ui/save-bar";
 import { useToast } from "@/components/ui/toast";
 import { CampuriSectiune } from "@/components/dashboard/campuri-sectiune";
 import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare";
+import { dimensiuniPozaSectiune } from "@/lib/dimensiuni-poze";
 import { raportRamei } from "@/lib/rame-poze";
 import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import type { OreDePrimaPagina } from "@/components/site/sections/programare";
@@ -147,6 +148,8 @@ export function EditorSectiune({
             nu în descrierea câmpului.
           */
           raportPentru={(drum) => raportRamei(meta.cheie, drum, { asezari: template.asezari, variant })}
+          // Aceeași formă, spusă în cuvinte și cu mărimea potrivită, sub „Trage o imagine…".
+          dimensiuniPentru={(drum) => dimensiuniPozaSectiune(meta.cheie, drum, { asezari: template.asezari, variant })}
         />
 
         <PanouPrevizualizare
