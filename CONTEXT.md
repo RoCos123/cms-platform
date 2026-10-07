@@ -1565,14 +1565,22 @@ se ceruse o părere, nu alte texte.
 
 **Doar pe sitepsihologi**, prin `variant = 'comparatie'` pe rândul „Pachete" (ca
 „vitrina" și „linie"); panoul nu scrie `variant`, deci niciun client nu-l vede.
-Se pornește o dată, din Supabase → SQL Editor, și trebuie să răspundă `UPDATE 1`:
+Se pornește o dată, din Supabase → SQL Editor. Cu `returning`, editorul arată
+rândul schimbat (`pricing | comparatie`); dacă nu arată niciun rând, domeniul nu
+s-a potrivit:
 
 ```sql
 update public.site_content
 set variant = 'comparatie'
 where site_id = (select id from public.sites where domain = 'sitepsihologi.vercel.app')
-  and key = 'pricing';
+  and key = 'pricing'
+returning key, variant;
 ```
+
+**Capcană, prinsă la prima rulare (7 oct.):** SQL Editor-ul din Supabase nu scrie
+`UPDATE 1`, cum scria aici înainte, ci „Success. No rows returned” la ORICE
+`update` fără `returning` — și când a schimbat un rând, și când n-a schimbat
+niciunul. Mesajul acela nu dovedește nimic; de-aia `returning`.
 
 Ordinea față de deploy nu contează: codul vechi ignoră o variantă pe care n-o
 știe. După mutarea pe `sitepsihologi.ro`, domeniul din linie se schimbă.
@@ -3637,14 +3645,17 @@ texte. Se pornește o singură dată, din Supabase:
    query**;
 2. lipit textul de mai jos, cu domeniul potrivit (azi
    `sitepsihologi.vercel.app`; după cumpărarea domeniului, `sitepsihologi.ro`);
-3. **Run**. Dacă scrie `UPDATE 1`, e gata — se vede la reîncărcarea paginii.
-   Dacă scrie `UPDATE 0`, domeniul scris nu s-a potrivit cu niciun site.
+3. **Run**. Dacă arată un rând (`portfolio | vitrina`), e gata — se vede la
+   reîncărcarea paginii. Dacă nu arată niciun rând, domeniul scris nu s-a
+   potrivit cu niciun site. (Fără `returning`, Supabase scrie „Success. No rows
+   returned” oricum — vezi capcana de la §„Tabelul comparativ din «Pachete»”.)
 
 ```sql
 update public.site_content
 set variant = 'vitrina'
 where site_id = (select id from public.sites where domain = 'sitepsihologi.vercel.app')
-  and key = 'portfolio';
+  and key = 'portfolio'
+returning key, variant;
 ```
 
 Linia asta schimbă STRICT forma cartonașului. NU atinge `data` — adică niciun
