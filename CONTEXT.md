@@ -135,6 +135,66 @@ adăuga pași — întreabă ce vede sau oferă să faci tu partea (ca la captur
 merge pe master abia după un „da, fă merge pe master" explicit; SQL-ul i se dă și în
 chat, nu doar ca fișier.
 
+### Lista de sarcini înainte de lansare, reluată (7 oct. 2026)
+
+Reluată la cererea proprietarului, din tabelele și secțiunile de mai jos, cu ce s-a
+schimbat de la ele încoace. Unde starea nu se vede din cod (setări Supabase/Vercel,
+acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține-o la zi.**
+
+**A. Înainte de primul client plătitor**
+1. **Contract + acord de prelucrare (GDPR)**, cu avocat — săptămâni, cel mai lent
+   punct; se începe primul și curge în paralel cu restul. Din clipa în care
+   platforma ține numele și telefoanele pacienților altcuiva, actele nu sunt opționale.
+2. **Backup / PITR verificat în Supabase** — minute, proprietar. Nu se știe dacă
+   e făcut.
+3. **Resetarea parolei:** codul e gata (10 sept.); rămân **3 setări în Supabase**
+   (minute, proprietar). Nu se știe dacă le-a făcut.
+4. **Email tranzacțional** (mesaj nou, confirmare de programare) — **ultimul, prin
+   decizia lui explicită** (26 aug.); nu se propune Resend ca următor pas. Până
+   atunci clientul vede mesajele doar intrând în panou.
+5. **Videoclipul de instructaj** — ultimul de tot, fiindcă se învechește la fiecare
+   schimbare de ecran.
+6. ✓ Făcut: cheile hCaptcha (17 sept.), izolarea dovedită pe baza reală (10 sept.),
+   provizionarea ca o linie de SQL, CI cu probe.
+
+**B. Înainte de a arăta produsul (site-ul de vânzări `sitepsihologi`)**
+1. **Domeniul `sitepsihologi.ro`** — acum site-ul stă pe `sitepsihologi.vercel.app`,
+   nepublicat și neindexat.
+2. **Textul proprietarului:** „Cine ești?" și în câte zile se livrează.
+3. **Secțiunea de păreri:** trei locuri goale, dinadins — **nu se inventează
+   recenzii**; ori vin păreri adevărate, ori rămâne stinsă la publicare.
+4. **Galeria de șabloane:** capturile sunt făcute (7 oct.); de verificat că fiecare
+   cartonaș duce la adresa `model-…` și că adresele vechi `cosmin-…` au fost scoase
+   din Vercel.
+5. **Comutatorul de publicare** — ultimul pas.
+6. **Ordinea hotărâtă pe 27 aug.:** site-ul proprietarului, făcut primul cap la
+   cap; apoi site-ul firmei de web design; abia apoi clienții.
+
+**C. Verificări înainte de lansare**
+- `DEV_TENANT_DOMAIN` să NU fie setat pe Production (pinuiește orice `*.vercel.app`
+  la un singur site). Cele cinci `model-…` arată fiecare alt șablon, ceea ce
+  sugerează că nu e setat — **deducție, neverificată** direct în Vercel.
+- Testul de izolare pe domenii distincte și rutate (vezi §„Izolarea între
+  clienți: cum o testezi înainte de lansare").
+- Tragerea articolelor pe un telefon real (vezi „Unde am rămas").
+
+**D. Amânate în cunoștință de cauză:** plățile cu cardul (Netopia), categoriile de
+blog, semnul din panou pentru secțiunile aprinse dar goale.
+
+**E. Strategie de marketing — ultimele pe listă** (adăugate la cererea
+proprietarului, 7 oct. 2026). Nu există încă un canal de vânzare; asta e munca lui, nu
+cod, și poate curge în paralel cu actele (se strâng clienți interesați cât se coace
+hârtia GDPR):
+1. **Contactează-o pe Rodica** pentru un site.
+2. **Contactează-o pe Ema** pentru un site.
+3. **Contactează-l pe Alex** pentru un site.
+4. **Alți psihologi** pe aceeași linie, după aceștia.
+
+Despre ele/el nu e scris nimic în note (cine sunt, ce șablon li s-ar potrivi, ce
+ofertă li se face) — de completat de proprietar. Fiecare site făcut pentru ei e și
+proba pentru lanțul „site-model completat → capturi → site de vânzări convingător"
+(vezi §„Munca proprietarului, care nu e nici cod, nici acte").
+
 ### Ce blochează primul client PLĂTITOR
 
 | # | Ce | Al cui | Cât ține |
