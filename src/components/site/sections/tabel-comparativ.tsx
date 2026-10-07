@@ -21,7 +21,7 @@ export function TabelComparativ() {
                 sitepsihologi.ro
               </th>
               <th className="p-4 bg-gray-50 text-sm font-semibold text-gray-500 w-1/4">
-                Platforme DIY (Wix, WordPress)
+                Platforme DIY (Wix, Squarespace)
               </th>
               <th className="p-4 bg-gray-50 text-sm font-semibold text-gray-500 w-1/4">
                 Agenții Web
@@ -36,7 +36,7 @@ export function TabelComparativ() {
                 Plată unică + 50€/an
               </td>
               <td className="p-4 text-gray-500">Abonament lunar</td>
-              <td className="p-4 text-gray-500">Mii de euro (Cost mare)</td>
+              <td className="p-4 text-gray-500">Prețuri mari, peste 1000 €</td>
             </tr>
 
             {/* Rândul 2 */}
@@ -65,7 +65,7 @@ export function TabelComparativ() {
               <td className="p-4 bg-[#f4f6f8] border-x border-gray-200 font-bold text-green-600">
                 Inclus. 0% comision pe ședință.
               </td>
-              <td className="p-4 text-gray-500">Modul plătit separat / Comision per ședință</td>
+              <td className="p-4 text-gray-500">Modul plătit separat / Abonament extra</td>
               <td className="p-4 text-gray-500">Necesită dezvoltare custom</td>
             </tr>
 

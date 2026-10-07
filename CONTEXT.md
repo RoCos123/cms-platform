@@ -1585,17 +1585,20 @@ textele din captura proprietarului: alături la 1280 și 1366px (căsuța 374px,
 tabelul 654px, aliniate sus), dedesubt la 1024px și pe telefon.
 
 Schimbate la cererea lui, tot pe 7 oct.: „Mentenanță & Suport" → „Mentenanță &
-Securitate", „Platforme DIY" → „Platforme DIY (Wix, WordPress)", „ZERO. Ne ocupăm
+Securitate", „Platforme DIY" → „Platforme DIY (Wix, Squarespace)", „ZERO. Ne ocupăm
 noi." → „MINIM, doar încarci pozele și textele.", „Comision programări" →
 „Sistem de programări", rând nou „Timp de lansare", „Proprietate design: Licență
 pe viață" → „Proprietate: Site-ul îți aparține 100%." Primul cod trimis avea
-cinci rânduri; ultimele trei au venit după, dintr-o versiune mai nouă a lui.
+cinci rânduri; ultimele trei au venit după, dintr-o versiune mai nouă a lui. Apoi:
+„Mii de euro (Cost mare)" → „Prețuri mari, peste 1000 €", „Modul plătit separat /
+Comision per ședință" → „Modul plătit separat / Abonament extra".
 
 Spuse proprietarului o dată, lăsate cum le-a scris el: proprietatea („Licență pe
 viață", apoi „Site-ul îți aparține 100%") și „Mentenanță & Securitate: Inclusă"
 sunt promisiuni încă nehotărâte (§„Ce vindem") — designul e al platformei, iar
-site-ul trăiește cât se plătește anul; „Ești blocat pe platforma lor" e adevărat
-la Wix, nu și la WordPress, acum numit în antet. Măsurat pe pagină: pe
+site-ul trăiește cât se plătește anul. WordPress, numit o vreme în antet, a ieșit:
+de pe el te poți muta oricând, deci „Ești blocat pe platforma lor" nu era adevărat
+la el; la Squarespace, ca la Wix, designul nu se poate lua. Măsurat pe pagină: pe
 telefon (390px) se văd doar primele două coloane, restul stă ascuns după derulare
 laterală, fără semn că există (aceeași capcană ca la `/proprietar`, 22 sept.);
 verdele de la rândul cu programările are contrast ~3:1, sub pragul de 4,5:1. Verificat pe
