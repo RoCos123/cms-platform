@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { CampParola } from "@/components/ui/camp-parola";
 import { loginProprietar } from "./actions";
 
 export function LoginProprietarForm() {
@@ -36,14 +37,7 @@ export function LoginProprietarForm() {
         <label htmlFor="password" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
           Parolă
         </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          required
-          autoComplete="current-password"
-          className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
-        />
+        <CampParola id="password" name="password" autoComplete="current-password" />
       </div>
 
       {state?.error && <p className="text-sm text-red-600 dark:text-red-400">{state.error}</p>}

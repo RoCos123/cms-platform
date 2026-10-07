@@ -1,10 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
+import { CampParola } from "@/components/ui/camp-parola";
 import { schimbaParola } from "./actions";
-
-const stilCamp =
-  "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50";
 
 export function FormularParolaNoua() {
   const [state, action, pending] = useActionState(schimbaParola, undefined);
@@ -25,30 +23,14 @@ export function FormularParolaNoua() {
         <label htmlFor="parola" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
           Parolă nouă
         </label>
-        <input
-          id="parola"
-          name="parola"
-          type="password"
-          required
-          minLength={8}
-          autoComplete="new-password"
-          className={stilCamp}
-        />
+        <CampParola id="parola" name="parola" minLength={8} autoComplete="new-password" />
       </div>
 
       <div className="space-y-1">
         <label htmlFor="confirma" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
           Încă o dată
         </label>
-        <input
-          id="confirma"
-          name="confirma"
-          type="password"
-          required
-          minLength={8}
-          autoComplete="new-password"
-          className={stilCamp}
-        />
+        <CampParola id="confirma" name="confirma" minLength={8} autoComplete="new-password" />
       </div>
 
       {state?.eroare && <p className="text-sm text-red-600 dark:text-red-400">{state.eroare}</p>}
