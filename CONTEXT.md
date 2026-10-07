@@ -1538,8 +1538,10 @@ De-aia pe site s-ar scrie lucrurile, nu cuvântul:
 - actualizări și reparații — un singur cod pentru toate site-urile, deci ce se
   repară ajunge la toți deodată, fără ca vreun client să instaleze ceva;
 - copii de siguranță zilnice — DOAR după trecerea pe Supabase Pro (vezi A.2);
-- ajutor când se împotmolește în panou (deja promis pe site: „Dacă te
-  împotmolești, mă suni");
+- ajutor când se împotmolește în panou — de hotărât de proprietar. Fraza
+  „Dacă te împotmolești, mă suni" e în textul turnat la început pe sitepsihologi
+  (`continut.ts`, „Cum decurge" → „Scrii textele și pui pozele"); dacă mai e pe
+  site-ul viu nu se știe, iar proprietarul n-o recunoaște ca promisiune a lui;
 - politica de confidențialitate ținută la zi când se schimbă platforma (oricum
   datorată — §„Politica de confidențialitate se schimbă odată cu platforma").
 
