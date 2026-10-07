@@ -1,5 +1,5 @@
 /**
- * Tabelul comparativ de sub pachete — DOAR pe sitepsihologi.ro.
+ * Tabelul comparativ din dreapta pachetelor — DOAR pe sitepsihologi.ro.
  *
  * Cerut de proprietar pe 7 oct. 2026, cu textele și înfățișarea lui, scrise aici
  * în cod la cererea lui (nu se editează din panou). Apare numai când rândul
@@ -9,7 +9,7 @@
  */
 export function TabelComparativ() {
   return (
-    <div className="w-full max-w-3xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm mt-8">
+    <div className="w-full max-w-3xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse min-w-[600px]">
           <thead>

@@ -179,11 +179,12 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
 6. **Ordinea hotărâtă pe 27 aug.:** site-ul proprietarului, făcut primul cap la
    cap; apoi site-ul firmei de web design; abia apoi clienții.
 7. **Textele despre domeniu și mentenanță** (7 oct.): după hotărârea că clientul
-   își cumpără singur domeniul (§„Ce vindem"), site-ul de vânzări o contrazice în
-   patru locuri — pasul „Îmi scrii", pachetele „Site complet" și „Anii următori",
-   nota de sub prețuri. De schimbat din panou, plus `src/app/proba-vanzari/continut.ts`,
-   ca sursa să nu mintă. Tot acolo, de lămurit: „Programări din calendar" e trecut
-   ca inclus în 300 €, deși programările sunt modul contra cost (27 aug.).
+   își cumpără singur domeniul (§„Ce vindem"), site-ul de vânzări o contrazicea în
+   patru locuri. „Pachete" a fost rescrisă de proprietar pe site (captura din 7
+   oct.: un singur pachet, nota fără domeniu). Rămâne de văzut pasul „Îmi scrii"
+   din „Cum decurge", iar `src/app/proba-vanzari/continut.ts` are încă textele
+   vechi. De lămurit: pe site, „Modul integrat de programări online" e în pachetul
+   de 300 €, deși programările sunt modul contra cost (27 aug.).
 8. **Tabelul comparativ din „Pachete"** (7 oct.): codul e gata; pe site-ul viu
    apare abia după linia de SQL din §„Tabelul comparativ din «Pachete»".
 
@@ -1500,7 +1501,9 @@ Hotărât de proprietar: **`sitepsihologi.ro` se face CU panoul nostru**, ca ori
 alt client. E și cea mai bună probă posibilă — dacă nu putem face site-ul nostru
 cu el, nu-l putem vinde.
 
-Prețurile se scriu pe față: **300 € o dată, primul an inclus, apoi 60 €/an.**
+Prețurile se scriu pe față: **300 € o dată (configurarea și primul an de găzduire),
+apoi 50 €/an din anul 2** — așa scrie proprietarul pe site-ul viu (captura lui
+din 7 oct.; până atunci, 60 €/an).
 **Domeniul NU e inclus** — schimbat pe 7 oct. 2026, vezi mai jos.
 
 Corectat pe 8 sept. 2026, de proprietar. Nota de aici a rămas o săptămână la
@@ -1516,7 +1519,8 @@ mentenanța. Până azi nota de mai sus spunea „primul an și domeniul incluse
 domeniul inclus în fiecare an", iar site-ul de vânzări promite încă, în patru
 locuri, că domeniul e „cumpărat și reînnoit de mine, pe numele tău" (vezi lista
 de sarcini, B.7). Proprietarul credea că hotărârea e deja scrisă aici; nu era —
-scria invers. **Prețul (300 € / 60 €) n-a fost rediscutat după schimbare.**
+scria invers. **Prețul anual a coborât apoi la 50 €** (scris de proprietar pe
+site, în aceeași zi).
 
 **„Securitatea Vercel", ce înseamnă de fapt** (verificat în documentația lor, 7
 oct.): lacătul `https`, pus și reînnoit automat la legarea domeniului, și
@@ -1553,7 +1557,7 @@ că site-ul nu cade niciodată.
 
 ### Tabelul comparativ din „Pachete" — doar sitepsihologi (7 oct. 2026)
 
-Cerut de proprietar, cu codul și textele LUI: sub pachete, un tabel
+Cerut de proprietar, cu codul și textele LUI: în dreapta pachetului, un tabel
 „sitepsihologi.ro / Platforme DIY / Agenții Web" cu cinci rânduri. **Textele sunt
 ale lui, cuvânt cu cuvânt, și stau în cod** (`tabel-comparativ.tsx`), nu în panou —
 așa a cerut. O primă propunere a mea le rescria; a respins-o pe bună dreptate: mi
@@ -1573,9 +1577,15 @@ where site_id = (select id from public.sites where domain = 'sitepsihologi.verce
 Ordinea față de deploy nu contează: codul vechi ignoră o variantă pe care n-o
 știe. După mutarea pe `sitepsihologi.ro`, domeniul din linie se schimbă.
 
-Spuse proprietarului o dată, lăsate cum le-a scris el: în tabel scrie „50€/an",
-iar pachetul de deasupra 60 €; „Licență pe viață" și „Mentenanță & Suport:
-Inclusă" sunt promisiuni încă nehotărâte (§„Ce vindem"). Măsurat pe pagină: pe
+**Alături de căsuță, nu dedesubt** (cerut tot pe 7 oct.): `LangaTabel` din
+`pricing.tsx`, un flex cu `wrap`. Stau alături doar cât încap întregi — căsuța
+de cel puțin 340px, tabelul de cel puțin 600px, sub care s-ar derula pe
+orizontală chiar pe laptop; altfel tabelul coboară sub căsuță. Măsurat cu
+textele din captura proprietarului: alături la 1280 și 1366px (căsuța 374px,
+tabelul 654px, aliniate sus), dedesubt la 1024px și pe telefon.
+
+Spuse proprietarului o dată, lăsate cum le-a scris el: „Licență pe viață" și
+„Mentenanță & Suport: Inclusă" sunt promisiuni încă nehotărâte (§„Ce vindem"). Măsurat pe pagină: pe
 telefon (390px) se văd doar primele două coloane, restul stă ascuns după derulare
 laterală, fără semn că există (aceeași capcană ca la `/proprietar`, 22 sept.);
 verdele de la „0% Comision" are contrast ~3:1, sub pragul de 4,5:1. Verificat pe

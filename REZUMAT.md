@@ -14,7 +14,7 @@ Actions), Supabase, Tailwind, Vercel.
 **Ce vindem (7 oct. 2026):** construim site-ul și îl găzduim pe Vercel, cu
 securitatea Vercel și mentenanță. Clientul își cumpără și își plătește singur
 domeniul. Ce cuprinde mentenanța e o propunere neconfirmată (CONTEXT.md, §„Ce
-vindem"). Prețul: 300 € o dată, apoi 60 €/an, nerediscutat după schimbare.
+vindem"). Prețul, cum scrie acum pe site: 300 € o dată, apoi 50 €/an din anul 2.
 
 ## Unde suntem
 
@@ -58,8 +58,10 @@ Făcute: cheile hCaptcha (17 sept.), izolarea dovedită, provizionarea, CI cu pr
   duce la adresa `model-…` și că adresele vechi `cosmin-…` au fost scoase din
   Vercel.
 - Textele despre domeniu: din 7 oct. clientul își cumpără și își plătește singur
-  domeniul, dar site-ul încă promite în patru locuri că îl cumpărăm noi. Tot
-  acolo, de lămurit dacă programările sunt incluse în 300 € sau contra cost.
+  domeniul. „Pachete" e rescrisă de proprietar; rămâne de văzut pasul „Îmi scrii".
+  De lămurit dacă programările sunt incluse în 300 € sau contra cost.
+- Tabelul comparativ, în dreapta pachetului: codul e gata; pe site apare după o
+  linie de SQL (CONTEXT.md, §„Tabelul comparativ din «Pachete»").
 - Comutatorul de publicare: ultimul pas.
 - Ordinea hotărâtă pe 27 aug.: site-ul proprietarului, apoi site-ul firmei de web
   design, apoi clienții.

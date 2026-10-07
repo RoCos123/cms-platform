@@ -52,7 +52,7 @@ export function Pricing({
    */
   friendly?: boolean;
   /**
-   * `"comparatie"` = tabelul comparativ sub pachete. Doar sitepsihologi.ro, pus
+   * `"comparatie"` = tabelul comparativ în dreapta pachetelor. Doar sitepsihologi.ro, pus
    * din SQL; vezi `tabel-comparativ.tsx`. Lipsa sau orice altceva = fără tabel.
    */
   variant?: string | null;
@@ -69,183 +69,183 @@ export function Pricing({
         intro={data.intro}
       />
 
-      <div
-        style={{
-          marginTop: "clamp(32px, 4vw, 48px)",
-          display: "grid",
-          // `auto-fit` cu minim 260px: două pachete stau larg, patru se așază pe
-          // două rânduri pe laptop și unul sub altul pe telefon, fără media query.
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          gap: "clamp(16px, 2vw, 24px)",
-          alignItems: "start",
-        }}
-      >
-        {pachete.map((pachet, i) => {
-          const inFata = Boolean(pachet.eticheta?.trim());
+      <LangaTabel activ={variant === "comparatie"}>
+        <div
+          style={{
+            marginTop: variant === "comparatie" ? 0 : "clamp(32px, 4vw, 48px)",
+            display: "grid",
+            // `auto-fit` cu minim 260px: două pachete stau larg, patru se așază pe
+            // două rânduri pe laptop și unul sub altul pe telefon, fără media query.
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            gap: "clamp(16px, 2vw, 24px)",
+            alignItems: "start",
+          }}
+        >
+          {pachete.map((pachet, i) => {
+            const inFata = Boolean(pachet.eticheta?.trim());
 
-          // La „Apropiere" (`friendly`) cardul e alb, cu culorile șablonului
-          // (`--t-…`), deci lizibil pe orice ton; la rest rămâne așezat pe fundalul
-          // secțiunii (`--s-…`), ca înainte. Cel evidențiat: chenar și buton verde.
-          const cardFundal = friendly
-            ? "var(--t-suprafata, var(--t-fundal-nuantat))"
-            : inFata
-              ? "color-mix(in oklab, var(--s-accent) 7%, transparent)"
-              : "transparent";
-          const cardChenar = friendly
-            ? inFata
-              ? "2px solid var(--t-accent)"
-              : "1px solid var(--t-chenar)"
-            : inFata
-              ? "2px solid var(--s-accent)"
-              : "1px solid color-mix(in oklab, currentColor 18%, transparent)";
-          const textSecundar = friendly ? "var(--t-text-secundar)" : "var(--s-text-secundar)";
-          const bifa = friendly ? "var(--t-accent)" : "var(--s-accent)";
-          const butonFundal = friendly ? "var(--t-accent)" : "var(--s-buton-fundal)";
-          const butonText = friendly ? "var(--t-accent-text)" : "var(--s-buton-text)";
+            // La „Apropiere" (`friendly`) cardul e alb, cu culorile șablonului
+            // (`--t-…`), deci lizibil pe orice ton; la rest rămâne așezat pe fundalul
+            // secțiunii (`--s-…`), ca înainte. Cel evidențiat: chenar și buton verde.
+            const cardFundal = friendly
+              ? "var(--t-suprafata, var(--t-fundal-nuantat))"
+              : inFata
+                ? "color-mix(in oklab, var(--s-accent) 7%, transparent)"
+                : "transparent";
+            const cardChenar = friendly
+              ? inFata
+                ? "2px solid var(--t-accent)"
+                : "1px solid var(--t-chenar)"
+              : inFata
+                ? "2px solid var(--s-accent)"
+                : "1px solid color-mix(in oklab, currentColor 18%, transparent)";
+            const textSecundar = friendly ? "var(--t-text-secundar)" : "var(--s-text-secundar)";
+            const bifa = friendly ? "var(--t-accent)" : "var(--s-accent)";
+            const butonFundal = friendly ? "var(--t-accent)" : "var(--s-buton-fundal)";
+            const butonText = friendly ? "var(--t-accent-text)" : "var(--s-buton-text)";
 
-          return (
-            <div
-              key={`${pachet.nume}-${i}`}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "14px",
-                height: "100%",
-                padding: "clamp(20px, 2.4vw, 28px)",
-                borderRadius: "var(--t-raza)",
-                border: cardChenar,
-                background: cardFundal,
-                color: friendly ? "var(--t-text)" : undefined,
-              }}
-            >
-              <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "8px 12px" }}>
-                <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 600, lineHeight: 1.3 }}>
-                  {pachet.nume}
-                </h3>
-                {inFata && (
-                  <span
-                    style={{
-                      /*
-                        Perechea BUTONULUI, nu accentul cu `--t-accent-text`.
-                        Pe tonul închis, `--s-accent` devine `accentPeInchis`,
-                        dar `--t-accent-text` rămâne culoarea gândită pentru
-                        accentul de pe fundal deschis — două culori care nu s-au
-                        văzut niciodată împreună. `--s-buton-fundal` și
-                        `--s-buton-text` sunt pereche prin construcție, la toate
-                        cele patru tonuri.
-                      */
-                      borderRadius: "999px",
-                      background: butonFundal,
-                      color: butonText,
-                      padding: "3px 10px",
-                      fontSize: "12px",
-                      fontWeight: 600,
-                      letterSpacing: "0.02em",
-                    }}
-                  >
-                    {pachet.eticheta}
-                  </span>
-                )}
-              </div>
-
-              <div>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "clamp(28px, 3.4vw, 40px)",
-                    lineHeight: 1.05,
-                    letterSpacing: "-0.02em",
-                    fontWeight: "var(--t-greutate-titlu)" as unknown as number,
-                    fontFamily: "var(--t-font-titlu)",
-                  }}
-                >
-                  {pachet.pret}
-                </p>
-                {pachet.subPret && (
-                  <p style={{ margin: "4px 0 0", fontSize: "14px", color: textSecundar }}>
-                    {pachet.subPret}
-                  </p>
-                )}
-              </div>
-
-              {pachet.descriere && (
-                <p style={{ margin: 0, fontSize: "15px", lineHeight: 1.6, color: textSecundar }}>
-                  {pachet.descriere}
-                </p>
-              )}
-
-              {pachet.include && pachet.include.length > 0 && (
-                <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: "8px" }}>
-                  {(pachet.include ?? []).map((rand, j) => (
-                    <li
-                      key={`${rand}-${j}`}
+            return (
+              <div
+                key={`${pachet.nume}-${i}`}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "14px",
+                  height: "100%",
+                  padding: "clamp(20px, 2.4vw, 28px)",
+                  borderRadius: "var(--t-raza)",
+                  border: cardChenar,
+                  background: cardFundal,
+                  color: friendly ? "var(--t-text)" : undefined,
+                }}
+              >
+                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "8px 12px" }}>
+                  <h3 style={{ margin: 0, fontSize: "18px", fontWeight: 600, lineHeight: 1.3 }}>
+                    {pachet.nume}
+                  </h3>
+                  {inFata && (
+                    <span
                       style={{
-                        display: "grid",
-                        gridTemplateColumns: "auto 1fr",
-                        gap: "10px",
-                        fontSize: "15px",
-                        lineHeight: 1.5,
+                        /*
+                          Perechea BUTONULUI, nu accentul cu `--t-accent-text`.
+                          Pe tonul închis, `--s-accent` devine `accentPeInchis`,
+                          dar `--t-accent-text` rămâne culoarea gândită pentru
+                          accentul de pe fundal deschis — două culori care nu s-au
+                          văzut niciodată împreună. `--s-buton-fundal` și
+                          `--s-buton-text` sunt pereche prin construcție, la toate
+                          cele patru tonuri.
+                        */
+                        borderRadius: "999px",
+                        background: butonFundal,
+                        color: butonText,
+                        padding: "3px 10px",
+                        fontSize: "12px",
+                        fontWeight: 600,
+                        letterSpacing: "0.02em",
                       }}
                     >
-                      {/*
-                        Bifa e desenată, nu un caracter: „✓" arată altfel la fiecare
-                        font, iar la Caveat (Apropiere) nici nu există în font și ar
-                        fi căzut pe altul. `aria-hidden` fiindcă rândul se citește
-                        oricum întreg de un cititor de ecran.
-                      */}
-                      <svg
-                        aria-hidden="true"
-                        viewBox="0 0 20 20"
-                        width="18"
-                        height="18"
-                        style={{ marginTop: "3px", flexShrink: 0, color: bifa }}
+                      {pachet.eticheta}
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "clamp(28px, 3.4vw, 40px)",
+                      lineHeight: 1.05,
+                      letterSpacing: "-0.02em",
+                      fontWeight: "var(--t-greutate-titlu)" as unknown as number,
+                      fontFamily: "var(--t-font-titlu)",
+                    }}
+                  >
+                    {pachet.pret}
+                  </p>
+                  {pachet.subPret && (
+                    <p style={{ margin: "4px 0 0", fontSize: "14px", color: textSecundar }}>
+                      {pachet.subPret}
+                    </p>
+                  )}
+                </div>
+
+                {pachet.descriere && (
+                  <p style={{ margin: 0, fontSize: "15px", lineHeight: 1.6, color: textSecundar }}>
+                    {pachet.descriere}
+                  </p>
+                )}
+
+                {pachet.include && pachet.include.length > 0 && (
+                  <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "grid", gap: "8px" }}>
+                    {(pachet.include ?? []).map((rand, j) => (
+                      <li
+                        key={`${rand}-${j}`}
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "auto 1fr",
+                          gap: "10px",
+                          fontSize: "15px",
+                          lineHeight: 1.5,
+                        }}
                       >
-                        <path
-                          d="M4 10.5l4 4 8-9"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <span>{rand}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
+                        {/*
+                          Bifa e desenată, nu un caracter: „✓" arată altfel la fiecare
+                          font, iar la Caveat (Apropiere) nici nu există în font și ar
+                          fi căzut pe altul. `aria-hidden` fiindcă rândul se citește
+                          oricum întreg de un cititor de ecran.
+                        */}
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 20 20"
+                          width="18"
+                          height="18"
+                          style={{ marginTop: "3px", flexShrink: 0, color: bifa }}
+                        >
+                          <path
+                            d="M4 10.5l4 4 8-9"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span>{rand}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
 
-              {pachet.buton?.text && (
-                <a
-                  href={pachet.buton.href || "#contact"}
-                  style={{
-                    // `marginTop: auto` lipește butonul de talpa cardului, ca
-                    // toate butoanele să stea pe aceeași linie chiar dacă
-                    // pachetele au liste de lungimi diferite.
-                    marginTop: "auto",
-                    display: "inline-flex",
-                    minHeight: "44px",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: "var(--t-raza-buton)",
-                    padding: "0 20px",
-                    background: inFata ? butonFundal : "transparent",
-                    color: inFata ? butonText : "currentColor",
-                    border: inFata ? "none" : "1px solid currentColor",
-                    fontSize: "15px",
-                    fontWeight: 600,
-                    textDecoration: "none",
-                  }}
-                >
-                  {pachet.buton.text}
-                </a>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {variant === "comparatie" && <TabelComparativ />}
+                {pachet.buton?.text && (
+                  <a
+                    href={pachet.buton.href || "#contact"}
+                    style={{
+                      // `marginTop: auto` lipește butonul de talpa cardului, ca
+                      // toate butoanele să stea pe aceeași linie chiar dacă
+                      // pachetele au liste de lungimi diferite.
+                      marginTop: "auto",
+                      display: "inline-flex",
+                      minHeight: "44px",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: "var(--t-raza-buton)",
+                      padding: "0 20px",
+                      background: inFata ? butonFundal : "transparent",
+                      color: inFata ? butonText : "currentColor",
+                      border: inFata ? "none" : "1px solid currentColor",
+                      fontSize: "15px",
+                      fontWeight: 600,
+                      textDecoration: "none",
+                    }}
+                  >
+                    {pachet.buton.text}
+                  </a>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </LangaTabel>
 
       {data.nota && (
         <p
@@ -261,5 +261,37 @@ export function Pricing({
         </p>
       )}
     </Section>
+  );
+}
+
+/**
+ * Pachetele cu tabelul comparativ ÎN DREAPTA lor — doar când rândul are
+ * `variant = 'comparatie'` (sitepsihologi.ro; vezi `tabel-comparativ.tsx`). Fără
+ * variantă nu adaugă nimic în pagină: grila de pachete iese exact ca înainte.
+ *
+ * Flex cu `wrap`, nu o grilă pe două coloane egale: tabelul are nevoie de cel
+ * puțin 600px, iar sub atât s-ar derula pe orizontală chiar pe laptop. Cu baza de
+ * 600px, cele două stau alături doar cât încap întregi; altfel tabelul coboară sub
+ * pachete, ca pe telefon. `minWidth: 0` lasă coloana tabelului să se strângă pe
+ * telefon, unde derularea rămâne înăuntrul tabelului, nu a paginii.
+ */
+function LangaTabel({ activ, children }: { activ: boolean; children: React.ReactNode }) {
+  if (!activ) return <>{children}</>;
+
+  return (
+    <div
+      style={{
+        marginTop: "clamp(32px, 4vw, 48px)",
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "flex-start",
+        gap: "clamp(16px, 2vw, 24px)",
+      }}
+    >
+      <div style={{ flex: "1 1 340px", minWidth: 0 }}>{children}</div>
+      <div style={{ flex: "1.6 1 600px", minWidth: 0 }}>
+        <TabelComparativ />
+      </div>
+    </div>
   );
 }
