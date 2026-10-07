@@ -1,6 +1,7 @@
 import type { SectionTone } from "@/lib/templates";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
+import { TabelComparativ } from "./tabel-comparativ";
 
 export type PricingData = {
   eyebrow?: string;
@@ -40,6 +41,7 @@ export function Pricing({
   data,
   tone,
   friendly,
+  variant,
 }: {
   data: PricingData;
   tone?: SectionTone;
@@ -49,6 +51,11 @@ export function Pricing({
    * vin din nivelul șablonului (`--t-…`), deci rămân deschise pe orice ton.
    */
   friendly?: boolean;
+  /**
+   * `"comparatie"` = tabelul comparativ sub pachete. Doar sitepsihologi.ro, pus
+   * din SQL; vezi `tabel-comparativ.tsx`. Lipsa sau orice altceva = fără tabel.
+   */
+  variant?: string | null;
 }) {
   const pachete = data.pachete ?? [];
   if (pachete.length === 0) return null;
@@ -237,6 +244,8 @@ export function Pricing({
           );
         })}
       </div>
+
+      {variant === "comparatie" && <TabelComparativ />}
 
       {data.nota && (
         <p

@@ -159,7 +159,12 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
     />
   ),
   pricing: (row, ctx) => (
-    <Pricing data={row.data as PricingData} tone={row.tone} friendly={ctx.asezari.pricingFriendly} />
+    <Pricing
+      data={row.data as PricingData}
+      tone={row.tone}
+      friendly={ctx.asezari.pricingFriendly}
+      variant={row.variant}
+    />
   ),
   faq: (row, ctx) => (
     <Faq

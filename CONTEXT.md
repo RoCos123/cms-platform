@@ -184,6 +184,8 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
    nota de sub prețuri. De schimbat din panou, plus `src/app/proba-vanzari/continut.ts`,
    ca sursa să nu mintă. Tot acolo, de lămurit: „Programări din calendar" e trecut
    ca inclus în 300 €, deși programările sunt modul contra cost (27 aug.).
+8. **Tabelul comparativ din „Pachete"** (7 oct.): codul e gata; pe site-ul viu
+   apare abia după linia de SQL din §„Tabelul comparativ din «Pachete»".
 
 **C. Verificări înainte de lansare**
 - `DEV_TENANT_DOMAIN` să NU fie setat pe Production (pinuiește orice `*.vercel.app`
@@ -1548,6 +1550,36 @@ De-aia pe site s-ar scrie lucrurile, nu cuvântul:
 NU intră: schimbatul textelor și pozelor la cerere (modelul e că le scrie
 clientul — §„Ce se predă clientului"), domeniul, emailul pe domeniu, o garanție
 că site-ul nu cade niciodată.
+
+### Tabelul comparativ din „Pachete" — doar sitepsihologi (7 oct. 2026)
+
+Cerut de proprietar, cu codul și textele LUI: sub pachete, un tabel
+„sitepsihologi.ro / Platforme DIY / Agenții Web" cu cinci rânduri. **Textele sunt
+ale lui, cuvânt cu cuvânt, și stau în cod** (`tabel-comparativ.tsx`), nu în panou —
+așa a cerut. O primă propunere a mea le rescria; a respins-o pe bună dreptate: mi
+se ceruse o părere, nu alte texte.
+
+**Doar pe sitepsihologi**, prin `variant = 'comparatie'` pe rândul „Pachete" (ca
+„vitrina" și „linie"); panoul nu scrie `variant`, deci niciun client nu-l vede.
+Se pornește o dată, din Supabase → SQL Editor, și trebuie să răspundă `UPDATE 1`:
+
+```sql
+update public.site_content
+set variant = 'comparatie'
+where site_id = (select id from public.sites where domain = 'sitepsihologi.vercel.app')
+  and key = 'pricing';
+```
+
+Ordinea față de deploy nu contează: codul vechi ignoră o variantă pe care n-o
+știe. După mutarea pe `sitepsihologi.ro`, domeniul din linie se schimbă.
+
+Spuse proprietarului o dată, lăsate cum le-a scris el: în tabel scrie „50€/an",
+iar pachetul de deasupra 60 €; „Licență pe viață" și „Mentenanță & Suport:
+Inclusă" sunt promisiuni încă nehotărâte (§„Ce vindem"). Măsurat pe pagină: pe
+telefon (390px) se văd doar primele două coloane, restul stă ascuns după derulare
+laterală, fără semn că există (aceeași capcană ca la `/proprietar`, 22 sept.);
+verdele de la „0% Comision" are contrast ~3:1, sub pragul de 4,5:1. Verificat pe
+`/proba-vanzari` (conținutul din `continut.ts`), nu pe site-ul viu.
 
 **Stare la 8 sept. 2026: site-ul EXISTĂ.** Provizionat cu `creeaza_client` pe
 `sitepsihologi.vercel.app`, șablonul `claritate`, conținutul turnat din SQL

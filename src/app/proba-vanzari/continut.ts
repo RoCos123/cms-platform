@@ -122,7 +122,9 @@ export const SECTIUNI: SectionRow[] = [
   {
     id: "pricing",
     key: "pricing",
-    variant: null,
+    // Tabelul comparativ de sub pachete (7 oct. 2026). Pe site-ul viu se pornește
+    // din SQL, ca „vitrina" — vezi CONTEXT.md.
+    variant: "comparatie",
     tone: "nuantat",
     data: {
       eyebrow: "Prețuri",
