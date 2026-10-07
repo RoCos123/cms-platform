@@ -145,8 +145,14 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
 1. **Contract + acord de prelucrare (GDPR)**, cu avocat — săptămâni, cel mai lent
    punct; se începe primul și curge în paralel cu restul. Din clipa în care
    platforma ține numele și telefoanele pacienților altcuiva, actele nu sunt opționale.
-2. **Backup / PITR verificat în Supabase** — minute, proprietar. Nu se știe dacă
-   e făcut.
+2. **Planurile plătite la Vercel și Supabase, cu backup** — minute, proprietar.
+   Nu se știe pe ce planuri e proiectul. Din documentația lor (citită 7 oct.):
+   **Vercel Hobby (gratuit) e doar pentru uz necomercial** — a fi plătit ca să faci
+   sau să găzduiești un site e uz comercial și cere Pro; Hobby are și plafon de
+   50 de domenii pe proiect, Pro practic nu. **Supabase gratuit n-are niciun
+   backup automat** și oprește proiectul după o săptămână fără activitate; Pro
+   (25 $/lună) are backup zilnic, păstrat 7 zile, și nu se oprește. De când
+   găzduirea e chiar ce vindem (§„Ce vindem"), punctul ăsta nu e opțional.
 3. **Resetarea parolei:** codul e gata (10 sept.); rămân **3 setări în Supabase**
    (minute, proprietar). **Confirmat de proprietar pe 7 oct. 2026: NU le-a făcut
    încă.** Până atunci „Ți-ai uitat parola?" poate să nu trimită emailul. Ocolire
@@ -172,6 +178,12 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
 5. **Comutatorul de publicare** — ultimul pas.
 6. **Ordinea hotărâtă pe 27 aug.:** site-ul proprietarului, făcut primul cap la
    cap; apoi site-ul firmei de web design; abia apoi clienții.
+7. **Textele despre domeniu și mentenanță** (7 oct.): după hotărârea că clientul
+   își cumpără singur domeniul (§„Ce vindem"), site-ul de vânzări o contrazice în
+   patru locuri — pasul „Îmi scrii", pachetele „Site complet" și „Anii următori",
+   nota de sub prețuri. De schimbat din panou, plus `src/app/proba-vanzari/continut.ts`,
+   ca sursa să nu mintă. Tot acolo, de lămurit: „Programări din calendar" e trecut
+   ca inclus în 300 €, deși programările sunt modul contra cost (27 aug.).
 
 **C. Verificări înainte de lansare**
 - `DEV_TENANT_DOMAIN` să NU fie setat pe Production (pinuiește orice `*.vercel.app`
@@ -1486,13 +1498,54 @@ Hotărât de proprietar: **`sitepsihologi.ro` se face CU panoul nostru**, ca ori
 alt client. E și cea mai bună probă posibilă — dacă nu putem face site-ul nostru
 cu el, nu-l putem vinde.
 
-Prețurile se scriu pe față: **300 € o dată — primul an și domeniul incluse —
-apoi 60 €/an, cu domeniul inclus în fiecare an.**
+Prețurile se scriu pe față: **300 € o dată, primul an inclus, apoi 60 €/an.**
+**Domeniul NU e inclus** — schimbat pe 7 oct. 2026, vezi mai jos.
 
 Corectat pe 8 sept. 2026, de proprietar. Nota de aici a rămas o săptămână la
 varianta abandonată („apoi 200 lei/an"), în timp ce site-ul spunea deja 60 €.
 Documentul ăsta e primul citit la fiecare sesiune nouă, deci o cifră greșită
 aici nu stă degeaba: se repetă.
+
+### Ce vindem: construire + găzduire, fără domeniu (7 oct. 2026)
+
+Hotărât de proprietar: **clientul își cumpără și își plătește singur domeniul.**
+Noi construim site-ul, îl găzduim pe Vercel, cu securitatea Vercel, și facem
+mentenanța. Până azi nota de mai sus spunea „primul an și domeniul incluse… cu
+domeniul inclus în fiecare an", iar site-ul de vânzări promite încă, în patru
+locuri, că domeniul e „cumpărat și reînnoit de mine, pe numele tău" (vezi lista
+de sarcini, B.7). Proprietarul credea că hotărârea e deja scrisă aici; nu era —
+scria invers. **Prețul (300 € / 60 €) n-a fost rediscutat după schimbare.**
+
+**„Securitatea Vercel", ce înseamnă de fapt** (verificat în documentația lor, 7
+oct.): lacătul `https`, pus și reînnoit automat la legarea domeniului, și
+protecție automată împotriva atacurilor care încearcă să doboare site-ul cu
+trafic (DDoS), pe toate planurile. Restul securității e a NOASTRĂ, nu a lor:
+clienții despărțiți între ei (RLS), fișierele private, anti-spamul, zero
+cookie-uri.
+
+**Urmări ale domeniului cumpărat de client:**
+- trebuie îndreptat spre Vercel din contul LUI de la firma de domenii (două
+  înregistrări DNS); un psiholog rar face asta singur — ori dă acces, ori se face
+  împreună, la telefon;
+- dacă uită să-l reînnoiască, site-ul dispare de pe adresa lui. De scris în
+  contract că reînnoirea e a lui;
+- emailul pe domeniu (`contact@cabinet.ro`) nu e al nostru: îl face el, la firma
+  de domenii sau la un furnizor de email.
+
+**Mentenanța — propunere, NECONFIRMATĂ de proprietar.** Cuvântul îl înțelege
+fiecare altfel; un psiholog poate citi în el „îmi schimbă el textele când îi cer".
+De-aia pe site s-ar scrie lucrurile, nu cuvântul:
+- actualizări și reparații — un singur cod pentru toate site-urile, deci ce se
+  repară ajunge la toți deodată, fără ca vreun client să instaleze ceva;
+- copii de siguranță zilnice — DOAR după trecerea pe Supabase Pro (vezi A.2);
+- ajutor când se împotmolește în panou (deja promis pe site: „Dacă te
+  împotmolești, mă suni");
+- politica de confidențialitate ținută la zi când se schimbă platforma (oricum
+  datorată — §„Politica de confidențialitate se schimbă odată cu platforma").
+
+NU intră: schimbatul textelor și pozelor la cerere (modelul e că le scrie
+clientul — §„Ce se predă clientului"), domeniul, emailul pe domeniu, o garanție
+că site-ul nu cade niciodată.
 
 **Stare la 8 sept. 2026: site-ul EXISTĂ.** Provizionat cu `creeaza_client` pe
 `sitepsihologi.vercel.app`, șablonul `claritate`, conținutul turnat din SQL

@@ -11,6 +11,11 @@ site public per client). Un singur cod și o singură bază Supabase pentru toț
 clienții, izolați prin `site_id` și RLS. Stack: Next.js (App Router, Server
 Actions), Supabase, Tailwind, Vercel.
 
+**Ce vindem (7 oct. 2026):** construim site-ul și îl găzduim pe Vercel, cu
+securitatea Vercel și mentenanță. Clientul își cumpără și își plătește singur
+domeniul. Ce cuprinde mentenanța e o propunere neconfirmată (CONTEXT.md, §„Ce
+vindem"). Prețul: 300 € o dată, apoi 60 €/an, nerediscutat după schimbare.
+
 ## Unde suntem
 
 - Platforma e în esență terminată: 13 ecrane în panou, 5 șabloane (Căldură,
@@ -30,8 +35,9 @@ Actions), Supabase, Tailwind, Vercel.
 
 1. **Contract + acord de prelucrare (GDPR), cu avocat.** Durează săptămâni și e
    cel mai lent punct. Se începe primul, în paralel cu restul.
-2. **Backup / PITR verificat în Supabase.** Minute, proprietarul. Nu știu dacă
-   e făcut.
+2. **Planurile plătite la Vercel și Supabase, cu backup.** Nu știu pe ce planuri
+   e proiectul. Vercel gratuit (Hobby) e doar pentru uz necomercial, deci vânzarea
+   de site-uri cere Pro; Supabase gratuit n-are niciun backup automat.
 3. **Resetarea parolei.** Codul e gata. Cele 3 setări din Supabase NU sunt
    făcute (confirmat de proprietar, 7 oct.), deci emailul de resetare poate să nu
    ajungă. În plus, vezi „Tensiuni" mai jos: varianta completă depinde de domeniu
@@ -51,6 +57,9 @@ Făcute: cheile hCaptcha (17 sept.), izolarea dovedită, provizionarea, CI cu pr
 - Galeria de șabloane: capturile sunt făcute. De verificat că fiecare cartonaș
   duce la adresa `model-…` și că adresele vechi `cosmin-…` au fost scoase din
   Vercel.
+- Textele despre domeniu: din 7 oct. clientul își cumpără și își plătește singur
+  domeniul, dar site-ul încă promite în patru locuri că îl cumpărăm noi. Tot
+  acolo, de lămurit dacă programările sunt incluse în 300 € sau contra cost.
 - Comutatorul de publicare: ultimul pas.
 - Ordinea hotărâtă pe 27 aug.: site-ul proprietarului, apoi site-ul firmei de web
   design, apoi clienții.
