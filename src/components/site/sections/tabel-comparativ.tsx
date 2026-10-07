@@ -9,9 +9,9 @@
  */
 export function TabelComparativ() {
   return (
-    <div className="w-full max-w-3xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse min-w-[600px]">
+    <div className="w-full h-full max-w-3xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="h-full overflow-x-auto">
+        <table className="w-full h-full text-left border-collapse min-w-[600px]">
           <thead>
             <tr className="border-b border-gray-200">
               <th className="p-4 bg-gray-50 text-sm font-semibold text-gray-600 uppercase tracking-wider">

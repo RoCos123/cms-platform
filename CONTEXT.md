@@ -1592,6 +1592,13 @@ orizontală chiar pe laptop; altfel tabelul coboară sub căsuță. Măsurat cu
 textele din captura proprietarului: alături la 1280 și 1366px (căsuța 374px,
 tabelul 654px, aliniate sus), dedesubt la 1024px și pe telefon.
 
+Apoi, tot la cererea lui: **tabelul cât căsuța** (coloanele se întind la aceeași
+înălțime, căsuța și tabelul le umplu — măsurat: încep și se termină pe aceeași
+linie) și **titlul secțiunii pe toată lățimea**, și peste tabel (`maxWidthTitlu`
+„none", doar cu `comparatie`; la 1280px, două rânduri în loc de trei). Urmare
+de știut: cu două pachete în stânga, tabelul se întinde cât amândouă, iar
+rândurile lui se răresc mult.
+
 Schimbate la cererea lui, tot pe 7 oct.: „Mentenanță & Suport" → „Mentenanță &
 Securitate", „Platforme DIY" → „Platforme DIY (Wix, Squarespace)", „ZERO. Ne ocupăm
 noi." → „MINIM, doar încarci pozele și textele.", „Comision programări" →

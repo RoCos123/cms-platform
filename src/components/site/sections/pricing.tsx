@@ -67,12 +67,17 @@ export function Pricing({
         titlu={data.titlu}
         titluAccent={data.titluAccent}
         intro={data.intro}
+        // Cu tabelul alături, titlul se întinde pe toată lățimea, și peste tabel
+        // (cerut pentru sitepsihologi). Altfel rămâne lățimea obișnuită.
+        maxWidthTitlu={variant === "comparatie" ? "none" : undefined}
       />
 
       <LangaTabel activ={variant === "comparatie"}>
         <div
           style={{
             marginTop: variant === "comparatie" ? 0 : "clamp(32px, 4vw, 48px)",
+            // Lângă tabel, cât toată coloana: căsuța și tabelul ies la fel de înalte.
+            height: variant === "comparatie" ? "100%" : undefined,
             display: "grid",
             // `auto-fit` cu minim 260px: două pachete stau larg, patru se așază pe
             // două rânduri pe laptop și unul sub altul pe telefon, fără media query.
@@ -274,6 +279,10 @@ export function Pricing({
  * 600px, cele două stau alături doar cât încap întregi; altfel tabelul coboară sub
  * pachete, ca pe telefon. `minWidth: 0` lasă coloana tabelului să se strângă pe
  * telefon, unde derularea rămâne înăuntrul tabelului, nu a paginii.
+ *
+ * `stretch`: alături, cele două coloane au aceeași înălțime, iar căsuța și
+ * tabelul o umplu (`height: 100%`), deci se termină pe aceeași linie — cerut de
+ * proprietar, „tabelul de mărimea căsuței".
  */
 function LangaTabel({ activ, children }: { activ: boolean; children: React.ReactNode }) {
   if (!activ) return <>{children}</>;
@@ -284,7 +293,7 @@ function LangaTabel({ activ, children }: { activ: boolean; children: React.React
         marginTop: "clamp(32px, 4vw, 48px)",
         display: "flex",
         flexWrap: "wrap",
-        alignItems: "flex-start",
+        alignItems: "stretch",
         gap: "clamp(16px, 2vw, 24px)",
       }}
     >
