@@ -148,7 +148,10 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
 2. **Backup / PITR verificat în Supabase** — minute, proprietar. Nu se știe dacă
    e făcut.
 3. **Resetarea parolei:** codul e gata (10 sept.); rămân **3 setări în Supabase**
-   (minute, proprietar). Nu se știe dacă le-a făcut.
+   (minute, proprietar). **Confirmat de proprietar pe 7 oct. 2026: NU le-a făcut
+   încă.** Până atunci „Ți-ai uitat parola?" poate să nu trimită emailul. Ocolire
+   când un cont e blocat: intri din `/proprietar` („Intră în panou") sau pui o
+   parolă nouă din Supabase → Authentication → Users.
 4. **Email tranzacțional** (mesaj nou, confirmare de programare) — **ultimul, prin
    decizia lui explicită** (26 aug.); nu se propune Resend ca următor pas. Până
    atunci clientul vede mesajele doar intrând în panou.

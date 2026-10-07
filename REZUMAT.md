@@ -32,8 +32,10 @@ Actions), Supabase, Tailwind, Vercel.
    cel mai lent punct. Se începe primul, în paralel cu restul.
 2. **Backup / PITR verificat în Supabase.** Minute, proprietarul. Nu știu dacă
    e făcut.
-3. **Resetarea parolei.** Codul e gata, dar vezi „Tensiuni" mai jos: varianta
-   completă depinde de domeniu și email.
+3. **Resetarea parolei.** Codul e gata. Cele 3 setări din Supabase NU sunt
+   făcute (confirmat de proprietar, 7 oct.), deci emailul de resetare poate să nu
+   ajungă. În plus, vezi „Tensiuni" mai jos: varianta completă depinde de domeniu
+   și email.
 4. **Email tranzacțional** (mesaj nou, confirmare de programare). Ultimul, prin
    decizia proprietarului din 26 aug.; nu se propune Resend ca următor pas.
 5. **Videoclipul de instructaj.** Ultimul de tot, fiindcă se învechește la
