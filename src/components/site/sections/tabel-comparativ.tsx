@@ -21,7 +21,7 @@ export function TabelComparativ() {
                 sitepsihologi.ro
               </th>
               <th className="p-4 bg-gray-50 text-sm font-semibold text-gray-500 w-1/4">
-                Platforme DIY
+                Platforme DIY (Wix, WordPress)
               </th>
               <th className="p-4 bg-gray-50 text-sm font-semibold text-gray-500 w-1/4">
                 Agenții Web
@@ -43,7 +43,7 @@ export function TabelComparativ() {
             <tr className="border-b border-gray-100 hover:bg-gray-50/50">
               <td className="p-4 font-medium text-gray-900">Efortul tău tehnic</td>
               <td className="p-4 bg-[#f4f6f8] border-x border-gray-200 font-semibold text-[#1e3a8a]">
-                ZERO. Ne ocupăm noi.
+                MINIM, doar încarci pozele și textele.
               </td>
               <td className="p-4 text-gray-500">Construiești singur</td>
               <td className="p-4 text-gray-500">Ședințe lungi și feedback</td>
@@ -51,7 +51,7 @@ export function TabelComparativ() {
 
             {/* Rândul 3 */}
             <tr className="border-b border-gray-100 hover:bg-gray-50/50">
-              <td className="p-4 font-medium text-gray-900">Mentenanță & Suport</td>
+              <td className="p-4 font-medium text-gray-900">Mentenanță & Securitate</td>
               <td className="p-4 bg-[#f4f6f8] border-x border-gray-200 font-semibold text-[#1e3a8a]">
                 Inclusă
               </td>
@@ -61,22 +61,32 @@ export function TabelComparativ() {
 
             {/* Rândul 4 */}
             <tr className="border-b border-gray-100 hover:bg-gray-50/50">
-              <td className="p-4 font-medium text-gray-900">Comision programări</td>
+              <td className="p-4 font-medium text-gray-900">Sistem de programări</td>
               <td className="p-4 bg-[#f4f6f8] border-x border-gray-200 font-bold text-green-600">
-                0% Comision
+                Inclus. 0% comision pe ședință.
               </td>
-              <td className="p-4 text-gray-500">Plătit extra / % din ședință</td>
-              <td className="p-4 text-gray-500">Necesită modul custom</td>
+              <td className="p-4 text-gray-500">Modul plătit separat / Comision per ședință</td>
+              <td className="p-4 text-gray-500">Necesită dezvoltare custom</td>
             </tr>
 
             {/* Rândul 5 */}
-            <tr>
-              <td className="p-4 font-medium text-gray-900">Proprietate design</td>
+            <tr className="border-b border-gray-100 hover:bg-gray-50/50">
+              <td className="p-4 font-medium text-gray-900">Timp de lansare</td>
               <td className="p-4 bg-[#f4f6f8] border-x border-gray-200 font-semibold text-[#1e3a8a]">
-                Licență pe viață
+                Câteva zile. Alegi designul și e gata.
               </td>
-              <td className="p-4 text-gray-500">Aparține platformei</td>
-              <td className="p-4 text-gray-500">Aparține agenției</td>
+              <td className="p-4 text-gray-500">Săptămâni întregi de frustrări</td>
+              <td className="p-4 text-gray-500">1-3 luni de așteptare</td>
+            </tr>
+
+            {/* Rândul 6 */}
+            <tr>
+              <td className="p-4 font-medium text-gray-900">Proprietate</td>
+              <td className="p-4 bg-[#f4f6f8] border-x border-gray-200 font-semibold text-[#1e3a8a]">
+                Site-ul îți aparține 100%.
+              </td>
+              <td className="p-4 text-gray-500">Ești blocat pe platforma lor.</td>
+              <td className="p-4 text-gray-500">Depinzi tehnic de agenție.</td>
             </tr>
           </tbody>
         </table>

@@ -1558,7 +1558,7 @@ că site-ul nu cade niciodată.
 ### Tabelul comparativ din „Pachete" — doar sitepsihologi (7 oct. 2026)
 
 Cerut de proprietar, cu codul și textele LUI: în dreapta pachetului, un tabel
-„sitepsihologi.ro / Platforme DIY / Agenții Web" cu cinci rânduri. **Textele sunt
+„sitepsihologi.ro / Platforme DIY / Agenții Web" cu șase rânduri. **Textele sunt
 ale lui, cuvânt cu cuvânt, și stau în cod** (`tabel-comparativ.tsx`), nu în panou —
 așa a cerut. O primă propunere a mea le rescria; a respins-o pe bună dreptate: mi
 se ceruse o părere, nu alte texte.
@@ -1584,11 +1584,21 @@ orizontală chiar pe laptop; altfel tabelul coboară sub căsuță. Măsurat cu
 textele din captura proprietarului: alături la 1280 și 1366px (căsuța 374px,
 tabelul 654px, aliniate sus), dedesubt la 1024px și pe telefon.
 
-Spuse proprietarului o dată, lăsate cum le-a scris el: „Licență pe viață" și
-„Mentenanță & Suport: Inclusă" sunt promisiuni încă nehotărâte (§„Ce vindem"). Măsurat pe pagină: pe
+Schimbate la cererea lui, tot pe 7 oct.: „Mentenanță & Suport" → „Mentenanță &
+Securitate", „Platforme DIY" → „Platforme DIY (Wix, WordPress)", „ZERO. Ne ocupăm
+noi." → „MINIM, doar încarci pozele și textele.", „Comision programări" →
+„Sistem de programări", rând nou „Timp de lansare", „Proprietate design: Licență
+pe viață" → „Proprietate: Site-ul îți aparține 100%." Primul cod trimis avea
+cinci rânduri; ultimele trei au venit după, dintr-o versiune mai nouă a lui.
+
+Spuse proprietarului o dată, lăsate cum le-a scris el: proprietatea („Licență pe
+viață", apoi „Site-ul îți aparține 100%") și „Mentenanță & Securitate: Inclusă"
+sunt promisiuni încă nehotărâte (§„Ce vindem") — designul e al platformei, iar
+site-ul trăiește cât se plătește anul; „Ești blocat pe platforma lor" e adevărat
+la Wix, nu și la WordPress, acum numit în antet. Măsurat pe pagină: pe
 telefon (390px) se văd doar primele două coloane, restul stă ascuns după derulare
 laterală, fără semn că există (aceeași capcană ca la `/proprietar`, 22 sept.);
-verdele de la „0% Comision" are contrast ~3:1, sub pragul de 4,5:1. Verificat pe
+verdele de la rândul cu programările are contrast ~3:1, sub pragul de 4,5:1. Verificat pe
 `/proba-vanzari` (conținutul din `continut.ts`), nu pe site-ul viu.
 
 **Stare la 8 sept. 2026: site-ul EXISTĂ.** Provizionat cu `creeaza_client` pe
