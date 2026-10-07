@@ -73,6 +73,68 @@ Toate sunt pe master, CI verde. Șabloanele neatinse de o cerere anume au rămas
 neschimbate — regula „funcție/structură la toți, piele doar unde" a ținut peste
 tot.
 
+### Unde am rămas (7 oct. 2026)
+
+Scris la sfârșitul unei conversații foarte lungi, ca următoarea să nu pornească
+din rezumate. Tot ce e cod e pe master (`cb3cfe2`), CI verde, arborele curat.
+
+**Lucrări de la 1 la 7 oct.** (fiecare are secțiunea ei mai jos; aici doar lista):
+rama de poziționare ia forma locului (1 oct.), mărirea pozei pe ambele axe,
+„Păreri" pe verde și cartonașele de servicii refăcute la Liniște (3 oct.),
+cartonașe de servicii egale cu „Citește mai mult" și trunchierea văzută în panou
+(3 oct.), mesajul de limită (3 oct.), previzualizarea aduce poza în vedere și nu mai
+pâlpâie în Edge (4 oct.), bulinele plutesc, fără emoji (4–5 oct.), cel mult trei
+repere la „Despre mine" (4 oct.), citatul și întrebările frecvente pe fundalul
+„relief" (5 oct.), „X" de ștergere în Bibliotecă (5 oct.), programarea de la
+Apropiere pe săptămână Luni–Sâmbătă (5 oct.), **articolele de blog se mută trăgând
+„⋯"** (5 oct., migrare rulată) și **mărimea potrivită a pozelor scrisă în panou**
+(6 oct.).
+
+**Demo-urile au fost redenumite (7 oct.).** `cosmin-<șablon>.vercel.app` → 
+`model-<șablon>.vercel.app` pentru toate cinci (caldura, liniste, lumina, apropiere,
+claritate), printr-un `update` pe `sites.domain` rulat de proprietar în Supabase; a
+verificat că toate cinci se deschid. `sitepsihologi.vercel.app` și site-urile de
+test n-au fost atinse. Adresele din conținut (butoanele „Buton" de la fiecare
+program din galeria de pe sitepsihologi) și ștergerea adreselor vechi din Vercel
+sunt pași ai proprietarului; el a spus că a terminat cu galeria, dar **n-am
+confirmat explicit** că a schimbat butoanele și a șters adresele vechi — de
+verificat dacă un cartonaș duce în gol.
+
+**Capturile pentru galerie sunt făcute** (proprietarul a spus „am terminat"). Lecții
+pentru cine mai are de făcut capturi, din ce a mers și ce nu:
+- Partea de sus a paginii Căldură e **înaltă** (~1500–1800 px: titlu mare, poză lată,
+  apoi buton), iar cartonașul „vitrina" e o casetă fixă 16:9, aliniată sus: orice
+  captură înaltă se taie la titlu. Soluția care a mers: captura întreagă, pusă
+  într-un cadru de 1200 × 675 px cu fundalul crem al paginii în părți (Pillow,
+  scalată pe înălțime). Iese mică, dar se vede titlul, poza și butonul.
+- Varianta alternativă, **nealeasă de proprietar**: cartonaș mai înalt (3:4). Rămâne
+  deschisă dacă vrea vreodată să se vadă mai mult din pagină; ar schimba forma
+  galeriei, deci se hotărăște de el.
+- Pe Windows/Edge: `F11` (ecran complet) apoi `Windows + PrtScn` salvează în Imagini →
+  Capturi de ecran, **sau în OneDrive → Imagini**, dacă acela e folderul Imagini al
+  contului. Unelte de dezvoltator + „Capture screenshot" l-au încurcat: nu le mai
+  recomanda. Proprietarul e pe Edge și nu e programator; la el merg pașii puțini și
+  fiecare cu rezultatul vizibil, nu liste lungi.
+
+**Deschise, fără cerere de la proprietar (nu începe fără el):**
+- Culori proprii pe site, fără a atinge șablonul (discutat 5 oct.): azi nu există
+  nicio suprascriere per site. Calea ar fi o paletă pe `site_settings.brand`, aplicată
+  doar acelui site, cu verificare de contrast; întâi doar accentul. Nu s-a implementat.
+- Zilele din preaviz la programare scriu „Fără ore" (poate fi „Prea aproape: sunt
+  necesare 24 de ore"); săgeți „săptămâna următoare/anterioară" în grila Apropiere;
+  banda de citat pe „relief" la Liniște (cere mostră de culoare).
+- Neverificate pe aparate/pagini reale: tragerea articolelor cu degetul pe un telefon
+  adevărat (emulată prin CDP), derularea automată la marginea ecranului în timpul
+  tragerii (scrisă, nerulată), textul cu dimensiunile pozei din editorul de articole
+  (același mecanism ca la servicii, nerulat pe pagină), dacă pâlpâitul previzualizării
+  din Edge a dispărut de tot (cauza exactă n-a fost confirmată).
+
+**Cum se lucrează cu proprietarul, observat în sesiunea asta:** nu vrea „clar, concret, direct" când nu e; o explicație lungă sau un
+șir de pași care nu duc nicăieri îl enervează, cu motiv. Când ceva nu merge la el, nu
+adăuga pași — întreabă ce vede sau oferă să faci tu partea (ca la capturi). Orice
+merge pe master abia după un „da, fă merge pe master" explicit; SQL-ul i se dă și în
+chat, nu doar ca fișier.
+
 ### Ce blochează primul client PLĂTITOR
 
 | # | Ce | Al cui | Cât ține |
@@ -885,6 +947,12 @@ trebuie să se potrivească LITERĂ CU LITERĂ:
    ăsta, cererea nu ajunge la aplicație. O adresă `.vercel.app` liberă se dă pe
    loc; un subdomeniu al domeniului real (ex. `caldura.sitepsihologi.ro`) cere un
    CNAME la registrar, arătat de Vercel.
+
+**Actualizare 7 oct. 2026:** adresele demo-urilor sunt acum `model-caldura`,
+`model-liniste`, `model-lumina`, `model-apropiere`, `model-claritate` (`.vercel.app`),
+nu `cosmin-…`. Redenumirea a fost un singur `update` pe `sites.domain` + adresele noi
+adăugate întâi în Vercel; vezi §„Unde am rămas". Exemplele de mai sus cu `cosmin-…`
+sunt istorice.
 
 **Regula de aur:** adresa din pasul 1 și cea din pasul 2 trebuie să fie identice.
 Dacă diferă, Vercel primește cererea dar platforma nu știe ce site să arate.
@@ -2424,7 +2492,7 @@ niciun semn că e link nu se apasă.
    „exemplu — aici va veni o captură adevărată" scris în ele, iar desenul are
    și numele șablonului scris înăuntru — deci numele apare de două ori, o dată
    desenat și o dată peste poză. Dispare de la sine la prima captură adevărată.
-   Cum se fac capturile: vezi §„Capturi elocvente pentru galeria de șabloane".
+   Cum se fac capturile: vezi §„Unde am rămas (7 oct. 2026)" (secțiunea „Capturi elocvente…" nu a fost niciodată scrisă).
 2. **Adresele demo-urilor**, ca să se poată apăsa cartonașele. Se scriu din
    panou: Secțiuni → „Programe și materiale" → fiecare program → câmpul
    „Buton" → adresa (ex. `https://cosmin-caldura.vercel.app`). Textul butonului
