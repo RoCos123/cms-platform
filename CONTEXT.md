@@ -1620,6 +1620,17 @@ scrisă pe site: maxim 5 zile lucrătoare.** Din ce moment se numără și ce se
 întâmplă când clientul întârzie cu domeniul (îl cumpără și îl îndreaptă singur
 spre Vercel, §„Ce vindem") nu e hotărât.
 
+**8 oct. 2026, rândul „Proprietate":** la noi „Domeniul îți aparține exclusiv", la
+DIY „Anulezi abonamentul = pierzi site-ul", la agenții „Domeniul e adesea pe firma
+agenției" — textele proprietarului, după ce i-am arătat că „Site-ul îți aparține
+100%" avea aceeași limită ca la Wix (designul nu se poate lua). Verificat în surse
+neoficiale: la Squarespace site-ul cade, iar conținutul se șterge după o perioadă
+de grație (14–30 de zile, sursele diferă); la Wix site-ul NU dispare, ci rămâne pe
+o adresă gratuită Wix, cu reclame, iar domeniul propriu se deconectează. Deci
+„pierzi site-ul" e exact la Squarespace și exagerat la Wix. Și, probabil, valabil
+și la noi: fără cei 50 €/an site-ul se oprește (neconfirmat), deci diferența reală
+față de ei e domeniul, nu site-ul.
+
 Spuse proprietarului o dată, lăsate cum le-a scris el: proprietatea („Licență pe
 viață", apoi „Site-ul îți aparține 100%") și „Mentenanță & Securitate: Inclusă"
 sunt promisiuni încă nehotărâte (§„Ce vindem") — designul e al platformei, iar
