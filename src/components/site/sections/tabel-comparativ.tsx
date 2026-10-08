@@ -73,7 +73,7 @@ export function TabelComparativ() {
             <tr className="border-b border-gray-100 hover:bg-gray-50/50">
               <td className="p-4 font-medium text-gray-900">Timp de lansare</td>
               <td className="p-4 bg-[#f4f6f8] border-x border-gray-200 font-semibold text-[#1e3a8a]">
-                Câteva zile - maxim 5 zile lucrătoare.
+                Maxim 5 zile lucrătoare.
               </td>
               <td className="p-4 text-gray-500">Săptămâni întregi de frustrări</td>
               <td className="p-4 text-gray-500">1-3 luni de așteptare</td>

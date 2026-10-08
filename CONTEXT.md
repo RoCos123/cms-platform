@@ -1614,7 +1614,8 @@ Comision per ședință" → „Modul plătit separat / Abonament extra".
 uneori peste 1000 €"; „Ședințe lungi și feedback" → „Ședințe lungi, du-te-vino
 obositor"; „Facturată separat la oră" → „Factură separat la oră" (scris așa de
 el; poate fi o scăpare de tastare, nelămurit); „Câteva zile. Alegi designul și e
-gata." → „Câteva zile - maxim 5 zile lucrătoare." **Termenul e acum o promisiune
+gata." → „Maxim 5 zile lucrătoare." (întâi „Câteva zile - maxim 5 zile
+lucrătoare.", apoi, în aceeași zi, fără „Câteva zile"). **Termenul e acum o promisiune
 scrisă pe site: maxim 5 zile lucrătoare.** Din ce moment se numără și ce se
 întâmplă când clientul întârzie cu domeniul (îl cumpără și îl îndreaptă singur
 spre Vercel, §„Ce vindem") nu e hotărât.
