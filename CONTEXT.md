@@ -1540,6 +1540,14 @@ cookie-uri.
 - emailul pe domeniu (`contact@cabinet.ro`) nu e al nostru: îl face el, la firma
   de domenii sau la un furnizor de email.
 
+**Dacă clientul nu mai plătește anul (8 oct. 2026):** proprietarul scoate site-ul
+din Vercel, din tot. Rămân deschise, de hotărât și de scris în contract: (1) ce
+primește clientul ÎNAINTE (avertisment, termen) și dacă i se lasă un acces doar de
+export câteva zile după — fără panou, „textele le descarci oricând" nu mai e
+adevărat după oprire; (2) cât păstrăm datele lui în bază și când se șterg
+(GDPR). Până atunci, pe site nu se promite că „textele rămân ale tale" fără
+„cât ești client".
+
 **Mentenanța — propunere, NECONFIRMATĂ de proprietar.** Cuvântul îl înțelege
 fiecare altfel; un psiholog poate citi în el „îmi schimbă el textele când îi cer".
 De-aia pe site s-ar scrie lucrurile, nu cuvântul:
@@ -1627,9 +1635,10 @@ agenției" — textele proprietarului, după ce i-am arătat că „Site-ul îț
 neoficiale: la Squarespace site-ul cade, iar conținutul se șterge după o perioadă
 de grație (14–30 de zile, sursele diferă); la Wix site-ul NU dispare, ci rămâne pe
 o adresă gratuită Wix, cu reclame, iar domeniul propriu se deconectează. Deci
-„pierzi site-ul" e exact la Squarespace și exagerat la Wix. Și, probabil, valabil
-și la noi: fără cei 50 €/an site-ul se oprește (neconfirmat), deci diferența reală
-față de ei e domeniul, nu site-ul.
+„pierzi site-ul" e exact la Squarespace și exagerat la Wix. **Valabil și la noi:**
+fără cei 50 €/an, proprietarul scoate site-ul din Vercel, din tot (confirmat de el,
+8 oct.) — deci celula „Anulezi abonamentul = pierzi site-ul" descrie și produsul
+nostru, nu o slăbiciune a lor. Cum se rescrie rândul: deschis (vezi mai jos).
 
 Spuse proprietarului o dată, lăsate cum le-a scris el: proprietatea („Licență pe
 viață", apoi „Site-ul îți aparține 100%") și „Mentenanță & Securitate: Inclusă"
