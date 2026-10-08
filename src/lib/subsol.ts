@@ -1,8 +1,8 @@
 import "server-only";
 
 import { cache } from "react";
-import { createServiceClient } from "@/lib/supabase/admin";
 import { serviciiPublicate } from "@/lib/servicii-publice";
+import { cheileSectiunilorVizibile } from "@/lib/sectiuni-vizibile";
 import { ANCORE_SECTIUNI, type Destinatie } from "@/lib/destinatii";
 
 /**
@@ -19,11 +19,9 @@ export const coloaneleSubsolului = cache(
     siteId: string,
     optiuni: { paginaServiciiActiva: boolean; areBlog: boolean },
   ): Promise<{ servicii: Destinatie[]; cabinet: Destinatie[] }> => {
-    const service = createServiceClient();
-
-    const [servicii, { data: sectiuni }] = await Promise.all([
+    const [servicii, chei] = await Promise.all([
       serviciiPublicate(siteId),
-      service.from("site_content").select("key").eq("site_id", siteId).eq("visible", true),
+      cheileSectiunilorVizibile(siteId),
     ]);
 
     // SERVICII. Cu pagina de servicii pornită, fiecare serviciu are adresa lui;
@@ -43,7 +41,7 @@ export const coloaneleSubsolului = cache(
     // CABINET. Secțiunile vizibile, în ordinea din ANCORE_SECTIUNI, fără cele care
     // au deja loc altundeva: „Serviciile mele" (coloana Servicii) și „Articole"
     // (le acoperă linkul de Blog). Apoi Blog și Contact.
-    const cheiVizibile = new Set((sectiuni ?? []).map((r) => r.key as string));
+    const cheiVizibile = new Set(chei);
     const coloanaCabinet: Destinatie[] = [];
     for (const [cheie, { ancora, eticheta }] of Object.entries(ANCORE_SECTIUNI)) {
       if (cheie === "features" || cheie === "latestPosts") continue;

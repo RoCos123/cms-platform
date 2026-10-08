@@ -10,6 +10,8 @@ import { getTemplate, templateStyle } from "@/lib/templates";
 import { templateFontStyle } from "@/lib/templates/fonturi";
 import { adresaImaginii } from "@/lib/imagini-adrese";
 import { coloaneleSubsolului } from "@/lib/subsol";
+import { cheileSectiunilorVizibile } from "@/lib/sectiuni-vizibile";
+import { esteDespreVizibila } from "@/lib/antet";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { BaraAdmin } from "@/components/site/bara-admin";
@@ -45,10 +47,11 @@ export async function CadruSite({
   // de administrare) și numărarea vizitelor stau în frunze proprii, `BaraAdmin` și
   // `NumaratorVizite`, ca acest cadru să poată fi memorat între cereri fără riscul
   // de a servi bara unui proprietar altui vizitator. (Pasul 1 din cache-ul pe tenant.)
-  const [{ site, brand, pagini, social }, articole, linkuriPagini] = await Promise.all([
+  const [{ site, brand, pagini, social }, articole, linkuriPagini, cheiVizibile] = await Promise.all([
     identitateaSiteului(siteId),
     articolePublicate(siteId),
     linkurilePaginilor(siteId),
+    cheileSectiunilorVizibile(siteId),
   ]);
 
   const template = getTemplate(site?.template);
@@ -116,6 +119,7 @@ export async function CadruSite({
             subtitlu: brand.subtitlu,
             logo: logoSemnat,
             telefon: brand.telefon,
+            areDespre: esteDespreVizibila(cheiVizibile),
             paginaServicii: paginaEsteActiva(pagini, "servicii"),
             blog: areBlog ? "pagina" : null,
             paginiProprii: inAntet,

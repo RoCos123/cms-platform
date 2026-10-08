@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { linkuriImplicite } from "@/lib/antet";
 import { HeaderNav, type LinkAntet } from "./header-nav";
 
 export type SiteHeaderData = {
@@ -11,6 +12,11 @@ export type SiteHeaderData = {
   initiala?: string;
   linkuri?: LinkAntet[];
   telefon?: string;
+  /**
+   * E pornită secțiunea „Despre mine"? Fără ea, „Despre" n-are unde să ducă și nu mai
+   * apare în meniu. Lipsa valorii = apare (cum era înainte); site-ul public o dă mereu.
+   */
+  areDespre?: boolean;
   /** E pornită pagina cu serviciile pe larg? Atunci „Servicii" duce acolo. */
   paginaServicii?: boolean;
   /**
@@ -28,32 +34,6 @@ export type SiteHeaderData = {
 };
 
 /**
- * Adresele încep cu „/", nu cu „#".
- *
- * Un „#despre" e un loc din PAGINA CURENTĂ. Pe prima pagină merge; pe pagina de
- * servicii nu există nimic cu numele acela, deci apăsarea nu face nimic — omul
- * rămâne blocat, cu impresia că site-ul e stricat. „/#despre" spune „du-te la
- * prima pagină, la secțiunea despre", și merge de oriunde.
- */
-function linkuriImplicite(
-  paginaServicii: boolean,
-  blog: "pagina" | "sectiune" | null,
-  paginiProprii: LinkAntet[],
-): LinkAntet[] {
-  return [
-    { text: "Despre", href: "/#despre" },
-    { text: "Servicii", href: paginaServicii ? "/servicii" : "/#servicii" },
-    // Un meniu cu patru intrări din care una nu face nimic e mai rău decât unul
-    // cu trei: prima dă impresia unui site stricat, a doua e doar un site fără blog.
-    ...(blog ? [{ text: "Blog", href: blog === "pagina" ? "/blog" : "/#articole" }] : []),
-    // Paginile proprii intră aici, nu la coadă: „Contact" rămâne ultimul, unde
-    // îl caută toată lumea de douăzeci de ani încoace.
-    ...paginiProprii,
-    { text: "Contact", href: "/#contact" },
-  ];
-}
-
-/**
  * Antetul site-ului public. Nu e o secțiune editabilă din cele 21 — e cadrul
  * paginii, la fel ca subsolul, deci datele lui vin din setările site-ului, nu
  * din `site_content`.
@@ -65,7 +45,12 @@ function linkuriImplicite(
 export function SiteHeader({ data, friendly }: { data: SiteHeaderData; friendly?: boolean }) {
   const linkuriToate = data.linkuri?.length
     ? data.linkuri
-    : linkuriImplicite(data.paginaServicii ?? false, data.blog ?? null, data.paginiProprii ?? []);
+    : linkuriImplicite({
+        areDespre: data.areDespre ?? true,
+        paginaServicii: data.paginaServicii ?? false,
+        blog: data.blog ?? null,
+        paginiProprii: data.paginiProprii ?? [],
+      });
   const initiala = data.initiala ?? data.nume.trim().charAt(0).toUpperCase();
 
   // Pe „Apropiere" (`friendly`), „Programare" iese din rândul de linkuri și

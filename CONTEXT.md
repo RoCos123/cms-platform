@@ -76,7 +76,16 @@ tot.
 ### Unde am rămas (7 oct. 2026)
 
 Scris la sfârșitul unei conversații foarte lungi, ca următoarea să nu pornească
-din rezumate. Tot ce e cod e pe master (`cb3cfe2`), CI verde, arborele curat.
+din rezumate. Tot ce e cod e pe master (`cb3cfe2`), CI verde, arborele curat — aceasta
+e starea de la 7 oct.; ce s-a făcut după e în paragraful „Lucrări de la 8 oct." de mai jos,
+iar ce e pe master și ce nu se vede din `git log`, nu de aici.
+
+**Lucrări de la 8 oct. 2026** (fiecare are secțiunea ei): domeniul îl cumpără clientul,
+plus ce înseamnă găzduirea, securitatea și mentenanța (§„Ce vindem: construire +
+găzduire, fără domeniu"); tabelul comparativ din „Pachete", doar pe sitepsihologi
+(§„Tabelul comparativ din «Pachete»", linia de SQL care îl pornește e rulată);
+linkul „Despre" din antet apare doar când secțiunea e pornită (§„Linkul «Despre» din
+antet"); ochișorul la parolă (7 oct.).
 
 **Lucrări de la 1 la 7 oct.** (fiecare are secțiunea ei mai jos; aici doar lista):
 rama de poziționare ia forma locului (1 oct.), mărirea pozei pe ambele axe,
@@ -1679,6 +1688,29 @@ telefon (390px) se văd doar primele două coloane, restul stă ascuns după der
 laterală, fără semn că există (aceeași capcană ca la `/proprietar`, 22 sept.);
 verdele de la rândul cu programările are contrast ~3:1, sub pragul de 4,5:1. Verificat pe
 `/proba-vanzari` (conținutul din `continut.ts`), nu pe site-ul viu.
+
+### Linkul „Despre" din antet apare doar când secțiunea e pornită (8 oct. 2026)
+
+Proprietarul: pe sitepsihologi.ro, „Despre" din bară nu făcea nimic. Cauza: antetul
+avea mereu linkul `/#despre`, iar „Despre mine" era oprit pe site (scriptul de la
+început a oprit tot ce nu e în site-ul de vânzări) — fără secțiune, browserul doar
+adăuga `#despre` la adresă. Confirmat de el: secțiunea era ascunsă în panou, și a
+cerut s-o țină așa și să dispară linkul.
+
+**Reparat pentru TOATE site-urile**, nu doar sitepsihologi: `linkuriImplicite` din
+`src/lib/antet.ts` pune „Despre" numai dacă secțiunea e vizibilă — aceeași regulă ca la
+„Blog". Cheile vizibile vin dintr-o singură interogare memorată pe cerere
+(`src/lib/sectiuni-vizibile.ts`), folosită și de subsol (înainte avea interogarea ei);
+antetul o primește ca `areDespre`. În previzualizarea din Setări, unde antetul e doar
+un exemplu, „Despre" rămâne (fără valoare = apare, ca înainte). Clienții cu „Despre
+mine" pornit nu văd nicio diferență; ceilalți pierd un link mort.
+
+Probă: `e2e/antet.proba.mjs` (6 teste; verificat că 2 pică când linkul redevine
+necondiționat). Verificat pe pagină, lat și pe telefon cu panoul deschis: fără „Despre"
+rămân „Servicii" și „Contact". **Neverificat pe site-ul viu.**
+
+Rămâne, nepropus încă: meniul sitepsihologi e acum doar „Servicii" și „Contact"; „Prețuri"
+și „Cum decurge" n-au intrări în bară.
 
 **Stare la 8 sept. 2026: site-ul EXISTĂ.** Provizionat cu `creeaza_client` pe
 `sitepsihologi.vercel.app`, șablonul `claritate`, conținutul turnat din SQL
