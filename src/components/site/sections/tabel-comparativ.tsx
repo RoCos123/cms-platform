@@ -36,7 +36,7 @@ export function TabelComparativ() {
                 Plată unică + 50€/an
               </td>
               <td className="p-4 text-gray-500">Abonament lunar</td>
-              <td className="p-4 text-gray-500">Prețuri mari, peste 1000 €</td>
+              <td className="p-4 text-gray-500">Prețuri mari, uneori peste 1000 €</td>
             </tr>
 
             {/* Rândul 2 */}
@@ -46,7 +46,7 @@ export function TabelComparativ() {
                 MINIM, doar încarci pozele și textele.
               </td>
               <td className="p-4 text-gray-500">Construiești singur</td>
-              <td className="p-4 text-gray-500">Ședințe lungi și feedback</td>
+              <td className="p-4 text-gray-500">Ședințe lungi, du-te-vino obositor</td>
             </tr>
 
             {/* Rândul 3 */}
@@ -56,7 +56,7 @@ export function TabelComparativ() {
                 Inclusă
               </td>
               <td className="p-4 text-gray-500">Te descurci singur</td>
-              <td className="p-4 text-gray-500">Facturată separat la oră</td>
+              <td className="p-4 text-gray-500">Factură separat la oră</td>
             </tr>
 
             {/* Rândul 4 */}
@@ -73,7 +73,7 @@ export function TabelComparativ() {
             <tr className="border-b border-gray-100 hover:bg-gray-50/50">
               <td className="p-4 font-medium text-gray-900">Timp de lansare</td>
               <td className="p-4 bg-[#f4f6f8] border-x border-gray-200 font-semibold text-[#1e3a8a]">
-                Câteva zile. Alegi designul și e gata.
+                Câteva zile - maxim 5 zile lucrătoare.
               </td>
               <td className="p-4 text-gray-500">Săptămâni întregi de frustrări</td>
               <td className="p-4 text-gray-500">1-3 luni de așteptare</td>

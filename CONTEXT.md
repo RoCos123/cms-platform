@@ -169,7 +169,9 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
 **B. Înainte de a arăta produsul (site-ul de vânzări `sitepsihologi`)**
 1. **Domeniul `sitepsihologi.ro`** — acum site-ul stă pe `sitepsihologi.vercel.app`,
    nepublicat și neindexat.
-2. **Textul proprietarului:** „Cine ești?" și în câte zile se livrează.
+2. **Textul proprietarului:** „Cine ești?" și în câte zile se livrează. (8 oct.:
+   în tabelul comparativ din „Pachete" scrie acum „maxim 5 zile lucrătoare"; textul
+   din „Cum decurge" spune încă „În câteva zile", fără număr.)
 3. **Secțiunea de păreri:** trei locuri goale, dinadins — **nu se inventează
    recenzii**; ori vin păreri adevărate, ori rămâne stinsă la publicare.
 4. **Galeria de șabloane:** capturile sunt făcute (7 oct.); de verificat că fiecare
@@ -1607,6 +1609,15 @@ pe viață" → „Proprietate: Site-ul îți aparține 100%." Primul cod trimis
 cinci rânduri; ultimele trei au venit după, dintr-o versiune mai nouă a lui. Apoi:
 „Mii de euro (Cost mare)" → „Prețuri mari, peste 1000 €", „Modul plătit separat /
 Comision per ședință" → „Modul plătit separat / Abonament extra".
+
+**8 oct. 2026, tot de proprietar:** „Prețuri mari, peste 1000 €" → „Prețuri mari,
+uneori peste 1000 €"; „Ședințe lungi și feedback" → „Ședințe lungi, du-te-vino
+obositor"; „Facturată separat la oră" → „Factură separat la oră" (scris așa de
+el; poate fi o scăpare de tastare, nelămurit); „Câteva zile. Alegi designul și e
+gata." → „Câteva zile - maxim 5 zile lucrătoare." **Termenul e acum o promisiune
+scrisă pe site: maxim 5 zile lucrătoare.** Din ce moment se numără și ce se
+întâmplă când clientul întârzie cu domeniul (îl cumpără și îl îndreaptă singur
+spre Vercel, §„Ce vindem") nu e hotărât.
 
 Spuse proprietarului o dată, lăsate cum le-a scris el: proprietatea („Licență pe
 viață", apoi „Site-ul îți aparține 100%") și „Mentenanță & Securitate: Inclusă"
