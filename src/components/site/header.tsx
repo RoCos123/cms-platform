@@ -17,6 +17,11 @@ export type SiteHeaderData = {
    * apare în meniu. Lipsa valorii = apare (cum era înainte); site-ul public o dă mereu.
    */
   areDespre?: boolean;
+  /**
+   * Intrări cerute de secțiuni, puse după „Servicii" (azi: „Prețuri", din „Pachete").
+   * Le hotărăște cadrul site-ului; lipsa = niciuna.
+   */
+  linkuriSectiuni?: LinkAntet[];
   /** E pornită pagina cu serviciile pe larg? Atunci „Servicii" duce acolo. */
   paginaServicii?: boolean;
   /**
@@ -50,6 +55,7 @@ export function SiteHeader({ data, friendly }: { data: SiteHeaderData; friendly?
         paginaServicii: data.paginaServicii ?? false,
         blog: data.blog ?? null,
         paginiProprii: data.paginiProprii ?? [],
+        linkuriSectiuni: data.linkuriSectiuni ?? [],
       });
   const initiala = data.initiala ?? data.nume.trim().charAt(0).toUpperCase();
 

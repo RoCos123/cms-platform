@@ -22,6 +22,29 @@ export function esteDespreVizibila(cheiVizibile: readonly string[]): boolean {
 }
 
 /**
+ * Linkul din bară cerut de secțiunea „Pachete", din câmpul „Link în bara de sus".
+ *
+ * `date` e `data` rândului „pricing" așa cum vine din bază — JSON necunoscut, deci
+ * se verifică aici, nu se presupune. Fără link când:
+ * - textul e gol sau doar spații (câmp lăsat liber = nu vrea link);
+ * - nu e niciun pachet: secțiunea fără pachete nu se afișează deloc, deci linkul ar
+ *   duce într-un loc care nu există — aceeași greșeală ca la „Despre".
+ *
+ * Că secțiunea e și pornită o hotărăște interogarea (`dateleSectiuniiPachete`).
+ */
+export function linkPachete(date: unknown): LinkAntet | null {
+  if (typeof date !== "object" || date === null) return null;
+
+  const { linkMeniu, pachete } = date as { linkMeniu?: unknown; pachete?: unknown };
+  const text = typeof linkMeniu === "string" ? linkMeniu.trim() : "";
+
+  if (text === "") return null;
+  if (!Array.isArray(pachete) || pachete.length === 0) return null;
+
+  return { text, href: `/#${ANCORE_SECTIUNI.pricing.ancora}` };
+}
+
+/**
  * Adresele încep cu „/", nu cu „#".
  *
  * Un „#despre" e un loc din PAGINA CURENTĂ. Pe prima pagină merge; pe pagina de
@@ -34,15 +57,19 @@ export function linkuriImplicite({
   paginaServicii,
   blog,
   paginiProprii,
+  linkuriSectiuni = [],
 }: {
   areDespre: boolean;
   paginaServicii: boolean;
   blog: "pagina" | "sectiune" | null;
   paginiProprii: LinkAntet[];
+  /** Intrări cerute de secțiuni (ex. „Prețuri"); vin după „Servicii". */
+  linkuriSectiuni?: LinkAntet[];
 }): LinkAntet[] {
   return [
     ...(areDespre ? [{ text: "Despre", href: `/#${ANCORE_SECTIUNI.aboutTeaser.ancora}` }] : []),
     { text: "Servicii", href: paginaServicii ? "/servicii" : "/#servicii" },
+    ...linkuriSectiuni,
     // Un meniu cu patru intrări din care una nu face nimic e mai rău decât unul
     // cu trei: prima dă impresia unui site stricat, a doua e doar un site fără blog.
     ...(blog ? [{ text: "Blog", href: blog === "pagina" ? "/blog" : "/#articole" }] : []),

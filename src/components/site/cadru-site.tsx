@@ -10,8 +10,8 @@ import { getTemplate, templateStyle } from "@/lib/templates";
 import { templateFontStyle } from "@/lib/templates/fonturi";
 import { adresaImaginii } from "@/lib/imagini-adrese";
 import { coloaneleSubsolului } from "@/lib/subsol";
-import { cheileSectiunilorVizibile } from "@/lib/sectiuni-vizibile";
-import { esteDespreVizibila } from "@/lib/antet";
+import { cheileSectiunilorVizibile, dateleSectiuniiPachete } from "@/lib/sectiuni-vizibile";
+import { esteDespreVizibila, linkPachete } from "@/lib/antet";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { BaraAdmin } from "@/components/site/bara-admin";
@@ -47,12 +47,14 @@ export async function CadruSite({
   // de administrare) și numărarea vizitelor stau în frunze proprii, `BaraAdmin` și
   // `NumaratorVizite`, ca acest cadru să poată fi memorat între cereri fără riscul
   // de a servi bara unui proprietar altui vizitator. (Pasul 1 din cache-ul pe tenant.)
-  const [{ site, brand, pagini, social }, articole, linkuriPagini, cheiVizibile] = await Promise.all([
-    identitateaSiteului(siteId),
-    articolePublicate(siteId),
-    linkurilePaginilor(siteId),
-    cheileSectiunilorVizibile(siteId),
-  ]);
+  const [{ site, brand, pagini, social }, articole, linkuriPagini, cheiVizibile, datePachete] =
+    await Promise.all([
+      identitateaSiteului(siteId),
+      articolePublicate(siteId),
+      linkurilePaginilor(siteId),
+      cheileSectiunilorVizibile(siteId),
+      dateleSectiuniiPachete(siteId),
+    ]);
 
   const template = getTemplate(site?.template);
   const nume = site?.name ?? domain;
@@ -61,6 +63,9 @@ export async function CadruSite({
   // articol publicat, „Blog" ar duce la o pagină pe care scrie doar că articolele
   // vin în curând — mai bine nu-l punem încă.
   const areBlog = paginaEsteActiva(pagini, "blog") && articole.length > 0;
+
+  // „Prețuri" în bară: doar dacă proprietarul a scris textul în „Pachete" și secțiunea chiar se afișează.
+  const linkPreturi = linkPachete(datePachete);
 
   // Aceeași listă, împărțită după unde a cerut clientul să apară fiecare pagină.
   const catreLink = (pagina: (typeof linkuriPagini)[number]) => ({
@@ -120,6 +125,7 @@ export async function CadruSite({
             logo: logoSemnat,
             telefon: brand.telefon,
             areDespre: esteDespreVizibila(cheiVizibile),
+            linkuriSectiuni: linkPreturi ? [linkPreturi] : [],
             paginaServicii: paginaEsteActiva(pagini, "servicii"),
             blog: areBlog ? "pagina" : null,
             paginiProprii: inAntet,

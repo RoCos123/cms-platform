@@ -85,7 +85,8 @@ plus ce înseamnă găzduirea, securitatea și mentenanța (§„Ce vindem: cons
 găzduire, fără domeniu"); tabelul comparativ din „Pachete", doar pe sitepsihologi
 (§„Tabelul comparativ din «Pachete»", linia de SQL care îl pornește e rulată);
 linkul „Despre" din antet apare doar când secțiunea e pornită (§„Linkul «Despre» din
-antet"); ochișorul la parolă (7 oct.).
+antet"); „Prețuri" în bara de sus, dintr-un câmp al secțiunii „Pachete" (§„«Prețuri» în
+bara de sus"); ochișorul la parolă (7 oct.).
 
 **Lucrări de la 1 la 7 oct.** (fiecare are secțiunea ei mai jos; aici doar lista):
 rama de poziționare ia forma locului (1 oct.), mărirea pozei pe ambele axe,
@@ -1711,6 +1712,36 @@ rămân „Servicii" și „Contact". **Neverificat pe site-ul viu.**
 
 Rămâne, nepropus încă: meniul sitepsihologi e acum doar „Servicii" și „Contact"; „Prețuri"
 și „Cum decurge" n-au intrări în bară.
+
+### „Prețuri" în bara de sus, dintr-un câmp al secțiunii „Pachete" (8 oct. 2026)
+
+Proprietarul a cerut un link rapid „Prețuri" în bară, ca „Servicii" și „Contact", doar
+pentru sitepsihologi. Propuse trei variante, el a cerut-o pe a doua: **un câmp opțional
+în secțiunea „Pachete", „Link în bara de sus"** (`linkMeniu`, cel mult 20 de caractere,
+ultimul din formular). Gol = niciun link, deci niciun alt client nu vede nimic; scris,
+apare `/#pachete` după „Servicii", dar numai cât secțiunea e pornită ȘI are cel puțin un
+pachet (fără pachete secțiunea nu se afișează, deci linkul ar fi mort — ca la „Despre").
+
+Respinse: linkul automat pentru toți (pe site-urile noi „Pachete" e pornită din oficiu,
+deci toți psihologii ar fi primit „Prețuri" nechemat) și o cheie pusă din SQL (panoul
+salvează doar câmpurile din schemă, `catreStocare`, deci ar fi dispărut la prima salvare).
+
+Cod: câmpul în `src/lib/sectiuni.ts`, regula `linkPachete` în `src/lib/antet.ts`,
+interogarea `dateleSectiuniiPachete` în `src/lib/sectiuni-vizibile.ts` (o citire în plus
+pe pagină, în paralel cu celelalte), `linkuriSectiuni` din `cadru-site.tsx` către antet.
+Probă: `e2e/antet.proba.mjs`, 15 teste; verificat că pică la fiecare regulă stricată pe
+rând (fără verificarea pachetelor, cu text gol, fără câmpul din schemă).
+
+Verificat pe pagină: câmpul în formularul real (cu textul de ajutor), linkul apare și
+dispare după cum scrii sau golești; antetul probabil de pe sitepsihologi („Servicii |
+Prețuri | Contact") stă pe un singur rând de la 901px în sus. **Limită, măsurată:** cu
+nume lung de cabinet + Despre + Blog + telefon + Prețuri, între 900 și ~1000px bara se
+rupe pe două rânduri (sub 900px e meniul cu buton). **Neverificat pe site-ul viu.**
+Previzualizarea din panou arată doar secțiunea, nu bara, deci linkul se vede numai pe
+site.
+
+Cum se folosește: Panou → Secțiuni → Pachete → ultimul câmp, „Link în bara de sus" →
+„Prețuri" → Salvează.
 
 **Stare la 8 sept. 2026: site-ul EXISTĂ.** Provizionat cu `creeaza_client` pe
 `sitepsihologi.vercel.app`, șablonul `claritate`, conținutul turnat din SQL

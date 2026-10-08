@@ -523,6 +523,23 @@ const LISTA: MetaSectiune[] = [
         hint: "Ex.: Prețurile nu includ costul domeniului. Se plătește după ce site-ul e gata.",
         max: 300,
       },
+      {
+        /*
+         * Linkul „Prețuri” din bara de sus, cerut pe 8 oct. 2026. Câmp opțional, nu
+         * un link pus tuturor: pe un site nou „Pachete” e pornită din oficiu, iar o
+         * intrare de meniu pusă automat ar apărea la fiecare client care n-a cerut-o.
+         * Gol = niciun link.
+         *
+         * Stă în schemă, nu doar în date: panoul salvează numai câmpurile pe care le
+         * cunoaște (`catreStocare`), deci o cheie pusă pe ascuns din SQL ar dispărea la
+         * prima salvare a secțiunii.
+         */
+        tip: "text",
+        cheie: "linkMeniu",
+        eticheta: "Link în bara de sus",
+        hint: "Cuvântul care apare în bara de sus a site-ului, lângă „Servicii” și „Contact”, și duce la secțiunea asta. Ex.: Prețuri. Lasă gol dacă nu vrei link. Apare doar cât secțiunea e pornită și are cel puțin un pachet.",
+        max: 20,
+      },
     ],
   },
   {

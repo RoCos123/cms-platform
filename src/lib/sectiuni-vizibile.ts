@@ -23,3 +23,23 @@ export const cheileSectiunilorVizibile = cache(async (siteId: string): Promise<s
 
   return (data ?? []).map((rand) => rand.key as string);
 });
+
+/**
+ * `data` secțiunii „Pachete", doar dacă secțiunea e pornită. De aici își ia antetul
+ * linkul „Prețuri" (câmpul „Link în bara de sus"; vezi `linkPachete`).
+ *
+ * Memorată pe cerere și chemată în paralel cu restul citirilor din cadru, deci nu
+ * lungește pagina. La eroare sau fără rând întoarce `null` — fără link, nu pagină căzută.
+ */
+export const dateleSectiuniiPachete = cache(async (siteId: string): Promise<unknown> => {
+  const { data } = await createServiceClient()
+    .from("site_content")
+    .select("data")
+    .eq("site_id", siteId)
+    .eq("key", "pricing")
+    .eq("visible", true)
+    .order("position")
+    .limit(1);
+
+  return data?.[0]?.data ?? null;
+});

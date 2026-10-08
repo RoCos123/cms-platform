@@ -20,6 +20,11 @@ export type PricingData = {
     buton?: { text: string; href: string };
   }[];
   nota?: string;
+  /**
+   * Textul linkului din bara de sus a site-ului (ex. „Prețuri”). Îl citește antetul,
+   * nu secțiunea — vezi `linkPachete` din `src/lib/antet.ts`. Gol = niciun link.
+   */
+  linkMeniu?: string;
 };
 
 /**

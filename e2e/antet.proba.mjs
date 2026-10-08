@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { esteDespreVizibila, linkuriImplicite } from "@/lib/antet";
+import { esteDespreVizibila, linkPachete, linkuriImplicite } from "@/lib/antet";
 import { ANCORE_SECTIUNI } from "@/lib/destinatii";
 
 /**
@@ -84,4 +84,72 @@ test("site-ul public dă antetului ce secțiuni sunt pornite", () => {
   // Fără asta, cineva ar putea pune la loc un „Despre” scris de mână în antet.
   const antet = readFileSync("src/components/site/header.tsx", "utf8");
   assert.ok(!antet.includes('text: "Despre"'), "header.tsx are iar un „Despre” scris de mână");
+});
+
+/*
+ * Linkul „Prețuri” din bară (8 oct. 2026): îl cere secțiunea „Pachete”, printr-un câmp
+ * opțional. Apărarea e dublă — să nu apară unde nu l-a cerut nimeni, și să nu ducă în gol.
+ */
+
+const pachete = [{ nume: "Site complet", pret: "300 €" }];
+
+test("„Prețuri” apare când textul e scris și există măcar un pachet", () => {
+  const link = linkPachete({ linkMeniu: "Prețuri", pachete });
+  assert.deepEqual(link, { text: "Prețuri", href: "/#pachete" });
+});
+
+test("textul se curăță de spații; spațiile singure nu fac un link", () => {
+  assert.equal(linkPachete({ linkMeniu: "  Tarife  ", pachete }).text, "Tarife");
+  assert.equal(linkPachete({ linkMeniu: "   ", pachete }), null);
+  assert.equal(linkPachete({ linkMeniu: "", pachete }), null);
+});
+
+test("fără text în câmp nu apare nimic — adică la niciun client care n-a cerut", () => {
+  assert.equal(linkPachete({ pachete }), null);
+  assert.equal(linkPachete({ titlu: "Pachete", pachete }), null);
+});
+
+test("fără niciun pachet nu apare: secțiunea nu se afișează, linkul ar duce în gol", () => {
+  assert.equal(linkPachete({ linkMeniu: "Prețuri", pachete: [] }), null);
+  assert.equal(linkPachete({ linkMeniu: "Prețuri" }), null);
+  assert.equal(linkPachete({ linkMeniu: "Prețuri", pachete: "nu e listă" }), null);
+});
+
+test("date stricate sau lipsă nu aruncă și nu produc link", () => {
+  for (const stricat of [null, undefined, "text", 42, [], { linkMeniu: 7, pachete }]) {
+    assert.equal(linkPachete(stricat), null);
+  }
+});
+
+test("linkul din secțiune stă după „Servicii”, înaintea blogului și a lui „Contact”", () => {
+  const linkuri = linkuriImplicite({
+    areDespre: false,
+    paginaServicii: true,
+    blog: "pagina",
+    paginiProprii: [],
+    linkuriSectiuni: [{ text: "Prețuri", href: "/#pachete" }],
+  });
+  assert.deepEqual(
+    linkuri.map((l) => l.text),
+    ["Servicii", "Prețuri", "Blog", "Contact"],
+  );
+});
+
+test("linkul duce la ancora pe care o pune secțiunea „Pachete”", () => {
+  const componenta = readFileSync("src/components/site/sections/pricing.tsx", "utf8");
+  assert.ok(componenta.includes('id="pachete"'), "pricing.tsx nu mai pune ancora #pachete");
+});
+
+test("câmpul există în schema „Pachete”, altfel panoul ar șterge textul la salvare", () => {
+  const schema = readFileSync("src/lib/sectiuni.ts", "utf8");
+  const pricing = schema.slice(schema.indexOf('cheie: "pricing"'), schema.indexOf('cheie: "testimonials"'));
+  assert.ok(pricing.includes('cheie: "linkMeniu"'), "linkMeniu a dispărut din schema Pachete");
+  // Câmpul nu trebuie pus în nicio altă secțiune: ar fi un link în bară cerut de oricine.
+  assert.equal(schema.split('cheie: "linkMeniu"').length - 1, 1);
+});
+
+test("site-ul public trece antetului linkul secțiunii", () => {
+  const cadru = readFileSync("src/components/site/cadru-site.tsx", "utf8");
+  assert.ok(cadru.includes("linkuriSectiuni:"), "cadru-site.tsx nu mai trece linkuriSectiuni");
+  assert.ok(cadru.includes("dateleSectiuniiPachete("), "cadru-site.tsx nu mai citește secțiunea Pachete");
 });
