@@ -81,12 +81,12 @@ export function TabelComparativ() {
 
             {/* Rândul 6 */}
             <tr>
-              <td className="p-4 font-medium text-gray-900">Proprietate</td>
+              <td className="p-4 font-medium text-gray-900">Dacă nu mai plătești</td>
               <td className="p-4 bg-[#f4f6f8] border-x border-gray-200 font-semibold text-[#1e3a8a]">
                 Domeniul îți aparține exclusiv
               </td>
-              <td className="p-4 text-gray-500">Anulezi abonamentul = pierzi site-ul</td>
-              <td className="p-4 text-gray-500">Domeniul e adesea pe firma agenției</td>
+              <td className="p-4 text-gray-500">Pierzi adresa web</td>
+              <td className="p-4 text-gray-500">Riști să pierzi domeniul</td>
             </tr>
           </tbody>
         </table>

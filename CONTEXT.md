@@ -1638,7 +1638,32 @@ o adresă gratuită Wix, cu reclame, iar domeniul propriu se deconectează. Deci
 „pierzi site-ul" e exact la Squarespace și exagerat la Wix. **Valabil și la noi:**
 fără cei 50 €/an, proprietarul scoate site-ul din Vercel, din tot (confirmat de el,
 8 oct.) — deci celula „Anulezi abonamentul = pierzi site-ul" descrie și produsul
-nostru, nu o slăbiciune a lor. Cum se rescrie rândul: deschis (vezi mai jos).
+nostru, nu o slăbiciune a lor.
+
+**Rândul rescris, tot 8 oct.** Eticheta devine „Dacă nu mai plătești" (fără ea,
+„Pierzi adresa web" ar suna necondiționat), la DIY „Pierzi adresa web", la agenții
+„Riști să pierzi domeniul" — textele proprietarului, **verificate înainte**, în
+surse secundare (paginile Wix și Squarespace nu se pot deschide din mediul de
+lucru, rețeaua le blochează):
+- **Wix:** când planul plătit se termină, site-ul trece pe o adresă gratuită Wix,
+  cu reclame, iar un domeniu propriu nu mai poate sta pe un site gratuit (eroare
+  în documentația lor pentru dezvoltatori). Domeniul în sine rămâne în contul
+  clientului. De-aia „adresa web", nu „domeniul".
+- **Squarespace:** site-ul cade (momentul diferă după surse), iar conținutul se
+  șterge după o perioadă de grație; dacă domeniul rămâne al clientului, sursele se
+  contrazic.
+- **Agenții:** bloguri de profil spun că proprietar practic e cine ține contul de la
+  registrar și că unele agenții înregistrează domeniul pe contul lor; de-aici
+  „Riști", nu „Pierzi".
+
+**Ținută pe loc: prima celulă dorită, „Păstrezi domeniul și textele".** Domeniul —
+da, e al clientului. Textele — exportul există (`/dashboard/export`: setări,
+secțiunile primei pagini, pagini, servicii, articole, mesaje; pozele doar ca
+listă, iar adresele lor mor odată cu site-ul), dar cere panoul, iar panoul
+dispare când site-ul se scoate din Vercel din tot. Deci „păstrezi textele" e
+adevărat doar dacă le descarcă ÎNAINTE. Până se hotărăște procesul (avertisment
++ termen, sau acces doar de export după oprire), prima celulă rămâne „Domeniul
+îți aparține exclusiv" — adevărat și sub eticheta nouă.
 
 Spuse proprietarului o dată, lăsate cum le-a scris el: proprietatea („Licență pe
 viață", apoi „Site-ul îți aparține 100%") și „Mentenanță & Securitate: Inclusă"
