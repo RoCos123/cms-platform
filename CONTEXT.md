@@ -133,7 +133,10 @@ pentru cine mai are de făcut capturi, din ce a mers și ce nu:
 șir de pași care nu duc nicăieri îl enervează, cu motiv. Când ceva nu merge la el, nu
 adăuga pași — întreabă ce vede sau oferă să faci tu partea (ca la capturi). Orice
 merge pe master abia după un „da, fă merge pe master" explicit; SQL-ul i se dă și în
-chat, nu doar ca fișier.
+chat, nu doar ca fișier. **Nu schimba nimic nesolicitat**, nici ca să iasă mai corect un
+text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: eticheta unui
+rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
+face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
 ### Lista de sarcini înainte de lansare, reluată (7 oct. 2026)
 
@@ -1640,8 +1643,9 @@ fără cei 50 €/an, proprietarul scoate site-ul din Vercel, din tot (confirmat
 8 oct.) — deci celula „Anulezi abonamentul = pierzi site-ul" descrie și produsul
 nostru, nu o slăbiciune a lor.
 
-**Rândul rescris, tot 8 oct.** Eticheta devine „Dacă nu mai plătești" (fără ea,
-„Pierzi adresa web" ar suna necondiționat), la DIY „Pierzi adresa web", la agenții
+**Rândul rescris, tot 8 oct.** Eticheta rămâne „Proprietate" (o schimbasem eu în „Dacă nu
+mai plătești", ca „Pierzi adresa web" să nu sune necondiționat; proprietarul a
+respins-o: „sună prost"), la DIY „Pierzi adresa web", la agenții
 „Riști să pierzi domeniul" — textele proprietarului, **verificate înainte**, în
 surse secundare (paginile Wix și Squarespace nu se pot deschide din mediul de
 lucru, rețeaua le blochează):
@@ -1663,7 +1667,7 @@ listă, iar adresele lor mor odată cu site-ul), dar cere panoul, iar panoul
 dispare când site-ul se scoate din Vercel din tot. Deci „păstrezi textele" e
 adevărat doar dacă le descarcă ÎNAINTE. Până se hotărăște procesul (avertisment
 + termen, sau acces doar de export după oprire), prima celulă rămâne „Domeniul
-îți aparține exclusiv" — adevărat și sub eticheta nouă.
+îți aparține exclusiv".
 
 Spuse proprietarului o dată, lăsate cum le-a scris el: proprietatea („Licență pe
 viață", apoi „Site-ul îți aparține 100%") și „Mentenanță & Securitate: Inclusă"

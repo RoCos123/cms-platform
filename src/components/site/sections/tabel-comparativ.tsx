@@ -81,7 +81,7 @@ export function TabelComparativ() {
 
             {/* Rândul 6 */}
             <tr>
-              <td className="p-4 font-medium text-gray-900">Dacă nu mai plătești</td>
+              <td className="p-4 font-medium text-gray-900">Proprietate</td>
               <td className="p-4 bg-[#f4f6f8] border-x border-gray-200 font-semibold text-[#1e3a8a]">
                 Domeniul îți aparține exclusiv
               </td>
