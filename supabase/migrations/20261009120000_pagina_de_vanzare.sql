@@ -23,17 +23,26 @@
 -- ORDINE: migrarea ÎNAINTE de cod nu e obligatorie — codul citește marcajul
 -- separat și, dacă coloana lipsește, tratează site-ul ca 'cabinet'. Dar
 -- formularul paginii de vânzare scrie `model_preferat`, deci marcajul 'vanzare'
--- se pune abia după ce migrarea a rulat.
+-- se pune abia după ce migrarea a rulat (`supabase/marcheaza-sitepsihologi.sql`).
+--
+-- Se poate rula de două ori fără eroare: coloanele au `if not exists`, iar
+-- regulile se șterg înainte să fie puse la loc, ca în `ton_relief`.
 -- ----------------------------------------------------------------------------
 
 alter table public.sites
   add column if not exists tip text not null default 'cabinet';
 
 alter table public.sites
+  drop constraint if exists sites_tip_check;
+
+alter table public.sites
   add constraint sites_tip_check check (tip in ('cabinet', 'vanzare'));
 
 alter table public.contact_messages
   add column if not exists model_preferat text;
+
+alter table public.contact_messages
+  drop constraint if exists contact_messages_model_preferat_lungime;
 
 alter table public.contact_messages
   add constraint contact_messages_model_preferat_lungime
