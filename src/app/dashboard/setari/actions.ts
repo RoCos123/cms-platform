@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
-import { CAMPURI_CABINET, CAMPURI_SEO, CAMPURI_SOCIAL } from "@/lib/setari";
+import { CAMPURI_CABINET, CAMPURI_FIRMA, CAMPURI_SEO, CAMPURI_SOCIAL } from "@/lib/setari";
+import { tipulSiteului } from "@/lib/pagina-vanzare-date";
 import { catreEditor, catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 
 export type RezultatSetari =
@@ -29,14 +30,24 @@ export async function salveazaSetari(
   cabinet: ValoareEditor,
   seo: ValoareEditor,
   social: ValoareEditor,
+  /** Doar pagina de vânzare trimite „Datele firmei"; la cabinete lipsește. */
+  firma?: ValoareEditor,
 ): Promise<RezultatSetari> {
   const session = await verifySession();
   const supabase = await createClient();
+
+  /*
+    „Datele firmei" se scriu DOAR pe un site marcat `vanzare` (brief 9 oct. 2026).
+    Hotărăște marcajul din bază, nu ce trimite browserul: un cabinet care trimite
+    totuși grupul îl vede ignorat, iar `brand`-ul lui rămâne exact cel de până acum.
+  */
+  const cuFirma = firma !== undefined && (await tipulSiteului(session.siteId)) === "vanzare";
 
   const erori = {
     ...valideaza(cabinet, CAMPURI_CABINET),
     ...valideaza(seo, CAMPURI_SEO),
     ...valideaza(social, CAMPURI_SOCIAL),
+    ...(cuFirma ? valideaza(firma, CAMPURI_FIRMA) : {}),
   };
 
   if (Object.keys(erori).length > 0) {
@@ -47,7 +58,11 @@ export async function salveazaSetari(
   const seoCurat = catreStocare(catreEditor(seo, CAMPURI_SEO), CAMPURI_SEO);
   const socialCurat = catreStocare(catreEditor(social, CAMPURI_SOCIAL), CAMPURI_SOCIAL);
 
-  const { nume, ...brand } = cabinetCurat as { nume?: string } & Record<string, unknown>;
+  const { nume, ...brandCabinet } = cabinetCurat as { nume?: string } & Record<string, unknown>;
+  // Prefixul `firma` ține cele două grupuri despărțite în același `brand`.
+  const brand = cuFirma
+    ? { ...brandCabinet, ...catreStocare(catreEditor(firma, CAMPURI_FIRMA), CAMPURI_FIRMA) }
+    : brandCabinet;
 
   const { error: eroareNume } = await supabase
     .from("sites")

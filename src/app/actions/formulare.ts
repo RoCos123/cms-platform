@@ -1,8 +1,17 @@
 "use server";
 
 import { tenantTable } from "@/lib/supabase/admin";
+import { getTenant } from "@/lib/dal";
 import { capcanaDeclansata, verificaCaptcha } from "@/lib/antispam";
-import { LIMITE, citesteText, esteEmailValid, type StareFormular } from "@/lib/formulare";
+import {
+  LIMITE,
+  citesteText,
+  esteEmailValid,
+  esteTelefonValid,
+  type StareFormular,
+} from "@/lib/formulare";
+import { TEXTE_VANZARE, modelulEsteValid } from "@/lib/pagina-vanzare";
+import { modeleleDePePagina, tipulSiteului } from "@/lib/pagina-vanzare-date";
 
 /**
  * Formularele publice: contact și abonare la newsletter.
@@ -53,7 +62,31 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
   const nume = citesteText(formData, "nume", LIMITE.nume);
   const email = citesteText(formData, "email", LIMITE.email);
   const acord = formData.get("acord") === "da";
-  const valori = { nume, email };
+
+  /*
+    Pagina de vânzare (9 oct. 2026) primește în plus telefon, model preferat și
+    mesaj. Hotărârea o ia SERVERUL, din marcajul site-ului — nu formularul: un
+    cabinet care primește câmpurile astea (de la un bot, de la o pagină
+    modificată) le ignoră, deci regula „fără text liber, fără telefon" a
+    cabinetelor nu depinde de ce trimite browserul.
+
+    La o eroare la citirea tenantului, formularul rămâne cel de cabinet:
+    inserarea de mai jos dă peste aceeași eroare și răspunde cu mesajul tehnic,
+    ca înainte.
+  */
+  const siteId = await getTenant().then(
+    (tenant) => tenant.siteId,
+    () => null,
+  );
+  const vanzare = siteId !== null && (await tipulSiteului(siteId)) === "vanzare";
+
+  const telefon = vanzare ? citesteText(formData, "telefon", LIMITE.telefon) : "";
+  const model = vanzare ? citesteText(formData, "model", LIMITE.model) : "";
+  const mesajLiber = vanzare ? citesteText(formData, "mesaj", LIMITE.mesaj) : "";
+
+  const valori: Record<string, string> = vanzare
+    ? { nume, email, telefon, model, mesaj: mesajLiber }
+    : { nume, email };
 
   const erori: Record<string, string> = {};
 
@@ -70,6 +103,18 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
   // Consimțământul e obligatoriu prin GDPR și trebuie să fie o acțiune, nu o
   // bifă pusă din start — de asta se verifică aici, nu doar prin `required`.
   if (!acord) erori.acord = "Avem nevoie de acordul tău ca să îți putem răspunde.";
+
+  if (vanzare && siteId) {
+    // Telefonul e opțional: gol trece, scris trebuie să semene a număr.
+    if (telefon && !esteTelefonValid(telefon)) erori.telefon = TEXTE_VANZARE.formular.eroareTelefon;
+
+    // Modelul se verifică față de galeria de pe pagină, nu față de o listă scrisă
+    // aici: e singura listă de modele. Lipsa lui (o pagină veche, din cache) nu
+    // e o greșeală — înseamnă doar că omul n-a spus nimic despre model.
+    if (model && !modelulEsteValid(model, await modeleleDePePagina(siteId))) {
+      erori.model = TEXTE_VANZARE.formular.eroareModel;
+    }
+  }
 
   if (Object.keys(erori).length > 0) {
     return { status: "eroare", erori, valori, mesaj: "Mai lipsește ceva mai jos." };
@@ -115,16 +160,29 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
       };
     }
 
-    const { error } = await tabel.insert({
-      name: nume,
-      // Telefonul a fost scos din formular (16 sept. 2026); coloana rămâne, cu
-      // numerele primite până acum, dar cererile noi nu mai au ce număr scrie.
-      phone: null,
-      email,
-      // Nu se mai adună. Coloana rămâne, cu mesajele primite până acum.
-      message: null,
-      consent: acord,
-    });
+    const { error } = await tabel.insert(
+      vanzare
+        ? {
+            name: nume,
+            phone: telefon || null,
+            email,
+            message: mesajLiber || null,
+            // Coloana vine cu migrarea `pagina_de_vanzare`; marcajul „vanzare" se
+            // pune abia după ea, deci aici există sigur.
+            model_preferat: model || null,
+            consent: acord,
+          }
+        : {
+            name: nume,
+            // Telefonul a fost scos din formular (16 sept. 2026); coloana rămâne, cu
+            // numerele primite până acum, dar cererile noi nu mai au ce număr scrie.
+            phone: null,
+            email,
+            // Nu se mai adună. Coloana rămâne, cu mesajele primite până acum.
+            message: null,
+            consent: acord,
+          },
+    );
 
     if (error) {
       console.error("Inserare mesaj de contact eșuată:", error);

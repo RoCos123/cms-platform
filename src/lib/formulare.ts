@@ -15,6 +15,10 @@ export const LIMITE = {
   nume: 120,
   email: 200,
   mesaj: 5000,
+  /** Cât acceptă și Setări pentru numărul cabinetului. Doar pe pagina de vânzare. */
+  telefon: 40,
+  /** Cât acceptă coloana `contact_messages.model_preferat`. */
+  model: 80,
 } as const;
 
 export type StareFormular = {
@@ -51,6 +55,19 @@ export const STARE_INITIALA: StareFormular = { status: "initial", incercari: 0 }
 export function esteEmailValid(email: string): boolean {
   if (email.length > LIMITE.email) return false;
   return /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email);
+}
+
+/**
+ * Un număr de telefon plauzibil: între 6 și 15 cifre, cu „+" în față dacă vrea,
+ * iar spațiile, punctele, liniuțele și parantezele nu contează. Aceeași regulă cu
+ * care secțiunea „Contact" hotărăște ce rând e număr pe care se poate apăsa.
+ *
+ * Nu verifică dacă numărul există — asta n-o poate ști nicio expresie regulată.
+ * Prinde doar ce sigur nu e un număr: un email scris în câmpul greșit, un cuvânt.
+ */
+export function esteTelefonValid(telefon: string): boolean {
+  if (telefon.length > LIMITE.telefon) return false;
+  return /^\+?\d{6,15}$/.test(telefon.replace(/[\s().-]/g, ""));
 }
 
 /**

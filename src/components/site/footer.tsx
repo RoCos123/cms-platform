@@ -22,6 +22,19 @@ export type SiteFooterData = {
   legal?: LinkSubsol[];
   /** Profilurile de pe rețele, deja filtrate de `linkurileSociale`. */
   retele?: { nume: string; adresa: string }[];
+  /**
+   * DOAR pagina de vânzare (brief 9 oct. 2026, 1.3): o singură listă de navigare,
+   * fără titlu, cu aceleași linkuri ca bara de sus. Când e dată, coloanele SERVICII
+   * și CABINET — care țin de un cabinet — nu se mai desenează.
+   */
+  navigare?: { linkuri: LinkSubsol[]; eticheta: string };
+  /** Titlul coloanei cu telefon/email/adresă. Lipsă = „Contact", ca până acum. */
+  titluContact?: string;
+  /**
+   * DOAR pagina de vânzare: rândul legal al firmei (denumire, CUI, Registrul
+   * Comerțului, sediu), în bara de jos. Lipsă sau gol = nu se desenează nimic.
+   */
+  rindLegal?: string | null;
 };
 
 const TITLU_COLOANA: CSSProperties = {
@@ -176,8 +189,25 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
             )}
           </div>
 
-          <ColoanaLinkuri titlu="Servicii" linkuri={servicii} />
-          <ColoanaLinkuri titlu="Cabinet" linkuri={cabinet} />
+          {data.navigare ? (
+            data.navigare.linkuri.length > 0 && (
+              <nav
+                aria-label={data.navigare.eticheta}
+                style={{ display: "flex", flexDirection: "column", gap: "12px", minWidth: 0 }}
+              >
+                {data.navigare.linkuri.map((link) => (
+                  <a key={`${link.href}-${link.eticheta}`} href={link.href} style={LINK_COLOANA}>
+                    {link.eticheta}
+                  </a>
+                ))}
+              </nav>
+            )
+          ) : (
+            <>
+              <ColoanaLinkuri titlu="Servicii" linkuri={servicii} />
+              <ColoanaLinkuri titlu="Cabinet" linkuri={cabinet} />
+            </>
+          )}
 
           {areContact && (
             <div
@@ -191,7 +221,7 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
                 overflowWrap: "anywhere",
               }}
             >
-              <p style={TITLU_COLOANA}>Contact</p>
+              <p style={TITLU_COLOANA}>{data.titluContact ?? "Contact"}</p>
               {data.telefon && (
                 <a
                   href={`tel:${data.telefon.replace(/\s/g, "")}`}
@@ -234,6 +264,8 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
           <span>
             © {an} {data.nume}
           </span>
+
+          {data.rindLegal && <span style={{ minWidth: 0, overflowWrap: "anywhere" }}>{data.rindLegal}</span>}
 
           {(legal.length > 0 || data.acreditare) && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 20px", alignItems: "center" }}>

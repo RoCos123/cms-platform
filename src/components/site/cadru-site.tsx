@@ -11,7 +11,9 @@ import { templateFontStyle } from "@/lib/templates/fonturi";
 import { adresaImaginii } from "@/lib/imagini-adrese";
 import { coloaneleSubsolului } from "@/lib/subsol";
 import { cheileSectiunilorVizibile, dateleSectiuniiPachete } from "@/lib/sectiuni-vizibile";
-import { esteDespreVizibila, linkPachete } from "@/lib/antet";
+import { esteDespreVizibila, linkPachete, linkuriImplicite } from "@/lib/antet";
+import { TEXTE_VANZARE, dateleFirmei, rindulLegal } from "@/lib/pagina-vanzare";
+import { tipulSiteului } from "@/lib/pagina-vanzare-date";
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import { BaraAdmin } from "@/components/site/bara-admin";
@@ -47,14 +49,16 @@ export async function CadruSite({
   // de administrare) și numărarea vizitelor stau în frunze proprii, `BaraAdmin` și
   // `NumaratorVizite`, ca acest cadru să poată fi memorat între cereri fără riscul
   // de a servi bara unui proprietar altui vizitator. (Pasul 1 din cache-ul pe tenant.)
-  const [{ site, brand, pagini, social }, articole, linkuriPagini, cheiVizibile, datePachete] =
+  const [{ site, brand, pagini, social }, articole, linkuriPagini, cheiVizibile, datePachete, tip] =
     await Promise.all([
       identitateaSiteului(siteId),
       articolePublicate(siteId),
       linkurilePaginilor(siteId),
       cheileSectiunilorVizibile(siteId),
       dateleSectiuniiPachete(siteId),
+      tipulSiteului(siteId),
     ]);
+  const vanzare = tip === "vanzare";
 
   const template = getTemplate(site?.template);
   const nume = site?.name ?? domain;
@@ -87,16 +91,41 @@ export async function CadruSite({
   }
   const inSubsol = linkuriPagini.filter((pagina) => pagina.loc === "footer").map(catreLink);
 
+  /*
+    Pagina de vânzare (brief 9 oct. 2026): meniul se calculează AICI, o dată, și
+    merge și în bară, și în subsol — brieful cere ca subsolul să aibă exact
+    aceleași linkuri ca bara. „Modele" vine primul (galeria e prima secțiune după
+    deschidere) și doar dacă galeria e pornită. Textele, din `TEXTE_VANZARE`.
+
+    La cabinete, `undefined`: antetul își face singur meniul, ca până acum.
+  */
+  const meniuVanzare = vanzare
+    ? linkuriImplicite({
+        areDespre: esteDespreVizibila(cheiVizibile),
+        paginaServicii: paginaEsteActiva(pagini, "servicii"),
+        blog: areBlog ? "pagina" : null,
+        paginiProprii: inAntet,
+        linkuriSectiuni: linkPreturi ? [linkPreturi] : [],
+        linkuriDeInceput: cheiVizibile.includes("portfolio")
+          ? [{ text: TEXTE_VANZARE.meniu.modele, href: "/#modele" }]
+          : [],
+        etichete: TEXTE_VANZARE.meniu,
+      })
+    : undefined;
+
   // Logoul semnat din id (adresa poate expira), folosit și în antet, și în
   // subsol. Plus coloanele de servicii și cabinet ale subsolului, umplute din ce
   // e publicat — vezi `coloaneleSubsolului`.
   const logoSemnat = brand.logo?.uploadId
     ? { url: adresaImaginii(brand.logo.uploadId), altText: brand.logo.altText }
     : undefined;
-  const { servicii: coloanaServicii, cabinet: coloanaCabinet } = await coloaneleSubsolului(siteId, {
-    paginaServiciiActiva: paginaEsteActiva(pagini, "servicii"),
-    areBlog,
-  });
+  // Pe pagina de vânzare nu se cer: subsolul ei are lista de mai sus în loc de coloane.
+  const { servicii: coloanaServicii, cabinet: coloanaCabinet } = vanzare
+    ? { servicii: [], cabinet: [] }
+    : await coloaneleSubsolului(siteId, {
+        paginaServiciiActiva: paginaEsteActiva(pagini, "servicii"),
+        areBlog,
+      });
 
   return (
     <>
@@ -124,6 +153,7 @@ export async function CadruSite({
             subtitlu: brand.subtitlu,
             logo: logoSemnat,
             telefon: brand.telefon,
+            linkuri: meniuVanzare,
             areDespre: esteDespreVizibila(cheiVizibile),
             linkuriSectiuni: linkPreturi ? [linkPreturi] : [],
             paginaServicii: paginaEsteActiva(pagini, "servicii"),
@@ -148,6 +178,14 @@ export async function CadruSite({
             cabinet: coloanaCabinet,
             legal: inSubsol.map((link) => ({ eticheta: link.text, href: link.href })),
             retele: linkurileSociale(social),
+            ...(meniuVanzare && {
+              navigare: {
+                linkuri: meniuVanzare.map((link) => ({ eticheta: link.text, href: link.href })),
+                eticheta: TEXTE_VANZARE.subsol.navigare,
+              },
+              titluContact: TEXTE_VANZARE.subsol.contact,
+              rindLegal: rindulLegal(dateleFirmei(brand)),
+            }),
           }}
         />
 

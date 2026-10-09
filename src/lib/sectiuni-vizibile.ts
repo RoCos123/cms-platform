@@ -2,6 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 import { createServiceClient } from "@/lib/supabase/admin";
+import { contineUmplutura } from "@/lib/umplutura";
 
 /**
  * Cheile secțiunilor VIZIBILE de pe prima pagină a site-ului.
@@ -13,15 +14,19 @@ import { createServiceClient } from "@/lib/supabase/admin";
  * Ca orice citire publică, la eroare întoarce listă goală, nu aruncă: un vizitator
  * nu vede niciodată o eroare fiindcă baza a răspuns prost. Efectul e un meniu cu mai
  * puține intrări, nu o pagină căzută.
+ *
+ * O secțiune cu text de umplutură nu se randează (regula din 9 oct. 2026, vezi
+ * `umplutura.ts`), deci nu se numără nici aici: altfel meniul și subsolul ar duce
+ * la o ancoră care nu există pe pagină.
  */
 export const cheileSectiunilorVizibile = cache(async (siteId: string): Promise<string[]> => {
   const { data } = await createServiceClient()
     .from("site_content")
-    .select("key")
+    .select("key, data")
     .eq("site_id", siteId)
     .eq("visible", true);
 
-  return (data ?? []).map((rand) => rand.key as string);
+  return (data ?? []).filter((rand) => !contineUmplutura(rand.data)).map((rand) => rand.key as string);
 });
 
 /**
@@ -41,5 +46,7 @@ export const dateleSectiuniiPachete = cache(async (siteId: string): Promise<unkn
     .order("position")
     .limit(1);
 
-  return data?.[0]?.data ?? null;
+  const date = data?.[0]?.data ?? null;
+  // Cu umplutură, secțiunea nu apare pe pagină — deci nici linkul către ea.
+  return contineUmplutura(date) ? null : date;
 });

@@ -9,7 +9,15 @@ import { PanouPrevizualizare } from "@/components/dashboard/panou-previzualizare
 import { SiteHeader } from "@/components/site/header";
 import { SiteFooter } from "@/components/site/footer";
 import type { Template } from "@/lib/templates";
-import { CAMPURI_CABINET, CAMPURI_SEO, CAMPURI_SOCIAL, linkurileSociale, type Social } from "@/lib/setari";
+import {
+  CAMPURI_CABINET,
+  CAMPURI_FIRMA,
+  CAMPURI_SEO,
+  CAMPURI_SOCIAL,
+  linkurileSociale,
+  type Social,
+} from "@/lib/setari";
+import { TEXTE_VANZARE, dateleFirmei, rindulLegal } from "@/lib/pagina-vanzare";
 import { valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 import { salveazaSetari } from "./actions";
 
@@ -17,35 +25,41 @@ export function FormularSetari({
   cabinetInitial,
   seoInitial,
   socialInitial,
+  firmaInitial,
   domeniu,
   template,
 }: {
   cabinetInitial: ValoareEditor;
   seoInitial: ValoareEditor;
   socialInitial: ValoareEditor;
+  /** Doar pe pagina de vânzare: „Datele firmei". Lipsă = grupul nu există. */
+  firmaInitial?: ValoareEditor;
   domeniu: string;
   template: Template;
 }) {
   const [cabinet, setCabinet] = useState(cabinetInitial);
   const [seo, setSeo] = useState(seoInitial);
   const [social, setSocial] = useState(socialInitial);
+  const [firma, setFirma] = useState(firmaInitial);
   const [referinta, setReferinta] = useState({
     cabinet: cabinetInitial,
     seo: seoInitial,
     social: socialInitial,
+    firma: firmaInitial,
   });
   const [erori, setErori] = useState<Record<string, string>>({});
   const [seSalveaza, setSeSalveaza] = useState(false);
   const [eroare, setEroare] = useState<string | undefined>();
   const { show } = useToast();
 
-  const modificat = JSON.stringify({ cabinet, seo, social }) !== JSON.stringify(referinta);
+  const modificat = JSON.stringify({ cabinet, seo, social, firma }) !== JSON.stringify(referinta);
 
   async function salveaza() {
     const gasite = {
       ...valideaza(cabinet, CAMPURI_CABINET),
       ...valideaza(seo, CAMPURI_SEO),
       ...valideaza(social, CAMPURI_SOCIAL),
+      ...(firma ? valideaza(firma, CAMPURI_FIRMA) : {}),
     };
     setErori(gasite);
 
@@ -57,7 +71,7 @@ export function FormularSetari({
     setSeSalveaza(true);
     setEroare(undefined);
 
-    const rezultat = await salveazaSetari(cabinet, seo, social);
+    const rezultat = await salveazaSetari(cabinet, seo, social, firma);
     setSeSalveaza(false);
 
     if (!rezultat.ok) {
@@ -66,7 +80,7 @@ export function FormularSetari({
       return;
     }
 
-    setReferinta({ cabinet, seo, social });
+    setReferinta({ cabinet, seo, social, firma });
     show("Setările au fost salvate.", "success");
   }
 
@@ -97,6 +111,18 @@ export function FormularSetari({
           />
         </CardBody>
       </Card>
+
+      {firma && (
+        <Card>
+          <CardHeader
+            title="Datele firmei"
+            description="Doar pe acest site. Ce completezi apare lângă formularul de contact (telefon, WhatsApp, email), pe rândul de jos din subsol (denumire, CUI, Registrul Comerțului, sediu) și sub preț (TVA). Un câmp gol nu apare nicăieri."
+          />
+          <CardBody>
+            <CampuriSectiune campuri={CAMPURI_FIRMA} valoare={firma} onChange={setFirma} erori={erori} />
+          </CardBody>
+        </Card>
+      )}
 
       <Card>
         <CardHeader
@@ -153,7 +179,7 @@ export function FormularSetari({
       */}
       <PanouPrevizualizare
         template={template}
-        cheie={JSON.stringify({ cabinet, social })}
+        cheie={JSON.stringify({ cabinet, social, firma })}
         titlu="Antetul și subsolul, pe orice pagină"
         nota="Se actualizează pe măsură ce scrii. Coloanele Servicii și Cabinet se umplu singure din serviciile și secțiunile site-ului — aici le arătăm cu câteva exemple, doar ca să se vadă așezarea. Modificările ajung pe site abia după ce apeși Salvează."
       >
@@ -193,6 +219,13 @@ export function FormularSetari({
             servicii: SERVICII_EXEMPLU,
             cabinet: CABINET_EXEMPLU,
             retele: linkurileSociale(social as Social),
+            // Pagina de vânzare: o singură listă în loc de coloane și rândul legal
+            // al firmei, ca pe site.
+            ...(firma && {
+              navigare: { linkuri: NAVIGARE_EXEMPLU_VANZARE, eticheta: TEXTE_VANZARE.subsol.navigare },
+              titluContact: TEXTE_VANZARE.subsol.contact,
+              rindLegal: rindulLegal(dateleFirmei(firma)),
+            }),
           }}
         />
       </PanouPrevizualizare>
@@ -205,6 +238,7 @@ export function FormularSetari({
           setCabinet(referinta.cabinet);
           setSeo(referinta.seo);
           setSocial(referinta.social);
+          setFirma(referinta.firma);
           setErori({});
           setEroare(undefined);
         }}
@@ -231,6 +265,13 @@ const CABINET_EXEMPLU = [
   { eticheta: "Despre mine", href: "#" },
   { eticheta: "Blog", href: "#" },
   { eticheta: "Contact", href: "#" },
+];
+
+/** Pagina de vânzare n-are coloane în subsol, ci lista din bară; câteva intrări, ca exemplu. */
+const NAVIGARE_EXEMPLU_VANZARE = [
+  { eticheta: TEXTE_VANZARE.meniu.modele, href: "#" },
+  { eticheta: TEXTE_VANZARE.meniu.servicii, href: "#" },
+  { eticheta: TEXTE_VANZARE.meniu.contact, href: "#" },
 ];
 
 /**

@@ -10,7 +10,7 @@ import { dimensiuniPozaSectiune } from "@/lib/dimensiuni-poze";
 import { raportRamei } from "@/lib/rame-poze";
 import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import type { OreDePrimaPagina } from "@/components/site/sections/programare";
-import { RenderSections, type SectionRow } from "@/components/site/render-sections";
+import { RenderSections, type PaginaVanzare, type SectionRow } from "@/components/site/render-sections";
 import type { ArticolListat } from "@/lib/blog";
 import type { Serviciu } from "@/lib/servicii";
 import type { SectionTone, Template } from "@/lib/templates";
@@ -18,6 +18,7 @@ import type { MetaSectiune } from "@/lib/sectiuni";
 import type { Destinatie } from "@/lib/destinatii";
 import type { OptiuneDocument } from "@/lib/uploads";
 import { catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
+import { contineUmplutura } from "@/lib/umplutura";
 import { salveazaSectiune } from "../actions";
 
 export function EditorSectiune({
@@ -34,6 +35,7 @@ export function EditorSectiune({
   oreProgramare,
   destinatii,
   documente,
+  paginaVanzare,
 }: {
   id: string;
   meta: MetaSectiune;
@@ -57,6 +59,8 @@ export function EditorSectiune({
   destinatii: Destinatie[];
   /** Documentele din bibliotecă, pentru materialele de sub un program. */
   documente: OptiuneDocument[];
+  /** Doar pe pagina de vânzare — ca previzualizarea să arate ce are site-ul ăla, nu un cabinet. */
+  paginaVanzare: PaginaVanzare | null;
 }) {
   const [valoare, setValoare] = useState(valoareInitiala);
   const [referinta, setReferinta] = useState(valoareInitiala);
@@ -119,6 +123,15 @@ export function EditorSectiune({
               {meta.continutDinAltaParte}
             </p>
           )}
+
+          {/* Regula din 9 oct. 2026: cu text de umplutură, secțiunea nu apare pe site. */}
+          {contineUmplutura(datePreviz) && (
+            <p className="mt-3 max-w-2xl rounded-base border border-warning/30 bg-warning-surface p-3 text-sm text-warning">
+              Secțiunea nu apare pe site cât timp are un text întreg între paranteze drepte, ca
+              „[Numele]” — e semnul unui loc încă necompletat. Aici, în panou, o vezi în
+              continuare.
+            </p>
+          )}
         </div>
 
         <LinkVeziPeSite href={hrefPeSite} eticheta="Vezi pagina pe site" />
@@ -157,7 +170,10 @@ export function EditorSectiune({
           cheie={JSON.stringify(datePreviz)}
           nota="Se actualizează pe măsură ce scrii. Modificările ajung pe site abia după ce apeși Salvează."
         >
-          <RenderSections rows={[randPreviz]} context={{ articole, servicii, paginaServiciiActiva, oreProgramare, asezari: template.asezari }} />
+          <RenderSections
+            rows={[randPreviz]}
+            context={{ articole, servicii, paginaServiciiActiva, oreProgramare, asezari: template.asezari, paginaVanzare }}
+          />
         </PanouPrevizualizare>
       </div>
 

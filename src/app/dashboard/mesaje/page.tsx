@@ -29,9 +29,16 @@ export default async function MesajePage({
   const cerut = (await searchParams).vedere;
   const vedere: Vedere = VEDERI.some((v) => v.cheie === cerut) ? (cerut as Vedere) : "toate";
 
+  /*
+    Toate coloanele, nu o listă, dinadins: `model_preferat` (pagina de vânzare,
+    9 oct. 2026) există doar după migrarea `pagina_de_vanzare`. O listă care o
+    numește ar da eroare înaintea migrării — și ar goli căsuța TUTUROR clienților,
+    nu doar a paginii de vânzare. Fără ea, înainte de migrare câmpul lipsește și
+    atât.
+  */
   let interogare = supabase
     .from("contact_messages")
-    .select("id, name, email, phone, message, created_at, read_at, deleted_at")
+    .select("*")
     .eq("site_id", session.siteId)
     .order("created_at", { ascending: false })
     .limit(LIMITA);
@@ -63,6 +70,8 @@ export default async function MesajePage({
     // Poate lipsi: mesajele de după 28 aug. 2026 n-au text, formularul nu-l
     // mai cere. Cele vechi îl păstrează.
     text: (rand.message as string | null) ?? null,
+    // Doar mesajele de pe pagina de vânzare îl au; la cabinete e mereu gol.
+    model: (rand.model_preferat as string | null | undefined) ?? null,
     primitLa: rand.created_at as string,
     citit: rand.read_at !== null,
     sters: rand.deleted_at !== null,

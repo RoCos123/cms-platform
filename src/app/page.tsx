@@ -21,10 +21,17 @@ import { rescrieAdresele, rescrieAdreseleFisiere } from "@/lib/imagini";
 import { adresaImaginii, adresaFisierului } from "@/lib/imagini-adrese";
 import { CadruSite } from "@/components/site/cadru-site";
 import { DateStructurate } from "@/components/site/date-structurate";
+import { TEXTE_VANZARE, dateleFirmei, numeleModelelor } from "@/lib/pagina-vanzare";
+import { tipulSiteului } from "@/lib/pagina-vanzare-date";
+import { MARIMEA_CARTONASULUI } from "@/lib/cartonas-masuri";
+import { contineUmplutura } from "@/lib/umplutura";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteId, domain } = await getTenant();
-  const { site, seo, brand } = await identitateaSiteului(siteId);
+  const [{ site, seo, brand }, tip] = await Promise.all([
+    identitateaSiteului(siteId),
+    tipulSiteului(siteId),
+  ]);
 
   const nume = site?.name ?? domain;
   const titlu = seo.titlu || nume;
@@ -50,6 +57,25 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: nume,
       locale: "ro_RO",
       type: "website",
+      /*
+        Pagina de vânzare: același cartonaș, alt text alternativ (brief 9 oct.
+        2026, 1.3) — al cabinetelor ar spune „cabinetului" despre o pagină care
+        vinde site-uri. Textul fix din `opengraph-image.tsx` nu se poate schimba
+        per site, dar Next îl folosește doar cât pagina NU-și dă singură
+        `images`; aici și-l dă. Twitter le preia singur pe toate de aici.
+        La cabinete, nimic: rămâne cartonașul cu textul de până acum.
+      */
+      ...(tip === "vanzare" && {
+        images: [
+          {
+            url: "/opengraph-image",
+            width: MARIMEA_CARTONASULUI.width,
+            height: MARIMEA_CARTONASULUI.height,
+            type: "image/png",
+            alt: TEXTE_VANZARE.cartonasAlt,
+          },
+        ],
+      }),
     },
   };
 }
@@ -57,7 +83,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PublicHomePage() {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, pagini, brand, seo, social }, { data: rows }, articole, servicii] =
+  const [{ site, pagini, brand, seo, social }, { data: rows }, articole, servicii, tip] =
     await Promise.all([
     identitateaSiteului(siteId),
     (await tenantTable("site_content"))
@@ -74,6 +100,7 @@ export default async function PublicHomePage() {
     // listată nu poartă textul articolelor, deci nu costă.
     articolePublicate(siteId),
     serviciiPublicate(siteId),
+    tipulSiteului(siteId),
   ]);
 
   // Dublul cast e necesar cât timp nu generăm tipurile bazei de date: `tenantTable`
@@ -86,10 +113,18 @@ export default async function PublicHomePage() {
    * iar o adresă absolută rămasă în conținut nu trebuie să mai poată fi randată
    * deloc. Vezi `rescrieAdresele` în src/lib/imagini.ts.
    */
-  const sections = ((rows ?? []) as unknown as SectionRow[]).map((rand) => ({
-    ...rand,
-    data: rescrieAdreseleFisiere(rescrieAdresele(rand.data, adresaImaginii), adresaFisierului),
-  }));
+  const sections = ((rows ?? []) as unknown as SectionRow[])
+    /*
+     * Regula de platformă din 9 oct. 2026 (brief 1.2): o secțiune care încă are
+     * text de umplutură — „[Numele]", „[Aici vine…]" — nu ajunge pe site. În panou
+     * rămâne, cu tot cu text (acolo nu trece pe aici). Filtrul stă ÎNAINTEA
+     * întrebărilor de mai jos, ca nici datele structurate să nu le preia.
+     */
+    .filter((rand) => !contineUmplutura(rand.data))
+    .map((rand) => ({
+      ...rand,
+      data: rescrieAdreseleFisiere(rescrieAdresele(rand.data, adresaImaginii), adresaFisierului),
+    }));
 
   /**
    * Întrebările pentru `FAQPage` se iau din secțiunea de pe pagină, nu din tot
@@ -151,6 +186,10 @@ export default async function PublicHomePage() {
             // Așezările vin din șablon. Necunoscut sau lipsă → cel implicit,
             // ca peste tot: o pagină publică trebuie să se randeze mereu.
             asezari: getTemplate(site?.template as string | null).asezari,
+            // Doar pe pagina de vânzare. Modelele se iau din galeria de pe
+            // pagină — aceleași rânduri, deci nicio interogare în plus.
+            paginaVanzare:
+              tip === "vanzare" ? { modele: numeleModelelor(sections), firma: dateleFirmei(brand) } : null,
           }}
         />
       ) : (

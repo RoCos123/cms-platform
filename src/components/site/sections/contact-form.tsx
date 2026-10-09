@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { trimiteMesajContact } from "@/app/actions/formulare";
 import { LIMITE, STARE_INITIALA } from "@/lib/formulare";
-import { Camp, Capcana, MesajFormular, stilButonTrimite } from "@/components/site/form-parts";
+import { ATRIBUT_MODEL, TEXTE_VANZARE, optiunileModelului } from "@/lib/pagina-vanzare";
+import { Camp, Capcana, MesajFormular, Selectie, stilButonTrimite } from "@/components/site/form-parts";
 import { CasetaAmanata } from "@/components/site/captcha";
 
 export function ContactForm({
@@ -15,6 +16,7 @@ export function ContactForm({
   linkConfidentialitate,
   mesajSucces,
   textButon,
+  modele,
 }: {
   siteKey: string | null;
   furnizorCaptcha: string | null;
@@ -26,8 +28,46 @@ export function ContactForm({
   linkConfidentialitate?: string;
   mesajSucces?: string;
   textButon: string;
+  /**
+   * DOAR pe pagina de vânzare: numele modelelor din galerie. Prezența listei
+   * (chiar goală) aduce telefonul, modelul preferat și mesajul; lipsa ei lasă
+   * formularul de cabinet exact cum era — nume, email, acord.
+   */
+  modele?: readonly string[];
 }) {
   const [stare, actiune, seLucreaza] = useActionState(trimiteMesajContact, STARE_INITIALA);
+  const vanzare = modele !== undefined;
+  const refModel = useRef<HTMLSelectElement>(null);
+
+  /*
+    Butonul „Vreau acest model" de pe cartonașe e un link simplu către
+    `#contact`, cu numele modelului în `data-model`. Ascultarea stă aici, pe
+    document, nu pe buton: cartonașele sunt randate pe server, fără JavaScript
+    al lor. Fără JavaScript, linkul tot duce la formular — doar că modelul
+    rămâne de ales de mână.
+  */
+  useEffect(() => {
+    if (!vanzare) return;
+
+    function laClic(eveniment: MouseEvent) {
+      const tinta = eveniment.target;
+      if (!(tinta instanceof Element)) return;
+
+      const link = tinta.closest(`a[${ATRIBUT_MODEL}]`);
+      const lista = refModel.current;
+      if (!link || !lista) return;
+
+      const model = link.getAttribute(ATRIBUT_MODEL) ?? "";
+      if (Array.from(lista.options).some((optiune) => optiune.value === model)) {
+        lista.value = model;
+      }
+    }
+
+    document.addEventListener("click", laClic);
+    return () => document.removeEventListener("click", laClic);
+  }, [vanzare]);
+
+  const texte = TEXTE_VANZARE.formular;
 
   return (
     <form action={actiune} style={{ display: "flex", flexDirection: "column", gap: "18px" }} noValidate>
@@ -48,7 +88,7 @@ export function ContactForm({
       <Camp
         id="contact-nume"
         name="nume"
-        eticheta="Numele tău"
+        eticheta={vanzare ? texte.nume : "Numele tău"}
         autoComplete="name"
         maxLength={LIMITE.nume}
         eroare={stare.erori?.nume}
@@ -65,7 +105,7 @@ export function ContactForm({
         id="contact-email"
         name="email"
         tip="email"
-        eticheta="Adresa de email"
+        eticheta={vanzare ? texte.email : "Adresa de email"}
         autoComplete="email"
         maxLength={LIMITE.email}
         eroare={stare.erori?.email}
@@ -73,17 +113,74 @@ export function ContactForm({
       />
 
       {/*
+        EXCEPȚIA paginii de vânzare (9 oct. 2026, hotărârea proprietarului):
+        telefon, model preferat și mesaj — DOAR pe sitepsihologi.ro. Acolo scriu
+        psihologi despre un site, nu pacienți despre sănătatea lor, deci motivul
+        pentru care cabinetele n-au text liber și telefon nu se aplică. Vezi
+        CONTEXT.md, la hotărârile din 28 aug. și 16–18 sept.
+      */}
+      {modele && (
+        <>
+          <Camp
+            id="contact-telefon"
+            name="telefon"
+            tip="tel"
+            eticheta={texte.telefon}
+            autoComplete="tel"
+            maxLength={LIMITE.telefon}
+            obligatoriu={false}
+            sufixOptional={texte.optional}
+            eroare={stare.erori?.telefon}
+            valoare={stare.valori?.telefon}
+          />
+
+          {/*
+            `key` pe numărul de încercări: după o trimitere, React reface
+            formularul din valorile implicite, iar la o listă `defaultValue`
+            contează doar la montare. Fără remontare, modelul ales se pierdea la
+            prima eroare (prins la proba din 9 oct. 2026) — omul corecta
+            telefonul și trimitea, fără să observe, „Încă nu m-am hotărât".
+          */}
+          <Selectie
+            key={stare.incercari}
+            id="contact-model"
+            name="model"
+            eticheta={texte.model}
+            optiuni={optiunileModelului(modele)}
+            valoare={stare.valori?.model}
+            eroare={stare.erori?.model}
+            schemaCulori={temaCaptcha}
+            refSelectie={refModel}
+          />
+
+          <Camp
+            id="contact-mesaj"
+            name="mesaj"
+            eticheta={texte.mesaj}
+            randuri={5}
+            maxLength={LIMITE.mesaj}
+            obligatoriu={false}
+            sufixOptional={texte.optional}
+            eroare={stare.erori?.mesaj}
+            valoare={stare.valori?.mesaj}
+          />
+        </>
+      )}
+
+      {/*
         Câmpul de mesaj a fost scos dinadins (28 aug. 2026). Pe site-ul unui
         psiholog, „scrie-mi câteva rânduri" adună date despre sănătate —
         categoria cu cerințele legale cele mai stricte. Vezi migrarea
         `contact_fara_mesaj` pentru raționamentul întreg. Nu se pune la loc
-        fără să se recitească acolo.
+        fără să se recitească acolo. (Excepția de mai sus, a paginii de
+        vânzare, nu atinge niciun site de cabinet.)
       */}
 
       <Acord
         eroare={stare.erori?.acord}
         text={textAcord}
         linkConfidentialitate={linkConfidentialitate}
+        textLink={vanzare ? texte.politica : undefined}
       />
 
       {/*
@@ -101,7 +198,7 @@ export function ContactForm({
           )}
 
       <button type="submit" disabled={seLucreaza} style={stilButonTrimite(seLucreaza)}>
-        {seLucreaza ? "Se trimite…" : textButon}
+        {seLucreaza ? (vanzare ? texte.seTrimite : "Se trimite…") : textButon}
       </button>
     </form>
   );
@@ -119,10 +216,13 @@ function Acord({
   eroare,
   text,
   linkConfidentialitate,
+  textLink = "Politica de confidențialitate",
 }: {
   eroare?: string;
   text: string;
   linkConfidentialitate?: string;
+  /** Pagina de vânzare îl ia din textele ei; cabinetele, de aici. */
+  textLink?: string;
 }) {
   const idEroare = "contact-acord-eroare";
 
@@ -161,10 +261,10 @@ function Acord({
                 textUnderlineOffset: "2px",
               }}
             >
-              Politica de confidențialitate
+              {textLink}
             </a>
           ) : (
-            "Politica de confidențialitate"
+            textLink
           )}
           .
         </label>

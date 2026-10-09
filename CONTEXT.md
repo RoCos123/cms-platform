@@ -539,6 +539,9 @@ Toate livrate:
    email). Câmpul de mesaj **NU** s-a pus la loc — rămâne scos din motivul GDPR
    de pe 28 aug. (adună date de sănătate), confirmat de proprietar. Plus un rând
    editabil deasupra formularului („Răspund personal în maxim 24 de ore").
+   *Excepție din 9 oct. 2026: pagina de vânzare (sitepsihologi.ro) are telefon,
+   model preferat și mesaj — acolo scriu psihologi despre un site, nu pacienți
+   despre sănătate. Vezi „Fără câmpuri de text liber…", mai jos.*
 2. **Poză rotunjită în hero** — arcadă în cap pe așezarea cu poza lângă titlu
    (Lumină & co.), rotunjire blândă pe Căldură.
 3. **Bandă cu servicii** — secțiune nouă, pornit/oprit din lista de secțiuni;
@@ -599,6 +602,10 @@ doar):**
   contact, dusă peste tot.
 - **Câmpul de mesaj liber rămâne SCOS.** Referința îl are; noi nu-l punem la loc,
   din motivul GDPR de pe 28 aug. (adună date de sănătate).
+- *Excepție din 9 oct. 2026, doar pentru pagina de vânzare (sitepsihologi.ro,
+  `sites.tip = 'vanzare'`): telefon, model preferat și mesaj în formularul de
+  contact. Acolo scriu psihologi despre un site, nu pacienți despre sănătate.
+  Cabinetele rămân fără telefon cerut și fără text liber.*
 
 **Ce s-a făcut, pe secțiuni** (fiecare doar pe `apropiere`, prin câte un steag în
 `asezari`):
@@ -1144,6 +1151,18 @@ E o alegere de produs, nu una juridică, iar el a ales curățenia.
 message`, `appointments.notes`), pentru mesajele deja primite. Se scot doar din
 formulare și din acțiuni. Ștergerea coloanelor e altă discuție, cu backup
 înainte.
+
+**EXCEPȚIE: pagina de vânzare (9 oct. 2026, hotărârea proprietarului).** Pe
+sitepsihologi.ro — și NUMAI acolo — formularul de contact are telefon (opțional),
+„Modelul preferat" (listă) și mesaj (opțional, text liber). Motivul: acolo nu
+scriu pacienți despre sănătatea lor, ci psihologi despre un site; datele de
+sănătate, pentru care s-a scos textul liber, nu sunt subiectul conversației.
+Excepția atârnă de marcajul `sites.tip = 'vanzare'` (migrarea
+`pagina_de_vanzare`), pus doar din SQL; clientul nu-l poate schimba, iar o clonă
+pornește ca `cabinet`. Hotărârea o ia SERVERUL din marcaj, nu formularul — un
+cabinet care primește totuși `telefon`/`mesaj` (de la un bot) le ignoră.
+Pe site-urile de cabinet regula de mai sus rămâne neschimbată: fără text liber,
+fără telefon.
 
 ## Estimare de efort (corectată)
 

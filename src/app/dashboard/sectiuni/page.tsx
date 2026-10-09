@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { ListaSectiuni, type RandSectiune } from "./lista-sectiuni";
+import { contineUmplutura } from "@/lib/umplutura";
 
 export const metadata = { title: "Secțiunile paginii principale" };
 
@@ -15,7 +16,7 @@ export default async function SectiuniPage() {
   // adică greșeala s-ar vedea, nu s-ar ascunde în spatele unei chei atotputernice.
   const { data, error } = await supabase
     .from("site_content")
-    .select("id, key, visible, is_demo")
+    .select("id, key, visible, is_demo, data")
     .eq("site_id", session.siteId)
     .order("position", { ascending: true });
 
@@ -28,6 +29,9 @@ export default async function SectiuniPage() {
     cheie: rand.key as string,
     vizibil: rand.visible as boolean,
     demo: Boolean(rand.is_demo),
+    // Regula din 9 oct. 2026: cu text de umplutură, secțiunea nu apare pe site.
+    // Spus aici, altfel panoul ar arăta „vizibilă" o secțiune care pe site lipsește.
+    umplutura: contineUmplutura(rand.data),
   }));
 
   return (

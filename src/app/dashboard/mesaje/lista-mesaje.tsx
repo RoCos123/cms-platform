@@ -18,6 +18,8 @@ export type Mesaj = {
   telefon: string | null;
   /** Lipsește la cererile primite după 28 aug. 2026 — vezi `contact_fara_mesaj`. */
   text: string | null;
+  /** „Modelul preferat", doar pe pagina de vânzare (9 oct. 2026). */
+  model: string | null;
   primitLa: string;
   citit: boolean;
   sters: boolean;
@@ -138,6 +140,12 @@ export function ListaMesaje({
                   </a>
                 )}
               </p>
+
+              {mesaj.model && (
+                <p className="mt-2 text-sm text-foreground">
+                  <span className="text-muted-foreground">Modelul preferat:</span> {mesaj.model}
+                </p>
+              )}
 
               {/* `whitespace-pre-wrap`: omul a scris pe rânduri, nu într-un bloc. */}
               {mesaj.text && (

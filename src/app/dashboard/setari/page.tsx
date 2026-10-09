@@ -2,6 +2,7 @@ import { getTenant, verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import {
   CAMPURI_CABINET,
+  CAMPURI_FIRMA,
   CAMPURI_SEO,
   CAMPURI_SOCIAL,
   type Brand,
@@ -15,6 +16,7 @@ import { ComutatorPublicare } from "./comutator-publicare";
 import Link from "next/link";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
+import { tipulSiteului } from "@/lib/pagina-vanzare-date";
 
 export const metadata = { title: "Setări" };
 
@@ -23,7 +25,7 @@ export default async function SetariPage() {
   const { domain } = await getTenant();
   const supabase = await createClient();
 
-  const [{ data: site }, { data: setari }, { data: politica }] = await Promise.all([
+  const [{ data: site }, { data: setari }, { data: politica }, tip] = await Promise.all([
     supabase.from("sites").select("name, template, published_at").eq("id", session.siteId).single(),
     supabase.from("site_settings").select("brand, seo, social").eq("site_id", session.siteId).maybeSingle(),
     // Doar starea, nu textul: cardul de publicare vrea să știe dacă politica de
@@ -34,6 +36,8 @@ export default async function SetariPage() {
       .eq("site_id", session.siteId)
       .eq("slug", "politica-de-confidentialitate")
       .maybeSingle(),
+    // Pagina de vânzare are în plus „Datele firmei" (brief 9 oct. 2026).
+    tipulSiteului(session.siteId),
   ]);
 
   const brand = (setari?.brand ?? {}) as Brand;
@@ -106,6 +110,7 @@ export default async function SetariPage() {
         cabinetInitial={catreEditor({ ...brand, nume: site?.name ?? "" }, CAMPURI_CABINET)}
         seoInitial={catreEditor(seo, CAMPURI_SEO)}
         socialInitial={catreEditor(social, CAMPURI_SOCIAL)}
+        firmaInitial={tip === "vanzare" ? catreEditor(brand, CAMPURI_FIRMA) : undefined}
         domeniu={domain}
         template={getTemplate(site?.template as string | null)}
       />

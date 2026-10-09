@@ -3,6 +3,7 @@ import type { PunctFocal } from "@/lib/punct-focal";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
+import { ATRIBUT_MODEL, TEXTE_VANZARE } from "@/lib/pagina-vanzare";
 
 export type PortfolioData = {
   eyebrow?: string;
@@ -47,6 +48,7 @@ export function Portfolio({
   data,
   tone,
   variant,
+  paginaVanzare = false,
 }: {
   data: PortfolioData;
   tone?: SectionTone;
@@ -64,6 +66,13 @@ export function Portfolio({
    * retreat/workshop real, unde descrierea contează.
    */
   variant?: string | null;
+  /**
+   * Pagina de vânzare (brief 9 oct. 2026, 1.3 și 2.2). Doar acolo galeria e „Modele":
+   * ancora `#modele` (și `#programe`, ca linkurile vechi să meargă în continuare),
+   * demo-urile în filă nouă și butonul „Vreau acest model" pe fiecare cartonaș.
+   * Pe orice cabinet: nimic din toate astea.
+   */
+  paginaVanzare?: boolean;
 }) {
   /*
     Lista lipsește cu totul pe un site abia provizionat: `creeaza_client` pune
@@ -91,7 +100,23 @@ export function Portfolio({
   const vitrina = variant === "vitrina";
 
   return (
-    <Section tone={tone} id="programe">
+    <Section tone={tone} id={paginaVanzare ? "modele" : "programe"}>
+      {/*
+        Ancora veche, păstrată pe pagina de vânzare: un `/#programe` pus înainte
+        (într-un buton din panou, într-un link trimis cuiva) duce tot aici.
+        Goală și fără înălțime — e doar un reper pentru browser. Urcată cât
+        spațiul de sus al secțiunii, ca saltul să se oprească exact unde se
+        oprește și `#modele`, nu cu o bandă mai jos; `relative` nu mută nimic
+        altceva din jur.
+      */}
+      {paginaVanzare && (
+        <span
+          id="programe"
+          aria-hidden
+          style={{ display: "block", height: 0, position: "relative", top: "calc(-1 * var(--t-spatiere))" }}
+        />
+      )}
+
       <SectionHeading
         eyebrow={data.eyebrow}
         titlu={data.titlu}
@@ -132,7 +157,7 @@ export function Portfolio({
       >
         {elemente.map((element, i) =>
           vitrina ? (
-            <CartonasVitrina key={`${element.titlu}-${i}`} element={element} />
+            <CartonasVitrina key={`${element.titlu}-${i}`} element={element} paginaVanzare={paginaVanzare} />
           ) : (
           <li
             key={`${element.titlu}-${i}`}
@@ -324,10 +349,15 @@ export function Portfolio({
  */
 function CartonasVitrina({
   element,
+  paginaVanzare,
 }: {
   element: PortfolioData["elemente"][number];
+  paginaVanzare: boolean;
 }) {
   const href = element.buton?.href?.trim() || null;
+  const numeModel = element.titlu?.trim() ?? "";
+  // Butonul cere un nume: fără el n-ar avea ce model să aleagă în formular.
+  const cuButon = paginaVanzare && numeModel !== "";
 
   /*
     CĂSUȚA E FIXĂ, POZA O UMPLE, ALINIATĂ SUS.
@@ -379,23 +409,65 @@ function CartonasVitrina({
         }}
       />
 
-      <h3
+      {/* Cu butonul, numele stă pe rândul lui, mai jos — vezi `randJos`. */}
+      {!cuButon && (
+        <h3 style={{ ...STIL_NUME_MODEL, position: "absolute", right: "20px", bottom: "20px", left: "20px" }}>
+          {element.titlu}
+        </h3>
+      )}
+    </div>
+  );
+
+  /*
+    Pagina de vânzare: butonul „Vreau acest model" (brief 2.2) și numele, pe
+    ACELAȘI rând de jos, peste poză — cartonașul rămâne poza cu numele, cum l-a
+    aprobat proprietarul pe 21–22 sept., fără o bandă nouă sub ea.
+
+    Un rând flex, nu două bucăți puse la poziții fixe: textul butonului se poate
+    schimba (`TEXTE_VANZARE`), iar numele modelului la fel; așa își împart singure
+    lățimea, iar un nume lung coboară pe două rânduri în loc să intre sub buton.
+    Rândul nu prinde clicuri (`pointerEvents: none`), doar butonul: clicul pe nume
+    sau pe poză ajunge la linkul demo-ului de dedesubt. Butonul e frate cu acel
+    link, nu în el — un link în alt link nu e voie.
+  */
+  const randJos = cuButon && (
+    <div
+      style={{
+        position: "absolute",
+        right: "20px",
+        bottom: "20px",
+        left: "20px",
+        display: "flex",
+        alignItems: "flex-end",
+        justifyContent: "space-between",
+        gap: "12px",
+        pointerEvents: "none",
+      }}
+    >
+      <a
+        href="#contact"
+        {...{ [ATRIBUT_MODEL]: numeModel }}
         style={{
-          position: "absolute",
-          right: "20px",
-          bottom: "20px",
-          left: "20px",
-          margin: 0,
-          textAlign: "right",
-          fontSize: "clamp(20px, 2.6vw, 28px)",
-          lineHeight: 1.15,
-          fontWeight: 700,
-          color: "#fff",
-          textWrap: "pretty",
+          pointerEvents: "auto",
+          flexShrink: 0,
+          whiteSpace: "nowrap",
+          display: "inline-flex",
+          alignItems: "center",
+          padding: "8px 14px",
+          borderRadius: "999px",
+          background: "#fff",
+          color: "#1a1a1a",
+          fontSize: "13px",
+          fontWeight: 600,
+          lineHeight: 1.2,
+          textDecoration: "none",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.18)",
         }}
       >
-        {element.titlu}
-      </h3>
+        {TEXTE_VANZARE.butonModel}
+      </a>
+
+      <h3 style={{ ...STIL_NUME_MODEL, minWidth: 0 }}>{element.titlu}</h3>
     </div>
   );
 
@@ -403,6 +475,8 @@ function CartonasVitrina({
     <li
       className="cartonas-vitrina"
       style={{
+        // Reperul butonului „Vreau acest model", pus peste poză în colțul din stânga jos.
+        position: "relative",
         display: "flex",
         flexDirection: "column",
         overflow: "hidden",
@@ -419,12 +493,33 @@ function CartonasVitrina({
       }}
     >
       {href ? (
-        <a href={href} style={{ display: "block", color: "inherit", textDecoration: "none" }}>
+        <a
+          href={href}
+          // Pe pagina de vânzare demo-ul se deschide în filă nouă (brief 2.2): omul
+          // compară modele, iar pagina cu toate modelele trebuie să-i rămână deschisă.
+          // `noopener noreferrer`: demo-ul e alt site și nu primește acces la fereastra asta.
+          {...(paginaVanzare ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          style={{ display: "block", color: "inherit", textDecoration: "none" }}
+        >
           {continut}
         </a>
       ) : (
         continut
       )}
+
+      {/* Alegerea modelului în formular o face `ContactForm`, la clic pe buton. */}
+      {randJos}
     </li>
   );
 }
+
+/** Numele modelului scris peste poză, pe voalul întunecat. */
+const STIL_NUME_MODEL = {
+  margin: 0,
+  textAlign: "right",
+  fontSize: "clamp(20px, 2.6vw, 28px)",
+  lineHeight: 1.15,
+  fontWeight: 700,
+  color: "#fff",
+  textWrap: "pretty",
+} as const;

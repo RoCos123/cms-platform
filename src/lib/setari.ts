@@ -173,6 +173,65 @@ export const CAMPURI_SOCIAL: CampSchema[] = [
   },
 ];
 
+/**
+ * Datele firmei — DOAR pe pagina de vânzare (brief 9 oct. 2026, punctul 4).
+ *
+ * Grupul apare în Setări numai când site-ul e marcat `vanzare`; la cabinete nu
+ * există nici în formular, nici la salvare. Stau tot în `site_settings.brand`,
+ * cu prefixul `firma`, ca să nu se amestece cu datele cabinetului.
+ *
+ * Telefonul, WhatsApp-ul și emailul de aici sunt ALTELE decât cele din „Datele
+ * cabinetului": acelea apar în antet, în subsol și ca bulă verde în colț; astea,
+ * doar lângă formularul de contact — exact unde le cere brieful. Gol = nimic pe
+ * pagină: nici etichetă, nici spațiu.
+ */
+export const CAMPURI_FIRMA: CampSchema[] = [
+  {
+    tip: "text",
+    cheie: "firmaDenumire",
+    eticheta: "Denumirea firmei",
+    hint: "Cum apare în actele firmei. Apare în subsol, pe rândul de jos.",
+    max: 120,
+  },
+  { tip: "text", cheie: "firmaCui", eticheta: "CUI", hint: "Apare în subsol, după denumire.", max: 20 },
+  {
+    tip: "text",
+    cheie: "firmaRegCom",
+    eticheta: "Nr. de ordine în Registrul Comerțului",
+    hint: "Apare în subsol.",
+    max: 40,
+  },
+  { tip: "text", cheie: "firmaSediu", eticheta: "Sediul", hint: "Adresa sediului social. Apare în subsol.", max: 200 },
+  {
+    tip: "text",
+    cheie: "firmaTelefon",
+    eticheta: "Telefon",
+    hint: "Apare lângă formularul de contact, ca număr pe care se poate apăsa.",
+    max: 40,
+  },
+  {
+    tip: "text",
+    cheie: "firmaWhatsapp",
+    eticheta: "WhatsApp",
+    hint: "Apare lângă formularul de contact; apăsat, deschide o conversație. Scrie-l cum vrei — „0722…” sau „+40 722…”.",
+    max: 40,
+  },
+  {
+    tip: "email",
+    cheie: "firmaEmail",
+    eticheta: "Adresa de email",
+    hint: "Apare lângă formularul de contact.",
+    max: 200,
+  },
+  {
+    tip: "text",
+    cheie: "firmaTva",
+    eticheta: "Mențiunea despre TVA",
+    hint: "Apare sub preț, exact cum o scrii.",
+    max: 120,
+  },
+];
+
 /** Ce citește site-ul public din `site_settings.brand`. */
 export type Brand = {
   /** Numele psihologului ca om, separat de numele legal al cabinetului. */
@@ -189,6 +248,15 @@ export type Brand = {
   adresa?: string;
   acreditare?: string;
   descriereSubsol?: string;
+  /** Datele firmei: doar pe pagina de vânzare (vezi `CAMPURI_FIRMA`). */
+  firmaDenumire?: string;
+  firmaCui?: string;
+  firmaRegCom?: string;
+  firmaSediu?: string;
+  firmaTelefon?: string;
+  firmaWhatsapp?: string;
+  firmaEmail?: string;
+  firmaTva?: string;
 };
 
 export type Seo = {

@@ -52,12 +52,24 @@ export function linkPachete(date: unknown): LinkAntet | null {
  * rămâne blocat, cu impresia că site-ul e stricat. „/#despre" spune „du-te la
  * prima pagină, la secțiunea despre", și merge de oriunde.
  */
+/** Textele intrărilor fixe din meniu. Pagina de vânzare și le ia din textele ei. */
+export type EticheteMeniu = { despre: string; servicii: string; blog: string; contact: string };
+
+const ETICHETE_IMPLICITE: EticheteMeniu = {
+  despre: "Despre",
+  servicii: "Servicii",
+  blog: "Blog",
+  contact: "Contact",
+};
+
 export function linkuriImplicite({
   areDespre,
   paginaServicii,
   blog,
   paginiProprii,
   linkuriSectiuni = [],
+  linkuriDeInceput = [],
+  etichete = ETICHETE_IMPLICITE,
 }: {
   areDespre: boolean;
   paginaServicii: boolean;
@@ -65,17 +77,25 @@ export function linkuriImplicite({
   paginiProprii: LinkAntet[];
   /** Intrări cerute de secțiuni (ex. „Prețuri"); vin după „Servicii". */
   linkuriSectiuni?: LinkAntet[];
+  /**
+   * Intrări puse ÎNAINTEA lui „Servicii" — azi doar „Modele", pe pagina de vânzare,
+   * unde galeria de modele e prima secțiune după deschidere (brief 2.1).
+   */
+  linkuriDeInceput?: LinkAntet[];
+  /** Textele intrărilor fixe. Lipsă = cele de pe orice cabinet. */
+  etichete?: EticheteMeniu;
 }): LinkAntet[] {
   return [
-    ...(areDespre ? [{ text: "Despre", href: `/#${ANCORE_SECTIUNI.aboutTeaser.ancora}` }] : []),
-    { text: "Servicii", href: paginaServicii ? "/servicii" : "/#servicii" },
+    ...(areDespre ? [{ text: etichete.despre, href: `/#${ANCORE_SECTIUNI.aboutTeaser.ancora}` }] : []),
+    ...linkuriDeInceput,
+    { text: etichete.servicii, href: paginaServicii ? "/servicii" : "/#servicii" },
     ...linkuriSectiuni,
     // Un meniu cu patru intrări din care una nu face nimic e mai rău decât unul
     // cu trei: prima dă impresia unui site stricat, a doua e doar un site fără blog.
-    ...(blog ? [{ text: "Blog", href: blog === "pagina" ? "/blog" : "/#articole" }] : []),
+    ...(blog ? [{ text: etichete.blog, href: blog === "pagina" ? "/blog" : "/#articole" }] : []),
     // Paginile proprii intră aici, nu la coadă: „Contact" rămâne ultimul, unde
     // îl caută toată lumea de douăzeci de ani încoace.
     ...paginiProprii,
-    { text: "Contact", href: "/#contact" },
+    { text: etichete.contact, href: "/#contact" },
   ];
 }

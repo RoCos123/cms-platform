@@ -66,6 +66,8 @@ export function Contact({
   tone = "deschis",
   friendly,
   card,
+  modele,
+  detaliiFirma,
 }: {
   data: ContactData;
   tone?: SectionTone;
@@ -84,6 +86,17 @@ export function Contact({
    * pe banda deschisă „relief" pe care stă contactul.
    */
   card?: boolean;
+  /**
+   * Doar pe pagina de vânzare: modelele din galerie. Aduc în formular telefonul,
+   * modelul preferat și mesajul (vezi `ContactForm`). Lipsă = formularul de cabinet.
+   */
+  modele?: readonly string[];
+  /**
+   * Doar pe pagina de vânzare: telefonul, WhatsApp-ul și emailul firmei, din Setări
+   * (brief 9 oct. 2026, punctul 4). Se adaugă după rândurile scrise în secțiune,
+   * fiecare cu adresa lui deja făcută (WhatsApp-ul nu e un `tel:`).
+   */
+  detaliiFirma?: { eticheta: string; valoare: string; href?: string }[];
 }) {
   /*
     Fără un titlu, secțiunea nu se randează deloc.
@@ -94,7 +107,10 @@ export function Contact({
   */
   if (!data.titlu?.trim()) return null;
 
-  const detalii = data.detalii ?? [];
+  const detalii: { eticheta: string; valoare: string; href?: string }[] = [
+    ...(data.detalii ?? []),
+    ...(detaliiFirma ?? []),
+  ];
 
   // Cheia publică lipsă înseamnă că platforma n-are casetă anti-spam
   // configurată: nu o randăm. Serverul sare, la rândul lui, peste verificare —
@@ -116,6 +132,7 @@ export function Contact({
       // „Trimite", nu „Sună-mă": telefonul a fost scos, formularul trimite
       // acum numele și emailul, nu deschide un apel.
       textButon={data.textButon ?? "Trimite"}
+      modele={modele}
     />
   );
 
@@ -206,7 +223,7 @@ export function Contact({
           {detalii.length > 0 && (
             <dl style={{ margin: 0, display: "flex", flexDirection: "column", gap: "clamp(20px, 2.4vw, 28px)" }}>
               {detalii.map((detaliu) => {
-                const adresa = adresaDedusa(detaliu.valoare);
+                const adresa = detaliu.href ?? adresaDedusa(detaliu.valoare);
 
                 return (
                   <div
@@ -319,7 +336,7 @@ export function Contact({
               }}
             >
               {detalii.map((detaliu) => {
-                const adresa = adresaDedusa(detaliu.valoare);
+                const adresa = detaliu.href ?? adresaDedusa(detaliu.valoare);
 
                 return (
                   <div
@@ -401,7 +418,7 @@ export function Contact({
           {detalii.length > 0 && (
             <dl style={{ margin: "40px 0 0", display: "flex", flexDirection: "column", gap: "20px" }}>
               {detalii.map((detaliu) => {
-                const adresa = adresaDedusa(detaliu.valoare);
+                const adresa = detaliu.href ?? adresaDedusa(detaliu.valoare);
 
                 return (
                 <div key={detaliu.eticheta}>

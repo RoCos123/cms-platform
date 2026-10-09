@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, Ref } from "react";
 import { CAMP_CAPCANA } from "@/lib/formulare";
 
 /**
@@ -66,19 +66,23 @@ export function Camp({
   autoComplete,
   placeholder,
   obligatoriu = true,
+  sufixOptional = "(opțional)",
 }: {
   id: string;
   name: string;
   eticheta: string;
   eroare?: string;
   valoare?: string;
-  tip?: "text" | "email";
+  /** „tel" doar pe pagina de vânzare (9 oct. 2026); formularele de cabinet n-au telefon. */
+  tip?: "text" | "email" | "tel";
   /** Dacă e dat, câmpul e `<textarea>` cu atâtea rânduri. */
   randuri?: number;
   maxLength?: number;
   autoComplete?: string;
   placeholder?: string;
   obligatoriu?: boolean;
+  /** Ce scrie lângă eticheta unui câmp neobligatoriu. Pagina de vânzare îl ia din textele ei. */
+  sufixOptional?: string;
 }) {
   const idEroare = `${id}-eroare`;
 
@@ -101,7 +105,7 @@ export function Camp({
       <label htmlFor={id} style={{ fontSize: "14px", fontWeight: 600 }}>
         {eticheta}
         {!obligatoriu && (
-          <span style={{ fontWeight: 400, color: "var(--s-text-secundar)" }}> (opțional)</span>
+          <span style={{ fontWeight: 400, color: "var(--s-text-secundar)" }}> {sufixOptional}</span>
         )}
       </label>
 
@@ -110,6 +114,76 @@ export function Camp({
       ) : (
         <input {...legaturi} type={tip} />
       )}
+
+      {eroare && (
+        <p id={idEroare} style={{ margin: 0, fontSize: "14px", color: "var(--s-eroare)" }}>
+          {eroare}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * O listă din care se alege o singură valoare — azi doar „Modelul preferat", pe
+ * pagina de vânzare (9 oct. 2026).
+ *
+ * Necontrolată (`defaultValue`), ca și câmpurile de text. Dar, spre deosebire de
+ * ele, o listă își citește `defaultValue` doar la montare: ca alegerea omului să
+ * rămână după o trimitere, cine o folosește îi dă un `key` nou la fiecare
+ * încercare (vezi `ContactForm`). `ref` e pentru butonul „Vreau acest model",
+ * care alege modelul din afara formularului.
+ *
+ * `colorScheme`: lista desfășurată o desenează browserul, cu culorile lui. Pe o
+ * secțiune închisă, textul moștenit e deschis la culoare, iar fără schemă
+ * întunecată opțiunile ar ieși scris deschis pe alb, adică necitibile.
+ */
+export function Selectie({
+  id,
+  name,
+  eticheta,
+  optiuni,
+  valoare,
+  eroare,
+  schemaCulori,
+  refSelectie,
+}: {
+  id: string;
+  name: string;
+  eticheta: string;
+  optiuni: readonly string[];
+  valoare?: string;
+  eroare?: string;
+  schemaCulori: "light" | "dark";
+  refSelectie?: Ref<HTMLSelectElement>;
+}) {
+  const idEroare = `${id}-eroare`;
+  // O valoare care nu mai e în listă (modelul a fost redenumit între timp) nu se
+  // poate arăta — cade pe prima opțiune, nu pe un gol.
+  const aleasa = valoare && optiuni.includes(valoare) ? valoare : optiuni[0];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+      <label htmlFor={id} style={{ fontSize: "14px", fontWeight: 600 }}>
+        {eticheta}
+      </label>
+
+      <select
+        ref={refSelectie}
+        id={id}
+        name={name}
+        className="camp-public"
+        defaultValue={aleasa}
+        aria-describedby={eroare ? idEroare : undefined}
+        aria-invalid={eroare ? true : undefined}
+        style={{ ...stilControl(Boolean(eroare)), colorScheme: schemaCulori }}
+      >
+        {optiuni.map((optiune) => (
+          <option key={optiune} value={optiune}>
+            {optiune}
+          </option>
+        ))}
+      </select>
 
       {eroare && (
         <p id={idEroare} style={{ margin: 0, fontSize: "14px", color: "var(--s-eroare)" }}>

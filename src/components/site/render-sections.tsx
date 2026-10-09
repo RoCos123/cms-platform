@@ -20,6 +20,7 @@ import {
   type ProgramareData,
 } from "./sections/programare";
 import { Pricing, type PricingData } from "./sections/pricing";
+import { randurileDeContact, type DateFirma } from "@/lib/pagina-vanzare";
 
 /** Un rând din `site_content`, așa cum vine din baza de date. */
 export type SectionRow = {
@@ -76,6 +77,19 @@ export type SectionContext = {
    * design/sabloane/README.md).
    */
   asezari: TemplateAsezari;
+  /**
+   * DOAR pe pagina de vânzare (`sites.tip = 'vanzare'`, 9 oct. 2026). Lipsă pe
+   * orice site de cabinet — iar lipsa înseamnă: totul ca până acum.
+   */
+  paginaVanzare?: PaginaVanzare | null;
+};
+
+/** Ce știu secțiunile despre pagina de vânzare. */
+export type PaginaVanzare = {
+  /** Numele modelelor din galerie, în ordinea de pe pagină (vezi `numeleModelelor`). */
+  modele: string[];
+  /** Datele firmei din Setări, doar cele completate (vezi `dateleFirmei`). */
+  firma: DateFirma;
 };
 
 /**
@@ -164,6 +178,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       tone={row.tone}
       friendly={ctx.asezari.pricingFriendly}
       variant={row.variant}
+      mentiuneTva={ctx.paginaVanzare?.firma.tva}
     />
   ),
   faq: (row, ctx) => (
@@ -185,8 +200,13 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
     />
   ),
   logos: (row) => <Logos data={row.data as LogosData} tone={row.tone} />,
-  portfolio: (row) => (
-    <Portfolio data={row.data as PortfolioData} tone={row.tone} variant={row.variant} />
+  portfolio: (row, ctx) => (
+    <Portfolio
+      data={row.data as PortfolioData}
+      tone={row.tone}
+      variant={row.variant}
+      paginaVanzare={Boolean(ctx.paginaVanzare)}
+    />
   ),
   contact: (row, ctx) => (
     <Contact
@@ -194,6 +214,8 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       tone={row.tone}
       friendly={ctx.asezari.contactFriendly}
       card={ctx.asezari.contactCard}
+      modele={ctx.paginaVanzare?.modele}
+      detaliiFirma={ctx.paginaVanzare ? randurileDeContact(ctx.paginaVanzare.firma) : undefined}
     />
   ),
   programare: (row, ctx) => (

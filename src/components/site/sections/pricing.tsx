@@ -47,6 +47,7 @@ export function Pricing({
   tone,
   friendly,
   variant,
+  mentiuneTva,
 }: {
   data: PricingData;
   tone?: SectionTone;
@@ -61,6 +62,11 @@ export function Pricing({
    * din SQL; vezi `tabel-comparativ.tsx`. Lipsa sau orice altceva = fără tabel.
    */
   variant?: string | null;
+  /**
+   * Doar pe pagina de vânzare: mențiunea despre TVA din Setări → „Datele firmei"
+   * (brief 9 oct. 2026, punctul 4), sub prețul fiecărui pachet. Goală = nimic.
+   */
+  mentiuneTva?: string;
 }) {
   const pachete = data.pachete ?? [];
   if (pachete.length === 0) return null;
@@ -177,6 +183,9 @@ export function Pricing({
                       {pachet.subPret}
                     </p>
                   )}
+                  {mentiuneTva && (
+                    <p style={{ margin: "4px 0 0", fontSize: "13px", color: textSecundar }}>{mentiuneTva}</p>
+                  )}
                 </div>
 
                 {pachet.descriere && (
@@ -283,7 +292,8 @@ export function Pricing({
  * puțin 600px, iar sub atât s-ar derula pe orizontală chiar pe laptop. Cu baza de
  * 600px, cele două stau alături doar cât încap întregi; altfel tabelul coboară sub
  * pachete, ca pe telefon. `minWidth: 0` lasă coloana tabelului să se strângă pe
- * telefon, unde derularea rămâne înăuntrul tabelului, nu a paginii.
+ * telefon, unde tabelul devine câte un card pe rând (9 oct. 2026), deci nu se mai
+ * derulează nimic în lateral.
  *
  * `stretch`: alături, cele două coloane au aceeași înălțime, iar căsuța și
  * tabelul o umplu (`height: 100%`), deci se termină pe aceeași linie — cerut de

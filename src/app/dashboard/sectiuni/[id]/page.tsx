@@ -16,6 +16,8 @@ import { rescrieAdresele, rescrieAdreseleFisiere } from "@/lib/imagini";
 import { adresaImaginii, adresaFisierului } from "@/lib/imagini-adrese";
 import { construiesteDestinatii, ANCORE_SECTIUNI } from "@/lib/destinatii";
 import { documenteleBibliotecii } from "@/lib/imagini-panou";
+import { modeleleDePePagina, tipulSiteului } from "@/lib/pagina-vanzare-date";
+import { dateleFirmei } from "@/lib/pagina-vanzare";
 
 export default async function EditorSectiunePage({
   params,
@@ -95,6 +97,8 @@ export default async function EditorSectiunePage({
     { data: paginiPublicate },
     documente,
     oreProgramare,
+    tip,
+    modele,
   ] = await Promise.all([
     // Previzualizarea „Articolelor recente” arată articole adevărate, nu
     // exemple: altfel clientul n-ar avea cum să vadă că secțiunea dispare
@@ -103,7 +107,8 @@ export default async function EditorSectiunePage({
     // Doar cele publicate, ca previzualizarea să arate exact ce vede un
     // vizitator — inclusiv atunci când asta înseamnă „nimic încă”.
     serviciiPublicate(session.siteId),
-    supabase.from("site_settings").select("pagini").eq("site_id", session.siteId).maybeSingle(),
+    // `brand` doar pentru pagina de vânzare: datele firmei apar lângă formular și sub preț.
+    supabase.from("site_settings").select("pagini, brand").eq("site_id", session.siteId).maybeSingle(),
     // Unde poate duce un buton: secțiunile VIZIBILE (au ancoră pe pagină) și
     // paginile publicate. Doar așa butonul nu ajunge la un loc inexistent.
     supabase.from("site_content").select("key").eq("site_id", session.siteId).eq("visible", true),
@@ -118,6 +123,10 @@ export default async function EditorSectiunePage({
     // Aceleași ore ca pe site: previzualizarea secțiunii de programare trebuie
     // să arate exact ce vede un vizitator — inclusiv că se stinge fără ore libere.
     oreDeAratatPePrimaPagina(session.siteId, moduleleSiteului(site).programari),
+    // Pagina de vânzare are alt formular de contact (cu modelele din galerie);
+    // previzualizarea trebuie să-l arate pe acela, nu pe al unui cabinet.
+    tipulSiteului(session.siteId),
+    modeleleDePePagina(session.siteId),
   ]);
 
   const destinatii = construiesteDestinatii(
@@ -148,6 +157,7 @@ export default async function EditorSectiunePage({
       oreProgramare={oreProgramare}
       destinatii={destinatii}
       documente={documente}
+      paginaVanzare={tip === "vanzare" ? { modele, firma: dateleFirmei(setari?.brand) } : null}
     />
   );
 }
