@@ -215,17 +215,18 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
    provizionarea ca o linie de SQL, CI cu probe.
 
 **B. Înainte de a arăta produsul (site-ul de vânzări `sitepsihologi`)**
-1. **Domeniul `sitepsihologi.ro`** — acum site-ul stă pe `sitepsihologi.vercel.app`,
-   nepublicat și neindexat.
-2. **Textul proprietarului:** „Cine ești?" și în câte zile se livrează. (8 oct.:
-   în tabelul comparativ din „Pachete" scrie acum „maxim 5 zile lucrătoare"; textul
-   din „Cum decurge" spune încă „În câteva zile", fără număr.)
+*Adus la zi pe 9 oct., după citirea din bază și brieful din aceeași zi.*
+1. **Domeniul `sitepsihologi.ro`** — site-ul stă pe `sitepsihologi.vercel.app`,
+   PUBLICAT din 8 sept. (comutatorul e pornit), dar neindexat: `robots.txt` refuză
+   dinadins adresele `*.vercel.app`. Indexarea se deschide la mutarea pe domeniu
+   (legat în Vercel, apoi `sites.domain` schimbat din SQL).
+2. **Textul proprietarului:** „Cine ești?". (Livrarea e lămurită: și „Cum decurge",
+   și tabelul spun acum „maxim 5 zile lucrătoare" — citirea din 9 oct.)
 3. **Secțiunea de păreri:** trei locuri goale, dinadins — **nu se inventează
-   recenzii**; ori vin păreri adevărate, ori rămâne stinsă la publicare.
-4. **Galeria de șabloane:** capturile sunt făcute (7 oct.); de verificat că fiecare
-   cartonaș duce la adresa `model-…` și că adresele vechi `cosmin-…` au fost scoase
-   din Vercel.
-5. **Comutatorul de publicare** — ultimul pas.
+   recenzii**; proprietarul o ascunde din panou până vin păreri adevărate (9 oct.).
+4. **Galeria de modele:** fiecare cartonaș duce la `model-….vercel.app` (citirea din
+   9 oct.). Nu știu dacă adresele vechi `cosmin-…` au fost scoase din Vercel.
+5. **Comutatorul de publicare** — deja pornit (8 sept.).
 6. **Ordinea hotărâtă pe 27 aug.:** site-ul proprietarului, făcut primul cap la
    cap; apoi site-ul firmei de web design; abia apoi clienții.
 7. **Textele despre domeniu și mentenanță** (7 oct.): după hotărârea că clientul
@@ -233,10 +234,14 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
    patru locuri. „Pachete" a fost rescrisă de proprietar pe site (captura din 7
    oct.: un singur pachet, nota fără domeniu). Rămâne de văzut pasul „Îmi scrii"
    din „Cum decurge", iar `src/app/proba-vanzari/continut.ts` are încă textele
-   vechi. De lămurit: pe site, „Modul integrat de programări online" e în pachetul
-   de 300 €, deși programările sunt modul contra cost (27 aug.).
-8. **Tabelul comparativ din „Pachete"** (7 oct.): codul e gata; pe site-ul viu
-   apare abia după linia de SQL din §„Tabelul comparativ din «Pachete»".
+   vechi. De lămurit: pe site, programările apar ca INCLUSE în cei 300 € în trei
+   locuri (pachetul, cartonașul „Programări direct de pe site", tabelul — citirea din
+   9 oct.), deși pe 27 aug. erau modul contra cost.
+8. ~~**Tabelul comparativ din „Pachete"**~~ — făcut: SQL-ul rulat pe 8 oct., codul pe master.
+9. **Brieful din 9 oct.:** codul e pe master; rămân la proprietar textele din panou,
+   titlul și descrierea din Setări, „Datele firmei", politica de confidențialitate a
+   paginii de vânzare și FAQ-ul (fraza „Noi nu avem acces…", opțiunile programărilor).
+   Lista exactă: `RAPORT-BRIEF-SITEPSIHOLOGI.md`, secțiunea 7.
 
 **C. Verificări înainte de lansare**
 - `DEV_TENANT_DOMAIN` să NU fie setat pe Production (pinuiește orice `*.vercel.app`
