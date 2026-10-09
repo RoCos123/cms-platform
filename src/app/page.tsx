@@ -25,7 +25,6 @@ import { TEXTE_VANZARE, dateleFirmei, numeleModelelor } from "@/lib/pagina-vanza
 import { tipulSiteului } from "@/lib/pagina-vanzare-date";
 import { linkurilePaginilor } from "@/lib/pagini-publice";
 import { MARIMEA_CARTONASULUI } from "@/lib/cartonas-masuri";
-import { contineUmplutura } from "@/lib/umplutura";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { siteId, domain } = await getTenant();
@@ -120,18 +119,10 @@ export default async function PublicHomePage() {
    * iar o adresă absolută rămasă în conținut nu trebuie să mai poată fi randată
    * deloc. Vezi `rescrieAdresele` în src/lib/imagini.ts.
    */
-  const sections = ((rows ?? []) as unknown as SectionRow[])
-    /*
-     * Regula de platformă din 9 oct. 2026 (brief 1.2): o secțiune care încă are
-     * text de umplutură — „[Numele]", „[Aici vine…]" — nu ajunge pe site. În panou
-     * rămâne, cu tot cu text (acolo nu trece pe aici). Filtrul stă ÎNAINTEA
-     * întrebărilor de mai jos, ca nici datele structurate să nu le preia.
-     */
-    .filter((rand) => !contineUmplutura(rand.data))
-    .map((rand) => ({
-      ...rand,
-      data: rescrieAdreseleFisiere(rescrieAdresele(rand.data, adresaImaginii), adresaFisierului),
-    }));
+  const sections = ((rows ?? []) as unknown as SectionRow[]).map((rand) => ({
+    ...rand,
+    data: rescrieAdreseleFisiere(rescrieAdresele(rand.data, adresaImaginii), adresaFisierului),
+  }));
 
   /**
    * Întrebările pentru `FAQPage` se iau din secțiunea de pe pagină, nu din tot

@@ -88,6 +88,27 @@ linkul „Despre" din antet apare doar când secțiunea e pornită (§„Linkul 
 antet"); „Prețuri" în bara de sus, dintr-un câmp al secțiunii „Pachete" (§„«Prețuri» în
 bara de sus"); ochișorul la parolă (7 oct.).
 
+**Brieful din 9 oct. 2026 — pagina de vânzare (ÎN LUCRU).** Pe branch-ul
+`claude/brief-sitepsihologi`, nimic pe master, nimic în producție până nu aprobă
+proprietarul. Ce e făcut în cod: marcajul `sites.tip` ('cabinet' implicit /
+'vanzare'; migrarea `20261009120000_pagina_de_vanzare.sql`, **nerulată încă** în
+Supabase), formularul cu telefon, model preferat și mesaj doar pe pagina de vânzare
+(excepția e scrisă la §„Fără câmpuri de text liber…"), galeria „Modele" (`#modele`,
+`#programe` merge în continuare, demo în filă nouă, „Vreau acest model"), „Modele"
+primul în bară, subsolul cu o singură listă, alt text propriu la cartonașul de
+distribuire, tabelul pe carduri pe ecran îngust, „Datele firmei" în Setări (doar pe
+vânzare), bifa de acord legată singură de politica publicată. Textele scrise în cod
+ale paginii stau în `src/lib/pagina-vanzare.ts`. Hotărârile proprietarului, de ținut:
+- **Regula 1.2 din brief NU se aplică** (9 oct.): nimic nu se ascunde automat din
+  cauza textului între [ ], pe niciun site, și nu există script de verificare.
+  Secțiunile necompletate (ex. „Păreri" pe sitepsihologi) le ascunde el din panou.
+- Întrebările frecvente le schimbă el din panou: nu se ating nici în cod, nici în SQL.
+- Tabelul comparativ rămâne în cod (hotărârea din 7 oct.); cifra „5" rămâne scrisă de mână.
+- Adresa canonică rămâne `sites.domain`; trece pe `sitepsihologi.ro` abia după ce
+  proprietarul confirmă că domeniul e legat și răspunde.
+Rămase: SQL-ul de texte (din exportul cerut proprietarului), alegerea titlului pentru
+Google (cel din brief are 73 de caractere, Setări primește 60) și raportul final.
+
 **Lucrări de la 1 la 7 oct.** (fiecare are secțiunea ei mai jos; aici doar lista):
 rama de poziționare ia forma locului (1 oct.), mărirea pozei pe ambele axe,
 „Păreri" pe verde și cartonașele de servicii refăcute la Liniște (3 oct.),

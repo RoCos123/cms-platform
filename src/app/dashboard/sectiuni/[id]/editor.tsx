@@ -18,7 +18,6 @@ import type { MetaSectiune } from "@/lib/sectiuni";
 import type { Destinatie } from "@/lib/destinatii";
 import type { OptiuneDocument } from "@/lib/uploads";
 import { catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
-import { contineUmplutura } from "@/lib/umplutura";
 import { salveazaSectiune } from "../actions";
 
 export function EditorSectiune({
@@ -121,15 +120,6 @@ export function EditorSectiune({
           {meta.continutDinAltaParte && (
             <p className="mt-3 max-w-2xl rounded-base border border-border bg-surface p-3 text-sm text-muted-foreground">
               {meta.continutDinAltaParte}
-            </p>
-          )}
-
-          {/* Regula din 9 oct. 2026: cu text de umplutură, secțiunea nu apare pe site. */}
-          {contineUmplutura(datePreviz) && (
-            <p className="mt-3 max-w-2xl rounded-base border border-warning/30 bg-warning-surface p-3 text-sm text-warning">
-              Secțiunea nu apare pe site cât timp are un text întreg între paranteze drepte, ca
-              „[Numele]” — e semnul unui loc încă necompletat. Aici, în panou, o vezi în
-              continuare.
             </p>
           )}
         </div>

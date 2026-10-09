@@ -14,8 +14,6 @@ export type RandSectiune = {
   vizibil: boolean;
   /** Conținut demonstrativ, pus de noi la provizionare — nu scris de client. */
   demo: boolean;
-  /** Are text de umplutură („[Numele]") — deci nu apare pe site, oricât ar fi de vizibilă aici. */
-  umplutura: boolean;
 };
 
 /**
@@ -128,11 +126,6 @@ export function ListaSectiuni({ initiale }: { initiale: RandSectiune[] }) {
                   {rand.demo && (
                     <span className="rounded-base border border-border px-2 py-0.5 text-xs font-normal text-muted-foreground">
                       text demonstrativ
-                    </span>
-                  )}
-                  {rand.vizibil && rand.umplutura && (
-                    <span className="rounded-base border border-warning/30 bg-warning-surface px-2 py-0.5 text-xs font-normal text-warning">
-                      nu apare pe site: are text de completat între [ ]
                     </span>
                   )}
                 </p>
