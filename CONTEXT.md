@@ -88,9 +88,9 @@ linkul „Despre" din antet apare doar când secțiunea e pornită (§„Linkul 
 antet"); „Prețuri" în bara de sus, dintr-un câmp al secțiunii „Pachete" (§„«Prețuri» în
 bara de sus"); ochișorul la parolă (7 oct.).
 
-**Brieful din 9 oct. 2026 — pagina de vânzare (ÎN LUCRU).** Pe branch-ul
-`claude/brief-sitepsihologi`, nimic pe master, nimic în producție până nu aprobă
-proprietarul. Ce e făcut în cod: marcajul `sites.tip` ('cabinet' implicit /
+**Brieful din 9 oct. 2026 — pagina de vânzare (PE MASTER, 9 oct.).** Lucrat pe
+branch-ul `claude/brief-sitepsihologi`, dus pe master la „fă pe master" al
+proprietarului. Raportul final, cu ce are el de făcut: `RAPORT-BRIEF-SITEPSIHOLOGI.md`. Ce e făcut în cod: marcajul `sites.tip` ('cabinet' implicit /
 'vanzare'; migrarea `20261009120000_pagina_de_vanzare.sql` **rulată în Supabase pe
 9 oct.**, iar sitepsihologi e marcat `vanzare` cu `supabase/marcheaza-sitepsihologi.sql`
 — marcajul nu schimbă nimic pe site până nu ajunge codul pe master), formularul cu telefon, model preferat și mesaj doar pe pagina de vânzare
@@ -118,7 +118,10 @@ ale paginii stau în `src/lib/pagina-vanzare.ts`. Hotărârile proprietarului, d
 - **Titlul pentru Google:** „Site-uri pentru cabinete de psihologie | sitepsihologi.ro"
   (57 de caractere; cel din brief avea 73, iar Setări primește 60). Ales de proprietar
   pe 9 oct.; îl pune el din Setări, fără nicio schimbare de cod.
-Rămase: publicarea codului (doar la „fă pe master") și raportul final.
+Rămase, toate la proprietar (secțiunea 7 din raport): textele din panou și „Păreri"
+ascunsă, titlul și descrierea din Setări, „Datele firmei", politica de
+confidențialitate, legarea domeniului sitepsihologi.ro (apoi mutăm `sites.domain`),
+fraza din FAQ despre acces și opțiunile programărilor.
 
 **Lucrări de la 1 la 7 oct.** (fiecare are secțiunea ei mai jos; aici doar lista):
 rama de poziționare ia forma locului (1 oct.), mărirea pozei pe ambele axe,
