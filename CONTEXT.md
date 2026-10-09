@@ -91,8 +91,9 @@ bara de sus"); ochișorul la parolă (7 oct.).
 **Brieful din 9 oct. 2026 — pagina de vânzare (ÎN LUCRU).** Pe branch-ul
 `claude/brief-sitepsihologi`, nimic pe master, nimic în producție până nu aprobă
 proprietarul. Ce e făcut în cod: marcajul `sites.tip` ('cabinet' implicit /
-'vanzare'; migrarea `20261009120000_pagina_de_vanzare.sql`, **nerulată încă** în
-Supabase), formularul cu telefon, model preferat și mesaj doar pe pagina de vânzare
+'vanzare'; migrarea `20261009120000_pagina_de_vanzare.sql` **rulată în Supabase pe
+9 oct.**, iar sitepsihologi e marcat `vanzare` cu `supabase/marcheaza-sitepsihologi.sql`
+— marcajul nu schimbă nimic pe site până nu ajunge codul pe master), formularul cu telefon, model preferat și mesaj doar pe pagina de vânzare
 (excepția e scrisă la §„Fără câmpuri de text liber…"), galeria „Modele" (`#modele`,
 `#programe` merge în continuare, demo în filă nouă, „Vreau acest model"), „Modele"
 primul în bară, subsolul cu o singură listă, alt text propriu la cartonașul de
@@ -117,8 +118,7 @@ ale paginii stau în `src/lib/pagina-vanzare.ts`. Hotărârile proprietarului, d
 - **Titlul pentru Google:** „Site-uri pentru cabinete de psihologie | sitepsihologi.ro"
   (57 de caractere; cel din brief avea 73, iar Setări primește 60). Ales de proprietar
   pe 9 oct.; îl pune el din Setări, fără nicio schimbare de cod.
-Rămase: SQL-ul fără texte (migrarea + marcajul `tip = 'vanzare'`, rulate de
-proprietar când hotărăște publicarea) și raportul final.
+Rămase: publicarea codului (doar la „fă pe master") și raportul final.
 
 **Lucrări de la 1 la 7 oct.** (fiecare are secțiunea ei mai jos; aici doar lista):
 rama de poziționare ia forma locului (1 oct.), mărirea pozei pe ambele axe,
