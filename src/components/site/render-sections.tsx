@@ -90,6 +90,12 @@ export type PaginaVanzare = {
   modele: string[];
   /** Datele firmei din Setări, doar cele completate (vezi `dateleFirmei`). */
   firma: DateFirma;
+  /**
+   * Adresa politicii de confidențialitate, DOAR dacă pagina e publicată. Atunci
+   * „Politica de confidențialitate" de lângă bifă devine link singură (brief,
+   * punctul 4); cât e ciornă, rămâne text.
+   */
+  linkConfidentialitate?: string;
 };
 
 /**
@@ -216,6 +222,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       card={ctx.asezari.contactCard}
       modele={ctx.paginaVanzare?.modele}
       detaliiFirma={ctx.paginaVanzare ? randurileDeContact(ctx.paginaVanzare.firma) : undefined}
+      linkConfidentialitateImplicit={ctx.paginaVanzare?.linkConfidentialitate}
     />
   ),
   programare: (row, ctx) => (

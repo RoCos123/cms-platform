@@ -209,3 +209,14 @@ test("datele firmei ajung în cele trei locuri cerute, și doar pe pagina de vâ
   // Rândul legal stă în blocul care se pune doar când există meniul paginii de vânzare.
   assert.ok(cadru.indexOf("...(meniuVanzare && {") < cadru.indexOf("rindLegal:"));
 });
+
+test("bifa de acord: „Politica de confidențialitate” devine link doar când pagina e publicată", () => {
+  const pagina = citeste("src/app/page.tsx");
+  // Lista vine din `linkurilePaginilor`, care citește doar paginile publicate.
+  assert.ok(pagina.includes("linkurilePaginilor(siteId)"));
+  assert.ok(pagina.includes("linkConfidentialitate: politica ? `/${politica.slug}` : undefined"));
+  assert.ok(citeste("src/lib/pagini-publice.ts").includes('.eq("status", "published")'));
+  // Câmpul scris în secțiune are întâietate; implicitul vine doar de pe pagina de vânzare.
+  const contact = citeste("src/components/site/sections/contact.tsx");
+  assert.ok(contact.includes("linkConfidentialitate={data.linkConfidentialitate || linkConfidentialitateImplicit}"));
+});

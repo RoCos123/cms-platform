@@ -68,6 +68,7 @@ export function Contact({
   card,
   modele,
   detaliiFirma,
+  linkConfidentialitateImplicit,
 }: {
   data: ContactData;
   tone?: SectionTone;
@@ -97,6 +98,11 @@ export function Contact({
    * fiecare cu adresa lui deja făcută (WhatsApp-ul nu e un `tel:`).
    */
   detaliiFirma?: { eticheta: string; valoare: string; href?: string }[];
+  /**
+   * Doar pe pagina de vânzare: adresa politicii de confidențialitate PUBLICATE,
+   * folosită când câmpul din secțiune e gol. Cât pagina e ciornă, lipsește.
+   */
+  linkConfidentialitateImplicit?: string;
 }) {
   /*
     Fără un titlu, secțiunea nu se randează deloc.
@@ -126,8 +132,9 @@ export function Contact({
       nota={data.notaFormular}
       textAcord={data.textAcord ?? ACORD_IMPLICIT}
       // Fără valoare implicită: `/confidentialitate` nu există încă, iar un
-      // link către o pagină inexistentă e mai rău decât lipsa lui.
-      linkConfidentialitate={data.linkConfidentialitate}
+      // link către o pagină inexistentă e mai rău decât lipsa lui. Excepția e
+      // pagina de vânzare, unde vine adresa paginii DOAR dacă e publicată.
+      linkConfidentialitate={data.linkConfidentialitate || linkConfidentialitateImplicit}
       mesajSucces={data.mesajSucces}
       // „Trimite", nu „Sună-mă": telefonul a fost scos, formularul trimite
       // acum numele și emailul, nu deschide un apel.

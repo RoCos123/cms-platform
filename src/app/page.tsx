@@ -23,6 +23,7 @@ import { CadruSite } from "@/components/site/cadru-site";
 import { DateStructurate } from "@/components/site/date-structurate";
 import { TEXTE_VANZARE, dateleFirmei, numeleModelelor } from "@/lib/pagina-vanzare";
 import { tipulSiteului } from "@/lib/pagina-vanzare-date";
+import { linkurilePaginilor } from "@/lib/pagini-publice";
 import { MARIMEA_CARTONASULUI } from "@/lib/cartonas-masuri";
 import { contineUmplutura } from "@/lib/umplutura";
 
@@ -83,7 +84,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PublicHomePage() {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, pagini, brand, seo, social }, { data: rows }, articole, servicii, tip] =
+  const [{ site, pagini, brand, seo, social }, { data: rows }, articole, servicii, tip, paginiPublicate] =
     await Promise.all([
     identitateaSiteului(siteId),
     (await tenantTable("site_content"))
@@ -101,7 +102,13 @@ export default async function PublicHomePage() {
     articolePublicate(siteId),
     serviciiPublicate(siteId),
     tipulSiteului(siteId),
+    // Memorată pe cerere: cadrul o citește oricum pentru meniu, deci nu costă.
+    linkurilePaginilor(siteId),
   ]);
+
+  // Pagina de vânzare: politica de confidențialitate, dacă e publicată (aceeași
+  // regulă ca pe pagina de programare). Ciornele nu ajung în listă.
+  const politica = paginiPublicate.find((pagina) => pagina.slug.includes("confident"));
 
   // Dublul cast e necesar cât timp nu generăm tipurile bazei de date: `tenantTable`
   // primește numele tabelului ca `string`, deci supabase-js nu poate deduce forma
@@ -189,7 +196,13 @@ export default async function PublicHomePage() {
             // Doar pe pagina de vânzare. Modelele se iau din galeria de pe
             // pagină — aceleași rânduri, deci nicio interogare în plus.
             paginaVanzare:
-              tip === "vanzare" ? { modele: numeleModelelor(sections), firma: dateleFirmei(brand) } : null,
+              tip === "vanzare"
+                ? {
+                    modele: numeleModelelor(sections),
+                    firma: dateleFirmei(brand),
+                    linkConfidentialitate: politica ? `/${politica.slug}` : undefined,
+                  }
+                : null,
           }}
         />
       ) : (
