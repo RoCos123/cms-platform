@@ -206,9 +206,10 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
    încă.** Până atunci „Ți-ai uitat parola?" poate să nu trimită emailul. Ocolire
    când un cont e blocat: intri din `/proprietar` („Intră în panou") sau pui o
    parolă nouă din Supabase → Authentication → Users.
-4. **Email tranzacțional** (mesaj nou, confirmare de programare) — **ultimul, prin
-   decizia lui explicită** (26 aug.); nu se propune Resend ca următor pas. Până
-   atunci clientul vede mesajele doar intrând în panou.
+4. **Email tranzacțional** (mesaj nou, confirmare de programare) — era „ultimul,
+   prin decizia lui explicită" (26 aug.). **Schimbat pe 9 oct.: proprietarul a cerut
+   să urmeze, în sesiunea următoare — emailul prin Resend, împreună cu resetarea
+   parolei (punctul 3).** Până atunci clientul vede mesajele doar intrând în panou.
 5. **Videoclipul de instructaj** — ultimul de tot, fiindcă se învechește la fiecare
    schimbare de ecran.
 6. ✓ Făcut: cheile hCaptcha (17 sept.), izolarea dovedită pe baza reală (10 sept.),
