@@ -116,7 +116,7 @@ export function FormularSetari({
         <Card>
           <CardHeader
             title="Datele firmei"
-            description="Doar pe acest site. Ce completezi apare lângă formularul de contact (telefon, WhatsApp, email), pe rândul de jos din subsol (denumire, CUI, Registrul Comerțului, sediu) și sub preț (TVA). Un câmp gol nu apare nicăieri."
+            description="Doar pe acest site. Denumirea, CUI-ul, Registrul Comerțului și sediul apar pe rândul de jos din subsol, iar TVA-ul sub preț. Telefonul, WhatsApp-ul și emailul de lângă formularul de contact se iau din „Datele cabinetului”, de mai sus. Un câmp gol nu apare nicăieri."
           />
           <CardBody>
             <CampuriSectiune campuri={CAMPURI_FIRMA} valoare={firma} onChange={setFirma} erori={erori} />

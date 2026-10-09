@@ -180,10 +180,10 @@ export const CAMPURI_SOCIAL: CampSchema[] = [
  * există nici în formular, nici la salvare. Stau tot în `site_settings.brand`,
  * cu prefixul `firma`, ca să nu se amestece cu datele cabinetului.
  *
- * Telefonul, WhatsApp-ul și emailul de aici sunt ALTELE decât cele din „Datele
- * cabinetului": acelea apar în antet, în subsol și ca bulă verde în colț; astea,
- * doar lângă formularul de contact — exact unde le cere brieful. Gol = nimic pe
- * pagină: nici etichetă, nici spațiu.
+ * Telefon, WhatsApp și email NU are: lângă formular apar cele din „Datele
+ * cabinetului", deja folosite în antet, în subsol și în bula verde — o singură
+ * sursă, ca numărul să nu se scrie de două ori (hotărât cu proprietarul, 9 oct.).
+ * Gol = nimic pe pagină: nici etichetă, nici spațiu.
  */
 export const CAMPURI_FIRMA: CampSchema[] = [
   {
@@ -202,27 +202,6 @@ export const CAMPURI_FIRMA: CampSchema[] = [
     max: 40,
   },
   { tip: "text", cheie: "firmaSediu", eticheta: "Sediul", hint: "Adresa sediului social. Apare în subsol.", max: 200 },
-  {
-    tip: "text",
-    cheie: "firmaTelefon",
-    eticheta: "Telefon",
-    hint: "Apare lângă formularul de contact, ca număr pe care se poate apăsa.",
-    max: 40,
-  },
-  {
-    tip: "text",
-    cheie: "firmaWhatsapp",
-    eticheta: "WhatsApp",
-    hint: "Apare lângă formularul de contact; apăsat, deschide o conversație. Scrie-l cum vrei — „0722…” sau „+40 722…”.",
-    max: 40,
-  },
-  {
-    tip: "email",
-    cheie: "firmaEmail",
-    eticheta: "Adresa de email",
-    hint: "Apare lângă formularul de contact.",
-    max: 200,
-  },
   {
     tip: "text",
     cheie: "firmaTva",
@@ -253,9 +232,6 @@ export type Brand = {
   firmaCui?: string;
   firmaRegCom?: string;
   firmaSediu?: string;
-  firmaTelefon?: string;
-  firmaWhatsapp?: string;
-  firmaEmail?: string;
   firmaTva?: string;
 };
 

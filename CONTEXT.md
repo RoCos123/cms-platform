@@ -106,6 +106,10 @@ ale paginii stau în `src/lib/pagina-vanzare.ts`. Hotărârile proprietarului, d
 - Tabelul comparativ rămâne în cod (hotărârea din 7 oct.); cifra „5" rămâne scrisă de mână.
 - Adresa canonică rămâne `sites.domain`; trece pe `sitepsihologi.ro` abia după ce
   proprietarul confirmă că domeniul e legat și răspunde.
+- **Telefonul, WhatsApp-ul și emailul de lângă formular** se iau din Setări → „Datele
+  cabinetului" (aceleași numere din antet, subsol și bula verde), ca să nu se scrie de
+  două ori; „Datele firmei" are doar denumirea, CUI-ul, Registrul Comerțului, sediul și
+  TVA-ul (propus și aprobat, 9 oct.).
 - **Textele le schimbă proprietarul, manual, din panou** (9 oct.): nu se scrie niciun
   SQL de texte și nu e nevoie de exportul cerut inițial. Singurul text schimbat de
   noi e cel din tabelul comparativ („MINIM, …" → „Minim: …"), fiindcă tabelul nu se

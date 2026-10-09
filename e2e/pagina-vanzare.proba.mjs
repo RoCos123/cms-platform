@@ -163,10 +163,23 @@ test("căsuța de mesaje nu cere pe nume coloana nouă (ar goli-o înaintea migr
  */
 
 test("datele firmei: câmpurile goale sau doar cu spații dispar cu totul", () => {
-  assert.deepEqual(dateleFirmei({ firmaCui: "  ", firmaDenumire: " Exemplu SRL ", telefon: "0722" }), {
+  assert.deepEqual(dateleFirmei({ firmaCui: "  ", firmaDenumire: " Exemplu SRL ", email: " " }), {
     denumire: "Exemplu SRL",
   });
   for (const gol of [null, undefined, "text", {}, { firmaCui: 7 }]) assert.deepEqual(dateleFirmei(gol), {});
+});
+
+test("telefonul, WhatsApp-ul și emailul vin din „Datele cabinetului”, scrise o singură dată", () => {
+  const firma = dateleFirmei({ telefon: "0739 410 121", whatsapp: "0739410121", email: "a@b.ro", firmaCui: "RO1" });
+  assert.equal(firma.telefon, "0739 410 121");
+  assert.equal(firma.whatsapp, "0739410121");
+  assert.equal(firma.email, "a@b.ro");
+  // Câmpurile separate de la început (`firmaTelefon` …) nu mai există și nu se citesc.
+  assert.equal(dateleFirmei({ firmaTelefon: "0700 000 000" }).telefon, undefined);
+  const schema = citeste("src/lib/setari.ts");
+  for (const vechi of ["firmaTelefon", "firmaWhatsapp", "firmaEmail"]) {
+    assert.ok(!schema.includes(`cheie: "${vechi}"`), `${vechi} a revenit în „Datele firmei”`);
+  }
 });
 
 test("rândul legal: doar bucățile completate, fiecare cu eticheta ei; gol = nimic", () => {

@@ -53,8 +53,10 @@ export const TEXTE_VANZARE = {
   },
 
   /**
-   * Etichetele datelor firmei (brief, punctul 4). Valorile se scriu în Setări →
-   * „Datele firmei"; o valoare goală nu aduce nici eticheta ei pe pagină.
+   * Etichetele datelor firmei (brief, punctul 4). Denumirea, CUI-ul, Registrul
+   * Comerțului și sediul se scriu în Setări → „Datele firmei"; telefonul,
+   * WhatsApp-ul și emailul, în Setări → „Datele cabinetului". O valoare goală nu
+   * aduce nici eticheta ei pe pagină.
    */
   firma: {
     cui: "CUI",
@@ -150,7 +152,15 @@ export type DateFirma = {
   tva?: string;
 };
 
-/** Din `site_settings.brand` (câmpurile `firma…` din Setări) → datele firmei. */
+/**
+ * Din `site_settings.brand` → datele firmei.
+ *
+ * Denumirea, CUI-ul, Registrul Comerțului, sediul și TVA-ul vin din câmpurile
+ * `firma…` (Setări → „Datele firmei"). Telefonul, WhatsApp-ul și emailul vin din
+ * câmpurile pe care le are orice site (Setări → „Datele cabinetului"): sunt
+ * aceleași numere care apar deja în bara de sus, în subsol și în bula verde, deci
+ * se scriu o singură dată (hotărât cu proprietarul, 9 oct. 2026).
+ */
 export function dateleFirmei(brand: unknown): DateFirma {
   const sursa = (typeof brand === "object" && brand !== null ? brand : {}) as Record<string, unknown>;
   const curat = (cheie: string) => {
@@ -163,9 +173,9 @@ export function dateleFirmei(brand: unknown): DateFirma {
     cui: curat("firmaCui"),
     regCom: curat("firmaRegCom"),
     sediu: curat("firmaSediu"),
-    telefon: curat("firmaTelefon"),
-    whatsapp: curat("firmaWhatsapp"),
-    email: curat("firmaEmail"),
+    telefon: curat("telefon"),
+    whatsapp: curat("whatsapp"),
+    email: curat("email"),
     tva: curat("firmaTva"),
   };
   // Fără chei goale: `{ cui: undefined }` și `{}` trebuie să fie același lucru.
@@ -190,8 +200,8 @@ export function rindulLegal(firma: DateFirma): string | null {
 }
 
 /**
- * Telefonul, WhatsApp-ul și emailul firmei, ca rânduri pentru blocul de lângă
- * formular — doar cele completate. Fiecare cu adresa lui: telefonul sună,
+ * Telefonul, WhatsApp-ul și emailul (din „Datele cabinetului"), ca rânduri pentru
+ * blocul de lângă formular — doar cele completate. Fiecare cu adresa lui: telefonul sună,
  * WhatsApp-ul deschide conversația, emailul deschide un mesaj. Un WhatsApp care
  * nu se poate transforma în adresă (scris pe jumătate) rămâne text, nu link mort.
  */
