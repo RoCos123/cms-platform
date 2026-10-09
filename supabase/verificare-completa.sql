@@ -11,7 +11,7 @@
 --   comportament — chiar se încearcă: un client care caută datele altuia, un
 --                  vizitator anonim care scrie, o funcție a platformei chemată
 --                  de cine nu trebuie. Astea nu se pot deduce din schemă.
---   formă        — cele 274 de lucruri din schemă, față de migrări.
+--   formă        — cele 278 de lucruri din schemă, față de migrări.
 --   date         — ce nu poate opri nicio schemă, dar strică site-ul cuiva.
 --
 -- CE SCHIMBĂ. Aproape nimic, și nimic ce rămâne: `search_path`-ul sesiunii, o
@@ -846,6 +846,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('coloana', 'public.contact_messages.email', 'text poate fi gol', '—')
 ,  ('coloana', 'public.contact_messages.id', 'uuid not null implicit gen_random_uuid()', '—')
 ,  ('coloana', 'public.contact_messages.message', 'text poate fi gol', '—')
+,  ('coloana', 'public.contact_messages.model_preferat', 'text poate fi gol', '—')
 ,  ('coloana', 'public.contact_messages.name', 'text not null', '—')
 ,  ('coloana', 'public.contact_messages.phone', 'text poate fi gol', '—')
 ,  ('coloana', 'public.contact_messages.read_at', 'timestamp with time zone poate fi gol', '—')
@@ -919,6 +920,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('coloana', 'public.sites.name', 'text not null', '—')
 ,  ('coloana', 'public.sites.published_at', 'timestamp with time zone poate fi gol', '—')
 ,  ('coloana', 'public.sites.template', 'text not null implicit ''caldura''::text', '—')
+,  ('coloana', 'public.sites.tip', 'text not null implicit ''cabinet''::text', '—')
 ,  ('coloana', 'public.uploads.alt_text', 'text poate fi gol', '—')
 ,  ('coloana', 'public.uploads.created_at', 'timestamp with time zone not null implicit now()', '—')
 ,  ('coloana', 'public.uploads.filename', 'text not null', '—')
@@ -956,6 +958,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('constrangere', 'public.blog_categories.blog_categories_pkey', 'PRIMARY KEY (id)', '—')
 ,  ('constrangere', 'public.blog_categories.blog_categories_site_id_fkey', 'FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE', '—')
 ,  ('constrangere', 'public.blog_categories.blog_categories_site_id_slug_key', 'UNIQUE (site_id, slug)', '—')
+,  ('constrangere', 'public.contact_messages.contact_messages_model_preferat_lungime', 'CHECK (((model_preferat IS NULL) OR (char_length(model_preferat) <= 80)))', '20261009120000_pagina_de_vanzare.sql')
 ,  ('constrangere', 'public.contact_messages.contact_messages_pkey', 'PRIMARY KEY (id)', '—')
 ,  ('constrangere', 'public.contact_messages.contact_messages_site_id_fkey', 'FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE', '—')
 ,  ('constrangere', 'public.newsletter_subscribers.newsletter_subscribers_pkey', 'PRIMARY KEY (id)', '—')
@@ -986,6 +989,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('constrangere', 'public.sites.sites_domain_key', 'UNIQUE (domain)', '—')
 ,  ('constrangere', 'public.sites.sites_pkey', 'PRIMARY KEY (id)', '—')
 ,  ('constrangere', 'public.sites.sites_template_check', 'CHECK ((template = ANY (ARRAY[''caldura''::text, ''liniste''::text, ''lumina''::text, ''apropiere''::text, ''claritate''::text])))', '20260908090000_sablonul_claritate.sql')
+,  ('constrangere', 'public.sites.sites_tip_check', 'CHECK ((tip = ANY (ARRAY[''cabinet''::text, ''vanzare''::text])))', '20261009120000_pagina_de_vanzare.sql')
 ,  ('constrangere', 'public.uploads.uploads_focal_pereche_in_interval', 'CHECK ((((focal_x IS NULL) AND (focal_y IS NULL)) OR (((focal_x >= 0) AND (focal_x <= 100)) AND ((focal_y >= 0) AND (focal_y <= 100)))))', '20260911140000_pozitie_imagini.sql')
 ,  ('constrangere', 'public.uploads.uploads_focal_zoom_in_interval', 'CHECK (((focal_zoom IS NULL) OR ((focal_zoom >= (1)::double precision) AND (focal_zoom <= (3)::double precision))))', '20261003120000_zoom_coperti.sql')
 ,  ('constrangere', 'public.uploads.uploads_pkey', 'PRIMARY KEY (id)', '—')
@@ -1021,7 +1025,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('functie', 'public._curata_incarcarile(p_data jsonb)', 'cuprins 3452b22978ad | security invoker | drepturi nimeni din cei trei', '20260915120000_curata_incarcarile_la_clonare.sql')
 ,  ('functie', 'public._este_referinta_fisier(p jsonb)', 'cuprins 7ce178130631 | security invoker | drepturi nimeni din cei trei', '20260915120000_curata_incarcarile_la_clonare.sql')
 ,  ('functie', 'public.adauga_sectiunea_programare()', 'cuprins 934ddbb41d43 | security definer | drepturi oricine=X anon=X authenticated=X service_role=X', '20260827160000_sectiunea_programare.sql')
-,  ('functie', 'public.cloneaza_site(p_sursa_domeniu text, p_tinta_domeniu text, p_tinta_nume text, p_tinta_email text, p_tinta_sablon text)', 'cuprins 500f60fbc4ee | security definer | drepturi service_role=X', '20260915120000_curata_incarcarile_la_clonare.sql')
+,  ('functie', 'public.cloneaza_site(p_sursa_domeniu text, p_tinta_domeniu text, p_tinta_nume text, p_tinta_email text, p_tinta_sablon text)', 'cuprins 500f60fbc4ee | security definer | drepturi service_role=X', '20261009120000_pagina_de_vanzare.sql')
 ,  ('functie', 'public.creeaza_client(p_domeniu text, p_nume text, p_email text, p_sablon text, p_cu_programari boolean)', 'cuprins cb436da77182 | security definer | drepturi service_role=X', '20260916120000_banda_servicii.sql')
 ,  ('functie', 'public.current_site_id()', 'cuprins 9e5a0c2f19f2 | security definer | drepturi oricine=X anon=X authenticated=X service_role=X', '20260901090000_depozit_privat.sql')
 ,  ('functie', 'public.inregistreaza_afisarea(p_site_id uuid, p_zi date, p_cale text)', 'cuprins ebd86d2bfbca | security definer | drepturi service_role=X', '20260909100000_drepturi_de_executie.sql')
@@ -1103,7 +1107,7 @@ from diferente d
 
 union all
 
-select 'formă', 'toate cele 274 de lucruri din schemă', 'OK',
+select 'formă', 'toate cele 278 de lucruri din schemă', 'OK',
   'baza reală are exact ce scriu migrările'
 where not exists (select 1 from diferente)
 
