@@ -106,8 +106,13 @@ ale paginii stau în `src/lib/pagina-vanzare.ts`. Hotărârile proprietarului, d
 - Tabelul comparativ rămâne în cod (hotărârea din 7 oct.); cifra „5" rămâne scrisă de mână.
 - Adresa canonică rămâne `sites.domain`; trece pe `sitepsihologi.ro` abia după ce
   proprietarul confirmă că domeniul e legat și răspunde.
-Rămase: SQL-ul de texte (din exportul cerut proprietarului), alegerea titlului pentru
-Google (cel din brief are 73 de caractere, Setări primește 60) și raportul final.
+- **Textele le schimbă proprietarul, manual, din panou** (9 oct.): nu se scrie niciun
+  SQL de texte și nu e nevoie de exportul cerut inițial. Singurul text schimbat de
+  noi e cel din tabelul comparativ („MINIM, …" → „Minim: …"), fiindcă tabelul nu se
+  editează din panou și proprietarul a cerut schimbarea direct în cod.
+Rămase: SQL-ul fără texte (migrarea + marcajul `tip = 'vanzare'`, rulate de
+proprietar când hotărăște publicarea), titlul pentru Google (cel din brief are 73 de
+caractere, Setări primește 60 — fie îl scurtează, fie ridicăm limita) și raportul final.
 
 **Lucrări de la 1 la 7 oct.** (fiecare are secțiunea ei mai jos; aici doar lista):
 rama de poziționare ia forma locului (1 oct.), mărirea pozei pe ambele axe,
