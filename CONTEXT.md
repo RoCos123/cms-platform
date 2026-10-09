@@ -114,9 +114,11 @@ ale paginii stau în `src/lib/pagina-vanzare.ts`. Hotărârile proprietarului, d
   SQL de texte și nu e nevoie de exportul cerut inițial. Singurul text schimbat de
   noi e cel din tabelul comparativ („MINIM, …" → „Minim: …"), fiindcă tabelul nu se
   editează din panou și proprietarul a cerut schimbarea direct în cod.
+- **Titlul pentru Google:** „Site-uri pentru cabinete de psihologie | sitepsihologi.ro"
+  (57 de caractere; cel din brief avea 73, iar Setări primește 60). Ales de proprietar
+  pe 9 oct.; îl pune el din Setări, fără nicio schimbare de cod.
 Rămase: SQL-ul fără texte (migrarea + marcajul `tip = 'vanzare'`, rulate de
-proprietar când hotărăște publicarea), titlul pentru Google (cel din brief are 73 de
-caractere, Setări primește 60 — fie îl scurtează, fie ridicăm limita) și raportul final.
+proprietar când hotărăște publicarea) și raportul final.
 
 **Lucrări de la 1 la 7 oct.** (fiecare are secțiunea ei mai jos; aici doar lista):
 rama de poziționare ia forma locului (1 oct.), mărirea pozei pe ambele axe,
