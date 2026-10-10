@@ -190,6 +190,11 @@ schimbat de la ele încoace. Unde starea nu se vede din cod (setări Supabase/Ve
 acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține-o la zi.**
 
 **A. Înainte de primul client plătitor**
+0. **Firma NU există încă** (spus de proprietar, 10 oct.; vrea site-ul și domeniul pe
+   ea). Atârnă de ea: „Datele firmei" din Setări, operatorul din politica de
+   confidențialitate, contractele, facturarea. Domeniul se poate lua acum pe persoană
+   fizică și trece pe firmă mai târziu (transferul dreptului de folosință, la RoTLD,
+   prin registrar).
 1. **Contract + acord de prelucrare (GDPR)**, cu avocat — săptămâni, cel mai lent
    punct; se începe primul și curge în paralel cu restul. Din clipa în care
    platforma ține numele și telefoanele pacienților altcuiva, actele nu sunt opționale.
