@@ -217,7 +217,10 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
 
 **B. Înainte de a arăta produsul (site-ul de vânzări `sitepsihologi`)**
 *Adus la zi pe 9 oct., după citirea din bază și brieful din aceeași zi.*
-1. **Domeniul `sitepsihologi.ro`** — site-ul stă pe `sitepsihologi.vercel.app`,
+1. **Domeniul `sitepsihologi.ro`** — **NECUMPĂRAT încă** (spus de proprietar, 10 oct.),
+   și nu există nicio adresă de email pe el. E primul pas pentru tot ce urmează:
+   adresa site-ului, emailul prin Resend (are nevoie de DNS-ul domeniului) și o
+   adresă profesională. Site-ul stă pe `sitepsihologi.vercel.app`,
    PUBLICAT din 8 sept. (comutatorul e pornit), dar neindexat: `robots.txt` refuză
    dinadins adresele `*.vercel.app`. Indexarea se deschide la mutarea pe domeniu
    (legat în Vercel, apoi `sites.domain` schimbat din SQL).
