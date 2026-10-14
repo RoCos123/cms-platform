@@ -229,8 +229,10 @@ parola curentă + link de confirmare pe adresa nouă — o schimbare de adresă 
   `20261014120000_jurnal_entitati_site_si_date_personale.sql` (lărgește constrângerea
   la 12 valori; se poate rula de două ori). Încercată pe bancul complet, pe o bază cu
   regula veche și, în aplicația reală de probă: înainte, retragerea site-ului nu apărea
-  în Activitate; după, „Site-ul a fost publicat." apare. **De rulat în Supabase de
-  proprietar** (SQL-ul i s-a dat în chat); pe master abia după ce a rulat-o. Proba
+  în Activitate; după, „Site-ul a fost publicat." apare. **Rulată de proprietar în
+  Supabase pe 14 oct.**; verificarea (`pg_get_constraintdef`) a întors regula cu cele 12
+  valori, inclusiv `Site` și `DatePersonale`. Fișierul migrării e pe branch; pe master
+  merge la următorul „fă pe master". Proba
   `e2e/jurnal-entitati.proba.mjs` ține tipurile din `audit.ts` și constrângerile din
   amprenta schemei la fel — a pierdut două valori fără ca nimic să spună.
 - **Cum se ridică local un Supabase adevărat (n-a intrat în depozit):** Docker (în
