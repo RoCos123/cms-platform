@@ -360,7 +360,7 @@ asteptat (fel, cheie, amprenta, ultima_migrare) as (values
 ,  ('constrangere', 'public.appointments.appointments_status_check', 'CHECK ((status = ANY (ARRAY[''ceruta''::text, ''confirmata''::text, ''refuzata''::text, ''anulata''::text])))', '20260827140000_programari.sql')
 ,  ('constrangere', 'public.audit_log.audit_log_action_check', 'CHECK ((action = ANY (ARRAY[''create''::text, ''update''::text, ''delete''::text, ''publish''::text, ''unpublish''::text, ''login''::text, ''logout''::text])))', '—')
 ,  ('constrangere', 'public.audit_log.audit_log_actor_id_fkey', 'FOREIGN KEY (actor_id) REFERENCES users(id) ON DELETE SET NULL', '—')
-,  ('constrangere', 'public.audit_log.audit_log_entity_type_check', 'CHECK ((entity_type = ANY (ARRAY[''Page''::text, ''Service''::text, ''Appointment''::text, ''BlogArticle''::text, ''BlogCategory''::text, ''SiteContent''::text, ''SiteSettings''::text, ''Upload''::text, ''ContactSubmission''::text, ''Session''::text])))', '—')
+,  ('constrangere', 'public.audit_log.audit_log_entity_type_check', 'CHECK ((entity_type = ANY (ARRAY[''Page''::text, ''Service''::text, ''Appointment''::text, ''BlogArticle''::text, ''BlogCategory''::text, ''SiteContent''::text, ''SiteSettings''::text, ''Upload''::text, ''ContactSubmission''::text, ''Session''::text, ''Site''::text, ''DatePersonale''::text])))', '20261014120000_jurnal_entitati_site_si_date_personale.sql')
 ,  ('constrangere', 'public.audit_log.audit_log_pkey', 'PRIMARY KEY (id)', '—')
 ,  ('constrangere', 'public.audit_log.audit_log_site_id_fkey', 'FOREIGN KEY (site_id) REFERENCES sites(id) ON DELETE CASCADE', '—')
 ,  ('constrangere', 'public.blog_articles.blog_articles_author_id_fkey', 'FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL', '—')

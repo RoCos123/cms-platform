@@ -221,12 +221,18 @@ parola curentă + link de confirmare pe adresa nouă — o schimbare de adresă 
   3. `email_confirm: true` contează doar la un cont cu adresa neconfirmată (fără el,
      după schimbare ar primi „Email not confirmed"); o schimbare de administrator se
      aplică pe loc și nu trimite email.
-- **Găsit în trecere, NEREPARAT (propus proprietarului):** `scrieInJurnal` cu entitățile
-  `"Site"` (publicarea/retragerea site-ului) și `"DatePersonale"` (ștergerea datelor
-  unei persoane) pică la constrângerea `audit_log_entity_type_check` (acceptă doar zece
-  valori, fără acestea), iar eroarea e înghițită — deci acele intrări nu apar niciodată
-  în „Activitate". Verificat pe bancul local. Reparația ar fi o migrare care lărgește
-  constrângerea; nu s-a făcut, fiindcă nu a fost cerută.
+- **Găsit în trecere și reparat (14 oct.):** `scrieInJurnal` cu entitățile `"Site"`
+  (publicarea/retragerea site-ului) și `"DatePersonale"` (ștergerea datelor unei
+  persoane) picau la constrângerea `audit_log_entity_type_check` (accepta doar zece
+  valori, fără acestea), iar eroarea e înghițită — deci acele intrări nu au apărut
+  niciodată în „Activitate"; cele de până acum NU se pot recupera. Reparația: migrarea
+  `20261014120000_jurnal_entitati_site_si_date_personale.sql` (lărgește constrângerea
+  la 12 valori; se poate rula de două ori). Încercată pe bancul complet, pe o bază cu
+  regula veche și, în aplicația reală de probă: înainte, retragerea site-ului nu apărea
+  în Activitate; după, „Site-ul a fost publicat." apare. **De rulat în Supabase de
+  proprietar** (SQL-ul i s-a dat în chat); pe master abia după ce a rulat-o. Proba
+  `e2e/jurnal-entitati.proba.mjs` ține tipurile din `audit.ts` și constrângerile din
+  amprenta schemei la fel — a pierdut două valori fără ca nimic să spună.
 - **Cum se ridică local un Supabase adevărat (n-a intrat în depozit):** Docker (în
   containerul cloud: `dockerd --iptables=false --ip6tables=false --bridge=none`), imaginile
   `supabase/gotrue:v2.197.0` și `postgrest/postgrest:v12.2.3`, `--network host`, Postgres-ul
