@@ -20,8 +20,9 @@ import { SECTIUNI } from "@/app/proba-vanzari/continut";
  * Proba paginii de vânzare (brief 9 oct. 2026). `pnpm test:logica`.
  *
  * Ce apără, în ordinea gravității:
- * 1. un site de cabinet care primește telefon sau text liber prin formular — exact
- *    ce interzic hotărârile din 28 aug. și 16 sept. 2026;
+ * 1. un site de cabinet care primește text liber sau model preferat prin formular —
+ *    exact ce interzice hotărârea din 28 aug. 2026 (telefonul, scos pe 16 sept.,
+ *    a revenit ca opțional pe 14 oct. 2026, pe toate formularele: `formular-contact.proba.mjs`);
  * 2. o listă de modele în formular care nu e cea din galerie;
  * 3. textele paginii de vânzare scrise prin componente, nu într-un singur loc.
  */
@@ -74,9 +75,9 @@ test("telefonul: 6–15 cifre, „+” în față, fără să conteze spațiile 
   }
 });
 
-test("serverul citește telefonul, mesajul și modelul DOAR pe un site de vânzare", () => {
+test("serverul citește mesajul și modelul DOAR pe un site de vânzare", () => {
   const actiune = citeste("src/app/actions/formulare.ts");
-  for (const camp of ["telefon", "model", "mesaj"]) {
+  for (const camp of ["model", "mesaj"]) {
     assert.ok(
       actiune.includes(`vanzare ? citesteText(formData, "${camp}"`),
       `câmpul „${camp}” trebuie citit doar când site-ul e de vânzare`,
@@ -86,16 +87,19 @@ test("serverul citește telefonul, mesajul și modelul DOAR pe un site de vânza
   assert.ok(actiune.includes("await tipulSiteului(siteId)) === \"vanzare\""));
 });
 
-test("pe cabinet, rândul scris în bază rămâne cel de dinainte: fără telefon, fără text, fără model", () => {
+test("pe cabinet, rândul scris în bază n-are text liber și n-are model", () => {
   const actiune = citeste("src/app/actions/formulare.ts");
   const cabinet = actiune.slice(actiune.indexOf(": {\n            name: nume,"));
-  assert.ok(cabinet.includes("phone: null,") && cabinet.includes("message: null,"));
+  assert.ok(cabinet.includes("message: null,"), "cabinetul nu scrie mesaj liber");
   assert.ok(!cabinet.slice(0, cabinet.indexOf("},")).includes("model_preferat"), "cabinetul nu scrie model_preferat");
 });
 
-test("formularul arată câmpurile noi doar când primește lista de modele", () => {
+test("formularul arată modelul și mesajul doar când primește lista de modele", () => {
   const formular = citeste("src/components/site/sections/contact-form.tsx");
   assert.ok(formular.includes("{modele && ("), "câmpurile noi trebuie să atârne de `modele`");
+  const dupaModele = formular.slice(formular.indexOf("{modele && ("), formular.indexOf("<Acord"));
+  assert.ok(dupaModele.includes('name="model"') && dupaModele.includes('name="mesaj"'));
+  assert.ok(!dupaModele.includes('name="telefon"'), "telefonul nu mai atârnă de lista de modele");
   const contact = citeste("src/components/site/sections/contact.tsx");
   assert.ok(contact.includes("modele={modele}"));
   const registru = citeste("src/components/site/render-sections.tsx");

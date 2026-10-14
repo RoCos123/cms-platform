@@ -15,7 +15,7 @@ export const LIMITE = {
   nume: 120,
   email: 200,
   mesaj: 5000,
-  /** Cât acceptă și Setări pentru numărul cabinetului. Doar pe pagina de vânzare. */
+  /** Cât acceptă și Setări pentru numărul cabinetului; la fel pentru numărul lăsat de vizitator. */
   telefon: 40,
   /** Cât acceptă coloana `contact_messages.model_preferat`. */
   model: 80,

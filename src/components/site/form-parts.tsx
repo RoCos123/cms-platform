@@ -73,7 +73,7 @@ export function Camp({
   eticheta: string;
   eroare?: string;
   valoare?: string;
-  /** „tel" doar pe pagina de vânzare (9 oct. 2026); formularele de cabinet n-au telefon. */
+  /** „tel" aduce tastatura numerică pe telefon. */
   tip?: "text" | "email" | "tel";
   /** Dacă e dat, câmpul e `<textarea>` cu atâtea rânduri. */
   randuri?: number;

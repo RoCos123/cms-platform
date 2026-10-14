@@ -183,9 +183,36 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
-**Butonul „Schimbă emailul" din `/proprietar` (14 oct. 2026, pe branch-ul
-`claude/brief-sitepsihologi`, NEPUBLICAT — așteaptă „fă pe master").** Propus de
-sesiune, cerut de proprietar („da, fă-l"): schimbă adresa cu care un client intră în
+**Telefon OPȚIONAL în formularul de contact, pe toate șabloanele (14 oct. 2026, cerut de
+proprietar; pe branch, NEPUBLICAT — așteaptă „fă pe master").** Contactul cere acum
+nume + email (obligatorii) + telefon (opțional, „Număr de telefon (opțional)", câmp de
+tip `tel`). Schimbă hotărârea din 16 sept. („fără telefon"); proprietarul a cerut-o
+explicit. E o singură componentă (`ContactForm`), deci toate cele cinci șabloane o au
+deodată. Ce rămâne neschimbat: emailul obligatoriu (singura cale de răspuns pentru cine
+nu lasă numărul), fără mesaj liber și fără „model preferat" pe cabinete (GDPR, 28 aug.;
+doar pagina de vânzare le are), anti-dublarea tot pe email. Serverul citește telefonul pe
+orice site, îl verifică dacă e scris (`esteTelefonValid`: 6–15 cifre) și scrie în bază
+`phone: telefon || null` — gol rămâne `null`, nu șir gol. **Fără migrare:** coloana
+`contact_messages.phone` exista. Panoul „Mesaje" și „Șterge datele unei persoane" știau
+deja de telefon. Probe: `e2e/formular-contact.proba.mjs` (strică-le pe rând: pică;
+`pagina-vanzare.proba.mjs` ajustat la regula nouă). Încercat într-un browser pe aplicația
+construită, cu PostgREST și Postgres adevărate: fără număr → pleacă și în bază e `null`;
+număr prost → eroare pe câmp, ce a scris omul rămâne, nimic scris; doar număr, fără
+email → refuzat; mesaj/model băgate de mână pe un cabinet → ignorate; câmpul arată la fel
+de lat ca emailul pe toate cele cinci șabloane, la 1280 și 375 px, fără depășire
+orizontală.
+**De făcut, NEFĂCUT (decizia proprietarului):** (1) șablonul
+`sabloane/politica-de-confidentialitate.md` (rândul „Prin formularul de contact… se salvează
+numele și numărul tău de telefon, iar adresa de email doar dacă vrei") era depășit încă din
+16 sept. și acum e greșit în altă direcție; propunerea de înlocuit: „se salvează numele și
+adresa ta de email, iar numărul de telefon doar dacă vrei să-l lași". Politicile clienților
+deja publicate trebuie corectate de mână (vezi tabelul din „Ce s-a schimbat până acum…").
+(2) Textul-demo al secțiunii Contact din `creeaza_client` („Lasă-mi numele și numărul, te sun
+eu.") nu mai e nici el adevărat: numărul nu mai e ce se cere. E text demo, îl schimbă
+clientul din panou.
+
+**Butonul „Schimbă emailul" din `/proprietar` (14 oct. 2026, pe master din 14 oct.,
+`b3cd506`).** Propus de sesiune, cerut de proprietar („da, fă-l"): schimbă adresa cu care un client intră în
 panou, pentru ORICARE client, doar din ecranul proprietarului platformei. Un client NU
 îl are (hotărât: varianta pentru clienți — pe lista de făcut, punctul 4a — abia după ce merge emailul prin Resend, cu
 parola curentă + link de confirmare pe adresa nouă — o schimbare de adresă de login +
@@ -231,8 +258,7 @@ parola curentă + link de confirmare pe adresa nouă — o schimbare de adresă 
   regula veche și, în aplicația reală de probă: înainte, retragerea site-ului nu apărea
   în Activitate; după, „Site-ul a fost publicat." apare. **Rulată de proprietar în
   Supabase pe 14 oct.**; verificarea (`pg_get_constraintdef`) a întors regula cu cele 12
-  valori, inclusiv `Site` și `DatePersonale`. Fișierul migrării e pe branch; pe master
-  merge la următorul „fă pe master". Proba
+  valori, inclusiv `Site` și `DatePersonale`. Fișierul migrării e pe master. Proba
   `e2e/jurnal-entitati.proba.mjs` ține tipurile din `audit.ts` și constrângerile din
   amprenta schemei la fel — a pierdut două valori fără ca nimic să spună.
 - **Cum se ridică local un Supabase adevărat (n-a intrat în depozit):** Docker (în
@@ -673,6 +699,9 @@ Toate livrate:
    *Excepție din 9 oct. 2026: pagina de vânzare (sitepsihologi.ro) are telefon,
    model preferat și mesaj — acolo scriu psihologi despre un site, nu pacienți
    despre sănătate. Vezi „Fără câmpuri de text liber…", mai jos.*
+   *Schimbat pe 14 oct. 2026, la cererea proprietarului: telefonul revine pe TOATE
+   formularele de contact, ca OPȚIONAL (emailul rămâne obligatoriu). Vezi „Telefon
+   OPȚIONAL…", sus.*
 2. **Poză rotunjită în hero** — arcadă în cap pe așezarea cu poza lângă titlu
    (Lumină & co.), rotunjire blândă pe Căldură.
 3. **Bandă cu servicii** — secțiune nouă, pornit/oprit din lista de secțiuni;
@@ -727,7 +756,9 @@ doar):**
 - **Fără iconițe, nicăieri.** Referința are pictograme lângă multe rânduri;
   proprietarul le vrea scoase peste tot. Se implementează FĂRĂ ele — rămâne
   textul (eticheta), nu se caută un înlocuitor grafic.
-- **Nu se cere telefon vizitatorului, niciunde.** Numărul PROPRIU al cabinetului,
+- **~~Nu se cere telefon vizitatorului, niciunde.~~ Depășit pe 14 oct. 2026 la contact:
+  telefonul vizitatorului se cere iar, opțional, în formularul de contact (vezi „Telefon
+  OPȚIONAL…", sus); restul directivei rămâne.** Numărul PROPRIU al cabinetului,
   afișat ca dat de contact, rămâne (e al lui, apăsabil). Ce nu se face e un CÂMP
   care cere vizitatorului telefonul — la fel ca decizia din 16 sept. de la
   contact, dusă peste tot.
@@ -1292,8 +1323,9 @@ Excepția atârnă de marcajul `sites.tip = 'vanzare'` (migrarea
 `pagina_de_vanzare`), pus doar din SQL; clientul nu-l poate schimba, iar o clonă
 pornește ca `cabinet`. Hotărârea o ia SERVERUL din marcaj, nu formularul — un
 cabinet care primește totuși `telefon`/`mesaj` (de la un bot) le ignoră.
-Pe site-urile de cabinet regula de mai sus rămâne neschimbată: fără text liber,
-fără telefon.
+Pe site-urile de cabinet regula de mai sus rămâne neschimbată: fără text liber.
+*(„Fără telefon" a căzut pe 14 oct. 2026: telefonul e iar în formularul de contact, ca
+opțional, pe toate site-urile. Textul liber și modelul preferat rămân doar pe pagina de vânzare.)*
 
 ## Estimare de efort (corectată)
 
@@ -2408,8 +2440,11 @@ el, din ziua în care și-a făcut site-ul. Un client care și-a publicat politi
 | 30 aug. 2026 | Formularele nu mai au căsuță de mesaj; se cer nume + telefon, emailul opțional | Paragraful despre ce se strânge prin formular. Textul vechi spunea „nume, email și mesaj” și „nu îți cerem telefonul” — pe dos față de acum |
 | 31 aug. 2026 | Anti-spamul a trecut de la Cloudflare Turnstile la hCaptcha | Numele furnizorului, în paragraful despre anti-spam ȘI în lista de firme care ating datele |
 | 1 sept. 2026 | Fonturile se servesc de pe domeniul clientului | Paragraful despre Google Fonts SE SCOATE de tot |
+| 16 sept. 2026 | Contactul cere nume + email (obligatoriu); telefonul scos | Rândul despre ce salvează formularul: „numele și numărul tău de telefon, iar adresa de email doar dacă vrei” nu mai e adevărat |
+| 14 oct. 2026 | Contactul cere nume + email (obligatoriu) + telefon (OPȚIONAL) | Același rând: „se salvează numele și adresa ta de email, iar numărul de telefon doar dacă vrei să-l lași”. **Încă nefăcut în șablon** (propus proprietarului) |
 
-Toate trei sunt deja făcute în șablon. **Niciuna nu e făcută în paginile deja
+Primele trei sunt deja făcute în șablon; ultimele două (16 sept., 14 oct.) NU — rândul
+despre formular din șablon descrie încă situația de dinaintea lor. **Niciuna nu e făcută în paginile deja
 scrise de clienți** — deocamdată nu există niciun client care să-și fi publicat
 politica, deci lista e curată. Dar din prima zi în care există unul, tabelul
 ăsta devine o listă de treabă de făcut, nu un istoric.

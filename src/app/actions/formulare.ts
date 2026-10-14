@@ -27,6 +27,8 @@ import { modeleleDePePagina, tipulSiteului } from "@/lib/pagina-vanzare-date";
 
 const SUCCES_CONTACT = "Am primit datele tale. Vei fi contactat cât de curând.";
 const SUCCES_NEWSLETTER = "Gata. Dacă adresa e nouă, vei primi un email de confirmare.";
+/** Pe pagina de vânzare același lucru se spune cu vocea ei: `TEXTE_VANZARE.formular.eroareTelefon`. */
+const EROARE_TELEFON = "Numărul de telefon nu pare complet.";
 const EROARE_TEHNICA =
   "Mesajul nu a putut fi trimis din cauza unei probleme tehnice. Te rugăm să încerci din nou peste câteva minute.";
 
@@ -64,11 +66,12 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
   const acord = formData.get("acord") === "da";
 
   /*
-    Pagina de vânzare (9 oct. 2026) primește în plus telefon, model preferat și
-    mesaj. Hotărârea o ia SERVERUL, din marcajul site-ului — nu formularul: un
-    cabinet care primește câmpurile astea (de la un bot, de la o pagină
-    modificată) le ignoră, deci regula „fără text liber, fără telefon" a
-    cabinetelor nu depinde de ce trimite browserul.
+    Telefonul (opțional) îl au TOATE formularele de contact, de pe 14 oct. 2026
+    (cererea proprietarului; era scos din 16 sept.). Modelul preferat și mesajul
+    liber rămân ale paginii de vânzare (9 oct. 2026). Hotărârea pentru ele o ia
+    SERVERUL, din marcajul site-ului — nu formularul: un cabinet care primește
+    câmpurile astea (de la un bot, de la o pagină modificată) le ignoră, deci
+    regula „fără text liber" a cabinetelor nu depinde de ce trimite browserul.
 
     La o eroare la citirea tenantului, formularul rămâne cel de cabinet:
     inserarea de mai jos dă peste aceeași eroare și răspunde cu mesajul tehnic,
@@ -80,23 +83,24 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
   );
   const vanzare = siteId !== null && (await tipulSiteului(siteId)) === "vanzare";
 
-  const telefon = vanzare ? citesteText(formData, "telefon", LIMITE.telefon) : "";
+  const telefon = citesteText(formData, "telefon", LIMITE.telefon);
   const model = vanzare ? citesteText(formData, "model", LIMITE.model) : "";
   const mesajLiber = vanzare ? citesteText(formData, "mesaj", LIMITE.mesaj) : "";
 
   const valori: Record<string, string> = vanzare
     ? { nume, email, telefon, model, mesaj: mesajLiber }
-    : { nume, email };
+    : { nume, email, telefon };
 
   const erori: Record<string, string> = {};
 
   if (nume.length < 2) erori.nume = "Te rugăm să scrii numele tău.";
   /*
-   * Emailul e obligatoriu de pe 16 sept. 2026: câmpul de telefon a fost scos, iar
-   * formularul n-are câmp de mesaj (migrarea `contact_fara_mesaj`), deci emailul
-   * rămâne singura cale prin care cabinetul poate răspunde. Se cere ÎNTÂI să
-   * existe, apoi să aibă formă — altfel un email gol ar pica pe „nu pare
-   * complet", mesaj derutant când de fapt lipsește cu totul.
+   * Emailul e obligatoriu de pe 16 sept. 2026, iar telefonul — adăugat la loc pe 14
+   * oct. 2026 — e opțional: formularul n-are câmp de mesaj (migrarea
+   * `contact_fara_mesaj`), deci emailul rămâne singura cale pe care cabinetul
+   * poate răspunde ORICĂRUI om care a scris. Se cere ÎNTÂI să existe, apoi să aibă
+   * formă — altfel un email gol ar pica pe „nu pare complet", mesaj derutant când
+   * de fapt lipsește cu totul.
    */
   if (!email) erori.email = "Lasă o adresă de email, ca să poți fi contactat.";
   else if (!esteEmailValid(email)) erori.email = "Adresa de email nu pare completă.";
@@ -104,10 +108,14 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
   // bifă pusă din start — de asta se verifică aici, nu doar prin `required`.
   if (!acord) erori.acord = "Avem nevoie de acordul tău ca să îți putem răspunde.";
 
-  if (vanzare && siteId) {
-    // Telefonul e opțional: gol trece, scris trebuie să semene a număr.
-    if (telefon && !esteTelefonValid(telefon)) erori.telefon = TEXTE_VANZARE.formular.eroareTelefon;
+  // Telefonul e opțional: gol trece, scris trebuie să semene a număr. Emailul
+  // rămâne singurul câmp de contact obligatoriu — fără el n-ar avea cabinetul
+  // pe unde să răspundă celor care nu lasă numărul.
+  if (telefon && !esteTelefonValid(telefon)) {
+    erori.telefon = vanzare ? TEXTE_VANZARE.formular.eroareTelefon : EROARE_TELEFON;
+  }
 
+  if (vanzare && siteId) {
     // Modelul se verifică față de galeria de pe pagină, nu față de o listă scrisă
     // aici: e singura listă de modele. Lipsa lui (o pagină veche, din cache) nu
     // e o greșeală — înseamnă doar că omul n-a spus nimic despre model.
@@ -130,9 +138,10 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
     const tabel = await tenantTable("contact_messages");
 
     const de_cand = new Date(Date.now() - FEREASTRA_DUBLARE_MS).toISOString();
-    // Dublarea se caută pe EMAIL: e din nou obligatoriu (telefonul a fost scos),
-    // deci nu se caută niciodată pe șir gol — două cereri fără cheie ar fi părut
-    // dublu-click una alteia, iar a doua persoană ar fi fost aruncată în tăcere.
+    // Dublarea se caută pe EMAIL, nu pe telefon: emailul e obligatoriu, deci nu se
+    // caută niciodată pe șir gol — două cereri fără cheie ar fi părut dublu-click
+    // una alteia, iar a doua persoană ar fi fost aruncată în tăcere. Telefonul,
+    // fiind opțional, ar fi fost tocmai un asemenea șir gol.
     const { data: recent } = await tabel
       .select("id")
       .eq("email", email)
@@ -174,9 +183,8 @@ async function proceseazaContact(formData: FormData): Promise<Omit<StareFormular
           }
         : {
             name: nume,
-            // Telefonul a fost scos din formular (16 sept. 2026); coloana rămâne, cu
-            // numerele primite până acum, dar cererile noi nu mai au ce număr scrie.
-            phone: null,
+            // Opțional (14 oct. 2026): omul care nu scrie numărul lasă coloana goală.
+            phone: telefon || null,
             email,
             // Nu se mai adună. Coloana rămâne, cu mesajele primite până acum.
             message: null,

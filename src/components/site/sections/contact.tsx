@@ -136,8 +136,8 @@ export function Contact({
       // pagina de vânzare, unde vine adresa paginii DOAR dacă e publicată.
       linkConfidentialitate={data.linkConfidentialitate || linkConfidentialitateImplicit}
       mesajSucces={data.mesajSucces}
-      // „Trimite", nu „Sună-mă": telefonul a fost scos, formularul trimite
-      // acum numele și emailul, nu deschide un apel.
+      // „Trimite", nu „Sună-mă": telefonul e opțional, iar emailul obligatoriu —
+      // formularul nu promite un apel.
       textButon={data.textButon ?? "Trimite"}
       modele={modele}
     />

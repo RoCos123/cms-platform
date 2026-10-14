@@ -30,8 +30,8 @@ export function ContactForm({
   textButon: string;
   /**
    * DOAR pe pagina de vânzare: numele modelelor din galerie. Prezența listei
-   * (chiar goală) aduce telefonul, modelul preferat și mesajul; lipsa ei lasă
-   * formularul de cabinet exact cum era — nume, email, acord.
+   * (chiar goală) aduce modelul preferat și mesajul; lipsa ei lasă formularul de
+   * cabinet cu nume, email, telefon opțional și acord.
    */
   modele?: readonly string[];
 }) {
@@ -96,10 +96,12 @@ export function ContactForm({
       />
 
       {/*
-        Numai email, fără telefon (16 sept. 2026, la cererea proprietarului).
-        Cu telefonul scos, emailul rămâne singurul canal prin care cabinetul
-        poate răspunde — deci devine obligatoriu (era opțional). Câmpul de mesaj
-        rămâne scos oricum, din motivul GDPR de pe 28 aug. (vezi mai jos).
+        Email obligatoriu, telefon opțional (14 oct. 2026, la cererea
+        proprietarului; telefonul fusese scos pe 16 sept.). Emailul rămâne
+        singurul canal pe care cabinetul poate răspunde ORICĂRUI om care a scris,
+        deci nu se poate lăsa gol; telefonul e în plus, pentru cine preferă să fie
+        sunat. Câmpul de mesaj rămâne scos oricum, din motivul GDPR de pe 28 aug.
+        (vezi mai jos).
       */}
       <Camp
         id="contact-email"
@@ -112,28 +114,28 @@ export function ContactForm({
         valoare={stare.valori?.email}
       />
 
+      <Camp
+        id="contact-telefon"
+        name="telefon"
+        tip="tel"
+        eticheta={vanzare ? texte.telefon : "Număr de telefon"}
+        autoComplete="tel"
+        maxLength={LIMITE.telefon}
+        obligatoriu={false}
+        sufixOptional={texte.optional}
+        eroare={stare.erori?.telefon}
+        valoare={stare.valori?.telefon}
+      />
+
       {/*
         EXCEPȚIA paginii de vânzare (9 oct. 2026, hotărârea proprietarului):
-        telefon, model preferat și mesaj — DOAR pe sitepsihologi.ro. Acolo scriu
+        model preferat și mesaj liber — DOAR pe sitepsihologi.ro. Acolo scriu
         psihologi despre un site, nu pacienți despre sănătatea lor, deci motivul
-        pentru care cabinetele n-au text liber și telefon nu se aplică. Vezi
-        CONTEXT.md, la hotărârile din 28 aug. și 16–18 sept.
+        pentru care cabinetele n-au text liber nu se aplică. Vezi CONTEXT.md, la
+        hotărârile din 28 aug. și 16–18 sept.
       */}
       {modele && (
         <>
-          <Camp
-            id="contact-telefon"
-            name="telefon"
-            tip="tel"
-            eticheta={texte.telefon}
-            autoComplete="tel"
-            maxLength={LIMITE.telefon}
-            obligatoriu={false}
-            sufixOptional={texte.optional}
-            eroare={stare.erori?.telefon}
-            valoare={stare.valori?.telefon}
-          />
-
           {/*
             `key` pe numărul de încercări: după o trimitere, React reface
             formularul din valorile implicite, iar la o listă `defaultValue`
