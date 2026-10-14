@@ -187,7 +187,7 @@ face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spun
 `claude/brief-sitepsihologi`, NEPUBLICAT — așteaptă „fă pe master").** Propus de
 sesiune, cerut de proprietar („da, fă-l"): schimbă adresa cu care un client intră în
 panou, pentru ORICARE client, doar din ecranul proprietarului platformei. Un client NU
-îl are (hotărât: varianta pentru clienți abia după ce merge emailul prin Resend, cu
+îl are (hotărât: varianta pentru clienți — pe lista de făcut, punctul 4a — abia după ce merge emailul prin Resend, cu
 parola curentă + link de confirmare pe adresa nouă — o schimbare de adresă de login +
 „Ți-ai uitat parola?" înseamnă preluarea contului).
 - **Cod:** `src/lib/schimba-email-cont.ts` (regulile și pașii, probabile în Node),
@@ -277,6 +277,26 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
    prin decizia lui explicită" (26 aug.). **Schimbat pe 9 oct.: proprietarul a cerut
    să urmeze, în sesiunea următoare — emailul prin Resend, împreună cu resetarea
    parolei (punctul 3).** Până atunci clientul vede mesajele doar intrând în panou.
+4a. **„Schimbă emailul" și pentru clienți** (cerut de proprietar, 14 oct.; vine DUPĂ
+   punctul 4 — are nevoie de emailuri care ajung). Acum butonul există doar în
+   `/proprietar`; un client care pierde adresa de intrare scrie proprietarului, iar el o
+   schimbă. Pentru client, în panoul lui (de pus în Setări, ca grup nou): ce trebuie
+   - **parola curentă + link de confirmare trimis la adresa NOUĂ** — schimbarea se aplică
+     abia după apăsarea lui (o greșeală de scriere nu-l scoate din cont, iar cine apucă un
+     laptop deschis nu poate prelua contul prin „Ți-ai uitat parola?");
+   - **de hotărât, cu proprietarul:** Supabase trimite implicit linkuri de confirmare și
+     la adresa VECHE, și la cea nouă, dar clientul își schimbă adresa tocmai fiindcă n-o
+     mai are pe cea veche. Se poate cere confirmare doar pe cea nouă — securitate mai slabă;
+   - **copia `public.users.email` ținută la zi** după confirmare (sincronizare automată,
+     nu de mână) — o copie nepotrivită face ca „Intră în panou" să creeze conturi goale
+     (vezi lecțiile din §„Butonul «Schimbă emailul» din `/proprietar`");
+   - schimbă DOAR contul celui conectat; nu spune dacă o adresă e deja folosită de alt
+     cabinet (aceeași regulă ca la resetarea parolei: formularul nu devine o unealtă de aflat
+     ce adrese sunt înregistrate); emailul de confirmare în română;
+   - probat pe un GoTrue adevărat (rețeta din aceeași secțiune), nu doar cu înlocuitori —
+     forma erorilor pe calea clientului (`auth.updateUser`) poate diferi de cea de administrator;
+   - efort: de câteva ori cât butonul pentru proprietar (ecran nou, cerere de parolă, pagină
+     de confirmare, sincronizarea copiei, probe, mesaje).
 5. **Videoclipul de instructaj** — ultimul de tot, fiindcă se învechește la fiecare
    schimbare de ecran.
 6. ✓ Făcut: cheile hCaptcha (17 sept.), izolarea dovedită pe baza reală (10 sept.),
