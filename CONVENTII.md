@@ -457,6 +457,12 @@ variabilă inventată, și una adăugată în `Section` fără să fie trecută 
 cu 300px, accentul avea 2,5:1 pe fundal închis, numele cabinetului se tăia peste
 900px.
 
+**Ce atinge conturi, sesiuni sau drepturile din Supabase** nu se încearcă pe un banc cu
+`auth.users` de mântuială: forma erorilor, `generateLink`, tokenurile și RLS-ul se poartă
+altfel pe un GoTrue adevărat (14 oct. 2026: două lecții găsite așa, la butonul „Schimbă
+emailul"). Rețeta de ridicat unul local, cu Docker, e în CONTEXT.md, la „Butonul
+«Schimbă emailul» din `/proprietar`".
+
 Logica pură (parsere, validări, formatări) se testează cu Node direct, fără
 server și fără Supabase: **`pnpm test:logica`**. Rulează tot ce se cheamă
 `e2e/*.proba.mjs`, cu hook-ul din `e2e/alias.mjs` care rezolvă `@/`.

@@ -183,6 +183,60 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
+**Butonul „Schimbă emailul" din `/proprietar` (14 oct. 2026, pe branch-ul
+`claude/brief-sitepsihologi`, NEPUBLICAT — așteaptă „fă pe master").** Propus de
+sesiune, cerut de proprietar („da, fă-l"): schimbă adresa cu care un client intră în
+panou, pentru ORICARE client, doar din ecranul proprietarului platformei. Un client NU
+îl are (hotărât: varianta pentru clienți abia după ce merge emailul prin Resend, cu
+parola curentă + link de confirmare pe adresa nouă — o schimbare de adresă de login +
+„Ți-ai uitat parola?" înseamnă preluarea contului).
+- **Cod:** `src/lib/schimba-email-cont.ts` (regulile și pașii, probabile în Node),
+  acțiunea `schimbaEmailul` în `src/app/proprietar/actions.ts` (paznicul „ești
+  proprietarul?" ÎNAINTEA oricărui alt lucru; contul se găsește pe server după site,
+  niciodată un id din browser), fereastra `src/app/proprietar/schimba-email.tsx`,
+  nota în jurnal `scrieInJurnalDePlatforma` în `src/lib/audit.ts`. Probe:
+  `e2e/schimba-email-cont.proba.mjs` (toate stricate pe rând: pică).
+- **Ce schimbă:** adresa stă în DOUĂ locuri — conturile Supabase (`auth.users`, de
+  unde se loghează) și copia `public.users.email` (o citesc „Intră în panou", lista
+  din `/proprietar` și „Activitate"). Ordine: conturile întâi, apoi copia; dacă a doua
+  scriere pică, prima se dă înapoi; dacă nici înapoi nu merge, mesajul spune ambele
+  adrese. După un eșec „nesigur" (răspuns pierdut) se întreabă ce adresă are contul
+  acum, ca să nu rămână jumătate de schimbare. Parola rămâne; nu se trimite niciun email.
+- **Nota din jurnalul clientului** apare în „Activitate", fără autor: „Adresa de intrare
+  în panou a fost schimbată de administratorul platformei: vechi → nou."
+- **Încercat pe un Supabase adevărat** (GoTrue v2.197.0 + PostgREST, cu toate migrările
+  noastre peste), cap la cap în browser: proprietarul schimbă adresa Anei; Ana intră cu
+  adresa nouă și aceeași parolă, nu mai intră cu cea veche; nota apare la ea în
+  „Activitate"; un client conectat nu vede `/proprietar`; 375 px fără derulare în lateral.
+  **Lecții de acolo (nu se văd fără un GoTrue adevărat):**
+  1. O adresă deja folosită, la schimbarea de administrator, NU dă `email_exists` (422):
+     dă 500 „Error updating user", fără cod. De-aia adresa se verifică ÎNAINTE în
+     `public.users`; o adresă a unui cont din afara cabinetelor (ex. cel de proprietar)
+     dă doar „nu-merge", cu un mesaj care nu pretinde că știe cauza.
+  2. `generateLink` de tip `magiclink` pe o adresă FĂRĂ cont **creează un cont gol**
+     pentru ea (nu dă eroare). Deci o copie `public.users.email` nepotrivită cu conturile
+     face ca „Intră în panou" să creeze tăcut conturi goale în loc să pice — motivul
+     pentru care cele două se țin mereu la fel. (De întărit, la cerere: `intraInPanou` ar
+     putea lua adresa din conturi, nu din copie.)
+  3. `email_confirm: true` contează doar la un cont cu adresa neconfirmată (fără el,
+     după schimbare ar primi „Email not confirmed"); o schimbare de administrator se
+     aplică pe loc și nu trimite email.
+- **Găsit în trecere, NEREPARAT (propus proprietarului):** `scrieInJurnal` cu entitățile
+  `"Site"` (publicarea/retragerea site-ului) și `"DatePersonale"` (ștergerea datelor
+  unei persoane) pică la constrângerea `audit_log_entity_type_check` (acceptă doar zece
+  valori, fără acestea), iar eroarea e înghițită — deci acele intrări nu apar niciodată
+  în „Activitate". Verificat pe bancul local. Reparația ar fi o migrare care lărgește
+  constrângerea; nu s-a făcut, fiindcă nu a fost cerută.
+- **Cum se ridică local un Supabase adevărat (n-a intrat în depozit):** Docker (în
+  containerul cloud: `dockerd --iptables=false --ip6tables=false --bridge=none`), imaginile
+  `supabase/gotrue:v2.197.0` și `postgrest/postgrest:v12.2.3`, `--network host`, Postgres-ul
+  băncii cu un DB nou: rolul `supabase_auth_admin` + schema `auth` pentru GoTrue (își face
+  singur migrările), apoi `auth.uid()`, tabelele `storage` de probă și migrările noastre
+  în ordine; GoTrue cu `GOTRUE_JWT_DEFAULT_GROUP_NAME=authenticated` (altfel tokenul are
+  rolul gol, iar RLS refuză totul); un proxy mic care duce `/auth/v1` la GoTrue și
+  `/rest/v1` la PostgREST; aplicația construită cu `NEXT_PUBLIC_SUPABASE_URL` pe proxy.
+  Dacă se cere, se pun ca script în depozit.
+
 ### Lista de sarcini înainte de lansare, reluată (7 oct. 2026)
 
 Reluată la cererea proprietarului, din tabelele și secțiunile de mai jos, cu ce s-a

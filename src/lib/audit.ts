@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/admin";
 
 /**
  * Jurnalul de activitate — cine, ce și când.
@@ -66,6 +67,49 @@ export async function scrieInJurnal(intrare: {
       entity_id: intrare.entitateId ?? null,
       diff: intrare.diff ?? null,
     });
+
+    if (error) console.error("Jurnalul de activitate n-a putut fi scris:", error);
+  } catch (eroare) {
+    console.error("Jurnalul de activitate n-a putut fi scris:", eroare);
+  }
+}
+
+/**
+ * O intrare în jurnalul unui client, scrisă de PROPRIETARUL PLATFORMEI (nu de un
+ * cont al cabinetului).
+ *
+ * `scrieInJurnal` de mai sus nu merge aici: scrie cu clientul userului, iar RLS
+ * cere `site_id = current_site_id()` și `actor_id = auth.uid()`; proprietarul
+ * platformei nu e legat de niciun cabinet. Deci se scrie cu cheia secretă, fără
+ * autor (`actor_id` gol — coloana îl și permite, iar cheia externă duce la
+ * `users`, unde proprietarul platformei nu are rând). Ecranul „Activitate"
+ * arată o intrare fără autor ca pe oricare altă modificare, doar fără nume.
+ *
+ * Entitatea trebuie să fie una dintre cele zece din constrângerea bazei
+ * (`audit_log_entity_type_check`). „Site" și „DatePersonale", deși apar în
+ * tipul de mai sus, NU sunt printre ele: scrierile cu ele pică la bază, iar
+ * `scrieInJurnal` înghite eroarea. Aici se folosește „SiteSettings".
+ *
+ * Nu aruncă niciodată, din același motiv ca `scrieInJurnal`.
+ */
+export async function scrieInJurnalDePlatforma(intrare: {
+  siteId: string;
+  actiune: ActiuneAudit;
+  entitate: EntitateAudit;
+  /** Ce s-a schimbat, pe înțelesul clientului care citește jurnalul. */
+  rezumat: string;
+}): Promise<void> {
+  try {
+    const { error } = await createServiceClient()
+      .from("audit_log")
+      .insert({
+        site_id: intrare.siteId,
+        actor_id: null,
+        action: intrare.actiune,
+        entity_type: intrare.entitate,
+        entity_id: null,
+        diff: { rezumat: intrare.rezumat },
+      });
 
     if (error) console.error("Jurnalul de activitate n-a putut fi scris:", error);
   } catch (eroare) {

@@ -1,4 +1,5 @@
 import { ButonIntra } from "./buton-intra";
+import { SchimbaEmail } from "./schimba-email";
 
 /** Un rând din lista de site-uri, gata de arătat — datele deja pregătite în pagină. */
 export type RandSite = {
@@ -120,8 +121,12 @@ export function TabelSiteuri({
               {site.programari ? " · Programări pornite" : ""}
             </div>
 
-            <div className="mt-3">
+            {/* „Schimbă emailul" doar cu cont legat: fără cont n-are ce schimba. */}
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               <ButonIntra siteId={site.id} faraCont={!site.email} />
+              {site.email && (
+                <SchimbaEmail siteId={site.id} numeSite={site.name} emailCurent={site.email} />
+              )}
             </div>
           </li>
         ))}
@@ -159,8 +164,13 @@ export function TabelSiteuri({
                 <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
                   {site.programari ? "Pornite" : "—"}
                 </td>
-                <td className="px-4 py-3 text-right">
-                  <ButonIntra siteId={site.id} faraCont={!site.email} />
+                <td className="px-4 py-3">
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    <ButonIntra siteId={site.id} faraCont={!site.email} />
+                    {site.email && (
+                      <SchimbaEmail siteId={site.id} numeSite={site.name} emailCurent={site.email} />
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

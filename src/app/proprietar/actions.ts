@@ -1,9 +1,17 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { getProprietarOptional } from "@/lib/proprietar";
+import { scrieInJurnalDePlatforma } from "@/lib/audit";
+import {
+  dependinteDinSupabase,
+  rezumatJurnal,
+  schimbaEmailulContului,
+  type RezultatSchimbare,
+} from "@/lib/schimba-email-cont";
 
 /** Ieșirea din panoul de proprietar. */
 export async function signOutProprietar() {
@@ -80,4 +88,47 @@ export async function intraInPanou(siteId: string): Promise<RezultatIntrare> {
   const tinta = new URL("/proprietar/intra", `https://${site.domain}`);
   tinta.searchParams.set("token_hash", tokenHash);
   return { ok: true, url: tinta.toString() };
+}
+
+/** Ce află fereastra „Schimbă emailul": reușita sau de ce n-a mers. */
+export type RezultatSchimbareEmail = RezultatSchimbare | { ok: false; eroare: "neautentificat" };
+
+/**
+ * „Schimbă emailul contului" — adresa cu care un client intră în panou.
+ *
+ * Doar pentru proprietarul platformei, iar paznicul stă AICI, în acțiune, nu pe
+ * seama proxy-ului — la fel ca la `intraInPanou`, și din același motiv: un Server
+ * Action e un POST pe ruta lui, iar schimbarea adresei unui cont arbitrar e o
+ * putere mare (cine o are și cere „Ți-ai uitat parola?" preia contul), deci se
+ * verifică lângă ea, nu departe.
+ *
+ * Ce se schimbă și în ce ordine: `schimbaEmailulContului`, în
+ * `src/lib/schimba-email-cont.ts`. `siteId` și adresa vin din fereastră, dar
+ * contul se găsește pe server, după site — niciodată un id de cont venit din
+ * browser.
+ */
+export async function schimbaEmailul(
+  siteId: string,
+  emailNou: string,
+): Promise<RezultatSchimbareEmail> {
+  const proprietar = await getProprietarOptional();
+  if (!proprietar) return { ok: false, eroare: "neautentificat" };
+
+  const rezultat = await schimbaEmailulContului(
+    siteId,
+    emailNou,
+    dependinteDinSupabase(createServiceClient(), (idSite, vechi, nou) =>
+      scrieInJurnalDePlatforma({
+        siteId: idSite,
+        actiune: "update",
+        entitate: "SiteSettings",
+        rezumat: rezumatJurnal(vechi, nou),
+      }),
+    ),
+  );
+
+  // Lista din `/proprietar` arată adresa sub numele cabinetului: se recitește.
+  if (rezultat.ok) revalidatePath("/proprietar");
+
+  return rezultat;
 }
