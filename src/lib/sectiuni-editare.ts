@@ -240,6 +240,18 @@ export function valideaza(
         erori[drum] = `Cel mult ${camp.max} rânduri. Acum sunt ${lista.length}.`;
       }
 
+      // Lungimea unui rând, doar la listele de cuvinte scurte (banda cu servicii).
+      // Un rând prea lung nu se taie în tăcere: omul află care e, ca să-l scurteze el.
+      // Peste eroarea de număr nu se suprascrie — contează întâi ce e de șters.
+      if (camp.tip === "listaText" && camp.maxLungimeElement && !erori[drum]) {
+        const limita = camp.maxLungimeElement;
+        const prea = lista.map((text) => String(text ?? "").trim()).find((text) => text.length > limita);
+        if (prea !== undefined) {
+          const inceput = prea.length > 24 ? `${prea.slice(0, 24)}…` : prea;
+          erori[drum] = `Fiecare rând are cel mult ${limita} de caractere. „${inceput}” are ${prea.length}.`;
+        }
+      }
+
       /*
         Limita listelor cu câmpuri (apariții, programe, întrebări…), verificată
         și pe SERVER. Până pe 2 oct. 2026 o ținea doar panoul, prin butonul

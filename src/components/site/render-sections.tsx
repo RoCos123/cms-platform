@@ -144,6 +144,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
   bandaServicii: (row, ctx) => (
     <BandaServicii
       servicii={ctx.servicii}
+      cuvinte={(row.data as { cuvinte?: unknown } | null)?.cuvinte}
       tone={row.tone}
       discreta={ctx.asezari.bandaServiciiDiscreta}
       delimitata={ctx.asezari.bandaServiciiDelimitata}

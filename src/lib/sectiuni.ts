@@ -16,6 +16,8 @@
  * șabloane și corecția `logos` din design/sabloane/README.md.
  */
 
+import { MAX_CUVINTE_BANDA, MAX_LUNGIME_CUVANT_BANDA } from "@/lib/banda-servicii";
+
 type CampComun = {
   /** Cheia din JSON-ul secțiunii. */
   cheie: string;
@@ -113,8 +115,12 @@ export type CampSchema =
    * (`rescrieAdreseleFisiere`), exact ca la imagini.
    */
   | (CampComun & { tip: "document" })
-  /** Listă de rânduri de text simplu (paragrafe, detalii). */
-  | (CampComun & { tip: "listaText"; etichetaElement: string; max?: number })
+  /**
+   * Listă de rânduri de text simplu (paragrafe, detalii). `maxLungimeElement`:
+   * cât de lung poate fi UN rând — pentru listele de cuvinte scurte (banda cu
+   * servicii); paragrafele n-au limită pe rând.
+   */
+  | (CampComun & { tip: "listaText"; etichetaElement: string; max?: number; maxLungimeElement?: number })
   /** Listă de elemente cu mai multe câmpuri fiecare (servicii, pași, mărturii). */
   | (CampComun & {
       tip: "lista";
@@ -351,11 +357,21 @@ const LISTA: MetaSectiune[] = [
   {
     cheie: "bandaServicii",
     nume: "Bandă cu servicii",
-    descriere: "O fâșie îngustă care derulează numele serviciilor tale.",
+    descriere: "O fâșie îngustă care derulează numele serviciilor tale sau cuvintele pe care le alegi.",
     repetabila: false,
     continutDinAltaParte:
-      "Banda arată numele serviciilor tale, unul după altul, mișcându-se lin. Nu scrii nimic aici — numele vin din Servicii, din meniu. O pornești sau o oprești din lista de secțiuni.",
-    campuri: [],
+      "Banda arată cuvinte unul după altul, mișcându-se lin. Dacă scrii cuvinte mai jos, ele apar în bandă. Dacă lași lista goală, banda arată numele serviciilor tale, din Servicii, din meniu. O pornești sau o oprești din lista de secțiuni.",
+    campuri: [
+      {
+        tip: "listaText",
+        cheie: "cuvinte",
+        eticheta: "Cuvinte din bandă",
+        etichetaElement: "cuvânt",
+        hint: `Opțional. Câte unul pe rând, de exemplu: Traumă, Anxietate, Dezvoltare personală. Cel mult ${MAX_CUVINTE_BANDA} cuvinte, fiecare de cel mult ${MAX_LUNGIME_CUVANT_BANDA} de caractere. Lasă gol ca banda să arate numele serviciilor tale.`,
+        max: MAX_CUVINTE_BANDA,
+        maxLungimeElement: MAX_LUNGIME_CUVANT_BANDA,
+      },
+    ],
   },
   {
     cheie: "howItWorks",

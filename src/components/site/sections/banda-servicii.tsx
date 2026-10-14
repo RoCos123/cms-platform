@@ -1,13 +1,15 @@
 import type { SectionTone } from "@/lib/templates";
 import type { Serviciu } from "@/lib/servicii";
+import { numeleDinBanda } from "@/lib/banda-servicii";
 
 /**
  * Banda cu servicii — o fâșie îngustă cu numele serviciilor, care se derulează
  * lin pe fundalul de accent.
  *
- * Auto-conținut: numele vin din Servicii, ca la „Serviciile mele", nu din rândul
- * secțiunii. Fără niciun serviciu publicat, banda dispare — un titlu care se
- * mișcă în gol arată a defect.
+ * Ce derulează: cuvintele alese de client în secțiune („Traumă", „Anxietate"…),
+ * iar dacă n-a scris niciunul, numele serviciilor publicate, ca la „Serviciile
+ * mele" (`numeleDinBanda`). Fără cuvinte și fără niciun serviciu publicat, banda
+ * dispare — un titlu care se mișcă în gol arată a defect.
  *
  * Mișcarea stă într-un `<style>` CHIAR în componentă, nu în CSS-ul global: un
  * `@keyframes` nu se poate scrie inline, iar previzualizarea din panou rulează
@@ -20,10 +22,17 @@ import type { Serviciu } from "@/lib/servicii";
  */
 export function BandaServicii({
   servicii,
+  cuvinte,
   discreta,
   delimitata,
 }: {
   servicii: Serviciu[];
+  /**
+   * Cuvintele alese de client pentru bandă (`data.cuvinte`, vector de șiruri din
+   * JSON). Dacă are măcar unul, banda arată doar pe ele; altfel, titlurile
+   * serviciilor. Vezi `numeleDinBanda`.
+   */
+  cuvinte?: unknown;
   tone?: SectionTone;
   /**
    * Varianta discretă a referinței „Liniște": fundal crem (nu accentul plin),
@@ -42,7 +51,7 @@ export function BandaServicii({
    */
   delimitata?: boolean;
 }) {
-  const nume = servicii.map((s) => s.titlu).filter((t) => t?.trim());
+  const nume = numeleDinBanda(cuvinte, servicii);
   if (nume.length === 0) return null;
 
   // O jumătate destul de lată cât să umple ecranul și cu puține servicii; apoi

@@ -183,8 +183,30 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
+**Banda cu servicii, cu cuvinte proprii (14 oct. 2026, cerut de proprietar; pe branch,
+NEPUBLICAT — așteaptă „fă pe master").** Până acum banda nu avea câmpuri: derula
+titlurile serviciilor publicate. Un client care vrea la Servicii „Consiliere psihologică,
+Testare", dar în bandă „Traumă, Anxietate, Dezvoltare personală", nu avea cum. Acum
+secțiunea are un câmp opțional, „Cuvinte din bandă" (listă de rânduri, câte unul pe
+rând). **Regula:** dacă lista are măcar un cuvânt, banda arată DOAR cuvintele ei; dacă e
+goală, banda arată titlurile serviciilor, exact ca înainte — deci toate site-urile de
+acum, care au `{}` în bandă, nu se schimbă și **nu e nevoie de migrare** (varianta
+„doar cuvinte proprii, fără rezervă" ar fi cerut SQL pentru site-urile cu banda pornită
+și pentru clienții noi; proprietarul a ales varianta cu rezervă). Limite: cel mult 12
+cuvinte, fiecare de cel mult 40 de caractere, verificate și pe server (un rând prea lung
+nu se taie în tăcere: eroarea îl arată, „… are 41"). Cod: `src/lib/banda-servicii.ts`
+(`numeleDinBanda`, limitele), câmpul în `src/lib/sectiuni.ts` (tipul `listaText` a primit
+`maxLungimeElement`, opțional, verificat în `valideaza`), `BandaServicii` primește
+`cuvinte` din registru. Probe: `e2e/banda-servicii.proba.mjs` (strică-le pe rând: pică).
+Încercat în browser, ca client, pe aplicația construită: lista goală → numele
+serviciilor; cuvinte scrise → previzualizarea din panou se schimbă pe loc, iar pe site
+apar abia după „Salvează"; 13 cuvinte sau unul de 41 de caractere → eroare lângă câmp,
+nimic salvat; lista golită la loc → `{}` în date și banda revine la servicii; la 375 px
+fără depășire orizontală. Textul „Nu scrii nimic aici" din ecranul benzii și descrierea ei
+din lista de secțiuni au fost puse la zi (altfel ar fi minții).
+
 **Telefon OPȚIONAL în formularul de contact, pe toate șabloanele (14 oct. 2026, cerut de
-proprietar; pe branch, NEPUBLICAT — așteaptă „fă pe master").** Contactul cere acum
+proprietar; PE MASTER din 14 oct., `6044e7b`, CI verde).** Contactul cere acum
 nume + email (obligatorii) + telefon (opțional, „Număr de telefon (opțional)", câmp de
 tip `tel`). Schimbă hotărârea din 16 sept. („fără telefon"); proprietarul a cerut-o
 explicit. E o singură componentă (`ContactForm`), deci toate cele cinci șabloane o au
@@ -707,6 +729,8 @@ Toate livrate:
 3. **Bandă cu servicii** — secțiune nouă, pornit/oprit din lista de secțiuni;
    derulează numele serviciilor. La clienți noi vine vizibilă, la cei existenți
    ascunsă (backfill). Vezi migrarea `20260916120000_banda_servicii.sql`.
+   *Din 14 oct. 2026 poate derula și cuvinte proprii („Cuvinte din bandă"), cu numele
+   serviciilor ca rezervă — vezi „Banda cu servicii, cu cuvinte proprii", sus.*
 4. **Etichete** sub „Despre mine" (text mare + mărunt), pe toate șabloanele.
 5. **Poze la servicii** — copertă opțională per serviciu, ca la blog
    (`cover_upload_id`), pe cartonaș și pe pagina serviciului.
