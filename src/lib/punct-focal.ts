@@ -109,8 +109,8 @@ export function pozitiaImaginii(punct: unknown): string {
  * `object-position` se măsoară pe cât de mult IESE imaginea din ramă
  * (`surplus`): la 0% se vede marginea din stânga/sus, la 100% cea din
  * dreapta/jos. A trage imaginea la dreapta (`dx > 0`) dezvelește stânga, deci
- * procentul SCADE — de aici minusul. Pe axa unde imaginea încape fix (surplus
- * 0) nu e nimic de mutat, deci procentul rămâne.
+ * procentul SCADE — de aici minusul. Pe axa unde imaginea încape (aproape) fix —
+ * surplus sub `SURPLUS_MINIM_MUTARE` — nu e nimic de mutat, deci procentul rămâne.
  *
  * Se pleacă de la valoarea de la ÎNCEPUTUL tragerii plus deplasarea totală, nu
  * pas cu pas: altfel rotunjirile s-ar aduna și punctul ar aluneca singur.
@@ -164,14 +164,23 @@ export function surplusulPozei(masuri: {
  * întreagă în cadru. Pragul separă „nu e nimic de mutat" de „se poate muta":
  * din 4 px în sus mișcarea se vede.
  *
- * Folosit doar ca să se SPUNĂ omului ce se întâmplă (`RepozitionareImagine`); nu
- * schimbă ce face tragerea.
+ * Două întrebuințări, aceeași regulă: să se SPUNĂ omului ce se întâmplă
+ * (`RepozitionareImagine` scrie „Poza umple tot cadrul") și să NU se schimbe poziția
+ * pe o axă care nu are joc. Până pe 15 oct. 2026 a doua nu exista: pe o axă cu 1–3 px
+ * de surplus, orice tragere împărțea la un număr aproape de zero și arunca poziția
+ * salvată la 0% sau 100%, deși pe ecran nu se mișca nimic. Poziția se folosește și pe
+ * cartonașul din lista de articole, care are altă formă, deci acolo extremul se vedea.
  */
 export const SURPLUS_MINIM_MUTARE = 4;
 
+/** Are axa asta destul „joc” ca poza să se poată trage pe ea? */
+export function axaSePoateMuta(surplus: number): boolean {
+  return surplus >= SURPLUS_MINIM_MUTARE;
+}
+
 /** Mai iese poza din ramă destul, măcar pe o axă, ca tragerea să se vadă? */
 export function poateFiMutata(surplus: { surplusX: number; surplusY: number }): boolean {
-  return surplus.surplusX >= SURPLUS_MINIM_MUTARE || surplus.surplusY >= SURPLUS_MINIM_MUTARE;
+  return axaSePoateMuta(surplus.surplusX) || axaSePoateMuta(surplus.surplusY);
 }
 
 export function dupaTragere(
@@ -180,8 +189,10 @@ export function dupaTragere(
 ): PunctFocal {
   const { dx, dy, surplusX, surplusY } = deplasare;
 
-  const x = surplusX > 0 ? start.x - (dx / surplusX) * 100 : start.x;
-  const y = surplusY > 0 ? start.y - (dy / surplusY) * 100 : start.y;
+  // O axă fără joc destul (sub `SURPLUS_MINIM_MUTARE`) rămâne unde e: împărțirea la un
+  // surplus de 1–3 px ar arunca poziția la 0% sau 100% pentru o mișcare invizibilă.
+  const x = axaSePoateMuta(surplusX) ? start.x - (dx / surplusX) * 100 : start.x;
+  const y = axaSePoateMuta(surplusY) ? start.y - (dy / surplusY) * 100 : start.y;
 
   // Mărirea merge mai departe neatinsă: tragerea mută cadrul, nu-l apropie.
   return normalizeazaPunctFocal({ x, y, zoom: start.zoom });

@@ -184,7 +184,8 @@ rând, schimbată din inițiativa mea — amândouă respinse). Verificarea ceru
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
 **Mesajul „Poza umple tot cadrul" la repoziționarea pozelor (15 oct. 2026, cerut de
-proprietar; pe branch, NEPUBLICAT — așteaptă „fă pe master").** Proprietarul nu putea
+proprietar; pe branch, NEPUBLICAT — așteaptă „fă pe master"; mesajul e în `926388a`, pragul
+la tragere în comitul următor).** Proprietarul nu putea
 muta coperta unui articol de blog. Cauza: rama din editor are forma locului de pe site
 (16/9 la coperta articolului), iar poza lui era tot ~16/9 — umplea rama exact, deci nu
 ieșea nimic din ea și tragerea n-avea ce muta (0–3 px), în timp ce pe poză scria mereu
@@ -197,10 +198,16 @@ până nu se măsoară nu scrie nimic. Cod: `poateFiMutata`/`SURPLUS_MINIM_MUTAR
 `src/lib/punct-focal.ts`, mesajul în `repozitionare-imagine.tsx`; probe în
 `e2e/punct-focal.proba.mjs` (strică-le pe rând: pică). Încercat în editorul de blog, pe
 aplicația construită, cu poze de 16/9, ~1,79, 4/3 și portret, la 1,0× și 1,5×, și la 390 px.
-**NEFĂCUT, propus proprietarului (fără răspuns încă):** tragerea pe o poză cu surplus de
-1–3 px aruncă poziția salvată la extrem (0% sau 100%) — pe pagina articolului nu se vede,
-dar poziția se folosește și pe cartonașul din listă, care are altă formă. Soluția: ignoră
-mișcările sub același prag de 4 px (acum pragul doar alege mesajul).
+**Pragul și la tragere (15 oct. 2026, „da" al proprietarului — făcut):** pe o axă cu surplus
+sub 4 px, tragerea (mausul ȘI săgețile) nu mai schimbă poziția salvată. Înainte, pe o poză
+cu 1–3 px de joc, orice tragere împărțea la un număr aproape de zero și arunca poziția la
+0% sau 100%, deși pe ecran nu se mișca nimic; poziția se folosește și pe cartonașul din
+listă, care are altă formă. Regula e una singură, `axaSePoateMuta` (per axă) în
+`punct-focal.ts`, folosită și de mesaj. Încercat în editorul de blog: 16/9 exact și 7/4,
+la 1,0×, rămân pe 50% 50% oricât tragi (înainte săreau la 0%/100%); la 2,0× se mută în
+toate direcțiile; 4/3 și portretul se mișcă la fel ca înainte. Probe noi, stricate pe
+rând (5 încercări) ca să pice. Poziții deja salvate la extrem înainte de corectură nu se
+repară singure — se mută din nou trăgând după ce poza e mărită.
 
 **Banda cu servicii, cu cuvinte proprii (14 oct. 2026, cerut de proprietar; PE MASTER din
 14 oct., `429e244`, CI verde).** Până acum banda nu avea câmpuri: derula

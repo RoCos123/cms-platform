@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   PUNCT_FOCAL_IMPLICIT,
   SURPLUS_MINIM_MUTARE,
+  axaSePoateMuta,
   dupaTragere,
   normalizeazaPunctFocal,
   poateFiMutata,
@@ -185,4 +186,57 @@ test("mesajul de pe poză: textul proprietarului, cuvânt cu cuvânt, iar „Mă
   // Unde nu e glisor (Biblioteca), mesajul nu trimite la un buton care nu există.
   assert.ok(componenta.includes("cuMarire ? INDICIU_UMPLE_CU_MARIRE : INDICIU_UMPLE"));
   assert.ok(componenta.includes('"Trage de poză ca s-o poziționezi"'), "indiciul obișnuit trebuie să rămână");
+});
+
+/**
+ * Pragul și la tragere (15 oct. 2026, „da" al proprietarului). Pe o poză cu 1–3 px de
+ * surplus, orice tragere împărțea la un număr aproape de zero și arunca poziția
+ * salvată la 0% sau 100% — deși pe ecran nu se mișca nimic. Poziția se folosește și
+ * pe cartonașul din listă, care are altă formă, deci acolo extremul se vedea.
+ */
+
+test("pe o axă cu surplus sub prag (0,9 / 2,5 / 2,9 px), tragerea NU mută poziția salvată", () => {
+  // Cele trei valori reale: 16/9 într-o ramă cu chenar (0,9), ~1,79 (2,5), 7/4 (2,9).
+  for (const surplus of [0.875, 2.5, 2.857142857142833, SURPLUS_MINIM_MUTARE - 0.01]) {
+    assert.deepEqual(
+      dupaTragere({ x: 50, y: 50 }, { dx: 60, dy: 40, surplusX: surplus, surplusY: surplus }),
+      { x: 50, y: 50 },
+      `surplus ${surplus}`,
+    );
+    assert.deepEqual(
+      dupaTragere({ x: 20, y: 80 }, { dx: -300, dy: 300, surplusX: surplus, surplusY: surplus }),
+      { x: 20, y: 80 },
+      `surplus ${surplus}, tras tare`,
+    );
+  }
+});
+
+test("de la prag în sus, tragerea mută, proporțional cu surplusul", () => {
+  assert.ok(axaSePoateMuta(SURPLUS_MINIM_MUTARE));
+  assert.ok(!axaSePoateMuta(SURPLUS_MINIM_MUTARE - 0.01));
+  // 4 px de surplus, tras 2 px: jumătate din drum → 50 − 50 = 0.
+  assert.deepEqual(
+    dupaTragere({ x: 50, y: 50 }, { dx: 2, dy: 0, surplusX: SURPLUS_MINIM_MUTARE, surplusY: 0 }),
+    { x: 0, y: 50 },
+  );
+});
+
+test("fiecare axă își are pragul ei: una fără joc stă pe loc, cealaltă se mișcă", () => {
+  // 2752×1536 în rama 16/9: 2,5 px pe orizontală, 0 pe verticală — și 4/3: 0 pe orizontală, 60 pe verticală.
+  assert.deepEqual(
+    dupaTragere({ x: 50, y: 50 }, { dx: 30, dy: 30, surplusX: 0, surplusY: 60 }),
+    { x: 50, y: 0 },
+  );
+  assert.deepEqual(
+    dupaTragere({ x: 50, y: 50 }, { dx: 30, dy: 30, surplusX: 2.5, surplusY: 60 }),
+    { x: 50, y: 0 },
+    "2,5 px pe orizontală nu trebuie să mute x",
+  );
+});
+
+test("și săgețile respectă pragul, nu doar mausul", () => {
+  const componenta = readFileSync("src/components/ui/repozitionare-imagine.tsx", "utf8");
+  assert.ok(componenta.includes("axaSePoateMuta(surplusX) ? value.x + m[0] : value.x"));
+  assert.ok(componenta.includes("axaSePoateMuta(surplusY) ? value.y + m[1] : value.y"));
+  assert.ok(!/surplus[XY] > 0/.test(componenta), "a rămas o verificare „> 0” care ocolește pragul");
 });

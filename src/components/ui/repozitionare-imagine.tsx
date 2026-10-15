@@ -10,6 +10,7 @@ import {
 import {
   ZOOM_MAXIM,
   ZOOM_MINIM,
+  axaSePoateMuta,
   dupaTragere,
   normalizeazaPunctFocal,
   normalizeazaZoom,
@@ -203,8 +204,8 @@ export function RepozitionareImagine({
     cereSaSeVadaPoza(src);
     const { surplusX, surplusY } = surplus();
     const nou = normalizeazaPunctFocal({
-      x: surplusX > 0 ? value.x + m[0] : value.x,
-      y: surplusY > 0 ? value.y + m[1] : value.y,
+      x: axaSePoateMuta(surplusX) ? value.x + m[0] : value.x,
+      y: axaSePoateMuta(surplusY) ? value.y + m[1] : value.y,
     });
     ultima.current = nou;
     onChange(nou);
