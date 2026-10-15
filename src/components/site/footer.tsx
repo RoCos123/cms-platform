@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { IcoanaSociala } from "@/components/site/icoana-sociala";
+import { randulDeCopyright } from "@/lib/copyright-subsol";
 
 export type LinkSubsol = { eticheta: string; href: string };
 
@@ -14,6 +15,8 @@ export type SiteFooterData = {
   adresa?: string;
   /** Acreditări, cod din registrul profesional — apar în bara de jos. */
   acreditare?: string;
+  /** Rândul din stânga al barei de jos, scris de client. Gol sau lipsă = © + anul + numele. */
+  copyright?: string;
   /** Coloana SERVICII: „Toate serviciile" + fiecare serviciu publicat. */
   servicii?: LinkSubsol[];
   /** Coloana CABINET: secțiunile vizibile + Blog + Contact. */
@@ -261,9 +264,7 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
             color: "var(--t-text-secundar-pe-inchis)",
           }}
         >
-          <span>
-            © {an} {data.nume}
-          </span>
+          <span>{randulDeCopyright(data.copyright, an, data.nume)}</span>
 
           {data.rindLegal && <span style={{ minWidth: 0, overflowWrap: "anywhere" }}>{data.rindLegal}</span>}
 

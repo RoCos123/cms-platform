@@ -174,6 +174,7 @@ export async function CadruSite({
             email: brand.email,
             adresa: brand.adresa,
             acreditare: brand.acreditare,
+            copyright: brand.copyright,
             servicii: coloanaServicii,
             cabinet: coloanaCabinet,
             legal: inSubsol.map((link) => ({ eticheta: link.text, href: link.href })),

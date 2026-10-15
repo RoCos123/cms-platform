@@ -1,4 +1,5 @@
 import type { CampSchema } from "@/lib/sectiuni";
+import { MAX_COPYRIGHT } from "@/lib/copyright-subsol";
 
 /**
  * Setările site-ului, descrise în același fel ca secțiunile — deci editate cu
@@ -88,6 +89,13 @@ export const CAMPURI_CABINET: CampSchema[] = [
     hint: "Una-două propoziții despre ce faci, sub numele cabinetului, jos pe pagină.",
     randuri: 3,
     max: 300,
+  },
+  {
+    tip: "text",
+    cheie: "copyright",
+    eticheta: "Textul de copyright din subsol",
+    hint: "Rândul mic din stânga, în bara de jos. Ex.: © {an} Cabinet Individual de Psihologie Popescu Robert · CIF 12345678. Scrie {an} unde vrei anul — se schimbă singur în fiecare ianuarie. Lasă gol ca să apară © + anul + numele cabinetului.",
+    max: MAX_COPYRIGHT,
   },
 ];
 
@@ -227,6 +235,8 @@ export type Brand = {
   adresa?: string;
   acreditare?: string;
   descriereSubsol?: string;
+  /** Rândul din stânga al barei de jos, scris de client; gol = © + anul + numele (vezi `randulDeCopyright`). */
+  copyright?: string;
   /** Datele firmei: doar pe pagina de vânzare (vezi `CAMPURI_FIRMA`). */
   firmaDenumire?: string;
   firmaCui?: string;

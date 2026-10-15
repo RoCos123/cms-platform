@@ -183,6 +183,25 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
+**Rândul de copyright din subsol, scris de client (15 oct. 2026, cerut de proprietar; pe
+branch, NEPUBLICAT — așteaptă „fă pe master").** Bara de jos a subsolului avea în stânga
+„© 2026 Popescu Robert", compus singur (anul de azi + numele cabinetului, același din antet),
+deci nu se putea scrie altfel. Acum Setări are un câmp „Textul de copyright din subsol"
+(`brand.copyright`, text, cel mult 200 de caractere, opțional): cu text, rândul arată EXACT
+textul; gol, rămâne © + anul + numele, ca înainte — deci niciun site existent nu se schimbă și
+**nu e nevoie de SQL**. **`{an}` din text devine anul curent** (recomandarea sesiunii, pe care
+proprietarul a acceptat-o cu „facem așa cum propui tu"): fără el, cine scrie „© 2026" de mână
+rămâne cu un an învechit din ianuarie. Rândul din dreapta („Membru al Colegiului…") era deja
+editabil, în Setări → „Acreditare". Cod: `src/lib/copyright-subsol.ts` (regula, neutră — o
+folosesc și site-ul, și previzualizarea din Setări), câmpul în `CAMPURI_CABINET`
+(`src/lib/setari.ts`), `SiteFooter` + `cadru-site.tsx` + previzualizarea din
+`dashboard/setari/formular.tsx`. Probe: `e2e/copyright-subsol.proba.mjs` (opt încercări de
+stricare, toate pică). Încercat în browser, ca client, pe aplicația construită: fără câmp →
+„© 2026 Cabinet Ana"; scris → previzualizarea din Setări se schimbă pe loc, iar pe site apare
+abia după „Salvează", cu `{an}` → 2026; golit la loc → cheia dispare din date și subsolul revine;
+la 375 px rândul se rupe pe două linii, fără depășire. Pe sitepsihologi.ro (pagina de vânzare)
+nu s-a încercat: e același subsol și același câmp, iar rândul legal al firmei e separat, lângă el.
+
 **Politica de confidențialitate, rescrisă (15 oct. 2026, cerut de proprietar ca s-o încarce
 pe un site; pe branch, NEPUBLICATĂ — fișierul e doar un șablon, nu atinge nicio pagină).**
 `sabloane/politica-de-confidentialitate.md` descrie acum ce face chiar platforma:

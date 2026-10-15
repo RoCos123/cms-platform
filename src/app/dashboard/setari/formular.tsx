@@ -216,6 +216,7 @@ export function FormularSetari({
             email: text("email"),
             adresa: text("adresa"),
             acreditare: text("acreditare"),
+            copyright: text("copyright"),
             servicii: SERVICII_EXEMPLU,
             cabinet: CABINET_EXEMPLU,
             retele: linkurileSociale(social as Social),
