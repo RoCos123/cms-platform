@@ -94,7 +94,7 @@ export const CAMPURI_CABINET: CampSchema[] = [
     tip: "text",
     cheie: "copyright",
     eticheta: "Textul de copyright din subsol",
-    hint: "Rândul mic din stânga, în bara de jos. Ex.: © {an} Cabinet Individual de Psihologie Popescu Robert · CIF 12345678. Scrie {an} unde vrei anul — se schimbă singur în fiecare ianuarie. Lasă gol ca să apară © + anul + numele cabinetului.",
+    hint: "Rândul mic din stânga, în bara de jos. Scrie doar textul — semnul © și anul curent se pun singure în față, iar anul se schimbă singur în fiecare ianuarie. Ex.: Cabinet Individual de Psihologie Popescu Robert · CIF 12345678. Lasă gol ca să apară © + anul + numele cabinetului.",
     max: MAX_COPYRIGHT,
   },
 ];

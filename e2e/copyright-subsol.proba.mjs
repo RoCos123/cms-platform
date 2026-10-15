@@ -11,12 +11,15 @@ import { CAMPURI_CABINET } from "@/lib/setari";
  *
  * Cerut de proprietar: rândul din stânga al barei de jos („© 2026 Popescu Robert") se
  * compunea singur din anul de azi și numele cabinetului, deci nu se putea scrie cu
- * denumirea întreagă și CIF-ul. Acum are un câmp în Setări.
+ * denumirea întreagă și CIF-ul. Acum are un câmp în Setări. Omul scrie doar textul;
+ * „© " și anul curent se pun singure în față (a doua variantă — prima arăta „exact ce ai
+ * scris" și îl obliga să-și găsească semnul © pe tastatură).
  *
  * Ce apără:
  * 1. CÂMPUL GOL = comportamentul de dinainte. Toate site-urile existente nu au câmpul;
  *    dacă „gol" ar însemna altceva, subsolul lor s-ar schimba fără ca cineva să fi cerut;
- * 2. textul scris apare EXACT, doar cu `{an}` înlocuit — nu se adaugă nimic dinainte;
+ * 2. „© " și anul se pun singure în fața textului scris — dar NICIODATĂ al doilea © peste
+ *    unul scris de om (a scris deja rândul întreg, cum făcea prima variantă);
  * 3. câmpul se salvează, se reîncarcă și are o limită, ca orice câmp din Setări;
  * 4. subsolul de pe site și previzualizarea din Setări citesc același câmp, prin aceeași regulă.
  */
@@ -29,18 +32,33 @@ test("fără text scris, rândul rămâne cel de până acum: © + anul + numele
   }
 });
 
-test("cu text scris, rândul arată exact textul, fără nimic adăugat", () => {
-  const text = "© 2026 Cabinet Individual de Psihologie Popescu Cosmin Robert · CIF 54440949";
-  assert.equal(randulDeCopyright(text, 2027, "Popescu Robert"), text, "un an scris ca număr rămâne cum e");
-  assert.equal(randulDeCopyright("  Toate drepturile rezervate.  ", 2026, "Popescu Robert"), "Toate drepturile rezervate.");
-  // Nici numele, nici anul nu se adaugă singure când omul a scris propriul rând.
+test("cu text scris, „© ” și anul curent apar singure în față — și numele cabinetului NU", () => {
+  const text = "Cabinet Individual de Psihologie Popescu Cosmin Robert · CIF 54440949";
+  assert.equal(randulDeCopyright(text, 2026, "Popescu Robert"), `© 2026 ${text}`);
+  assert.equal(randulDeCopyright(text, 2027, "Popescu Robert"), `© 2027 ${text}`, "anul se schimbă singur");
+  assert.equal(randulDeCopyright("  Toate drepturile rezervate.  ", 2026, "Popescu Robert"), "© 2026 Toate drepturile rezervate.");
+  // Numele din antet nu se adaugă când omul a scris propriul text.
   assert.ok(!randulDeCopyright("Fără nimic altceva", 2026, "Popescu Robert").includes("Popescu"));
 });
 
-test("{an} devine anul curent — oriunde, de câte ori apare, cu litere mari sau mici", () => {
+test("cine a scris deja semnul își are rândul gata: niciun al doilea © în față", () => {
+  const gata = "© 2026 Cabinet Individual de Psihologie Popescu Cosmin Robert · CIF 54440949";
+  assert.equal(randulDeCopyright(gata, 2027, "X"), gata, "rândul scris întreg, cu an cu tot, rămâne exact cum e");
+  assert.equal(randulDeCopyright("©Cabinet", 2026, "X"), "©Cabinet");
+  assert.equal(randulDeCopyright("(c) Cabinet", 2026, "X"), "(c) Cabinet");
+  assert.equal(randulDeCopyright("Copyright Cabinet", 2026, "X"), "Copyright Cabinet");
+  assert.equal(randulDeCopyright("copyright 2026 Cabinet", 2026, "X"), "copyright 2026 Cabinet");
+  // Dar un cuvânt care doar începe cu aceleași litere nu e un semn de copyright.
+  assert.equal(randulDeCopyright("Copyrighted Cabinet", 2026, "X"), "© 2026 Copyrighted Cabinet");
+  assert.equal(randulDeCopyright("Cabinet (c) 2026", 2026, "X"), "© 2026 Cabinet (c) 2026");
+});
+
+test("{an} din text devine anul curent — oriunde, de câte ori apare, cu litere mari sau mici", () => {
   assert.equal(randulDeCopyright("© {an} Cabinet · CIF 54440949", 2026, "X"), "© 2026 Cabinet · CIF 54440949");
   assert.equal(randulDeCopyright("© {an} Cabinet · {an}", 2031, "X"), "© 2031 Cabinet · 2031");
   assert.equal(randulDeCopyright("© {AN} Cabinet", 2027, "X"), "© 2027 Cabinet");
+  // Fără semn în față, „© " și anul se pun singure, iar `{an}` din mijloc tot se înlocuiește.
+  assert.equal(randulDeCopyright("Cabinet, din {an}", 2026, "X"), "© 2026 Cabinet, din 2026");
   // O acoladă care nu e `{an}` nu se atinge.
   assert.equal(randulDeCopyright("© {anul} Cabinet {", 2026, "X"), "© {anul} Cabinet {");
 });
@@ -52,14 +70,15 @@ test("câmpul e în Setări, opțional, cu limită, și se salvează cum e scris
   assert.equal(camp.eticheta, "Textul de copyright din subsol");
   assert.ok(!camp.obligatoriu, "câmpul nu are voie să fie obligatoriu: gol înseamnă comportamentul de dinainte");
   assert.equal(camp.max, MAX_COPYRIGHT);
-  assert.ok(camp.hint.includes("{an}"), "hint-ul trebuie să spună că {an} devine anul");
+  assert.ok(/©/.test(camp.hint) && /se pun singure/.test(camp.hint), "hint-ul trebuie să spună că © și anul se pun singure");
+  assert.ok(!camp.hint.includes("{an}"), "omul nu trebuie să învețe un cod: © și anul vin singure");
 
-  const scris = { nume: "Popescu Robert", copyright: "  © {an} Cabinet Individual · CIF 54440949  " };
+  const scris = { nume: "Popescu Robert", copyright: "  Cabinet Individual · CIF 54440949  " };
   const stocat = catreStocare(catreEditor(scris, CAMPURI_CABINET), CAMPURI_CABINET);
-  assert.equal(stocat.copyright, "© {an} Cabinet Individual · CIF 54440949", "se taie spațiile de la capete, nimic mai mult");
+  assert.equal(stocat.copyright, "Cabinet Individual · CIF 54440949", "se salvează doar textul, fără © și fără an; se taie spațiile de la capete");
 
   // Reîncărcat în formular, textul e cel salvat.
-  assert.equal(catreEditor(stocat, CAMPURI_CABINET).copyright, "© {an} Cabinet Individual · CIF 54440949");
+  assert.equal(catreEditor(stocat, CAMPURI_CABINET).copyright, "Cabinet Individual · CIF 54440949");
 });
 
 test("câmpul golit nu lasă nicio cheie în date, deci subsolul revine la © + anul + numele", () => {
