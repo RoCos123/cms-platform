@@ -4,6 +4,7 @@ import { tenantTable } from "@/lib/supabase/admin";
 import { getTenant } from "@/lib/dal";
 import { capcanaDeclansata, verificaCaptcha } from "@/lib/antispam";
 import {
+  EROARE_TELEFON,
   LIMITE,
   citesteText,
   esteEmailValid,
@@ -27,8 +28,6 @@ import { modeleleDePePagina, tipulSiteului } from "@/lib/pagina-vanzare-date";
 
 const SUCCES_CONTACT = "Am primit datele tale. Vei fi contactat cât de curând.";
 const SUCCES_NEWSLETTER = "Gata. Dacă adresa e nouă, vei primi un email de confirmare.";
-/** Pe pagina de vânzare același lucru se spune cu vocea ei: `TEXTE_VANZARE.formular.eroareTelefon`. */
-const EROARE_TELEFON = "Numărul de telefon nu pare complet.";
 const EROARE_TEHNICA =
   "Mesajul nu a putut fi trimis din cauza unei probleme tehnice. Te rugăm să încerci din nou peste câteva minute.";
 

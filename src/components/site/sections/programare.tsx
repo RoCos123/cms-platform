@@ -46,7 +46,7 @@ export type ProgramareData = {
  *
  * Prima variantă arăta trei zile cu câteva ore și un buton către
  * `/programare`: două pagini și încă o alegere pentru ceva ce se hotărăște
- * dintr-o privire. Acum e un calendar, iar formularul — numele și telefonul —
+ * dintr-o privire. Acum e un calendar, iar formularul — numele, emailul și telefonul (opțional) —
  * se deschide dedesubt abia după ce s-a ales o oră.
  *
  * Nu se randează deloc fără ore libere. Asta se întâmplă în trei cazuri —

@@ -71,6 +71,12 @@ export function esteTelefonValid(telefon: string): boolean {
 }
 
 /**
+ * Ce citește omul când numărul scris nu seamănă a număr. Același text la contact și
+ * la programări (pagina de vânzare are propria ei voce, `TEXTE_VANZARE`).
+ */
+export const EROARE_TELEFON = "Numărul de telefon nu pare complet.";
+
+/**
  * Numele câmpului-capcană. Deliberat plauzibil: boturile completează automat
  * orice câmp cu nume cunoscut, iar „website" e printre primele. Un om nu-l vede
  * (e ascuns și scos din ordinea de tabulare), deci nu-l poate completa.

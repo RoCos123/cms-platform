@@ -16,8 +16,8 @@ import type { ZiCuOreScrise } from "./programare";
  *
  * Înainte, secțiunea arăta trei zile cu câteva ore și trimitea la
  * `/programare`. Acum ora se cere de aici: calendar, orele zilei alese, iar
- * după ce s-a ales o oră se deschide dedesubt un formular scurt — numele și
- * telefonul. Pagina întreagă rămâne, pentru cine vrea să scrie mai mult sau
+ * după ce s-a ales o oră se deschide dedesubt un formular scurt — numele,
+ * emailul și, dacă vrea, telefonul. Pagina întreagă rămâne, pentru cine vrea să scrie mai mult sau
  * intră direct pe ea din meniu.
  *
  * Se deschide în trepte fiindcă asta e și ordinea în care se hotărăște omul:
@@ -171,10 +171,10 @@ export function ProgramareRapida({
           />
 
           {/*
-            Emailul, nu telefonul (hotărât 18 sept. 2026): pe tot site-ul nu mai
-            cerem număr de telefon. Emailul rămâne singura cale prin care
-            psihologul poate răspunde, deci e cerut — serverul cere același lucru
-            (`eroriDeContact`), ca eticheta să nu mintă.
+            Emailul e cerut, telefonul e opțional (15 oct. 2026; între 18 sept. și
+            atunci nu se cerea telefon nicăieri). Emailul rămâne singura cale
+            prin care psihologul poate răspunde oricui, deci e cerut — serverul
+            cere același lucru (`eroriDeContact`), ca eticheta să nu mintă.
           */}
           <Camp
             id="prog-rapid-email"
@@ -185,6 +185,18 @@ export function ProgramareRapida({
             maxLength={LIMITE.email}
             eroare={stare.erori?.email}
             valoare={stare.valori?.email}
+          />
+
+          <Camp
+            id="prog-rapid-telefon"
+            name="telefon"
+            tip="tel"
+            eticheta="Număr de telefon"
+            autoComplete="tel"
+            maxLength={LIMITE.telefon}
+            obligatoriu={false}
+            eroare={stare.erori?.telefon}
+            valoare={stare.valori?.telefon}
           />
 
           <p style={{ margin: 0, fontSize: "14px", lineHeight: 1.6, color: "var(--s-text-secundar)" }}>

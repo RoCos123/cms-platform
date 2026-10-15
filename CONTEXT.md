@@ -183,6 +183,28 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
+**Telefon OPȚIONAL și la programări (15 oct. 2026, cerut de proprietar; pe branch,
+NEPUBLICAT — așteaptă „fă pe master").** „La modulul de programări cere doar emailul — hai
+să includem și telefonul." Ambele formulare (pagina întreagă `/programare` și cel de pe
+prima pagină, `programare-rapida.tsx`) au acum „Număr de telefon (opțional)", sub email;
+emailul rămâne obligatoriu. **Alegerea „opțional" e a sesiunii** (proprietarul n-a spus,
+dar la contact a cerut exact asta; dacă vrea telefon obligatoriu, e o schimbare de două
+rânduri + probă). Acțiunea `cereProgramare` (una singură pentru ambele formulare) citește
+telefonul, îl verifică (`esteTelefonValid`, aceeași regulă și același mesaj ca la contact,
+`EROARE_TELEFON` mutat în `src/lib/formulare.ts`) și scrie `phone: telefon || null`.
+`eroriDeContact` (regula comună a celor două formulare) a primit telefonul ca parametru.
+**Plafonul „o oră deodată pe persoană" rămâne pe email**, nu pe telefon: telefonul fiind
+opțional, ar fi fost tocmai cheia care lipsește. Fără migrare (`appointments.phone`
+exista); panoul „Programări" și „Șterge datele unei persoane" știau deja de telefon. Probe
+în `e2e/programari.proba.mjs` (strică-le pe rând: pică, șase încercări). Încercat în
+browser pe aplicația construită, cu modulul pornit pe un site de probă: fără telefon →
+cerere cu `phone` gol; telefon prost → eroare lângă câmp, ce a scris omul rămâne, nimic
+scris; doar telefon, fără email → refuzat; aceeași adresă cu alt telefon și altă oră →
+oprită de plafon; formularul de pe prima pagină la fel; câmpul are lățimea emailului la
+1280 și 390 px, fără depășire; în panou cererea arată emailul și telefonul. Deschis, tot
+la proprietar: șablonul politicii de confidențialitate (rândul despre ce salvează
+formularul) trebuie să pomenească acum și programările.
+
 **Mesajul „Poza umple tot cadrul" la repoziționarea pozelor (15 oct. 2026, cerut de
 proprietar; pe branch, NEPUBLICAT — așteaptă „fă pe master"; mesajul e în `926388a`, pragul
 la tragere în comitul următor).** Proprietarul nu putea
@@ -2491,7 +2513,7 @@ el, din ziua în care și-a făcut site-ul. Un client care și-a publicat politi
 | 31 aug. 2026 | Anti-spamul a trecut de la Cloudflare Turnstile la hCaptcha | Numele furnizorului, în paragraful despre anti-spam ȘI în lista de firme care ating datele |
 | 1 sept. 2026 | Fonturile se servesc de pe domeniul clientului | Paragraful despre Google Fonts SE SCOATE de tot |
 | 16 sept. 2026 | Contactul cere nume + email (obligatoriu); telefonul scos | Rândul despre ce salvează formularul: „numele și numărul tău de telefon, iar adresa de email doar dacă vrei” nu mai e adevărat |
-| 14 oct. 2026 | Contactul cere nume + email (obligatoriu) + telefon (OPȚIONAL) | Același rând: „se salvează numele și adresa ta de email, iar numărul de telefon doar dacă vrei să-l lași”. **Încă nefăcut în șablon** (propus proprietarului) |
+| 14–15 oct. 2026 | Contactul (14 oct.) ȘI programările (15 oct.) cer nume + email (obligatoriu) + telefon (OPȚIONAL) | Același rând (formularul de contact; programările adaugă numele, emailul, telefonul opțional și ora cerută): „se salvează numele și adresa ta de email, iar numărul de telefon doar dacă vrei să-l lași”. **Încă nefăcut în șablon** (propus proprietarului) |
 
 Primele trei sunt deja făcute în șablon; ultimele două (16 sept., 14 oct.) NU — rândul
 despre formular din șablon descrie încă situația de dinaintea lor. **Niciuna nu e făcută în paginile deja

@@ -138,6 +138,19 @@ export function FormularProgramare({
         valoare={stare.valori?.email}
       />
 
+      {/* Opțional (15 oct. 2026): emailul rămâne singura cale cerută, telefonul e în plus. */}
+      <Camp
+        id="prog-telefon"
+        name="telefon"
+        tip="tel"
+        eticheta="Număr de telefon"
+        autoComplete="tel"
+        maxLength={LIMITE.telefon}
+        obligatoriu={false}
+        eroare={stare.erori?.telefon}
+        valoare={stare.valori?.telefon}
+      />
+
       {/*
         Listă închisă, nu serviciile publicate ale cabinetului: cine cere o
         primă ședință n-are de unde ști ce fel de ședință îi trebuie. „(opțional)”

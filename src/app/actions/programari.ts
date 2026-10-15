@@ -4,7 +4,14 @@ import { revalidatePath } from "next/cache";
 import { getTenant } from "@/lib/dal";
 import { tenantTable } from "@/lib/supabase/admin";
 import { capcanaDeclansata, verificaCaptcha } from "@/lib/antispam";
-import { LIMITE, citesteText, esteEmailValid, type StareFormular } from "@/lib/formulare";
+import {
+  EROARE_TELEFON,
+  LIMITE,
+  citesteText,
+  esteEmailValid,
+  esteTelefonValid,
+  type StareFormular,
+} from "@/lib/formulare";
 import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
 import { eroriDeContact, motivValid, opresteCererea, oraEsteLibera } from "@/lib/programari";
 import { oreleOcupate, programulSiteului } from "@/lib/programari-publice";
@@ -56,6 +63,7 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
 
   const nume = citesteText(formData, "nume", LIMITE.nume);
   const email = citesteText(formData, "email", LIMITE.email);
+  const telefon = citesteText(formData, "telefon", LIMITE.telefon);
   // Lista are două intrări; orice altceva vine dintr-o cerere scrisă de mână,
   // nu de la cineva care apasă. Se aruncă în tăcere, nu se respinge: câmpul e
   // opțional, iar o pagină rămasă deschisă peste o schimbare de listă n-are de
@@ -63,11 +71,17 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
   const motiv = motivValid(citesteText(formData, "motiv", 120));
   const zi = citesteText(formData, "zi", 10);
   const ora = citesteText(formData, "ora", 5);
-  const valori = { nume, email, motiv: motiv ?? "", zi, ora };
+  const valori = { nume, email, telefon, motiv: motiv ?? "", zi, ora };
 
-  // Telefonul nu se mai cere nicăieri (18 sept. 2026): ambele formulare trimit
-  // email, deci emailul e singura cale cerută, la fel peste tot.
-  const erori: Record<string, string> = eroriDeContact(email, esteEmailValid);
+  // Emailul e cerut, telefonul e opțional (15 oct. 2026; între 18 sept. și atunci nu
+  // se cerea deloc). La fel pe ambele formulare: regula stă în `eroriDeContact`.
+  const erori: Record<string, string> = eroriDeContact(
+    email,
+    esteEmailValid,
+    telefon,
+    esteTelefonValid,
+    EROARE_TELEFON,
+  );
 
   if (!nume) erori.nume = "Scrie-ți numele, ca să știe cine vine.";
   if (!zi || !ora) erori.ora = "Alege o oră din listă.";
@@ -127,9 +141,9 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
     name: nume,
     // `null`, nu șir gol: „" în panou ar fi devenit un link `mailto:` gol.
     email: email || null,
-    // Telefonul nu se mai cere (18 sept. 2026); coloana rămâne pentru cererile
-    // vechi, dar cererile noi intră fără el.
-    phone: null,
+    // Opțional (15 oct. 2026): `null` când omul nu l-a scris, nu șir gol — panoul
+    // arată telefonul ca link `tel:` doar când există.
+    phone: telefon || null,
     // Coloana și-a păstrat numele din vremea când câmpul era „Pentru ce” și se
     // umplea din serviciile cabinetului. O redenumire ar fi cerut încă o migrare
     // rulată de mână, pentru zero câștig la client; traducerea se face aici și

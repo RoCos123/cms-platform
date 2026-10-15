@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   PROGRAM_GOL,
@@ -172,16 +173,32 @@ test("orice altceva se aruncă, nu se salvează", () => {
  * asta e exact ce se uită prima când se mai adaugă un formular.
  */
 const EMAIL_OK = (e) => e.includes("@") && e.includes(".");
+const TELEFON_OK = (t) => /^\+?\d{6,15}$/.test(t.replace(/[\s().-]/g, ""));
+const MESAJ_TELEFON = "Numărul de telefon nu pare complet.";
+const contact = (email, telefon = "") => eroriDeContact(email, EMAIL_OK, telefon, TELEFON_OK, MESAJ_TELEFON);
 
 test("se cere emailul, la fel pe amândouă formularele", () => {
-  // De la 18 sept. 2026 nu mai cerem telefon nicăieri: singura cale de răspuns
-  // e emailul, iar regula e aceeași pe prima pagină și pe pagina întreagă.
-  assert.deepEqual(eroriDeContact("ana@exemplu.ro", EMAIL_OK), {});
-  assert.deepEqual(Object.keys(eroriDeContact("", EMAIL_OK)), ["email"]);
+  // Emailul e singura cale de răspuns pentru oricine, deci rămâne obligatoriu (din
+  // 18 sept. 2026), iar regula e aceeași pe prima pagină și pe pagina întreagă.
+  assert.deepEqual(contact("ana@exemplu.ro"), {});
+  assert.deepEqual(Object.keys(contact("")), ["email"]);
 });
 
 test("un email scris greșit e prins", () => {
-  assert.deepEqual(Object.keys(eroriDeContact("ana la exemplu", EMAIL_OK)), ["email"]);
+  assert.deepEqual(Object.keys(contact("ana la exemplu")), ["email"]);
+});
+
+test("telefonul e opțional (15 oct. 2026): gol trece, bun trece, scris prost e prins", () => {
+  assert.deepEqual(contact("ana@exemplu.ro", ""), {}, "fără telefon e în regulă");
+  assert.deepEqual(contact("ana@exemplu.ro", "0722 123 456"), {});
+  assert.deepEqual(contact("ana@exemplu.ro", "+40 722 123 456"), {});
+  assert.deepEqual(contact("ana@exemplu.ro", "nu am"), { telefon: MESAJ_TELEFON });
+  assert.deepEqual(contact("ana@exemplu.ro", "123"), { telefon: MESAJ_TELEFON });
+});
+
+test("un telefon bun nu ține loc de email: emailul rămâne cerut", () => {
+  assert.deepEqual(Object.keys(contact("", "0722 123 456")), ["email"]);
+  assert.deepEqual(Object.keys(contact("", "nu am")).sort(), ["email", "telefon"]);
 });
 
 /**
@@ -235,4 +252,52 @@ test("mesajele trimit omul către telefon, nu îl acuză", () => {
   for (const mesaj of [opresteCererea(0, 1), opresteCererea(99, 0)]) {
     assert.match(mesaj, /sun[ăa] direct la cabinet/i);
   }
+});
+
+/**
+ * Telefonul la programări (15 oct. 2026) — ce se verifică în cod, nu doar în regulă.
+ * Două formulare (prima pagină și `/programare`), o singură acțiune: dacă unul
+ * dintre ele uită câmpul, omul îl completează pe celălalt și altul nu.
+ */
+const citeste = (cale) => readFileSync(cale, "utf8");
+const FORMULARE = [
+  ["pagina întreagă", "src/app/programare/formular.tsx", "prog-telefon"],
+  ["formularul de pe prima pagină", "src/components/site/sections/programare-rapida.tsx", "prog-rapid-telefon"],
+];
+
+for (const [nume, cale, id] of FORMULARE) {
+  test(`${nume}: câmpul de telefon e acolo, de tip „tel” și opțional`, () => {
+    const text = citeste(cale);
+    const inceput = text.indexOf(`id="${id}"`);
+    assert.ok(inceput >= 0, `lipsește câmpul ${id}`);
+    const camp = text.slice(text.lastIndexOf("<Camp", inceput), text.indexOf("/>", inceput));
+    assert.ok(camp.includes('name="telefon"'));
+    assert.ok(camp.includes('tip="tel"'));
+    assert.ok(camp.includes("obligatoriu={false}"), "telefonul nu are voie să fie obligatoriu");
+    assert.ok(camp.includes("stare.erori?.telefon"), "eroarea telefonului trebuie să se vadă lângă câmp");
+    assert.ok(camp.includes("stare.valori?.telefon"), "ce a scris omul trebuie să rămână după o eroare");
+  });
+
+  test(`${nume}: emailul rămâne obligatoriu`, () => {
+    const text = citeste(cale);
+    const inceput = text.indexOf('name="email"');
+    const camp = text.slice(text.lastIndexOf("<Camp", inceput), text.indexOf("/>", inceput));
+    assert.ok(!camp.includes("obligatoriu={false}"));
+  });
+}
+
+test("acțiunea citește telefonul, îl verifică prin regula comună și îl scrie ca null când e gol", () => {
+  const actiune = citeste("src/app/actions/programari.ts");
+  assert.ok(actiune.includes('const telefon = citesteText(formData, "telefon", LIMITE.telefon);'));
+  assert.ok(actiune.includes("esteTelefonValid"), "telefonul scris trebuie verificat");
+  assert.ok(/eroriDeContact\(\s*email,\s*esteEmailValid,\s*telefon,\s*esteTelefonValid,\s*EROARE_TELEFON,?\s*\)/.test(actiune));
+  assert.ok(actiune.includes("phone: telefon || null,"), "gol trebuie să intre ca null, nu ca șir gol");
+  assert.ok(!actiune.includes("phone: null,"), "cererile noi nu mai intră mereu fără telefon");
+  assert.ok(actiune.includes("const valori = { nume, email, telefon,"), "telefonul trebuie să rămână în formular după o eroare");
+});
+
+test("limita pe persoană rămâne pe email — telefonul, fiind opțional, nu poate fi cheia", () => {
+  const actiune = citeste("src/app/actions/programari.ts");
+  assert.ok(/\.eq\("email", email\)/.test(actiune), "plafonul pe persoană trebuie să numere după email");
+  assert.ok(!/\.eq\("phone"/.test(actiune), "plafonul nu are voie să numere după telefon (poate lipsi)");
 });

@@ -190,12 +190,18 @@ export function motivValid(brut: string): string | null {
 }
 
 /**
- * Ce lipsește din adresa de email a unei cereri de programare.
+ * Ce lipsește din datele de contact ale unei cereri de programare: emailul e
+ * CERUT, telefonul e OPȚIONAL.
  *
- * De la 18 sept. 2026 nu mai cerem telefon nicăieri: amândouă formularele
- * (secțiunea de pe prima pagină și pagina întreagă `/programare`) trimit email,
- * iar el e singura cale prin care psihologul poate răspunde — deci se cere și se
- * validează, la fel peste tot. Înainte formularul scurt cerea telefon; acum nu.
+ * Istoria: formularul scurt cerea telefon, iar pe 18 sept. 2026 telefonul a fost
+ * scos de peste tot și emailul a rămas singura cale prin care psihologul poate
+ * răspunde — deci se cere și se validează, la fel pe amândouă formularele (secțiunea
+ * de pe prima pagină și pagina întreagă `/programare`). Pe 15 oct. 2026 proprietarul a
+ * cerut telefonul înapoi, ca la formularul de contact: opțional. Emailul rămâne
+ * obligatoriu din același motiv ca înainte: fără el, cine nu lasă numărul n-are
+ * pe unde să primească confirmarea.
+ *
+ * Telefonul gol trece; scris, trebuie să semene a număr.
  *
  * Ce e cerut se scrie și lângă câmp, în formular; o etichetă „obligatoriu” pe
  * care serverul n-o susține e un fel de minciună care se descoperă abia la
@@ -206,11 +212,16 @@ export function motivValid(brut: string): string | null {
 export function eroriDeContact(
   email: string,
   emailPareValid: (email: string) => boolean,
+  telefon: string,
+  telefonPareValid: (telefon: string) => boolean,
+  mesajTelefon: string,
 ): Record<string, string> {
   const erori: Record<string, string> = {};
 
   if (!email) erori.email = "Lasă o adresă de email.";
   else if (!emailPareValid(email)) erori.email = "Adresa de email nu pare completă.";
+
+  if (telefon && !telefonPareValid(telefon)) erori.telefon = mesajTelefon;
 
   return erori;
 }
