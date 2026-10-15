@@ -183,6 +183,19 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
+**Emailul prin Resend și resetarea parolei sunt AMÂNATE până există firma (15 oct. 2026,
+hotărârea proprietarului).** Motivul spus de el: abonamentele și restul facturării vor fi pe
+firmă, deci și contul Resend, și domeniul de trimitere se fac pe firmă, nu acum pe persoană
+fizică. **Nu propune Resend, resetarea parolei sau „Schimbă emailul" pentru clienți (punctul 4a)
+ca următorul pas** cât timp firma nu există; reiau doar când proprietarul spune că a apărut
+(ordinea de atunci: firma → domeniul → contul Resend pe firmă → cele 3 setări Supabase +
+șablonul → resetarea parolei → 4a). *Ce rămâne valabil între timp:* mesajele și cererile de
+programare se văd DOAR în panou (de spus clientului la predare: dacă nu intră, nu află că i-a
+scris cineva); un client care și-a uitat parola o primește de la proprietar — din `/proprietar`
+(„Intră în panou") sau parolă nouă din Supabase → Authentication → Users; adresa de intrare a
+unui client o schimbă tot proprietarul, cu butonul din `/proprietar`. Nu se blochează cu asta
+nimic ce nu era blocat de firmă oricum (primul client plătitor, contractul, facturarea).
+
 **Rândul de copyright din subsol, scris de client (15 oct. 2026, cerut de proprietar; PE MASTER
 din 15 oct., `76c9450`; „© automat" pe branch, NEPUBLICAT — așteaptă „fă pe master").** Bara de
 jos a subsolului avea în stânga „© 2026 Popescu Robert", compus singur (anul de azi + numele
@@ -410,15 +423,17 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
    găzduirea e chiar ce vindem (§„Ce vindem"), punctul ăsta nu e opțional.
 3. **Resetarea parolei:** codul e gata (10 sept.); rămân **3 setări în Supabase**
    (minute, proprietar). **Confirmat de proprietar pe 7 oct. 2026: NU le-a făcut
-   încă.** Până atunci „Ți-ai uitat parola?" poate să nu trimită emailul. Ocolire
+   încă.** **15 oct.: amânat până există firma (vezi „Emailul prin Resend… AMÂNATE", sus).**
+   Până atunci „Ți-ai uitat parola?" poate să nu trimită emailul. Ocolire
    când un cont e blocat: intri din `/proprietar` („Intră în panou") sau pui o
    parolă nouă din Supabase → Authentication → Users.
 4. **Email tranzacțional** (mesaj nou, confirmare de programare) — era „ultimul,
    prin decizia lui explicită" (26 aug.). **Schimbat pe 9 oct.: proprietarul a cerut
    să urmeze, în sesiunea următoare — emailul prin Resend, împreună cu resetarea
-   parolei (punctul 3).** Până atunci clientul vede mesajele doar intrând în panou.
+   parolei (punctul 3). Schimbat din nou pe 15 oct.: AMÂNAT până există firma** (contul Resend
+   și abonamentele se fac pe firmă). Până atunci clientul vede mesajele doar intrând în panou.
 4a. **„Schimbă emailul" și pentru clienți** (cerut de proprietar, 14 oct.; vine DUPĂ
-   punctul 4 — are nevoie de emailuri care ajung). Acum butonul există doar în
+   punctul 4 — are nevoie de emailuri care ajung — deci, din 15 oct., după ce apare firma). Acum butonul există doar în
    `/proprietar`; un client care pierde adresa de intrare scrie proprietarului, iar el o
    schimbă. Pentru client, în panoul lui (de pus în Setări, ca grup nou): ce trebuie
    - **parola curentă + link de confirmare trimis la adresa NOUĂ** — schimbarea se aplică
