@@ -1,9 +1,12 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   PUNCT_FOCAL_IMPLICIT,
+  SURPLUS_MINIM_MUTARE,
   dupaTragere,
   normalizeazaPunctFocal,
+  poateFiMutata,
   pozitiaImaginii,
 } from "@/lib/punct-focal";
 
@@ -127,4 +130,59 @@ test("tragerea nu pierde mărirea", () => {
 
   assert.equal(dupa.zoom, 1.5);
   assert.ok(dupa.x > 50 && dupa.y > 50);
+});
+
+/**
+ * „Poza umple tot cadrul" (15 oct. 2026). Proprietarul nu putea muta coperta unui
+ * articol: poza era 16/9, rama din editor tot 16/9 — nu ieșea nimic din ea, deci
+ * tragerea nu avea ce muta, iar pe poză scria mereu „Trage de poză…". Acum, când
+ * nu e nimic de mutat, scrie asta.
+ */
+
+/** Rama din editor, așa cum o măsoară browserul: 320×180 cu chenar de 1px → 318×178 înăuntru. */
+const rama = { latimeRama: 318, inaltimeRama: 178 };
+
+test("o poză de aceeași formă cu rama, sau aproape, nu se poate muta (tipicele 16/9 și 1,79)", () => {
+  for (const [lat, inalt] of [
+    [1600, 900],
+    [1920, 1080],
+    [2752, 1536], // ~1,79 — cum scot de obicei generatoarele de imagini
+    [1344, 768], // 7/4
+  ]) {
+    const surplus = surplusulPozei({ ...rama, latimeFisier: lat, inaltimeFisier: inalt });
+    assert.equal(poateFiMutata(surplus), false, `${lat}×${inalt}: ${JSON.stringify(surplus)}`);
+  }
+});
+
+test("o poză cu altă formă se poate muta, pe axa pe care iese din ramă", () => {
+  assert.equal(poateFiMutata(surplusulPozei({ ...rama, latimeFisier: 1600, inaltimeFisier: 1200 })), true); // 4/3
+  assert.equal(poateFiMutata(surplusulPozei({ ...rama, latimeFisier: 900, inaltimeFisier: 1200 })), true); // portret
+  assert.equal(poateFiMutata(surplusulPozei({ ...rama, latimeFisier: 3000, inaltimeFisier: 900 })), true); // panoramă
+});
+
+test("mărită, aceeași poză 16/9 se poate muta — de-aia trimite mesajul la „Mărime”", () => {
+  const masuri = { ...rama, latimeFisier: 1600, inaltimeFisier: 900 };
+  assert.equal(poateFiMutata(surplusulPozei({ ...masuri, zoom: 1 })), false);
+  assert.equal(poateFiMutata(surplusulPozei({ ...masuri, zoom: 1.1 })), true);
+  assert.equal(poateFiMutata(surplusulPozei({ ...masuri, zoom: 2 })), true);
+});
+
+test("pragul: sub 4 px nu, de la 4 px da, pe oricare axă", () => {
+  assert.equal(SURPLUS_MINIM_MUTARE, 4);
+  assert.equal(poateFiMutata({ surplusX: 0, surplusY: 0 }), false);
+  assert.equal(poateFiMutata({ surplusX: 3.9, surplusY: 3.9 }), false);
+  assert.equal(poateFiMutata({ surplusX: 4, surplusY: 0 }), true);
+  assert.equal(poateFiMutata({ surplusX: 0, surplusY: 4 }), true);
+});
+
+test("mesajul de pe poză: textul proprietarului, cuvânt cu cuvânt, iar „Mărime” e chiar eticheta glisorului", () => {
+  const componenta = readFileSync("src/components/ui/repozitionare-imagine.tsx", "utf8");
+  assert.ok(
+    componenta.includes('"Poza umple tot cadrul. Mărește-o din «Mărime» ca s-o poți muta."'),
+    "textul cerut de proprietar s-a schimbat",
+  );
+  assert.ok(componenta.includes("<span className=\"shrink-0\">Mărime</span>"), "glisorul nu se mai numește „Mărime”");
+  // Unde nu e glisor (Biblioteca), mesajul nu trimite la un buton care nu există.
+  assert.ok(componenta.includes("cuMarire ? INDICIU_UMPLE_CU_MARIRE : INDICIU_UMPLE"));
+  assert.ok(componenta.includes('"Trage de poză ca s-o poziționezi"'), "indiciul obișnuit trebuie să rămână");
 });

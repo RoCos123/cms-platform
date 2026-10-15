@@ -183,8 +183,27 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
-**Banda cu servicii, cu cuvinte proprii (14 oct. 2026, cerut de proprietar; pe branch,
-NEPUBLICAT — așteaptă „fă pe master").** Până acum banda nu avea câmpuri: derula
+**Mesajul „Poza umple tot cadrul" la repoziționarea pozelor (15 oct. 2026, cerut de
+proprietar; pe branch, NEPUBLICAT — așteaptă „fă pe master").** Proprietarul nu putea
+muta coperta unui articol de blog. Cauza: rama din editor are forma locului de pe site
+(16/9 la coperta articolului), iar poza lui era tot ~16/9 — umplea rama exact, deci nu
+ieșea nimic din ea și tragerea n-avea ce muta (0–3 px), în timp ce pe poză scria mereu
+„Trage de poză ca s-o poziționezi". Aceeași cauză ca în notița din 1 oct. (`rame-poze.ts`).
+Acum, când poza nu se poate muta (surplus sub 4 px pe ambele axe, la mărirea de acum),
+pe ea scrie, cu textul proprietarului: „Poza umple tot cadrul. Mărește-o din «Mărime» ca
+s-o poți muta." — iar în Bibliotecă, unde nu există glisor, doar „Poza umple tot cadrul."
+Se re-măsoară la schimbarea pozei, a măririi, a mărimii ramei și la încărcarea pozei;
+până nu se măsoară nu scrie nimic. Cod: `poateFiMutata`/`SURPLUS_MINIM_MUTARE` în
+`src/lib/punct-focal.ts`, mesajul în `repozitionare-imagine.tsx`; probe în
+`e2e/punct-focal.proba.mjs` (strică-le pe rând: pică). Încercat în editorul de blog, pe
+aplicația construită, cu poze de 16/9, ~1,79, 4/3 și portret, la 1,0× și 1,5×, și la 390 px.
+**NEFĂCUT, propus proprietarului (fără răspuns încă):** tragerea pe o poză cu surplus de
+1–3 px aruncă poziția salvată la extrem (0% sau 100%) — pe pagina articolului nu se vede,
+dar poziția se folosește și pe cartonașul din listă, care are altă formă. Soluția: ignoră
+mișcările sub același prag de 4 px (acum pragul doar alege mesajul).
+
+**Banda cu servicii, cu cuvinte proprii (14 oct. 2026, cerut de proprietar; PE MASTER din
+14 oct., `429e244`, CI verde).** Până acum banda nu avea câmpuri: derula
 titlurile serviciilor publicate. Un client care vrea la Servicii „Consiliere psihologică,
 Testare", dar în bandă „Traumă, Anxietate, Dezvoltare personală", nu avea cum. Acum
 secțiunea are un câmp opțional, „Cuvinte din bandă" (listă de rânduri, câte unul pe

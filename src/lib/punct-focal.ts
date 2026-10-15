@@ -155,6 +155,25 @@ export function surplusulPozei(masuri: {
   };
 }
 
+/**
+ * De la câți pixeli de „surplus" are rost să spui că poza se poate muta.
+ *
+ * Fără mărire, o poză care are ACEEAȘI formă cu rama (un 16/9 într-o ramă 16/9) iese
+ * din ea cu 0 pixeli; una aproape la fel (7/4 sau 1,79 față de 1,78, cum scot
+ * generatoarele de imagini) iese cu 2–3. Tragi, și nu se vede nimic: poza e deja
+ * întreagă în cadru. Pragul separă „nu e nimic de mutat" de „se poate muta":
+ * din 4 px în sus mișcarea se vede.
+ *
+ * Folosit doar ca să se SPUNĂ omului ce se întâmplă (`RepozitionareImagine`); nu
+ * schimbă ce face tragerea.
+ */
+export const SURPLUS_MINIM_MUTARE = 4;
+
+/** Mai iese poza din ramă destul, măcar pe o axă, ca tragerea să se vadă? */
+export function poateFiMutata(surplus: { surplusX: number; surplusY: number }): boolean {
+  return surplus.surplusX >= SURPLUS_MINIM_MUTARE || surplus.surplusY >= SURPLUS_MINIM_MUTARE;
+}
+
 export function dupaTragere(
   start: PunctFocal,
   deplasare: { dx: number; dy: number; surplusX: number; surplusY: number },

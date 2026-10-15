@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useEffect,
   useRef,
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
@@ -12,12 +13,22 @@ import {
   dupaTragere,
   normalizeazaPunctFocal,
   normalizeazaZoom,
+  poateFiMutata,
   pozitiaImaginii,
   scaraImaginii,
   surplusulPozei,
   type PunctFocal,
 } from "@/lib/punct-focal";
 import { cereSaSeVadaPoza } from "@/lib/arata-poza";
+
+/**
+ * Ce scrie pe poză. Al doilea text e al proprietarului, cuvânt cu cuvânt (15 oct.
+ * 2026) — „Mărime" e eticheta glisorului de mai jos și trebuie să rămână la fel.
+ * Unde nu e glisor (Biblioteca), mesajul nu trimite la el.
+ */
+const INDICIU_TRAGE = "Trage de poză ca s-o poziționezi";
+const INDICIU_UMPLE_CU_MARIRE = "Poza umple tot cadrul. Mărește-o din «Mărime» ca s-o poți muta.";
+const INDICIU_UMPLE = "Poza umple tot cadrul.";
 
 /**
  * Repoziționarea unei poze, ca la Facebook: o vezi într-o ramă, o tragi cu
@@ -71,6 +82,45 @@ export function RepozitionareImagine({
   );
   const ultima = useRef(value);
   const [trage, setTrage] = useState(false);
+  /**
+   * Umple poza rama atât de exact încât nu mai e nimic de mutat? `null` până se
+   * măsoară (poza trebuie încărcată): până atunci nu spunem nimic, ca să nu
+   * pretindem un lucru nemăsurat.
+   */
+  const [umpleRama, setUmpleRama] = useState<boolean | null>(null);
+
+  // Se re-măsoară la fiecare schimbare care contează: poza (`src`), mărirea, mărimea
+  // ramei (`ResizeObserver` — care chiar la prima observare dă o citire) și
+  // încărcarea pozei (`load`, pentru cazul în care vine după prima citire).
+  useEffect(() => {
+    const rama = ramaRef.current;
+    const img = imgRef.current;
+    if (!rama || !img) return;
+
+    function masoara() {
+      if (!rama || !img || img.naturalWidth === 0) return;
+      setUmpleRama(
+        !poateFiMutata(
+          surplusulPozei({
+            latimeRama: rama.clientWidth,
+            inaltimeRama: rama.clientHeight,
+            latimeFisier: img.naturalWidth,
+            inaltimeFisier: img.naturalHeight,
+            zoom: value.zoom,
+          }),
+        ),
+      );
+    }
+
+    img.addEventListener("load", masoara);
+    const observator = new ResizeObserver(masoara);
+    observator.observe(rama);
+
+    return () => {
+      img.removeEventListener("load", masoara);
+      observator.disconnect();
+    };
+  }, [src, value.zoom]);
 
   /**
    * Cât IESE imaginea din ramă pe fiecare axă, în pixeli (`object-fit: cover`).
@@ -205,13 +255,14 @@ export function RepozitionareImagine({
           }}
         />
 
-        {/* Indiciu că poza se trage. Piere cât timp tragi, ca să nu stea în cale. */}
-        {!trage && (
+        {/* Indiciu că poza se trage — sau că nu are cum, dacă umple rama exact.
+            Piere cât timp tragi, ca să nu stea în cale. */}
+        {!trage && umpleRama !== null && (
           <span
             aria-hidden
             className="pointer-events-none absolute inset-x-0 bottom-0 bg-black/45 px-2 py-1.5 text-center text-[11px] font-medium text-white"
           >
-            Trage de poză ca s-o poziționezi
+            {umpleRama ? (cuMarire ? INDICIU_UMPLE_CU_MARIRE : INDICIU_UMPLE) : INDICIU_TRAGE}
           </span>
         )}
       </div>
