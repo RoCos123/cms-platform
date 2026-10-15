@@ -183,6 +183,29 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
+**Politica de confidențialitate, rescrisă (15 oct. 2026, cerut de proprietar ca s-o încarce
+pe un site; pe branch, NEPUBLICATĂ — fișierul e doar un șablon, nu atinge nicio pagină).**
+`sabloane/politica-de-confidentialitate.md` descrie acum ce face chiar platforma:
+formularul de contact cu email obligatoriu + telefon opțional; programările (nume, email,
+ora, telefon opțional, motivul dintr-o listă, fără text liber; temei scris în text: cererea
+omului — formularul de programare NU are bifă de acord, ci doar o frază cu linkul politicii,
+deci de arătat avocatului); hCaptcha (IP-ul ajunge la ei, trecut
+prin serverul de găzduire; cabinetul nu-l vede și nu-l păstrează); **contorul de afișări**
+(o cifră pe pagină și pe zi, fără IP/cookie/amprentă — varianta veche zicea „nu știu ce pagini
+citește", prea tare); cookie-uri ale site-ului: niciunul, cu hCaptcha pomenit prudent (nu
+s-a verificat ce memorează în browser); **firma platformei numită ca împuternicit**, cu
+acces tehnic (`[DENUMIREA FIRMEI PLATFORMEI]`, deocamdată fără firmă — blochează publicarea
+pentru clienți plătitori, punctul 0); regiunea bazei de date și faptul că Vercel/Supabase
+sunt americane (`[REGIUNEA BAZEI DE DATE]`, de aflat din Supabase). Paragrafe cu etichete
+(`[PROGRAMĂRI]` ×3, `[YOUTUBE]`, `[WHATSAPP]`) se păstrează sau se șterg întregi, după
+cabinet. Adevăruri verificate în cod, nu din memorie: `antispam.ts` trimite `remoteip` la
+hCaptcha; `page_views_daily` ține doar (site, zi, cale, afișări); coperta YouTube fără poză
+proprie vine de la `i.ytimg.com` la deschiderea paginii, iar filmul abia la clic
+(`youtube-nocookie`); WhatsApp e un link `wa.me`. **Nimic din bază nu se șterge singur** după
+N luni — clientul o face din panou; lista de verificări o spune. **Newsletter-ul NU e acoperit**
+(site-ul doar strânge adrese; trimiterea și dezabonarea n-au instrument încă). Nu e text
+juridic verificat; cere un avocat, mai ales pentru acordul cu firma platformei.
+
 **Telefon OPȚIONAL și la programări (15 oct. 2026, cerut de proprietar; pe branch,
 NEPUBLICAT — așteaptă „fă pe master").** „La modulul de programări cere doar emailul — hai
 să includem și telefonul." Ambele formulare (pagina întreagă `/programare` și cel de pe
@@ -201,9 +224,9 @@ browser pe aplicația construită, cu modulul pornit pe un site de probă: făr�
 cerere cu `phone` gol; telefon prost → eroare lângă câmp, ce a scris omul rămâne, nimic
 scris; doar telefon, fără email → refuzat; aceeași adresă cu alt telefon și altă oră →
 oprită de plafon; formularul de pe prima pagină la fel; câmpul are lățimea emailului la
-1280 și 390 px, fără depășire; în panou cererea arată emailul și telefonul. Deschis, tot
-la proprietar: șablonul politicii de confidențialitate (rândul despre ce salvează
-formularul) trebuie să pomenească acum și programările.
+1280 și 390 px, fără depășire; în panou cererea arată emailul și telefonul.
+**Șablonul politicii de confidențialitate a fost rescris** (15 oct., la cererea
+proprietarului, ca s-o încarce): vezi „Politica de confidențialitate, rescrisă", mai jos.
 
 **Mesajul „Poza umple tot cadrul" la repoziționarea pozelor (15 oct. 2026, cerut de
 proprietar; pe branch, NEPUBLICAT — așteaptă „fă pe master"; mesajul e în `926388a`, pragul
@@ -271,13 +294,9 @@ număr prost → eroare pe câmp, ce a scris omul rămâne, nimic scris; doar nu
 email → refuzat; mesaj/model băgate de mână pe un cabinet → ignorate; câmpul arată la fel
 de lat ca emailul pe toate cele cinci șabloane, la 1280 și 375 px, fără depășire
 orizontală.
-**De făcut, NEFĂCUT (decizia proprietarului):** (1) șablonul
-`sabloane/politica-de-confidentialitate.md` (rândul „Prin formularul de contact… se salvează
-numele și numărul tău de telefon, iar adresa de email doar dacă vrei") era depășit încă din
-16 sept. și acum e greșit în altă direcție; propunerea de înlocuit: „se salvează numele și
-adresa ta de email, iar numărul de telefon doar dacă vrei să-l lași". Politicile clienților
-deja publicate trebuie corectate de mână (vezi tabelul din „Ce s-a schimbat până acum…").
-(2) Textul-demo al secțiunii Contact din `creeaza_client` („Lasă-mi numele și numărul, te sun
+**De făcut:** (1) ~~șablonul `sabloane/politica-de-confidentialitate.md`~~ — rescris pe
+15 oct. (vezi mai jos). Politicile clienților deja publicate trebuie corectate de mână
+(vezi tabelul din „Ce s-a schimbat până acum…"). (2) Textul-demo al secțiunii Contact din `creeaza_client` („Lasă-mi numele și numărul, te sun
 eu.") nu mai e nici el adevărat: numărul nu mai e ce se cere. E text demo, îl schimbă
 clientul din panou.
 
@@ -2513,10 +2532,9 @@ el, din ziua în care și-a făcut site-ul. Un client care și-a publicat politi
 | 31 aug. 2026 | Anti-spamul a trecut de la Cloudflare Turnstile la hCaptcha | Numele furnizorului, în paragraful despre anti-spam ȘI în lista de firme care ating datele |
 | 1 sept. 2026 | Fonturile se servesc de pe domeniul clientului | Paragraful despre Google Fonts SE SCOATE de tot |
 | 16 sept. 2026 | Contactul cere nume + email (obligatoriu); telefonul scos | Rândul despre ce salvează formularul: „numele și numărul tău de telefon, iar adresa de email doar dacă vrei” nu mai e adevărat |
-| 14–15 oct. 2026 | Contactul (14 oct.) ȘI programările (15 oct.) cer nume + email (obligatoriu) + telefon (OPȚIONAL) | Același rând (formularul de contact; programările adaugă numele, emailul, telefonul opțional și ora cerută): „se salvează numele și adresa ta de email, iar numărul de telefon doar dacă vrei să-l lași”. **Încă nefăcut în șablon** (propus proprietarului) |
+| 14–15 oct. 2026 | Contactul (14 oct.) ȘI programările (15 oct.) cer nume + email (obligatoriu) + telefon (OPȚIONAL) | Același rând (formularul de contact; programările adaugă numele, emailul, telefonul opțional și ora cerută): „se salvează numele și adresa ta de email, iar numărul de telefon doar dacă vrei să-l lași”. **Făcut în șablon pe 15 oct.** (rescris; paginile clienților rămân de corectat de mână) |
 
-Primele trei sunt deja făcute în șablon; ultimele două (16 sept., 14 oct.) NU — rândul
-despre formular din șablon descrie încă situația de dinaintea lor. **Niciuna nu e făcută în paginile deja
+Toate sunt făcute în șablon (ultimele două — 16 sept. și 14–15 oct. — prin rescrierea din 15 oct.). **Niciuna nu e făcută în paginile deja
 scrise de clienți** — deocamdată nu există niciun client care să-și fi publicat
 politica, deci lista e curată. Dar din prima zi în care există unul, tabelul
 ăsta devine o listă de treabă de făcut, nu un istoric.
