@@ -95,6 +95,7 @@ function Rand({ cerere }: { cerere: Cerere }) {
             {cerere.telefon}
           </a>
         )}
+        {/* Doar la cererile vechi: „Motivul programării” nu se mai cere din 15 oct. 2026. */}
         {cerere.motiv && <span>{cerere.motiv}</span>}
         {/*
           Cererea venită de pe prima pagină poate să n-aibă nici email, nici

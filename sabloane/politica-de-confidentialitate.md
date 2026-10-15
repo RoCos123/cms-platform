@@ -92,7 +92,7 @@ Pentru orice întrebare legată de datele tale, scrie-mi la [EMAIL DE CONTACT].
 
 Prin formularul de contact de pe site se salvează numele tău și adresa ta de email, iar numărul de telefon doar dacă vrei să-l lași. Am nevoie de ele pentru un singur lucru: ca să te pot contacta înapoi.
 
-[PROGRAMĂRI] Dacă ceri o programare online, se salvează numele tău, adresa de email, ziua și ora pe care le-ai ales și, doar dacă vrei, numărul de telefon și motivul programării — pe acesta din urmă îl alegi dintr-o listă scurtă, nu îl scrii. Le folosesc ca să stabilesc ședința: ca să ți-o confirm sau, dacă ora nu se potrivește, să-ți propun alta.
+[PROGRAMĂRI] Dacă ceri o programare online, se salvează numele tău, adresa de email, ziua și ora pe care le-ai ales și, doar dacă vrei, numărul de telefon. Le folosesc ca să stabilesc ședința: ca să ți-o confirm sau, dacă ora nu se potrivește, să-ți propun alta.
 
 Formularele de pe site nu au căsuță de mesaj, dinadins. Nu vreau să ajungă la mine, printr-o pagină de internet, lucruri despre sănătatea ta înainte să fi vorbit vreodată. Ce ai de spus îmi spui la telefon sau la prima ședință.
 

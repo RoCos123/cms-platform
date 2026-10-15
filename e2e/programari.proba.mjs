@@ -5,7 +5,6 @@ import {
   PROGRAM_GOL,
   citesteProgramul,
   eroriDeContact,
-  motivValid,
   opresteCererea,
   oraEsteLibera,
   oreLibere,
@@ -148,27 +147,6 @@ test("un program citit din nimic e cel gol", () => {
 });
 
 /**
- * Motivul programării: listă închisă, verificată și pe server.
- *
- * Câmpul e un `select` cu două intrări, deci orice altă valoare vine dintr-o
- * cerere scrisă de mână. Fără verificarea asta, textul ar ajunge neatins în
- * panoul psihologului — un câmp liber deghizat în listă.
- */
-test("motivul trece doar dacă e unul dintre cele oferite", () => {
-  assert.equal(motivValid("Evaluări psihologice"), "Evaluări psihologice");
-  assert.equal(motivValid("Altceva"), "Altceva");
-});
-
-test("orice altceva se aruncă, nu se salvează", () => {
-  assert.equal(motivValid(""), null);
-  assert.equal(motivValid("Sună-mă la 07xx, ofertă"), null);
-  // Fără diacritice nu e același lucru: se scrie dintr-o listă, nu de mână.
-  assert.equal(motivValid("Evaluari psihologice"), null);
-  // Nici cu spații în plus — ar deschide ușa pentru variante aproape identice.
-  assert.equal(motivValid(" Altceva"), null);
-});
-
-/**
  * Regula de contact. Două formulare, aceeași acțiune, reguli diferite — iar
  * asta e exact ce se uită prima când se mai adaugă un formular.
  */
@@ -300,4 +278,33 @@ test("limita pe persoană rămâne pe email — telefonul, fiind opțional, nu p
   const actiune = citeste("src/app/actions/programari.ts");
   assert.ok(/\.eq\("email", email\)/.test(actiune), "plafonul pe persoană trebuie să numere după email");
   assert.ok(!/\.eq\("phone"/.test(actiune), "plafonul nu are voie să numere după telefon (poate lipsi)");
+});
+
+/**
+ * „Motivul programării” a fost scos (15 oct. 2026, hotărârea proprietarului). Era o listă cu
+ * două intrări („Evaluări psihologice”, „Altceva”), pusă din 27 aug. Ce apără probele:
+ * formularul n-o mai arată, serverul n-o mai citește (deci o cerere scrisă de mână cu un
+ * câmp `motiv` nu ajunge în panou), iar cererile vechi își păstrează motivul în panou.
+ */
+test("pagina /programare nu mai are câmpul „Motivul programării”", () => {
+  const formular = citeste("src/app/programare/formular.tsx");
+  assert.ok(!/name="motiv"/.test(formular), "a rămas câmpul `motiv`");
+  assert.ok(!formular.includes("Motivul programării</span>") && !formular.includes("MOTIVE"), "a rămas eticheta sau lista");
+  const rapid = citeste("src/components/site/sections/programare-rapida.tsx");
+  assert.ok(!/name="motiv"/.test(rapid), "formularul scurt n-a avut niciodată motiv");
+});
+
+test("serverul nu mai citește motivul: nu-l scrie în bază, oricâte câmpuri ar trimite cineva", () => {
+  const actiune = citeste("src/app/actions/programari.ts");
+  assert.ok(!actiune.includes('"motiv"'), "acțiunea citește încă câmpul `motiv`");
+  assert.ok(!actiune.includes("motivValid"), "a rămas `motivValid`");
+  assert.ok(actiune.includes("service: null,"), "coloana `service` trebuie să intre goală la cererile noi");
+  assert.ok(!/service:\s*motiv/.test(actiune));
+});
+
+test("lista a dispărut din cod, iar cererile vechi își arată în continuare motivul în panou", () => {
+  assert.ok(!citeste("src/lib/programari.ts").includes("MOTIVE"), "a rămas lista `MOTIVE`");
+  const panou = citeste("src/app/dashboard/programari/lista.tsx");
+  assert.ok(panou.includes("{cerere.motiv && <span>{cerere.motiv}</span>}"), "panoul nu mai arată motivul cererilor vechi");
+  assert.ok(citeste("src/app/dashboard/programari/page.tsx").includes("motiv: (rand.service as string | null) ?? null"));
 });

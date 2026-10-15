@@ -183,6 +183,23 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
+**„Motivul programării" a fost SCOS (15 oct. 2026, „da, scoate-l" al proprietarului; pe branch,
+NEPUBLICAT — așteaptă „fă pe master").** Era o listă cu două intrări, „Evaluări psihologice" și
+„Altceva", opțională, pusă la 27 aug. 2026 (vezi mai jos, la „Motivul programării"); proprietarul a
+întrebat dacă nu spusese că n-o vrea pe pagina de programări — în notițe nu exista nicio hotărâre de
+scoatere (poate spusă în altă conversație, nescrisă), așa că s-a întrebat și a confirmat. Acum
+formularul de pe `/programare` n-are câmpul (formularul scurt de pe prima pagină nu l-a avut
+niciodată), iar `cereProgramare` nu mai citește `motiv`: o cerere scrisă de mână cu un astfel de
+câmp e ignorată, iar `appointments.service` intră `null`. Cererile VECHI își păstrează motivul în
+panou (coloana rămâne, `lista.tsx` îl arată dacă există). Dispar din cod `MOTIVE` și `motivValid`.
+Textul de ajutor din panoul „Programări" spune acum „cu nume, email și telefon (dacă l-a lăsat)".
+**Politica:** propoziția despre programări din șablon nu mai pomenește motivul; pe pagina lui
+Robert (încărcată de proprietar) trebuie scoasă mâna: „…și, doar dacă vrei, numărul de telefon și
+motivul programării, ales dintr-o listă." → „…și, doar dacă vrei, numărul de telefon." Probe în
+`e2e/programari.proba.mjs` (cinci încercări de stricare, toate pică). Încercat în browser, pe
+aplicația construită: pe `/programare` nu mai e niciun `select`; cerere cu câmp `motiv` băgat de mână
+→ `service` `null`; o cerere veche cu motiv e încă afișată în panou; la 390 px fără depășire.
+
 **Emailul prin Resend și resetarea parolei sunt AMÂNATE până există firma (15 oct. 2026,
 hotărârea proprietarului).** Motivul spus de el: abonamentele și restul facturării vor fi pe
 firmă, deci și contul Resend, și domeniul de trimitere se fac pe firmă, nu acum pe persoană
@@ -225,7 +242,7 @@ legal al firmei e separat, lângă el.
 pe un site; pe branch, NEPUBLICATĂ — fișierul e doar un șablon, nu atinge nicio pagină).**
 `sabloane/politica-de-confidentialitate.md` descrie acum ce face chiar platforma:
 formularul de contact cu email obligatoriu + telefon opțional; programările (nume, email,
-ora, telefon opțional, motivul dintr-o listă, fără text liber; temei scris în text: cererea
+ora, telefon opțional — *și, până pe 15 oct., motivul dintr-o listă, scos ulterior* —, fără text liber; temei scris în text: cererea
 omului — formularul de programare NU are bifă de acord, ci doar o frază cu linkul politicii,
 deci de arătat avocatului); hCaptcha (IP-ul ajunge la ei, trecut
 prin serverul de găzduire; cabinetul nu-l vede și nu-l păstrează); **contorul de afișări**
@@ -1580,8 +1597,9 @@ care n-are cum să ajungă la zero ar fi învățat clientul să-l ignore. Răm�
 totuși ceva ce se vede doar dacă psihologul deschide panoul; emailul e singurul
 care ajunge la el fără să caute.
 
-**Motivul programării** e o listă închisă cu două intrări — „Evaluări
-psihologice" și „Altceva” — și e opțional (hotărât de proprietar, 27 aug. 2026).
+**Motivul programării** — *SCOS pe 15 oct. 2026 (vezi „Motivul programării a fost SCOS", sus);
+ce urmează e istoria lui.* Era o listă închisă cu două intrări — „Evaluări
+psihologice" și „Altceva” — și opțională (hotărât de proprietar, 27 aug. 2026).
 Înainte se umplea din serviciile publicate ale cabinetului, dar cine cere o
 primă ședință n-are de unde ști ce fel de ședință îi trebuie. Lista e verificată
 și pe server: un `select` cu două intrări e altfel un câmp liber deghizat, iar

@@ -121,8 +121,8 @@ function Neactivat() {
           <li className="flex gap-3">
             <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
             <span className="text-foreground">
-              <b className="font-medium">Programările apar aici</b>, cu nume, telefon
-              și motivul programării. Le confirmi sau le refuzi dintr-un buton.
+              <b className="font-medium">Programările apar aici</b>, cu nume, email și
+              telefon (dacă l-a lăsat). Le confirmi sau le refuzi dintr-un buton.
             </span>
           </li>
           <li className="flex gap-3">

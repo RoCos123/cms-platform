@@ -13,7 +13,7 @@ import {
   type StareFormular,
 } from "@/lib/formulare";
 import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
-import { eroriDeContact, motivValid, opresteCererea, oraEsteLibera } from "@/lib/programari";
+import { eroriDeContact, opresteCererea, oraEsteLibera } from "@/lib/programari";
 import { oreleOcupate, programulSiteului } from "@/lib/programari-publice";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { momentLa, ziuaScrisa, oraLa } from "@/lib/zile";
@@ -64,14 +64,9 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
   const nume = citesteText(formData, "nume", LIMITE.nume);
   const email = citesteText(formData, "email", LIMITE.email);
   const telefon = citesteText(formData, "telefon", LIMITE.telefon);
-  // Lista are două intrări; orice altceva vine dintr-o cerere scrisă de mână,
-  // nu de la cineva care apasă. Se aruncă în tăcere, nu se respinge: câmpul e
-  // opțional, iar o pagină rămasă deschisă peste o schimbare de listă n-are de
-  // ce să pice.
-  const motiv = motivValid(citesteText(formData, "motiv", 120));
   const zi = citesteText(formData, "zi", 10);
   const ora = citesteText(formData, "ora", 5);
-  const valori = { nume, email, telefon, motiv: motiv ?? "", zi, ora };
+  const valori = { nume, email, telefon, zi, ora };
 
   // Emailul e cerut, telefonul e opțional (15 oct. 2026; între 18 sept. și atunci nu
   // se cerea deloc). La fel pe ambele formulare: regula stă în `eroriDeContact`.
@@ -144,11 +139,12 @@ async function proceseaza(formData: FormData): Promise<Omit<StareFormular, "ince
     // Opțional (15 oct. 2026): `null` când omul nu l-a scris, nu șir gol — panoul
     // arată telefonul ca link `tel:` doar când există.
     phone: telefon || null,
-    // Coloana și-a păstrat numele din vremea când câmpul era „Pentru ce” și se
-    // umplea din serviciile cabinetului. O redenumire ar fi cerut încă o migrare
-    // rulată de mână, pentru zero câștig la client; traducerea se face aici și
-    // în ecranul din panou, în câte o linie.
-    service: motiv,
+    // „Motivul programării” nu se mai cere (15 oct. 2026, hotărârea proprietarului);
+    // coloana rămâne, cu motivele cererilor primite până atunci, iar panoul le arată
+    // în continuare. O cerere scrisă de mână cu un câmp `motiv` e ignorată: aici nu se
+    // mai citește. Coloana și-a păstrat numele din vremea când câmpul era „Pentru ce”
+    // și se umplea din serviciile cabinetului; o redenumire ar fi cerut o migrare.
+    service: null,
     // Nu se mai adună (vezi `contact_fara_mesaj`). Coloana rămâne, cu
     // cererile primite până acum.
     notes: null,
