@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { metaSectiune } from "@/lib/sectiuni";
 import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate, type SectionTone } from "@/lib/templates";
+import { culoriDinBrand } from "@/lib/aspect/culori";
 import { serviciiPublicate } from "@/lib/servicii-publice";
 import { articolePublicate } from "@/lib/blog-public";
 import { paginaEsteActiva, type Pagini } from "@/lib/setari";
@@ -148,7 +149,7 @@ export default async function EditorSectiunePage({
       tone={(rand.tone as SectionTone) ?? "deschis"}
       variant={rand.variant as string | null}
       valoareInitiala={catreEditor(continut, meta.campuri)}
-      template={getTemplate(site?.template as string | null)}
+      template={getTemplate(site?.template as string | null, culoriDinBrand(setari?.brand))}
       // Goale când blogul e oprit — exact ca pe site, ca previzualizarea să nu
       // arate o secțiune care în realitate nu apare.
       articole={paginaEsteActiva((setari?.pagini ?? {}) as Pagini, "blog") ? articole : []}

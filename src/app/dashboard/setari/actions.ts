@@ -64,6 +64,20 @@ export async function salveazaSetari(
     ? { ...brandCabinet, ...catreStocare(catreEditor(firma, CAMPURI_FIRMA), CAMPURI_FIRMA) }
     : brandCabinet;
 
+  /*
+    Aspectul ales în meniul „Aspect" (culori, mai târziu fonturi) stă în același `brand`, dar
+    NU se scrie de aici: formularul de Setări trimite doar câmpurile lui, iar un `upsert` cu
+    `brand` nou ar șterge tot ce n-a trimis. Fără rândurile de mai jos, fiecare salvare de
+    telefon sau de adresă ar fi lăsat site-ul fără culorile alese — pe tăcute.
+  */
+  const { data: existente } = await supabase
+    .from("site_settings")
+    .select("brand")
+    .eq("site_id", session.siteId)
+    .maybeSingle();
+  const aspect = (existente?.brand as { aspect?: unknown } | null)?.aspect;
+  const brandDeScris = aspect === undefined ? brand : { ...brand, aspect };
+
   const { error: eroareNume } = await supabase
     .from("sites")
     .update({ name: nume })
@@ -79,7 +93,7 @@ export async function salveazaSetari(
   const { error: eroareSetari } = await supabase
     .from("site_settings")
     .upsert(
-      { site_id: session.siteId, brand, seo: seoCurat, social: socialCurat },
+      { site_id: session.siteId, brand: brandDeScris, seo: seoCurat, social: socialCurat },
       { onConflict: "site_id" },
     );
 

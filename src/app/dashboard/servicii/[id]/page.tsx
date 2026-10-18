@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CAMPURI_SERVICIU } from "@/lib/servicii";
 import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate } from "@/lib/templates";
+import { culoriDinBrand } from "@/lib/aspect/culori";
 import { paginaEsteActiva, type Pagini } from "@/lib/setari";
 import { adresaImaginii } from "@/lib/imagini-adrese";
 import { serviciiPublicate } from "@/lib/servicii-publice";
@@ -30,7 +31,7 @@ export default async function EditorServiciuPage({
       .eq("site_id", session.siteId)
       .maybeSingle(),
     supabase.from("sites").select("template").eq("id", session.siteId).single(),
-    supabase.from("site_settings").select("pagini").eq("site_id", session.siteId).maybeSingle(),
+    supabase.from("site_settings").select("pagini, brand").eq("site_id", session.siteId).maybeSingle(),
     // Pentru previzualizarea „Cum arată pe prima pagină": secțiunea „Serviciile
     // mele" (titlul, câte se văd, așezarea) și vecinii serviciului, ca
     // cartonașul să iasă la lățimea și cu tăierea de pe site. În aceeași rundă,
@@ -89,7 +90,7 @@ export default async function EditorServiciuPage({
     <EditorServiciu
       id={id}
       valoareInitiala={catreEditor({ ...serviciu, coperta }, CAMPURI_SERVICIU)}
-      template={getTemplate(site?.template as string | null)}
+      template={getTemplate(site?.template as string | null, culoriDinBrand(setari?.brand))}
       hrefPeSite={hrefPeSite}
       primaPagina={{
         sectiune: sectiuneServicii

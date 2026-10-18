@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { citesteAspectCulori, paletaEfectiva } from "@/lib/aspect/culori";
 import type { Template, TemplateId } from "./types";
 import { caldura } from "./caldura";
 import { liniste } from "./liniste";
@@ -28,8 +29,16 @@ const TEMPLATES: Record<string, Template> = {
  * Șablonul unui site. Necunoscut sau lipsă → cel implicit: un site public trebuie să
  * se randeze mereu, chiar dacă rândul din baza de date a rămas în urma codului.
  */
-export function getTemplate(id: string | null | undefined): Template {
-  return TEMPLATES[id ?? ""] ?? caldura;
+export function getTemplate(id: string | null | undefined, culori?: unknown): Template {
+  const sablon = TEMPLATES[id ?? ""] ?? caldura;
+
+  // Culorile alese de client (meniul „Aspect"). Fără ele — sau cu un JSON care nu e valid —
+  // se întoarce EXACT obiectul șablonului, nu o copie: site-urile care n-au ales nimic
+  // rămân identice, iar un conținut stricat din bază nu poate strica un site public.
+  const aspect = citesteAspectCulori(culori);
+  if (!aspect) return sablon;
+
+  return { ...sablon, paleta: paletaEfectiva(sablon.paleta, aspect) };
 }
 
 export function listTemplates(): Template[] {

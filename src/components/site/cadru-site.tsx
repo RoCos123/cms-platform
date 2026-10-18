@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
+import { culoriDinBrand } from "@/lib/aspect/culori";
 import { articolePublicate } from "@/lib/blog-public";
 import { linkurilePaginilor } from "@/lib/pagini-publice";
 import { linkurileSociale, paginaEsteActiva } from "@/lib/setari";
@@ -60,7 +61,7 @@ export async function CadruSite({
     ]);
   const vanzare = tip === "vanzare";
 
-  const template = getTemplate(site?.template);
+  const template = getTemplate(site?.template, culoriDinBrand(brand));
   const nume = site?.name ?? domain;
 
   // Blogul oprit stinge tot blogul, deci și intrarea din meniu. Iar fără niciun

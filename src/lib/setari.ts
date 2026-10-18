@@ -237,6 +237,12 @@ export type Brand = {
   descriereSubsol?: string;
   /** Rândul din stânga al barei de jos, scris de client; gol = © + anul + numele (vezi `randulDeCopyright`). */
   copyright?: string;
+  /**
+   * Aspectul ales de client în meniul „Aspect" (culori; fonturile vin după). Nu se scrie din
+   * Setări, ci din ecranul „Aspect" — iar salvarea Setărilor îl PĂSTREAZĂ, altfel fiecare
+   * salvare de telefon sau adresă ar șterge culorile alese. Vezi `src/lib/aspect/culori.ts`.
+   */
+  aspect?: { culori?: unknown };
   /** Datele firmei: doar pe pagina de vânzare (vezi `CAMPURI_FIRMA`). */
   firmaDenumire?: string;
   firmaCui?: string;

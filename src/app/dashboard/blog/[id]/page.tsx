@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CAMPURI_ARTICOL } from "@/lib/blog";
 import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate } from "@/lib/templates";
+import { culoriSiteului } from "@/lib/aspect/citire";
 import { adresaImaginii } from "@/lib/imagini-adrese";
 import { normalizeazaPunctFocal, type PunctFocal } from "@/lib/punct-focal";
 import { EditorArticol } from "./editor";
@@ -17,7 +18,7 @@ export default async function EditorArticolPage({
   const session = await verifySession();
   const supabase = await createClient();
 
-  const [{ data: articol }, { data: site }] = await Promise.all([
+  const [{ data: articol }, { data: site }, culori] = await Promise.all([
     supabase
       .from("blog_articles")
       .select(
@@ -27,6 +28,7 @@ export default async function EditorArticolPage({
       .eq("site_id", session.siteId)
       .maybeSingle(),
     supabase.from("sites").select("template").eq("id", session.siteId).single(),
+    culoriSiteului(supabase, session.siteId),
   ]);
 
   // Un articol al altui client dispare aici la fel ca unul inexistent — 404, nu
@@ -60,7 +62,7 @@ export default async function EditorArticolPage({
       valoareInitiala={catreEditor({ ...articol, coperta }, CAMPURI_ARTICOL)}
       publicat={articol.status === "published"}
       publicatLa={articol.published_at as string | null}
-      template={getTemplate(site?.template as string | null)}
+      template={getTemplate(site?.template as string | null, culori)}
     />
   );
 }

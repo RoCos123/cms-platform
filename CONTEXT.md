@@ -162,10 +162,8 @@ pentru cine mai are de făcut capturi, din ce a mers și ce nu:
   fiecare cu rezultatul vizibil, nu liste lungi.
 
 **Deschise, fără cerere de la proprietar (nu începe fără el):**
-- *(Cerut și hotărât pe 18 oct. — vezi „Meniul «Aspect»", sus, în starea curentă.)* Culori proprii pe
-  site, fără a atinge șablonul (discutat 5 oct.): azi nu există
-  nicio suprascriere per site. Calea ar fi o paletă pe `site_settings.brand`, aplicată
-  doar acelui site, cu verificare de contrast; întâi doar accentul. Nu s-a implementat.
+- *(Făcut pe 18 oct., pe branch, nepublicat — vezi „Meniul «Aspect»", sus, în starea curentă.)* Culori
+  proprii pe site, fără a atinge șablonul (discutat 5 oct.). Fonturile proprii încă nu.
 - Zilele din preaviz la programare scriu „Fără ore" (poate fi „Prea aproape: sunt
   necesare 24 de ore"); săgeți „săptămâna următoare/anterioară" în grila Apropiere;
   banda de citat pe „relief" la Liniște (cere mostră de culoare).
@@ -221,9 +219,10 @@ să pară „versiunea oficială în engleză"; (d) comutatorul ar fi opțional 
 de mai sus iese bine; programările/formularele într-o limbă străină sunt partea necunoscută.
 *Limbi:* nehotărât; propunerea sesiunii: engleza întâi.
 
-**Meniul „Aspect": culori și fonturi alese de client — HOTĂRÂT, NEÎNCEPUT (18 oct. 2026, discutat
-cu proprietarul; el a spus explicit „momentan nu facem nimic, doar discutăm" — nu începe fără un
-„începe" de la el).** Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
+**Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE, PE BRANCH, NEPUBLICATE
+(18 oct. 2026); FONTURILE, NEÎNCEPUTE.** Întâi a fost doar discutat (proprietarul: „momentan nu facem
+nimic, doar discutăm"); apoi a cerut „hai sa facem partea cu culorile si fonturile… Mai intai
+culorile". Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
 *Hotărâri confirmate:*
 - **Culori, mod AUTOMAT (implicit):** clientul alege O culoare principală, iar restul paletei se
   calculează din ea — inclusiv **fundalurile, care se colorează după culoarea aleasă** (tentă
@@ -253,9 +252,59 @@ sute de culori la întâmplare, pe aceleași perechi pe care le verifică `e2e/c
 Site-urile existente nu se schimbă până nu alege clientul. *Estimare, cu rezerve:* culori 2–3
 sesiuni, fonturi o jumătate–una. *Riscuri spuse proprietarului:* un client își poate strica site-ul în
 modul manual și va scrie proprietarului (de aici butonul de revenire și avertismentul); șabloanele au
-caractere diferite, deci paleta calculată cere grijă. *Rămas de hotărât:* **ordinea** (propunerea
-sesiunii: întâi fonturile — mai mici, schelet de ecran „Aspect" —, apoi culorile, automat înainte de
-manual) și **lista de fonturi**.
+caractere diferite, deci paleta calculată cere grijă. *Ordinea, hotărâtă de proprietar:* întâi
+culorile (automat înainte de manual), apoi fonturile. *Rămas de hotărât:* **lista de fonturi** (de
+arătat proprietarului ÎNAINTE să se construiască).
+
+*Starea culorilor (18 oct. 2026, pe branch `claude/sleepy-tesla-aanhq7`; „fă pe master" nu s-a spus):*
+- **Ce vede clientul:** intrare nouă „Aspect" în meniu (înaintea Setărilor), ecran `/dashboard/aspect`.
+  Două moduri, ambele vizibile, fiecare cu explicația lui: **Automat** (o culoare: pătrățel + cod
+  `#RRGGBB` + 12 culori gata alese; se acceptă și codul fără „#") și **Manual** (opt culori cu nume
+  pe înțelesul lui, fiecare cu „Revino la cea calculată"; pornește de la paleta calculată din
+  culoarea principală, sau de la a șablonului dacă n-a ales una). Previzualizare vie (antet, hero,
+  servicii, citat, întrebări pe fundal închis, subsol — toate cele patru fundaluri, la orice șablon).
+  „Revino la culorile șablonului" + Salvează ⇒ cheia dispare din bază, site-ul e identic cu cel de
+  dinainte. Un cod greșit nu strică nimic: eroare lângă câmp, la ieșire revine ultima valoare bună.
+- **Automat:** paleta se calculează în OKLCH din culoarea aleasă (`src/lib/aspect/paleta.ts`): se
+  schimbă DOAR nuanța; luminozitatea fiecărui rol și „cât de colorat e față de accent" rămân ale
+  șablonului (Claritate își păstrează albul pur, Lumină fundalul închis intens, Apropiere piersica).
+  Pe fiecare pereche text–fundal contrastul e ≥ 4,5:1 — verificat pe 386 de culori × 5 șabloane,
+  inclusiv galben, magenta, alb, negru, gri. **O culoare prea deschisă se întunecă** doar cât să se
+  citească pe fundal deschis, iar panoul o spune („Pe site apare puțin mai închisă"); galbenul
+  `#FFEB3B` ajunge un măsliniu închis (`#695F00`) — așa cere fizica contrastului, nu un defect.
+  Cele 12 culori gata alese nu se întunecă vizibil pe niciun șablon (la Căldură, cel mult o treaptă).
+- **Manual:** ce alege omul se aplică EXACT, fără corecții. Pe ecran apare o listă galbenă
+  **neblocantă** cu perechile sub 4,5:1, cu nume pe înțelesul lui („Textul pe fundalul paginii:
+  contrast 1,0:1 (se recomandă cel puțin 4,5:1)") și „Poți salva oricum — alegerea e a ta". Dacă
+  schimbă fundalul paginii, fundalul „mai închis" și chenarul se mută odată cu el.
+  **Alegerea mea, de confirmat de proprietar:** în loc de bifa „înțeleg că poate fi greu de citit"
+  (propusă, neconfirmată), salvarea cu avertismente scrie singură `asumat: true` în bază — nu
+  schimbă nimic pe site, e doar dovada că a salvat știind. Dacă vrea bifa, e o schimbare mică.
+- **Unde stau datele:** `site_settings.brand.aspect.culori` = `{mod, principala, manual, asumat}`;
+  fără migrare, fără SQL. Fonturile vor sta lângă ele, în `brand.aspect`.
+- **Cum ajung pe site:** `getTemplate(id, culori)` întoarce EXACT obiectul șablonului când nu sunt
+  culori valide (site-urile existente: octet cu octet la fel; un JSON stricat din bază e ignorat),
+  altfel o copie cu paleta nouă; `templateStyle` o transformă în variabilele `--t-*`, deci
+  componentele nu se ating. Citesc culorile: `cadru-site.tsx` (tot site-ul public) și toate
+  previzualizările din panou (secțiuni, servicii, pagini, blog, Setări).
+- **Capcana evitată:** salvarea din Setări făcea `upsert` cu `brand` nou și ar fi ȘTERS culorile la
+  fiecare schimbare de telefon. `salveazaSetari` citește acum `brand.aspect` și-l pune la loc.
+  Invers, `salveazaCulori` citește `brand` și scrie înapoi tot, schimbând doar `aspect.culori`
+  (`brandCuCulori`); `seo` și `social` nu sunt în cerere. Detaliu: citire-apoi-scriere, deci două
+  salvări simultane din două file ar putea să se calce (la fel ca la Setări; neglijabil cu un singur
+  utilizator per cabinet).
+- **Fișiere:** `src/lib/aspect/{culoare,paleta,culori,citire,salvare}.ts`, `src/app/dashboard/aspect/`
+  (`page.tsx`, `formular.tsx`, `actions.ts`), `getTemplate` în `src/lib/templates/index.ts`.
+  Acțiunea: `verifySession()` întâi, validare strictă (`valideazaCulori`: orice nu e `#RRGGBB` e
+  refuzat cu mesaj, cheile străine se aruncă), jurnal în „Activitate", `revalidatePath("/", "layout")`.
+- **Probe:** `e2e/aspect-culori.proba.mjs` (38 de teste; 20 de stricări pe rând, toate prinse — două
+  nu erau la început și au fost întărite: ordinea sesiune→validare→scriere și „ce se scrie e ce a ieșit
+  din validare"). Încercat în browser pe un Supabase adevărat (GoTrue + PostgREST), ca Ana: culoare
+  aleasă → previzualizare → Salvează → site public cu EXACT aceleași culori; Setări păstrează culorile;
+  galben întunecat și explicat; cod greșit; manual cu avertisment și salvare; „Revino…" ⇒ site identic
+  cu cel de la început; 375 px fără derulare în lateral; capturi pe toate cele 5 șabloane.
+- **Rămas:** (1) „fă pe master" de la proprietar; (2) FONTURILE — lista curată, arătată lui înainte;
+  (3) opțional: bifa „înțeleg…", ordonarea culorilor gata alese după gustul lui.
 
 **„Motivul programării" a fost SCOS (15 oct. 2026, „da, scoate-l" al proprietarului; pe branch,
 NEPUBLICAT — așteaptă „fă pe master").** Era o listă cu două intrări, „Evaluări psihologice" și
