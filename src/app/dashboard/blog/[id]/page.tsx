@@ -28,7 +28,7 @@ export default async function EditorArticolPage({
       .eq("id", id)
       .eq("site_id", session.siteId)
       .maybeSingle(),
-    supabase.from("sites").select("template").eq("id", session.siteId).single(),
+    supabase.from("sites").select("domain, template").eq("id", session.siteId).single(),
     brandulSiteului(supabase, session.siteId),
   ]);
 
@@ -65,7 +65,7 @@ export default async function EditorArticolPage({
       publicatLa={articol.published_at as string | null}
       template={getTemplate(
         site?.template as string | null,
-        culoriPermise(brand, { siteId: session.siteId, template: site?.template as string | null }),
+        culoriPermise(brand, { domain: site?.domain as string | null, template: site?.template as string | null }),
       )}
     />
   );

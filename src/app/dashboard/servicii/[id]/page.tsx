@@ -30,7 +30,7 @@ export default async function EditorServiciuPage({
       .eq("id", id)
       .eq("site_id", session.siteId)
       .maybeSingle(),
-    supabase.from("sites").select("template").eq("id", session.siteId).single(),
+    supabase.from("sites").select("domain, template").eq("id", session.siteId).single(),
     supabase.from("site_settings").select("pagini, brand").eq("site_id", session.siteId).maybeSingle(),
     // Pentru previzualizarea „Cum arată pe prima pagină": secțiunea „Serviciile
     // mele" (titlul, câte se văd, așezarea) și vecinii serviciului, ca
@@ -92,7 +92,7 @@ export default async function EditorServiciuPage({
       valoareInitiala={catreEditor({ ...serviciu, coperta }, CAMPURI_SERVICIU)}
       template={getTemplate(
         site?.template as string | null,
-        culoriPermise(setari?.brand, { siteId: session.siteId, template: site?.template as string | null }),
+        culoriPermise(setari?.brand, { domain: site?.domain as string | null, template: site?.template as string | null }),
       )}
       hrefPeSite={hrefPeSite}
       primaPagina={{

@@ -27,7 +27,7 @@ export default async function SetariPage() {
   const supabase = await createClient();
 
   const [{ data: site }, { data: setari }, { data: politica }, tip] = await Promise.all([
-    supabase.from("sites").select("name, template, published_at").eq("id", session.siteId).single(),
+    supabase.from("sites").select("name, domain, template, published_at").eq("id", session.siteId).single(),
     supabase.from("site_settings").select("brand, seo, social").eq("site_id", session.siteId).maybeSingle(),
     // Doar starea, nu textul: cardul de publicare vrea să știe dacă politica de
     // confidențialitate mai e ciornă, ca să spună asta înainte de lansare.
@@ -115,7 +115,7 @@ export default async function SetariPage() {
         domeniu={domain}
         template={getTemplate(
           site?.template as string | null,
-          culoriPermise(brand, { siteId: session.siteId, template: site?.template as string | null }),
+          culoriPermise(brand, { domain: site?.domain as string | null, template: site?.template as string | null }),
         )}
       />
     </div>

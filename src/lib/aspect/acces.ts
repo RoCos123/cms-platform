@@ -3,16 +3,17 @@ import { culoriDinBrand } from "./culori";
 /**
  * Cine are meniul „Aspect" — deocamdată doar în probă.
  *
- * Cerut de proprietar (18 oct. 2026): „limitează pe șablonul Claritate și pe site-ul meu" —
- * și apoi, lămurit: site-ul Popescu Robert, NU sitepsihologi — ca să încerce culorile într-un
- * singur loc înainte să le primească toți clienții. Trebuie să se potrivească AMBELE: șablonul
- * E în listă ȘI site-ul E în listă. Un site Claritate al altui client nu primește nimic; nici
- * site-ul proprietarului, dacă ar trece pe alt șablon.
+ * Cerut de proprietar (18 oct. 2026): „limitează pe șablonul Claritate și pe site-ul meu" — iar
+ * site-ul lui e „model claritate" (`model-claritate.vercel.app`, numit în panou „Popescu Robert"),
+ * NU sitepsihologi — ca să încerce culorile într-un singur loc înainte să le primească toți
+ * clienții. Trebuie să se potrivească AMBELE: șablonul E în listă ȘI domeniul E în listă. Un site
+ * Claritate al altui client nu primește nimic; nici site-ul proprietarului, dacă ar trece pe alt
+ * șablon.
  *
  * Poarta nu e o nevoie tehnică (paleta calculată e probată pe toate cinci șabloanele), ci o
  * măsură de prudență. O ține un SINGUR loc, aici. Ce hotărăște:
  *
- * • meniul „Aspect" din panou și pagina `/dashboard/aspect` (altfel: 404);
+ * • meniul „Aspect" din panou și pagina `/dashboard/aspect` (altfel: „Pagina nu există");
  * • salvarea culorilor (altfel refuzată, chiar dacă cineva trimite cererea de mână);
  * • aplicarea culorilor pe site-ul public și în toate previzualizările din panou — un site
  *   din afara probei le ignoră, chiar dacă în bază ar sta culori salvate.
@@ -25,28 +26,29 @@ import { culoriDinBrand } from "./culori";
 export const SABLOANE_CU_ASPECT: readonly string[] = ["claritate"];
 
 /**
- * Site-urile pe care e pornit „Aspect", după `sites.id` (nu după domeniu: domeniul se mută, id-ul nu).
+ * Domeniile (`sites.domain`) pe care e pornit „Aspect". Potrivire EXACTĂ, nu „conține".
  *
- * GOALĂ deocamdată, dinadins: proprietarul a cerut „Aspect" pe site-ul lui (Popescu Robert, pe
- * Claritate), NU pe sitepsihologi, iar id-ul acelui site nu e în depozit — se află cu
- * `supabase/cauta-site-aspect.sql`. Cât lista e goală, „Aspect" nu apare nicăieri.
+ * Domeniul, nu `sites.id`: platforma își recunoaște oricum site-urile după domeniu, iar id-ul lui
+ * „model claritate" nu e în depozit. Dacă domeniul se schimbă (a mai fost redenumit o dată:
+ * `cosmin-claritate` → `model-claritate`), poarta se închide singură — fără stricăciuni; se pune
+ * noul domeniu aici. Dacă vreodată e nevoie de ceva mai stabil, se trece pe id.
  */
-export const SITE_URI_CU_ASPECT: readonly string[] = [];
+export const DOMENII_CU_ASPECT: readonly string[] = ["model-claritate.vercel.app"];
 
 export type SiteAspect = {
-  siteId: string | null | undefined;
+  domain: string | null | undefined;
   template: string | null | undefined;
 };
 
 /** Cele două liste, ca probele să poată încerca regula și cu alte valori decât cele reale. */
-export type ListeAspect = { sabloane: readonly string[]; siteuri: readonly string[] };
+export type ListeAspect = { sabloane: readonly string[]; domenii: readonly string[] };
 
-const LISTE_REALE: ListeAspect = { sabloane: SABLOANE_CU_ASPECT, siteuri: SITE_URI_CU_ASPECT };
+const LISTE_REALE: ListeAspect = { sabloane: SABLOANE_CU_ASPECT, domenii: DOMENII_CU_ASPECT };
 
 /** Are acest site meniul „Aspect"? Ambele liste trebuie să-l cuprindă. */
 export function aspectPermis(site: SiteAspect, liste: ListeAspect = LISTE_REALE): boolean {
-  if (!site.siteId || !site.template) return false;
-  return liste.sabloane.includes(site.template) && liste.siteuri.includes(site.siteId);
+  if (!site.domain || !site.template) return false;
+  return liste.sabloane.includes(site.template) && liste.domenii.includes(site.domain);
 }
 
 /**

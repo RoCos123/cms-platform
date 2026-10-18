@@ -42,7 +42,7 @@ export default async function EditorSectiunePage({
       .eq("id", id)
       .eq("site_id", session.siteId)
       .maybeSingle(),
-    supabase.from("sites").select(`template, ${COLOANE_MODULE}`).eq("id", session.siteId).single(),
+    supabase.from("sites").select(`domain, template, ${COLOANE_MODULE}`).eq("id", session.siteId).single(),
   ]);
 
   // `.eq("site_id", …)` peste RLS: nu e redundant, e explicit. O secțiune a
@@ -151,7 +151,7 @@ export default async function EditorSectiunePage({
       valoareInitiala={catreEditor(continut, meta.campuri)}
       template={getTemplate(
         site?.template as string | null,
-        culoriPermise(setari?.brand, { siteId: session.siteId, template: site?.template as string | null }),
+        culoriPermise(setari?.brand, { domain: site?.domain as string | null, template: site?.template as string | null }),
       )}
       // Goale când blogul e oprit — exact ca pe site, ca previzualizarea să nu
       // arate o secțiune care în realitate nu apare.

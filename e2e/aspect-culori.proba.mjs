@@ -20,7 +20,7 @@ import {
   paletaEfectiva,
 } from "@/lib/aspect/culori";
 import { PRESETURI_CULOARE, brandCuCulori, valideazaCulori } from "@/lib/aspect/salvare";
-import { SABLOANE_CU_ASPECT, SITE_URI_CU_ASPECT, aspectPermis, culoriPermise } from "@/lib/aspect/acces";
+import { DOMENII_CU_ASPECT, SABLOANE_CU_ASPECT, aspectPermis, culoriPermise } from "@/lib/aspect/acces";
 
 /**
  * Culorile alese de client (meniul „Aspect”). `pnpm test:logica`.
@@ -317,18 +317,18 @@ test("cele opt culori ale modului manual: nume pe înțelesul unui client, făr�
 const citeste = (cale) => readFileSync(cale, "utf8");
 
 test("site-ul public și toate previzualizările din panou citesc culorile alese — doar prin poartă", () => {
-  assert.ok(citeste("src/components/site/cadru-site.tsx").includes("culoriPermise(brand, { siteId, template: site?.template })"));
+  assert.ok(citeste("src/components/site/cadru-site.tsx").includes("culoriPermise(brand, { domain, template: site?.template })"));
   for (const cale of [
     "src/app/dashboard/sectiuni/[id]/page.tsx",
     "src/app/dashboard/servicii/[id]/page.tsx",
     "src/app/dashboard/setari/page.tsx",
   ]) {
-    assert.match(citeste(cale), /culoriPermise\(\s*(setari\?\.brand|brand), \{ siteId: session\.siteId, template: /, cale);
+    assert.match(citeste(cale), /culoriPermise\(\s*(setari\?\.brand|brand), \{ domain: site\?\.domain as string \| null, template: /, cale);
   }
   for (const cale of ["src/app/dashboard/pagini/[id]/page.tsx", "src/app/dashboard/blog/[id]/page.tsx"]) {
     const text = citeste(cale);
     assert.ok(text.includes("brandulSiteului(supabase, session.siteId)"), cale);
-    assert.match(text, /culoriPermise\(brand, \{ siteId: session\.siteId, template: /, cale);
+    assert.match(text, /culoriPermise\(brand, \{ domain: site\?\.domain as string \| null, template: /, cale);
   }
 });
 
@@ -444,11 +444,11 @@ test("culorile se pun în `brand` fără să atingă nimic altceva — nici date
 test("acțiunea de salvare: verifică sesiunea întâi, validează, păstrează `brand`, scrie în jurnal și reîmprospătează tot site-ul", () => {
   const actiune = citeste("src/app/dashboard/aspect/actions.ts");
   assert.ok(actiune.startsWith('"use server";'));
-  const [iSesiune, iPoarta, iValidare, iScriere] = ["await verifySession()", "aspectPermis({ siteId: session.siteId, template: site?.template })", "valideazaCulori(brut)", ".upsert("].map((x) => actiune.indexOf(x));
+  const [iSesiune, iPoarta, iValidare, iScriere] = ["await verifySession()", "aspectPermis({ domain: site?.domain, template: site?.template })", "valideazaCulori(brut)", ".upsert("].map((x) => actiune.indexOf(x));
   assert.ok(iSesiune >= 0, "lipsește verificarea sesiunii");
   assert.ok(iPoarta > iSesiune, "poarta se verifică după sesiune și înaintea oricărei validări sau scrieri");
   assert.ok(iValidare > iPoarta, "un site fără poartă nu ajunge nici la validare");
-  assert.ok(actiune.includes('.from("sites").select("template")'), "șablonul se citește din bază, nu din cerere");
+  assert.ok(actiune.includes('.from("sites").select("domain, template")'), "domeniul și șablonul se citesc din bază, nu din cerere");
   assert.ok(iScriere > iValidare, "se validează înainte să se scrie");
   assert.ok(actiune.includes("const verificat = valideazaCulori(brut);"), "ce trimite browserul trece prin validare, nu se crede");
   assert.ok(actiune.includes("if (!verificat.ok) return { ok: false, mesaj: verificat.mesaj };"), "o validare eșuată oprește salvarea");
@@ -468,12 +468,12 @@ test("ecranul „Aspect” e în meniu, înaintea Setărilor, și are o pagină"
   assert.ok(meniu.includes("aspectActiv = false"), "implicit, intrarea nu apare");
   assert.ok(meniu.includes('NAV.filter((item) => aspectActiv || item.label !== "Aspect")'));
   const aranjament = citeste("src/app/dashboard/layout.tsx");
-  assert.ok(aranjament.includes("aspectActiv={aspectPermis({ siteId: session.siteId, template: site?.template })}"));
+  assert.ok(aranjament.includes("aspectActiv={aspectPermis({ domain: site?.domain, template: site?.template })}"));
   assert.ok(aranjament.includes('select("name, domain, template")'), "layout-ul trebuie să citească și șablonul");
   const pagina = citeste("src/app/dashboard/aspect/page.tsx");
   assert.ok(pagina.includes("verifySession()"));
   assert.ok(pagina.includes("citesteAspectCulori(culoriDinBrand(setari?.brand))"));
-  assert.ok(pagina.includes("if (!aspectPermis({ siteId: session.siteId, template: site?.template as string | null })) notFound();"), "fără poartă, pagina e 404");
+  assert.ok(pagina.includes("if (!aspectPermis({ domain: site?.domain as string | null, template: site?.template as string | null })) notFound();"), "fără poartă, pagina e 404");
   assert.ok(pagina.indexOf("notFound();") < pagina.indexOf("<FormularAspect"));
 });
 
@@ -498,47 +498,57 @@ test("previzualizarea din „Aspect” arată toate cele patru fundaluri — inc
 
 // ───────────────────────── poarta „în probă” ─────────────────────────
 
-// Id-ul lui sitepsihologi: proprietarul a cerut ca „Aspect" să NU fie pe el (18 oct.).
-const SITEPSIHOLOGI = "d4643a1a-42a3-4f45-814f-75234b041200";
-// Un site de probă și listele cu care se încearcă REGULA (listele reale se verifică separat).
-const SITE_PERMIS = "abcdef01-2345-4678-8abc-def012345678";
-const LISTE_PROBA = { sabloane: ["claritate"], siteuri: [SITE_PERMIS] };
+// Proprietarul a cerut „Aspect" pe „model claritate" (site-ul lui), NU pe sitepsihologi (18 oct.).
+const DOMENIU_PERMIS = "model-claritate.vercel.app";
+// Un domeniu de probă și listele cu care se încearcă REGULA (listele reale se verifică separat).
+const DOMENIU_PROBA = "cabinet-proba.test";
+const LISTE_PROBA = { sabloane: ["claritate"], domenii: [DOMENIU_PROBA] };
 
-test("listele reale: Claritate, și NICIODATĂ sitepsihologi; id-urile sunt UUID-uri", () => {
+test("listele reale: Claritate + model-claritate, și NICIODATĂ sitepsihologi", () => {
   assert.deepEqual([...SABLOANE_CU_ASPECT], ["claritate"]);
-  assert.ok(!SITE_URI_CU_ASPECT.includes(SITEPSIHOLOGI), "proprietarul a cerut „Aspect” NU pe sitepsihologi");
-  for (const id of SITE_URI_CU_ASPECT) assert.match(id, /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/, id);
-  // Cu listele reale, sitepsihologi pe Claritate nu primește nimic.
-  assert.equal(aspectPermis({ siteId: SITEPSIHOLOGI, template: "claritate" }), false);
-  assert.equal(culoriPermise({ aspect: { culori: { mod: "auto", principala: "#2E7D5B" } } }, { siteId: SITEPSIHOLOGI, template: "claritate" }), undefined);
+  assert.deepEqual([...DOMENII_CU_ASPECT], [DOMENIU_PERMIS]);
+  for (const domeniu of DOMENII_CU_ASPECT) {
+    assert.ok(!/sitepsihologi/i.test(domeniu), "proprietarul a cerut „Aspect” NU pe sitepsihologi");
+    assert.equal(domeniu, domeniu.toLowerCase().trim(), "domeniile se scriu cu litere mici, fără spații");
+    assert.ok(!/^https?:|\/|\s/.test(domeniu), "doar domeniul, fără https:// sau cale");
+  }
+  // Cu listele reale: „model claritate" pe Claritate are poarta deschisă, orice altceva nu.
+  assert.equal(aspectPermis({ domain: DOMENIU_PERMIS, template: "claritate" }), true);
+  assert.equal(aspectPermis({ domain: DOMENIU_PERMIS, template: "caldura" }), false);
+  for (const altul of ["sitepsihologi.vercel.app", "sitepsihologi.ro", "model-liniste.vercel.app", "model-caldura.vercel.app", "cosmin-claritate.vercel.app"]) {
+    assert.equal(aspectPermis({ domain: altul, template: "claritate" }), false, altul);
+  }
+  assert.equal(culoriPermise({ aspect: { culori: { mod: "auto", principala: "#2E7D5B" } } }, { domain: "sitepsihologi.vercel.app", template: "claritate" }), undefined);
 });
 
-test("poarta: ȘI șablonul, ȘI site-ul — ambele deodată (regula, cu liste de probă)", () => {
+test("poarta: ȘI șablonul, ȘI domeniul — ambele deodată (regula, cu liste de probă)", () => {
   const permis = (site) => aspectPermis(site, LISTE_PROBA);
-  assert.equal(permis({ siteId: SITE_PERMIS, template: "claritate" }), true);
+  assert.equal(permis({ domain: DOMENIU_PROBA, template: "claritate" }), true);
   // Un site Claritate al altcuiva nu primește nimic.
-  assert.equal(permis({ siteId: "00000000-0000-0000-0000-000000000001", template: "claritate" }), false);
+  assert.equal(permis({ domain: "alt-cabinet.test", template: "claritate" }), false);
   // Nici site-ul permis, dacă ar trece pe alt șablon.
   for (const sablon of ["caldura", "liniste", "lumina", "apropiere", "altceva", "", null, undefined]) {
-    assert.equal(permis({ siteId: SITE_PERMIS, template: sablon }), false, String(sablon));
+    assert.equal(permis({ domain: DOMENIU_PROBA, template: sablon }), false, String(sablon));
   }
-  for (const gol of [null, undefined, ""]) assert.equal(permis({ siteId: gol, template: "claritate" }), false);
-  // Potrivire exactă: nu „conține", nu litere mari/mici amestecate.
-  assert.equal(permis({ siteId: SITE_PERMIS.toUpperCase(), template: "claritate" }), false);
-  assert.equal(permis({ siteId: SITE_PERMIS, template: "Claritate" }), false);
-  assert.equal(permis({ siteId: SITE_PERMIS, template: "claritate " }), false);
+  for (const gol of [null, undefined, ""]) assert.equal(permis({ domain: gol, template: "claritate" }), false);
+  // Potrivire EXACTĂ: nu „conține", nu prefix/sufix, nu litere mari, nu subdomeniu al celui permis.
+  for (const aproape of [`www.${DOMENIU_PROBA}`, `${DOMENIU_PROBA}.evil.com`, `x${DOMENIU_PROBA}`, DOMENIU_PROBA.toUpperCase(), ` ${DOMENIU_PROBA}`, "cabinet-proba"]) {
+    assert.equal(permis({ domain: aproape, template: "claritate" }), false, aproape);
+  }
+  assert.equal(permis({ domain: DOMENIU_PROBA, template: "Claritate" }), false);
+  assert.equal(permis({ domain: DOMENIU_PROBA, template: "claritate " }), false);
   // Liste goale: nimeni.
-  assert.equal(aspectPermis({ siteId: SITE_PERMIS, template: "claritate" }, { sabloane: [], siteuri: [SITE_PERMIS] }), false);
-  assert.equal(aspectPermis({ siteId: SITE_PERMIS, template: "claritate" }, { sabloane: ["claritate"], siteuri: [] }), false);
+  assert.equal(aspectPermis({ domain: DOMENIU_PROBA, template: "claritate" }, { sabloane: [], domenii: [DOMENIU_PROBA] }), false);
+  assert.equal(aspectPermis({ domain: DOMENIU_PROBA, template: "claritate" }, { sabloane: ["claritate"], domenii: [] }), false);
 });
 
 test("poarta închisă: culorile salvate în bază NU ajung pe site — șablonul rămâne neatins", () => {
   const brand = { aspect: { culori: { mod: "auto", principala: "#2E7D5B", manual: {}, asumat: false } } };
 
   for (const [nume, site] of [
-    ["alt site, Claritate", { siteId: "00000000-0000-0000-0000-000000000001", template: "claritate" }],
-    ["site-ul permis, alt șablon", { siteId: SITE_PERMIS, template: "caldura" }],
-    ["fără site", { siteId: null, template: null }],
+    ["alt site, Claritate", { domain: "alt-cabinet.test", template: "claritate" }],
+    ["site-ul permis, alt șablon", { domain: DOMENIU_PROBA, template: "caldura" }],
+    ["fără site", { domain: null, template: null }],
   ]) {
     assert.equal(culoriPermise(brand, site, LISTE_PROBA), undefined, nume);
     for (const sablon of listTemplates()) {
@@ -547,15 +557,8 @@ test("poarta închisă: culorile salvate în bază NU ajung pe site — șablonu
   }
 
   // Poarta deschisă: culorile trec, iar șablonul Claritate se colorează.
-  const permis = culoriPermise(brand, { siteId: SITE_PERMIS, template: "claritate" }, LISTE_PROBA);
+  const permis = culoriPermise(brand, { domain: DOMENIU_PROBA, template: "claritate" }, LISTE_PROBA);
   assert.deepEqual(citesteAspectCulori(permis)?.principala, "#2E7D5B");
   assert.notEqual(getTemplate("claritate", permis), getTemplate("claritate"));
   assert.notDeepEqual(getTemplate("claritate", permis).paleta, getTemplate("claritate").paleta);
-});
-
-test("`supabase/cauta-site-aspect.sql` doar CITEȘTE: niciun insert, update, delete, drop", () => {
-  const fara = citeste("supabase/cauta-site-aspect.sql").replace(/--.*$/gm, "");
-  assert.match(fara, /^\s*select\b/i);
-  assert.ok(!/\b(insert|update|delete|drop|alter|truncate|create)\b/i.test(fara), fara);
-  assert.ok(/from\s+public\.sites/i.test(fara));
 });

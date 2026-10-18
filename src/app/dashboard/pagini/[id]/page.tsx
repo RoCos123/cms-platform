@@ -24,7 +24,7 @@ export default async function EditorPaginaPage({
       .eq("id", id)
       .eq("site_id", session.siteId)
       .maybeSingle(),
-    supabase.from("sites").select("template").eq("id", session.siteId).single(),
+    supabase.from("sites").select("domain, template").eq("id", session.siteId).single(),
     brandulSiteului(supabase, session.siteId),
   ]);
 
@@ -40,7 +40,7 @@ export default async function EditorPaginaPage({
       aFostPublicata={pagina.status !== "draft"}
       template={getTemplate(
         site?.template as string | null,
-        culoriPermise(brand, { siteId: session.siteId, template: site?.template as string | null }),
+        culoriPermise(brand, { domain: site?.domain as string | null, template: site?.template as string | null }),
       )}
     />
   );

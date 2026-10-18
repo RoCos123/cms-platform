@@ -219,8 +219,8 @@ să pară „versiunea oficială în engleză"; (d) comutatorul ar fi opțional 
 de mai sus iese bine; programările/formularele într-o limbă străină sunt partea necunoscută.
 *Limbi:* nehotărât; propunerea sesiunii: engleza întâi.
 
-**Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE, ÎN PROBĂ DOAR PE SITE-UL
-POPESCU ROBERT / CLARITATE (id încă de aflat), PE BRANCH, NEPUBLICATE (18 oct. 2026); FONTURILE,
+**Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE, ÎN PROBĂ DOAR PE
+`model-claritate.vercel.app` (Claritate), PE BRANCH, NEPUBLICATE (18 oct. 2026); FONTURILE,
 NEÎNCEPUTE.** Întâi a fost doar discutat (proprietarul: „momentan nu facem
 nimic, doar discutăm"); apoi a cerut „hai sa facem partea cu culorile si fonturile… Mai intai
 culorile". Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
@@ -305,36 +305,35 @@ arătat proprietarului ÎNAINTE să se construiască).
   galben întunecat și explicat; cod greșit; manual cu avertisment și salvare; „Revino…" ⇒ site identic
   cu cel de la început; 375 px fără derulare în lateral; capturi pe toate cele 5 șabloane.
 - **POARTA „în probă" (cerută de proprietar, 18 oct.: „limitează pe șablonul Claritate și pe site-ul
-  meu"; apoi, lămurit: „disponibile pe site-ul model claritate, NU pe sitepsihologi — mă refeream la
-  site-ul Popescu Robert"):** „Aspect" există DOAR când se potrivesc AMBELE: șablonul e `claritate` ȘI
-  `sites.id` e în `SITE_URI_CU_ASPECT`. Totul stă în `src/lib/aspect/acces.ts` (`SABLOANE_CU_ASPECT`,
-  `SITE_URI_CU_ASPECT`, `aspectPermis`, `culoriPermise`).
-  **STARE: lista de site-uri e GOALĂ — id-ul site-ului Popescu Robert nu e în depozit.** (Prima
-  variantă pusese id-ul lui sitepsihologi, `d4643a1a-…`; proprietarul a spus că nu-l vrea acolo, deci
-  a ieșit, iar o probă garantează că nu mai poate reintra.) Id-ul se află cu
-  `supabase/cauta-site-aspect.sql` (doar `select`, rulat de proprietar în Supabase); după ce îl
-  trimite, se pune în listă. Cât lista e goală, „Aspect" nu apare NICĂIERI, deci un „fă pe master"
-  dat prea devreme nu strică nimic și nu ajunge la niciun client. *Nelămurit:* dacă „site-ul model
-  claritate" (`model-claritate.vercel.app`, fostul `cosmin-claritate`) e chiar site-ul Popescu Robert,
-  sau sunt două site-uri; rândurile din `select` o arată.
-  Poarta hotărăște: meniul din panou (layout-ul citește și șablonul), pagina `/dashboard/aspect`
-  (altfel „Pagina nu există" — ca orice `notFound()` din panou, cod HTTP 200 fiindcă vine în flux),
-  salvarea (refuzată pe server, cu mesaj, chiar dacă cererea e trimisă de mână; șablonul se citește din
-  bază) și APLICAREA culorilor pe site-ul public și în toate previzualizările din panou — un site din
-  afara probei le ignoră chiar dacă în bază ar sta culori. Culorile deja salvate nu se șterg niciodată
-  de poartă. **Ca să deschizi pentru toți:** fă `aspectPermis` să întoarcă `true` (un rând; nimic
-  altceva de schimbat). Probe: 43 de teste în `e2e/aspect-culori.proba.mjs`; regula se încearcă cu
-  liste de probă (`aspectPermis(site, liste)`), listele reale se verifică separat (Claritate, fără
-  sitepsihologi, id-uri UUID); 8+12 stricări ale porții, toate prinse (AND→OR, fără verificarea
-  șablonului sau a site-ului, meniul nefiltrat, pagina fără 404, acțiunea fără poartă, site-ul public /
-  Setările ocolind poarta, listă lărgită, sitepsihologi reintrat, SQL-ul care scrie…), plus un test că
-  `culoriDinBrand` nu se cheamă de nicăieri pe lângă poartă. Încercat în browser pe stiva reală, cu
-  id-ul lui Ana pus TEMPORAR în listă (n-a intrat în cod): site permis + Claritate → totul merge;
-  același site pe Căldură → fără meniu, „Pagina nu există", salvarea refuzată (șablonul schimbat cât
-  ecranul era deschis), culorile din bază neaplicate, previzualizarea din Setări le ignoră; alt site pe
-  Claritate cu culori puse de mână în bază → la fel. (Refactorul de după — listele devin parametru cu
-  valoare implicită, ca probele să le poată înlocui — a fost acoperit de probe și de tipuri, dar NU a
-  mai fost repetat în browser.)
+  meu"; apoi: „disponibile pe site-ul model claritate, NU pe sitepsihologi", „mă refeream la site-ul
+  Popescu Robert", „nu m-am răzgândit, doar pe model claritate testam"):** „Aspect" există DOAR când se
+  potrivesc AMBELE: șablonul e `claritate` ȘI `sites.domain` e **exact** `model-claritate.vercel.app`
+  (site-ul proprietarului, numit în panou „Popescu Robert"). Totul stă în `src/lib/aspect/acces.ts`
+  (`SABLOANE_CU_ASPECT`, `DOMENII_CU_ASPECT`, `aspectPermis`, `culoriPermise`). Sitepsihologi NU e în
+  listă, iar o probă garantează că nu poate reintra. *Istoric:* întâi am pus `sites.id`-ul lui
+  sitepsihologi (greșit — „siteul meu" era altul), apoi am cerut un `select` pentru id-ul lui „model
+  claritate"; proprietarul n-a mai avut de rulat nimic: am trecut poarta pe DOMENIU, fiindcă platforma
+  își recunoaște oricum site-urile după domeniu. **Atenție:** domeniul `model-claritate` a mai fost
+  redenumit o dată (`cosmin-claritate` → `model-claritate`, 7 oct.); dacă se schimbă iar, poarta se
+  închide singură (fără stricăciuni) și noul domeniu se pune în `DOMENII_CU_ASPECT`; pentru ceva mai
+  stabil se poate trece pe id. Poarta hotărăște: meniul din panou (layout-ul citește și șablonul),
+  pagina `/dashboard/aspect` (altfel „Pagina nu există" — ca orice `notFound()` din panou, cod HTTP 200
+  fiindcă vine în flux), salvarea (refuzată pe server, cu mesaj, chiar dacă cererea e trimisă de mână;
+  domeniul și șablonul se citesc din bază) și APLICAREA culorilor pe site-ul public și în toate
+  previzualizările din panou — un site din afara probei le ignoră chiar dacă în bază ar sta culori.
+  Culorile deja salvate nu se șterg niciodată de poartă. **Ca să deschizi pentru toți:** fă
+  `aspectPermis` să întoarcă `true` (un rând; nimic altceva de schimbat). Probe: 42 de teste în
+  `e2e/aspect-culori.proba.mjs`; regula se încearcă cu liste de probă (`aspectPermis(site, liste)`),
+  listele reale se verifică separat; potrivire exactă (nu „conține", nu subdomeniu, nu litere mari);
+  14 stricări ale porții, toate prinse (AND→OR, fără verificarea șablonului sau a domeniului,
+  „conține", litere mari ignorate, sitepsihologi în listă, domeniu schimbat, șablon în plus, meniul
+  deschis tuturor, pagina fără 404, acțiunea fără poartă, site-ul public ocolind poarta…), plus un test
+  că `culoriDinBrand` nu se cheamă de nicăieri pe lângă poartă. Încercat în browser pe stiva reală, cu
+  `ana.test` pus TEMPORAR în listă (n-a intrat în cod): site permis + Claritate → totul merge; același
+  site pe Căldură → fără meniu, „Pagina nu există", salvarea refuzată (șablonul schimbat cât ecranul
+  era deschis), culorile din bază neaplicate, previzualizarea din Setări le ignoră; alt site pe
+  Claritate cu culori puse de mână în bază → la fel. **Neîncercat:** `model-claritate.vercel.app` în
+  sine (nu există local) — se vede abia după „fă pe master".
 - **Rămas:** (1) „fă pe master" de la proprietar; (2) FONTURILE — lista curată, arătată lui înainte;
   (3) opțional: bifa „înțeleg…", ordonarea culorilor gata alese după gustul lui.
 

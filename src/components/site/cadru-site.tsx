@@ -61,7 +61,7 @@ export async function CadruSite({
     ]);
   const vanzare = tip === "vanzare";
 
-  const template = getTemplate(site?.template, culoriPermise(brand, { siteId, template: site?.template }));
+  const template = getTemplate(site?.template, culoriPermise(brand, { domain, template: site?.template }));
   const nume = site?.name ?? domain;
 
   // Blogul oprit stinge tot blogul, deci și intrarea din meniu. Iar fără niciun

@@ -14,12 +14,12 @@ export default async function AspectPage() {
   const supabase = await createClient();
 
   const [{ data: site }, { data: setari }] = await Promise.all([
-    supabase.from("sites").select("name, template").eq("id", session.siteId).single(),
+    supabase.from("sites").select("name, domain, template").eq("id", session.siteId).single(),
     supabase.from("site_settings").select("brand").eq("site_id", session.siteId).maybeSingle(),
   ]);
 
   // Ecranul e în probă: cine n-are poarta deschisă îl vede ca pe o pagină care nu există.
-  if (!aspectPermis({ siteId: session.siteId, template: site?.template as string | null })) notFound();
+  if (!aspectPermis({ domain: site?.domain as string | null, template: site?.template as string | null })) notFound();
 
   const sablon = getTemplate(site?.template as string | null);
   const initiale = citesteAspectCulori(culoriDinBrand(setari?.brand));

@@ -60,7 +60,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             mesajeNecitite={mesajeNecitite ?? 0}
             programariDeRaspuns={programariDeRaspuns ?? 0}
             // „Aspect" e în probă: apare doar la cine are poarta deschisă (`acces.ts`).
-            aspectActiv={aspectPermis({ siteId: session.siteId, template: site?.template })}
+            aspectActiv={aspectPermis({ domain: site?.domain, template: site?.template })}
           />
         }
         unelteAntet={
