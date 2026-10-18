@@ -498,27 +498,38 @@ test("previzualizarea din „Aspect” arată toate cele patru fundaluri — inc
 
 // ───────────────────────── poarta „în probă” ─────────────────────────
 
-const SITE_MEU = "d4643a1a-42a3-4f45-814f-75234b041200";
+// Id-ul lui sitepsihologi: proprietarul a cerut ca „Aspect" să NU fie pe el (18 oct.).
+const SITEPSIHOLOGI = "d4643a1a-42a3-4f45-814f-75234b041200";
+// Un site de probă și listele cu care se încearcă REGULA (listele reale se verifică separat).
+const SITE_PERMIS = "abcdef01-2345-4678-8abc-def012345678";
+const LISTE_PROBA = { sabloane: ["claritate"], siteuri: [SITE_PERMIS] };
 
-test("poarta: doar șablonul Claritate ȘI doar site-ul proprietarului — ambele deodată", () => {
+test("listele reale: Claritate, și NICIODATĂ sitepsihologi; id-urile sunt UUID-uri", () => {
   assert.deepEqual([...SABLOANE_CU_ASPECT], ["claritate"]);
-  assert.deepEqual([...SITE_URI_CU_ASPECT], [SITE_MEU], "id-ul lui sitepsihologi, ca în marcheaza-sitepsihologi.sql");
-  assert.ok(citeste("supabase/marcheaza-sitepsihologi.sql").includes(SITE_MEU));
+  assert.ok(!SITE_URI_CU_ASPECT.includes(SITEPSIHOLOGI), "proprietarul a cerut „Aspect” NU pe sitepsihologi");
+  for (const id of SITE_URI_CU_ASPECT) assert.match(id, /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/, id);
+  // Cu listele reale, sitepsihologi pe Claritate nu primește nimic.
+  assert.equal(aspectPermis({ siteId: SITEPSIHOLOGI, template: "claritate" }), false);
+  assert.equal(culoriPermise({ aspect: { culori: { mod: "auto", principala: "#2E7D5B" } } }, { siteId: SITEPSIHOLOGI, template: "claritate" }), undefined);
+});
 
-  assert.equal(aspectPermis({ siteId: SITE_MEU, template: "claritate" }), true);
+test("poarta: ȘI șablonul, ȘI site-ul — ambele deodată (regula, cu liste de probă)", () => {
+  const permis = (site) => aspectPermis(site, LISTE_PROBA);
+  assert.equal(permis({ siteId: SITE_PERMIS, template: "claritate" }), true);
   // Un site Claritate al altcuiva nu primește nimic.
-  assert.equal(aspectPermis({ siteId: "00000000-0000-0000-0000-000000000001", template: "claritate" }), false);
-  // Nici site-ul proprietarului, dacă ar trece pe alt șablon.
+  assert.equal(permis({ siteId: "00000000-0000-0000-0000-000000000001", template: "claritate" }), false);
+  // Nici site-ul permis, dacă ar trece pe alt șablon.
   for (const sablon of ["caldura", "liniste", "lumina", "apropiere", "altceva", "", null, undefined]) {
-    assert.equal(aspectPermis({ siteId: SITE_MEU, template: sablon }), false, String(sablon));
+    assert.equal(permis({ siteId: SITE_PERMIS, template: sablon }), false, String(sablon));
   }
-  for (const gol of [null, undefined, ""]) {
-    assert.equal(aspectPermis({ siteId: gol, template: "claritate" }), false);
-  }
-  // Potrivire exactă: nu „conține", nu litere mici/mari amestecate.
-  assert.equal(aspectPermis({ siteId: SITE_MEU.toUpperCase(), template: "claritate" }), false);
-  assert.equal(aspectPermis({ siteId: SITE_MEU, template: "Claritate" }), false);
-  assert.equal(aspectPermis({ siteId: SITE_MEU, template: "claritate " }), false);
+  for (const gol of [null, undefined, ""]) assert.equal(permis({ siteId: gol, template: "claritate" }), false);
+  // Potrivire exactă: nu „conține", nu litere mari/mici amestecate.
+  assert.equal(permis({ siteId: SITE_PERMIS.toUpperCase(), template: "claritate" }), false);
+  assert.equal(permis({ siteId: SITE_PERMIS, template: "Claritate" }), false);
+  assert.equal(permis({ siteId: SITE_PERMIS, template: "claritate " }), false);
+  // Liste goale: nimeni.
+  assert.equal(aspectPermis({ siteId: SITE_PERMIS, template: "claritate" }, { sabloane: [], siteuri: [SITE_PERMIS] }), false);
+  assert.equal(aspectPermis({ siteId: SITE_PERMIS, template: "claritate" }, { sabloane: ["claritate"], siteuri: [] }), false);
 });
 
 test("poarta închisă: culorile salvate în bază NU ajung pe site — șablonul rămâne neatins", () => {
@@ -526,18 +537,25 @@ test("poarta închisă: culorile salvate în bază NU ajung pe site — șablonu
 
   for (const [nume, site] of [
     ["alt site, Claritate", { siteId: "00000000-0000-0000-0000-000000000001", template: "claritate" }],
-    ["site-ul meu, alt șablon", { siteId: SITE_MEU, template: "caldura" }],
+    ["site-ul permis, alt șablon", { siteId: SITE_PERMIS, template: "caldura" }],
     ["fără site", { siteId: null, template: null }],
   ]) {
-    assert.equal(culoriPermise(brand, site), undefined, nume);
+    assert.equal(culoriPermise(brand, site, LISTE_PROBA), undefined, nume);
     for (const sablon of listTemplates()) {
-      assert.equal(getTemplate(sablon.id, culoriPermise(brand, site)), sablon, `${nume}: ${sablon.id} trebuie să rămână același obiect`);
+      assert.equal(getTemplate(sablon.id, culoriPermise(brand, site, LISTE_PROBA)), sablon, `${nume}: ${sablon.id} trebuie să rămână același obiect`);
     }
   }
 
   // Poarta deschisă: culorile trec, iar șablonul Claritate se colorează.
-  const permis = culoriPermise(brand, { siteId: SITE_MEU, template: "claritate" });
+  const permis = culoriPermise(brand, { siteId: SITE_PERMIS, template: "claritate" }, LISTE_PROBA);
   assert.deepEqual(citesteAspectCulori(permis)?.principala, "#2E7D5B");
   assert.notEqual(getTemplate("claritate", permis), getTemplate("claritate"));
   assert.notDeepEqual(getTemplate("claritate", permis).paleta, getTemplate("claritate").paleta);
+});
+
+test("`supabase/cauta-site-aspect.sql` doar CITEȘTE: niciun insert, update, delete, drop", () => {
+  const fara = citeste("supabase/cauta-site-aspect.sql").replace(/--.*$/gm, "");
+  assert.match(fara, /^\s*select\b/i);
+  assert.ok(!/\b(insert|update|delete|drop|alter|truncate|create)\b/i.test(fara), fara);
+  assert.ok(/from\s+public\.sites/i.test(fara));
 });

@@ -3,10 +3,11 @@ import { culoriDinBrand } from "./culori";
 /**
  * Cine are meniul „Aspect" — deocamdată doar în probă.
  *
- * Cerut de proprietar (18 oct. 2026): „limitează pe șablonul Claritate și pe site-ul meu", ca
- * să încerce culorile într-un singur loc înainte să le primească toți clienții. Trebuie să se
- * potrivească AMBELE: șablonul E în listă ȘI site-ul E în listă. Un site Claritate al altui
- * client nu primește nimic; nici site-ul proprietarului, dacă ar trece pe alt șablon.
+ * Cerut de proprietar (18 oct. 2026): „limitează pe șablonul Claritate și pe site-ul meu" —
+ * și apoi, lămurit: site-ul Popescu Robert, NU sitepsihologi — ca să încerce culorile într-un
+ * singur loc înainte să le primească toți clienții. Trebuie să se potrivească AMBELE: șablonul
+ * E în listă ȘI site-ul E în listă. Un site Claritate al altui client nu primește nimic; nici
+ * site-ul proprietarului, dacă ar trece pe alt șablon.
  *
  * Poarta nu e o nevoie tehnică (paleta calculată e probată pe toate cinci șabloanele), ci o
  * măsură de prudență. O ține un SINGUR loc, aici. Ce hotărăște:
@@ -25,19 +26,27 @@ export const SABLOANE_CU_ASPECT: readonly string[] = ["claritate"];
 
 /**
  * Site-urile pe care e pornit „Aspect", după `sites.id` (nu după domeniu: domeniul se mută, id-ul nu).
- * Acum: sitepsihologi, site-ul proprietarului (același id ca în `supabase/marcheaza-sitepsihologi.sql`).
+ *
+ * GOALĂ deocamdată, dinadins: proprietarul a cerut „Aspect" pe site-ul lui (Popescu Robert, pe
+ * Claritate), NU pe sitepsihologi, iar id-ul acelui site nu e în depozit — se află cu
+ * `supabase/cauta-site-aspect.sql`. Cât lista e goală, „Aspect" nu apare nicăieri.
  */
-export const SITE_URI_CU_ASPECT: readonly string[] = ["d4643a1a-42a3-4f45-814f-75234b041200"];
+export const SITE_URI_CU_ASPECT: readonly string[] = [];
 
 export type SiteAspect = {
   siteId: string | null | undefined;
   template: string | null | undefined;
 };
 
+/** Cele două liste, ca probele să poată încerca regula și cu alte valori decât cele reale. */
+export type ListeAspect = { sabloane: readonly string[]; siteuri: readonly string[] };
+
+const LISTE_REALE: ListeAspect = { sabloane: SABLOANE_CU_ASPECT, siteuri: SITE_URI_CU_ASPECT };
+
 /** Are acest site meniul „Aspect"? Ambele liste trebuie să-l cuprindă. */
-export function aspectPermis(site: SiteAspect): boolean {
+export function aspectPermis(site: SiteAspect, liste: ListeAspect = LISTE_REALE): boolean {
   if (!site.siteId || !site.template) return false;
-  return SABLOANE_CU_ASPECT.includes(site.template) && SITE_URI_CU_ASPECT.includes(site.siteId);
+  return liste.sabloane.includes(site.template) && liste.siteuri.includes(site.siteId);
 }
 
 /**
@@ -45,6 +54,6 @@ export function aspectPermis(site: SiteAspect): boolean {
  * ajung pe site sau într-o previzualizare: un site din afara probei primește `undefined`, deci
  * `getTemplate` îi întoarce șablonul neatins.
  */
-export function culoriPermise(brand: unknown, site: SiteAspect): unknown {
-  return aspectPermis(site) ? culoriDinBrand(brand) : undefined;
+export function culoriPermise(brand: unknown, site: SiteAspect, liste: ListeAspect = LISTE_REALE): unknown {
+  return aspectPermis(site, liste) ? culoriDinBrand(brand) : undefined;
 }
