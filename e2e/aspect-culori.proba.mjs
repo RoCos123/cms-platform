@@ -562,3 +562,52 @@ test("poarta închisă: culorile salvate în bază NU ajung pe site — șablonu
   assert.notEqual(getTemplate("claritate", permis), getTemplate("claritate"));
   assert.notDeepEqual(getTemplate("claritate", permis).paleta, getTemplate("claritate").paleta);
 });
+
+// ───────────────────────── previzualizarea cu site-ul REAL ─────────────────────────
+
+test("previzualizarea din „Aspect” arată site-ul REAL al clientului, cu aceleași funcții ca pe site", () => {
+  const prev = citeste("src/lib/aspect/previzualizare.ts");
+  assert.ok(prev.startsWith('import "server-only";'), "citește din bază: doar pe server");
+
+  // Aceleași citiri ca prima pagină publică și ca cadrul public.
+  for (const functie of [
+    "identitateaSiteului(siteId)",
+    "articolePublicate(siteId)",
+    "serviciiPublicate(siteId)",
+    "linkurilePaginilor(siteId)",
+    "cheileSectiunilorVizibile(siteId)",
+    "dateleSectiuniiPachete(siteId)",
+    "tipulSiteului(siteId)",
+    "coloaneleSubsolului(siteId",
+    "oreDeAratatPePrimaPagina(siteId",
+  ]) {
+    assert.ok(prev.includes(functie), `lipsește ${functie}`);
+  }
+
+  // Secțiunile: doar cele VIZIBILE, în ordinea lor, ale ACESTUI site.
+  assert.match(prev, /\.from\("site_content"\)[\s\S]*?\.eq\("site_id", siteId\)[\s\S]*?\.eq\("visible", true\)[\s\S]*?\.order\("position", \{ ascending: true \}\)/);
+  // Pozele pe adresa de acum (nu cea veche din JSON) — aceeași rescriere ca pe site.
+  assert.ok(prev.includes("rescrieAdreseleFisiere(rescrieAdresele(rand.data, adresaImaginii), adresaFisierului)"));
+  // Fără nicio secțiune vizibilă → `null`, ca ecranul să păstreze exemplul în loc de o pagină goală.
+  assert.ok(prev.includes("if (!rows || rows.length === 0) return null;"));
+  // Blogul oprit stinge secțiunea, ca pe site.
+  assert.ok(prev.includes("articole: areBlog ? articole : []"));
+});
+
+test("ecranul „Aspect” ia `siteId` din sesiune pentru previzualizare și cade pe exemplu doar când nu are nimic real", () => {
+  const pagina = citeste("src/app/dashboard/aspect/page.tsx");
+  assert.ok(/previzualizareaSiteului\(\s*supabase,\s*session\.siteId,/.test(pagina), "site-ul vine din sesiune");
+  assert.ok(pagina.includes("previzualizare={previzualizare}"));
+
+  const ecran = citeste("src/app/dashboard/aspect/formular.tsx");
+  assert.ok(ecran.includes("previzualizare?.header ??"));
+  assert.ok(ecran.includes("previzualizare?.footer ??"));
+  assert.ok(ecran.includes("previzualizare?.randuri ?? RANDURI_EXEMPLU"));
+  assert.ok(ecran.includes("previzualizare?.context ??"));
+  // Cu site real, nu se mai arată textele inventate: exemplele apar doar ca rezervă.
+  const marcaj = ecran.slice(ecran.indexOf("<PanouPrevizualizare"), ecran.indexOf("</PanouPrevizualizare>"));
+  assert.ok(!marcaj.includes("RANDURI_EXEMPLU") && !marcaj.includes("SERVICII_EXEMPLU") && !marcaj.includes("LINKURI_EXEMPLU"), "JSX-ul previzualizării nu are voie să pună exemplele direct");
+  assert.ok(marcaj.includes("context={{ ...context, asezari: efectiv.asezari }}"), "așezările vin din șablonul cu culorile alese");
+  assert.ok(marcaj.includes("Ce vezi e site-ul tău"), "nota spune clar că e site-ul lui");
+  assert.ok(marcaj.includes("nicio secțiune vizibilă"), "iar la exemplu, nota o spune");
+});

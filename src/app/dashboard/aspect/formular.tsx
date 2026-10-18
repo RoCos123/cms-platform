@@ -16,6 +16,7 @@ import { normalizeazaHex } from "@/lib/aspect/culoare";
 import { paletaDinCuloare, verificaPerechi, PRAG_CONTRAST } from "@/lib/aspect/paleta";
 import { ROLURI_MANUALE, type AspectCulori, type ModCulori, type RolManual } from "@/lib/aspect/culori";
 import { PRESETURI_CULOARE } from "@/lib/aspect/salvare";
+import type { PrevizualizareSite } from "@/lib/aspect/previzualizare";
 import { salveazaCulori } from "./actions";
 
 type Stare = {
@@ -136,11 +137,14 @@ export function FormularAspect({
   numeSablon,
   numeSite,
   initiale,
+  previzualizare,
 }: {
   sablonId: string;
   numeSablon: string;
   numeSite: string;
   initiale: AspectCulori | null;
+  /** Site-ul adevărat al clientului. `null` = nicio secțiune vizibilă: se arată pagina de exemplu. */
+  previzualizare: PrevizualizareSite | null;
 }) {
   const [stare, setStare] = useState<Stare>({
     mod: initiale?.mod ?? "auto",
@@ -168,6 +172,30 @@ export function FormularAspect({
   // pornește modul manual și cu ea se compară ce a schimbat omul.
   const calculat = stare.principala ? paletaDinCuloare(sablon.paleta, stare.principala) : null;
   const baza = calculat?.paleta ?? sablon.paleta;
+
+  // Site-ul adevărat, dacă are secțiuni vizibile; altfel pagina de exemplu (de jos).
+  const antet = previzualizare?.header ?? {
+    nume: numeSite || "Cabinetul tău",
+    telefon: "0722 000 000",
+    areDespre: true,
+    blog: null,
+  };
+  const subsol = previzualizare?.footer ?? {
+    nume: numeSite || "Cabinetul tău",
+    telefon: "0722 000 000",
+    email: "contact@exemplu.ro",
+    servicii: LINKURI_EXEMPLU,
+    cabinet: LINKURI_EXEMPLU,
+    retele: [],
+  };
+  const randuri = previzualizare?.randuri ?? RANDURI_EXEMPLU;
+  const context = previzualizare?.context ?? {
+    articole: [],
+    servicii: SERVICII_EXEMPLU,
+    paginaServiciiActiva: false,
+    oreProgramare: { zile: [], luni: [] },
+    paginaVanzare: null,
+  };
 
   async function salveaza() {
     setSeSalveaza(true);
@@ -392,33 +420,15 @@ export function FormularAspect({
         template={efectiv}
         cheie={semnatura(culori)}
         titlu="Cum arată cu aceste culori"
-        nota="Se actualizează pe măsură ce alegi; derulează pagina ca să vezi și benzile de jos. Textele de aici sunt doar exemple, ca să se vadă culorile — pe site rămân ale tale. Modificările ajung pe site abia după ce apeși Salvează."
+        nota={
+          previzualizare
+            ? "Ce vezi e site-ul tău, cu textele și pozele tale, colorat cu ce alegi. Se actualizează pe măsură ce alegi; derulează pagina ca să vezi tot. Modificările ajung pe site abia după ce apeși Salvează."
+            : "Site-ul tău nu are încă nicio secțiune vizibilă, așa că aici vezi o pagină de exemplu, ca să se vadă culorile. Se actualizează pe măsură ce alegi; derulează pagina ca să vezi tot. Modificările ajung pe site abia după ce apeși Salvează."
+        }
       >
-        <SiteHeader
-          data={{ nume: numeSite || "Cabinetul tău", telefon: "0722 000 000", areDespre: true, blog: null }}
-          friendly={efectiv.asezari.antetPastila}
-        />
-        <RenderSections
-          rows={RANDURI_EXEMPLU}
-          context={{
-            articole: [],
-            servicii: SERVICII_EXEMPLU,
-            paginaServiciiActiva: false,
-            oreProgramare: { zile: [], luni: [] },
-            asezari: efectiv.asezari,
-            paginaVanzare: null,
-          }}
-        />
-        <SiteFooter
-          data={{
-            nume: numeSite || "Cabinetul tău",
-            telefon: "0722 000 000",
-            email: "contact@exemplu.ro",
-            servicii: LINKURI_EXEMPLU,
-            cabinet: LINKURI_EXEMPLU,
-            retele: [],
-          }}
-        />
+        <SiteHeader data={antet} friendly={efectiv.asezari.antetPastila} />
+        <RenderSections rows={randuri} context={{ ...context, asezari: efectiv.asezari }} />
+        <SiteFooter data={subsol} />
       </PanouPrevizualizare>
 
       <SaveBar

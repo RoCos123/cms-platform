@@ -3,6 +3,7 @@ import { verifySession } from "@/lib/dal";
 import { aspectPermis } from "@/lib/aspect/acces";
 import { createClient } from "@/lib/supabase/server";
 import { citesteAspectCulori, culoriDinBrand } from "@/lib/aspect/culori";
+import { previzualizareaSiteului } from "@/lib/aspect/previzualizare";
 import { getTemplate } from "@/lib/templates";
 import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { FormularAspect } from "./formular";
@@ -24,6 +25,14 @@ export default async function AspectPage() {
   const sablon = getTemplate(site?.template as string | null);
   const initiale = citesteAspectCulori(culoriDinBrand(setari?.brand));
 
+  // Site-ul adevărat al clientului, ca să vadă culorile pe pozele și textele lui; `null` pentru
+  // un site fără nicio secțiune vizibilă (atunci ecranul păstrează pagina de exemplu).
+  const previzualizare = await previzualizareaSiteului(
+    supabase,
+    session.siteId,
+    String(site?.domain ?? ""),
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -43,6 +52,7 @@ export default async function AspectPage() {
         numeSablon={sablon.nume}
         numeSite={String(site?.name ?? "")}
         initiale={initiale}
+        previzualizare={previzualizare}
       />
     </div>
   );

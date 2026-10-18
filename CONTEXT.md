@@ -281,6 +281,27 @@ arătat proprietarului ÎNAINTE să se construiască).
   **Alegerea mea, de confirmat de proprietar:** în loc de bifa „înțeleg că poate fi greu de citit"
   (propusă, neconfirmată), salvarea cu avertismente scrie singură `asumat: true` în bază — nu
   schimbă nimic pe site, e doar dovada că a salvat știind. Dacă vrea bifa, e o schimbare mică.
+- **Previzualizarea = site-ul REAL al clientului (18 oct., cerut de proprietar: „de ce nu am imaginea din
+  modelul Claritate, pe care am creat-o?" — primele două versiuni aveau o pagină de exemplu cu texte
+  inventate, fără nicio poză).** `src/lib/aspect/previzualizare.ts` (doar pe server) citește pentru
+  `session.siteId` ACELEAȘI lucruri ca prima pagină publică și cadrul public, prin aceleași funcții:
+  secțiunile VIZIBILE în ordinea lor, pozele rescrise din `uploadId` (adrese semnate, nu cele vechi din
+  JSON), serviciile publicate, articolele (doar dacă blogul e pornit), orele de programare, antetul
+  (nume, subtitlu, logo, telefon, meniu) și subsolul (datele din Setări, coloanele cu servicii și
+  cabinet, paginile legale, rețelele). Fără nicio secțiune vizibilă (site abia provizionat) → `null`, iar
+  ecranul păstrează pagina de exemplu, cu o notă care o spune. **Atenție, de ținut minte:** NU e o copie
+  automată a cadrului public — dacă antetul sau subsolul public capătă un câmp nou, previzualizarea nu-l
+  are decât după ce-l primește și acolo (e scris în comentariul fișierului); pe pagina de vânzare
+  (`tip = 'vanzare'`) antetul/subsolul au varianta lor (meniu și rând legal ale firmei), pe care
+  previzualizarea NU o reproduce — se primește doar `paginaVanzare` pentru secțiuni; de reluat când
+  „Aspect" se deschide și pe sitepsihologi. Probe: două teste noi în `e2e/aspect-culori.proba.mjs` (44
+  în total), 11 stricări noi (alt site, secțiuni ascunse, adrese vechi, fără rezervă, blog oprit,
+  exemplul rămas în JSX…), toate prinse. Încercat în browser pe stiva reală (Ana pe Claritate, cu
+  `ana.test` pus TEMPORAR în poartă): textul, serviciile, telefonul, emailul și descrierea ei apar;
+  exemplul inventat a dispărut; poza apare pe EXACT aceeași adresă semnată ca pe site; „Prună" schimbă
+  accentul și fundalul, iar textul și poza rămân; o secțiune ascunsă nu apare; fără secțiuni vizibile →
+  exemplul; 375 px fără derulare în lateral. *Local, pixelii pozei nu se încarcă* (depozitul de probă
+  n-are fișiere) — la fel și pe site-ul local; contează adresa, care e identică.
 - **Unde stau datele:** `site_settings.brand.aspect.culori` = `{mod, principala, manual, asumat}`;
   fără migrare, fără SQL. Fonturile vor sta lângă ele, în `brand.aspect`.
 - **Cum ajung pe site:** `getTemplate(id, culori)` întoarce EXACT obiectul șablonului când nu sunt
