@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { CAMPURI_SERVICIU } from "@/lib/servicii";
 import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate } from "@/lib/templates";
-import { culoriDinBrand } from "@/lib/aspect/culori";
+import { culoriPermise } from "@/lib/aspect/acces";
 import { paginaEsteActiva, type Pagini } from "@/lib/setari";
 import { adresaImaginii } from "@/lib/imagini-adrese";
 import { serviciiPublicate } from "@/lib/servicii-publice";
@@ -90,7 +90,10 @@ export default async function EditorServiciuPage({
     <EditorServiciu
       id={id}
       valoareInitiala={catreEditor({ ...serviciu, coperta }, CAMPURI_SERVICIU)}
-      template={getTemplate(site?.template as string | null, culoriDinBrand(setari?.brand))}
+      template={getTemplate(
+        site?.template as string | null,
+        culoriPermise(setari?.brand, { siteId: session.siteId, template: site?.template as string | null }),
+      )}
       hrefPeSite={hrefPeSite}
       primaPagina={{
         sectiune: sectiuneServicii

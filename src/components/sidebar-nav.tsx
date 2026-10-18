@@ -64,16 +64,19 @@ function isGroup(item: NavItem | NavGroup): item is NavGroup {
 export function SidebarNav({
   mesajeNecitite = 0,
   programariDeRaspuns = 0,
+  aspectActiv = false,
 }: {
   mesajeNecitite?: number;
   programariDeRaspuns?: number;
+  /** „Aspect" e în probă (vezi `src/lib/aspect/acces.ts`): fără asta, intrarea nu apare. */
+  aspectActiv?: boolean;
 }) {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const pathname = usePathname();
 
   return (
     <nav className="flex-1 space-y-1 overflow-y-auto p-3 text-sm">
-      {NAV.map((item) =>
+      {NAV.filter((item) => aspectActiv || item.label !== "Aspect").map((item) =>
         isGroup(item) ? (
           <div key={item.label}>
             <button

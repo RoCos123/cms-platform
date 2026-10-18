@@ -1,4 +1,6 @@
+import { notFound } from "next/navigation";
 import { verifySession } from "@/lib/dal";
+import { aspectPermis } from "@/lib/aspect/acces";
 import { createClient } from "@/lib/supabase/server";
 import { citesteAspectCulori, culoriDinBrand } from "@/lib/aspect/culori";
 import { getTemplate } from "@/lib/templates";
@@ -15,6 +17,9 @@ export default async function AspectPage() {
     supabase.from("sites").select("name, template").eq("id", session.siteId).single(),
     supabase.from("site_settings").select("brand").eq("site_id", session.siteId).maybeSingle(),
   ]);
+
+  // Ecranul e în probă: cine n-are poarta deschisă îl vede ca pe o pagină care nu există.
+  if (!aspectPermis({ siteId: session.siteId, template: site?.template as string | null })) notFound();
 
   const sablon = getTemplate(site?.template as string | null);
   const initiale = citesteAspectCulori(culoriDinBrand(setari?.brand));

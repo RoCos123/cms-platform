@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -19,6 +20,7 @@ import {
   paletaEfectiva,
 } from "@/lib/aspect/culori";
 import { PRESETURI_CULOARE, brandCuCulori, valideazaCulori } from "@/lib/aspect/salvare";
+import { SABLOANE_CU_ASPECT, SITE_URI_CU_ASPECT, aspectPermis, culoriPermise } from "@/lib/aspect/acces";
 
 /**
  * Culorile alese de client (meniul „Aspect”). `pnpm test:logica`.
@@ -314,20 +316,30 @@ test("cele opt culori ale modului manual: nume pe înțelesul unui client, făr�
 
 const citeste = (cale) => readFileSync(cale, "utf8");
 
-test("site-ul public și toate previzualizările din panou citesc culorile alese", () => {
-  assert.ok(citeste("src/components/site/cadru-site.tsx").includes("getTemplate(site?.template, culoriDinBrand(brand))"));
+test("site-ul public și toate previzualizările din panou citesc culorile alese — doar prin poartă", () => {
+  assert.ok(citeste("src/components/site/cadru-site.tsx").includes("culoriPermise(brand, { siteId, template: site?.template })"));
   for (const cale of [
     "src/app/dashboard/sectiuni/[id]/page.tsx",
     "src/app/dashboard/servicii/[id]/page.tsx",
     "src/app/dashboard/setari/page.tsx",
   ]) {
-    assert.match(citeste(cale), /getTemplate\([^)]*culoriDinBrand\(/, cale);
+    assert.match(citeste(cale), /culoriPermise\(\s*(setari\?\.brand|brand), \{ siteId: session\.siteId, template: /, cale);
   }
   for (const cale of ["src/app/dashboard/pagini/[id]/page.tsx", "src/app/dashboard/blog/[id]/page.tsx"]) {
     const text = citeste(cale);
-    assert.ok(text.includes("culoriSiteului(supabase, session.siteId)"), cale);
-    assert.ok(text.includes("getTemplate(site?.template as string | null, culori)"), cale);
+    assert.ok(text.includes("brandulSiteului(supabase, session.siteId)"), cale);
+    assert.match(text, /culoriPermise\(brand, \{ siteId: session\.siteId, template: /, cale);
   }
+});
+
+test("nicio culoare din `brand` nu ajunge pe un site pe lângă poartă: `culoriDinBrand` se cheamă doar din biblioteca „aspect”, plus ecranul Aspect", () => {
+    const gasite = execFileSync("grep", ["-rln", "culoriDinBrand", "src"], { encoding: "utf8" })
+    .split("\n").filter(Boolean).sort();
+  assert.deepEqual(gasite, [
+    "src/app/dashboard/aspect/page.tsx", // ecranul însuși: are poarta lui (`notFound`)
+    "src/lib/aspect/acces.ts",
+    "src/lib/aspect/culori.ts",
+  ]);
 });
 
 test("salvarea Setărilor PĂSTREAZĂ aspectul ales — altfel fiecare salvare ar șterge culorile", () => {
@@ -432,9 +444,11 @@ test("culorile se pun în `brand` fără să atingă nimic altceva — nici date
 test("acțiunea de salvare: verifică sesiunea întâi, validează, păstrează `brand`, scrie în jurnal și reîmprospătează tot site-ul", () => {
   const actiune = citeste("src/app/dashboard/aspect/actions.ts");
   assert.ok(actiune.startsWith('"use server";'));
-  const [iSesiune, iValidare, iScriere] = ["await verifySession()", "valideazaCulori(brut)", ".upsert("].map((x) => actiune.indexOf(x));
+  const [iSesiune, iPoarta, iValidare, iScriere] = ["await verifySession()", "aspectPermis({ siteId: session.siteId, template: site?.template })", "valideazaCulori(brut)", ".upsert("].map((x) => actiune.indexOf(x));
   assert.ok(iSesiune >= 0, "lipsește verificarea sesiunii");
-  assert.ok(iValidare > iSesiune, "sesiunea se verifică înaintea oricărei alte treburi");
+  assert.ok(iPoarta > iSesiune, "poarta se verifică după sesiune și înaintea oricărei validări sau scrieri");
+  assert.ok(iValidare > iPoarta, "un site fără poartă nu ajunge nici la validare");
+  assert.ok(actiune.includes('.from("sites").select("template")'), "șablonul se citește din bază, nu din cerere");
   assert.ok(iScriere > iValidare, "se validează înainte să se scrie");
   assert.ok(actiune.includes("const verificat = valideazaCulori(brut);"), "ce trimite browserul trece prin validare, nu se crede");
   assert.ok(actiune.includes("if (!verificat.ok) return { ok: false, mesaj: verificat.mesaj };"), "o validare eșuată oprește salvarea");
@@ -450,9 +464,17 @@ test("ecranul „Aspect” e în meniu, înaintea Setărilor, și are o pagină"
   const meniu = citeste("src/components/sidebar-nav.tsx");
   assert.ok(meniu.includes('{ label: "Aspect", href: "/dashboard/aspect" }'));
   assert.ok(meniu.indexOf('label: "Aspect"') < meniu.indexOf('label: "Setări"'));
+  // În probă: intrarea apare doar când poarta e deschisă, iar implicit e închisă.
+  assert.ok(meniu.includes("aspectActiv = false"), "implicit, intrarea nu apare");
+  assert.ok(meniu.includes('NAV.filter((item) => aspectActiv || item.label !== "Aspect")'));
+  const aranjament = citeste("src/app/dashboard/layout.tsx");
+  assert.ok(aranjament.includes("aspectActiv={aspectPermis({ siteId: session.siteId, template: site?.template })}"));
+  assert.ok(aranjament.includes('select("name, domain, template")'), "layout-ul trebuie să citească și șablonul");
   const pagina = citeste("src/app/dashboard/aspect/page.tsx");
   assert.ok(pagina.includes("verifySession()"));
   assert.ok(pagina.includes("citesteAspectCulori(culoriDinBrand(setari?.brand))"));
+  assert.ok(pagina.includes("if (!aspectPermis({ siteId: session.siteId, template: site?.template as string | null })) notFound();"), "fără poartă, pagina e 404");
+  assert.ok(pagina.indexOf("notFound();") < pagina.indexOf("<FormularAspect"));
 });
 
 test("modul manual are un loc vizibil pe ecran, cu explicație (cerut de proprietar), și salvarea nu e blocată de avertismente", () => {
@@ -472,4 +494,50 @@ test("previzualizarea din „Aspect” arată toate cele patru fundaluri — inc
   // La „Căldură" citatul stă mereu pe relief: dacă fundalul închis ar sta pe el, n-ar apărea acolo.
   assert.match(randuri, /key: "quote",\s+variant: null,\s+tone: "relief"/);
   assert.ok(!/key: "quote",\s+variant: null,\s+tone: "inchis"/.test(randuri), "fundalul închis nu poate sta pe citat");
+});
+
+// ───────────────────────── poarta „în probă” ─────────────────────────
+
+const SITE_MEU = "d4643a1a-42a3-4f45-814f-75234b041200";
+
+test("poarta: doar șablonul Claritate ȘI doar site-ul proprietarului — ambele deodată", () => {
+  assert.deepEqual([...SABLOANE_CU_ASPECT], ["claritate"]);
+  assert.deepEqual([...SITE_URI_CU_ASPECT], [SITE_MEU], "id-ul lui sitepsihologi, ca în marcheaza-sitepsihologi.sql");
+  assert.ok(citeste("supabase/marcheaza-sitepsihologi.sql").includes(SITE_MEU));
+
+  assert.equal(aspectPermis({ siteId: SITE_MEU, template: "claritate" }), true);
+  // Un site Claritate al altcuiva nu primește nimic.
+  assert.equal(aspectPermis({ siteId: "00000000-0000-0000-0000-000000000001", template: "claritate" }), false);
+  // Nici site-ul proprietarului, dacă ar trece pe alt șablon.
+  for (const sablon of ["caldura", "liniste", "lumina", "apropiere", "altceva", "", null, undefined]) {
+    assert.equal(aspectPermis({ siteId: SITE_MEU, template: sablon }), false, String(sablon));
+  }
+  for (const gol of [null, undefined, ""]) {
+    assert.equal(aspectPermis({ siteId: gol, template: "claritate" }), false);
+  }
+  // Potrivire exactă: nu „conține", nu litere mici/mari amestecate.
+  assert.equal(aspectPermis({ siteId: SITE_MEU.toUpperCase(), template: "claritate" }), false);
+  assert.equal(aspectPermis({ siteId: SITE_MEU, template: "Claritate" }), false);
+  assert.equal(aspectPermis({ siteId: SITE_MEU, template: "claritate " }), false);
+});
+
+test("poarta închisă: culorile salvate în bază NU ajung pe site — șablonul rămâne neatins", () => {
+  const brand = { aspect: { culori: { mod: "auto", principala: "#2E7D5B", manual: {}, asumat: false } } };
+
+  for (const [nume, site] of [
+    ["alt site, Claritate", { siteId: "00000000-0000-0000-0000-000000000001", template: "claritate" }],
+    ["site-ul meu, alt șablon", { siteId: SITE_MEU, template: "caldura" }],
+    ["fără site", { siteId: null, template: null }],
+  ]) {
+    assert.equal(culoriPermise(brand, site), undefined, nume);
+    for (const sablon of listTemplates()) {
+      assert.equal(getTemplate(sablon.id, culoriPermise(brand, site)), sablon, `${nume}: ${sablon.id} trebuie să rămână același obiect`);
+    }
+  }
+
+  // Poarta deschisă: culorile trec, iar șablonul Claritate se colorează.
+  const permis = culoriPermise(brand, { siteId: SITE_MEU, template: "claritate" });
+  assert.deepEqual(citesteAspectCulori(permis)?.principala, "#2E7D5B");
+  assert.notEqual(getTemplate("claritate", permis), getTemplate("claritate"));
+  assert.notDeepEqual(getTemplate("claritate", permis).paleta, getTemplate("claritate").paleta);
 });

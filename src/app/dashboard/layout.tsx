@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { BibliotecaImagini } from "@/components/dashboard/biblioteca-imagini";
 import { CadruPanou } from "@/components/dashboard/cadru-panou";
 import { SidebarNav } from "@/components/sidebar-nav";
+import { aspectPermis } from "@/lib/aspect/acces";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ToastProvider } from "@/components/ui/toast";
 import { signOut } from "./actions";
@@ -21,7 +22,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
     { count: mesajeNecitite },
     { count: programariDeRaspuns },
   ] = await Promise.all([
-    supabase.from("sites").select("name, domain").eq("id", session.siteId).single(),
+    supabase.from("sites").select("name, domain, template").eq("id", session.siteId).single(),
     // Numărul de lângă „Mesaje" din meniu. Fără el, un mesaj primit ar fi
     // invizibil până când clientul s-ar gândi singur să intre acolo — iar
     // notificarea pe email încă nu există.
@@ -58,6 +59,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
           <SidebarNav
             mesajeNecitite={mesajeNecitite ?? 0}
             programariDeRaspuns={programariDeRaspuns ?? 0}
+            // „Aspect" e în probă: apare doar la cine are poarta deschisă (`acces.ts`).
+            aspectActiv={aspectPermis({ siteId: session.siteId, template: site?.template })}
           />
         }
         unelteAntet={

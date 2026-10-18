@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { CAMPURI_PAGINA } from "@/lib/pagini";
 import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate } from "@/lib/templates";
-import { culoriSiteului } from "@/lib/aspect/citire";
+import { culoriPermise } from "@/lib/aspect/acces";
+import { brandulSiteului } from "@/lib/aspect/citire";
 import { EditorPagina } from "./editor";
 
 export default async function EditorPaginaPage({
@@ -16,7 +17,7 @@ export default async function EditorPaginaPage({
   const session = await verifySession();
   const supabase = await createClient();
 
-  const [{ data: pagina }, { data: site }, culori] = await Promise.all([
+  const [{ data: pagina }, { data: site }, brand] = await Promise.all([
     supabase
       .from("pages")
       .select("id, slug, title, content, status")
@@ -24,7 +25,7 @@ export default async function EditorPaginaPage({
       .eq("site_id", session.siteId)
       .maybeSingle(),
     supabase.from("sites").select("template").eq("id", session.siteId).single(),
-    culoriSiteului(supabase, session.siteId),
+    brandulSiteului(supabase, session.siteId),
   ]);
 
   // O pagină a altui client dispare aici la fel ca una inexistentă — 404, nu
@@ -37,7 +38,10 @@ export default async function EditorPaginaPage({
       valoareInitiala={catreEditor(pagina, CAMPURI_PAGINA)}
       publicata={pagina.status === "published"}
       aFostPublicata={pagina.status !== "draft"}
-      template={getTemplate(site?.template as string | null, culori)}
+      template={getTemplate(
+        site?.template as string | null,
+        culoriPermise(brand, { siteId: session.siteId, template: site?.template as string | null }),
+      )}
     />
   );
 }

@@ -10,7 +10,7 @@ import {
   type Social,
 } from "@/lib/setari";
 import { catreEditor } from "@/lib/sectiuni-editare";
-import { culoriDinBrand } from "@/lib/aspect/culori";
+import { culoriPermise } from "@/lib/aspect/acces";
 import { getTemplate } from "@/lib/templates";
 import { FormularSetari } from "./formular";
 import { ComutatorPublicare } from "./comutator-publicare";
@@ -113,7 +113,10 @@ export default async function SetariPage() {
         socialInitial={catreEditor(social, CAMPURI_SOCIAL)}
         firmaInitial={tip === "vanzare" ? catreEditor(brand, CAMPURI_FIRMA) : undefined}
         domeniu={domain}
-        template={getTemplate(site?.template as string | null, culoriDinBrand(brand))}
+        template={getTemplate(
+          site?.template as string | null,
+          culoriPermise(brand, { siteId: session.siteId, template: site?.template as string | null }),
+        )}
       />
     </div>
   );

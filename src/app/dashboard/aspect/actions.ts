@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
+import { aspectPermis } from "@/lib/aspect/acces";
 import { brandCuCulori, valideazaCulori } from "@/lib/aspect/salvare";
 
 export type RezultatAspect = { ok: true } | { ok: false; mesaj: string };
@@ -23,6 +24,15 @@ export type RezultatAspect = { ok: true } | { ok: false; mesaj: string };
  */
 export async function salveazaCulori(brut: unknown): Promise<RezultatAspect> {
   const session = await verifySession();
+  const supabase = await createClient();
+
+  // „Aspect" e în probă (`acces.ts`): cererea trimisă de mână de pe un site fără poartă
+  // deschisă se refuză aici, nu doar se ascunde din meniu. Șablonul se citește din bază,
+  // niciodată din ce trimite browserul.
+  const { data: site } = await supabase.from("sites").select("template").eq("id", session.siteId).single();
+  if (!aspectPermis({ siteId: session.siteId, template: site?.template })) {
+    return { ok: false, mesaj: "Culorile nu sunt pornite pentru site-ul tău încă." };
+  }
 
   let culori = null;
   if (brut !== null) {
@@ -30,8 +40,6 @@ export async function salveazaCulori(brut: unknown): Promise<RezultatAspect> {
     if (!verificat.ok) return { ok: false, mesaj: verificat.mesaj };
     culori = verificat.culori;
   }
-
-  const supabase = await createClient();
 
   const { data: existente, error: eroareCitire } = await supabase
     .from("site_settings")
