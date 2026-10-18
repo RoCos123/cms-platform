@@ -184,6 +184,43 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
+**Limbile site-ului: comutator RO / EN / … cu traducere AUTOMATĂ, pe site-ul public — PLANIFICAT, NEÎNCEPUT
+(18 oct. 2026; proprietarul: „nu facem nimic acum, doar adaugă în context ce planuim").**
+*Ce vrea:* un comutator de limbă pe SITE-UL PUBLIC (RO/EN, eventual germană, franceză etc.), cu
+traducere automată. **Panoul rămâne în română** — nu se traduce. Clientul nu scrie nicio traducere.
+*Hotărâri confirmate:* (1) **cât mai simplu**; (2) **fără DeepL sau orice alt serviciu de
+traducere plătit/cu cheie — „poate Google da, altfel nu"**; (3) deci s-au RESPINS: traducerea pe server
+cu un API extern (DeepL, un model de limbaj etc.), cu traduceri salvate în bază, și varianta „clientul
+scrie traducerile" (ecrane de editare pe limbi, adrese `/en/…`, `hreflang`, hartă de site pe limbi, `lang`
+pe pagină — vreo 4–6 sesiuni, deci mult mai mult). **Nu reproune alea.**
+*Ce rămâne de ales, cu observații (nu s-au hotărât):*
+- **Varianta cea mai simplă, propunerea sesiunii: comutatorul e un set de LINKURI către traducerea
+  Google a paginii** (adresa de tip `https://<domeniul-cu-liniuțe>.translate.goog/…?_x_tr_sl=ro&_x_tr_tl=en`),
+  nu un script pe site: până apasă vizitatorul, pagina NU încarcă nimic de la Google — la fel ca butonul
+  WhatsApp, care e un simplu link `wa.me` — deci „zero cereri către Google" rămâne adevărat; la clic,
+  Google vede pagina și IP-ul vizitatorului, alegerea lui. **De verificat înainte de a promite** (n-am
+  încercat, nu am acces la Google din mediul de lucru): dacă formularele, calendarul de programări și
+  caseta hCaptcha funcționează în pagina tradusă (un proxy poate strica trimiterea — probabil nu merg
+  și atunci arătăm un rând „pentru programări/contact, treci la versiunea în română"); dacă formatul
+  adresei cu `translate.goog` merge cu domeniile proprii ale clienților; dacă mecanismul mai e oferit de
+  Google (un widget de tip „Website Translator" are un istoric de schimbări — de verificat la momentul
+  construirii, nu de presupus).
+- **Varianta cu scriptul/widgetul Google pe site** (butonul apare în pagină): mai comodă pentru
+  vizitator, dar încarcă scripturi de la Google la fiecare vizită și poate pune cookie-uri — contrazice
+  „zero cereri către Google" și politica de confidențialitate. Doar dacă proprietarul o vrea, și atunci
+  cu politica rescrisă și, probabil, cu un banner.
+- **Nimic de construit:** browserele (Chrome, Edge) oferă oricum „Tradu pagina" pentru că `lang="ro"` e
+  corect — de spus clientului dacă întreabă.
+*Consecințe de ținut minte la construire:* (a) politica de confidențialitate (șablonul din
+`sabloane/`) trebuie să spună că, la apăsarea comutatorului, vizitatorul ajunge la Google (un paragraf cu
+etichetă, ca `[WHATSAPP]`); (b) pagina tradusă NU e indexată de Google ca pagina noastră (nu e pe
+domeniul clientului) — nu aduce poziționare, doar ajutor pentru vizitator; (c) calitatea traducerii e a
+Google, nu a noastră — pentru texte de psihologie poate ieși stângace; de aceea comutatorul n-ar trebui
+să pară „versiunea oficială în engleză"; (d) comutatorul ar fi opțional per site, OPRIT din oficiu
+(propunere, neconfirmată). *Efort (estimare cu rezerve):* mic — o sesiune sau mai puțin, dacă verificarea
+de mai sus iese bine; programările/formularele într-o limbă străină sunt partea necunoscută.
+*Limbi:* nehotărât; propunerea sesiunii: engleza întâi.
+
 **Meniul „Aspect": culori și fonturi alese de client — HOTĂRÂT, NEÎNCEPUT (18 oct. 2026, discutat
 cu proprietarul; el a spus explicit „momentan nu facem nimic, doar discutăm" — nu începe fără un
 „începe" de la el).** Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
