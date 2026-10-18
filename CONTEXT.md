@@ -162,7 +162,8 @@ pentru cine mai are de făcut capturi, din ce a mers și ce nu:
   fiecare cu rezultatul vizibil, nu liste lungi.
 
 **Deschise, fără cerere de la proprietar (nu începe fără el):**
-- Culori proprii pe site, fără a atinge șablonul (discutat 5 oct.): azi nu există
+- *(Cerut și hotărât pe 18 oct. — vezi „Meniul «Aspect»", sus, în starea curentă.)* Culori proprii pe
+  site, fără a atinge șablonul (discutat 5 oct.): azi nu există
   nicio suprascriere per site. Calea ar fi o paletă pe `site_settings.brand`, aplicată
   doar acelui site, cu verificare de contrast; întâi doar accentul. Nu s-a implementat.
 - Zilele din preaviz la programare scriu „Fără ore" (poate fi „Prea aproape: sunt
@@ -182,6 +183,42 @@ chat, nu doar ca fișier. **Nu schimba nimic nesolicitat**, nici ca să iasă ma
 text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: eticheta unui
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
+
+**Meniul „Aspect": culori și fonturi alese de client — HOTĂRÂT, NEÎNCEPUT (18 oct. 2026, discutat
+cu proprietarul; el a spus explicit „momentan nu facem nimic, doar discutăm" — nu începe fără un
+„începe" de la el).** Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
+*Hotărâri confirmate:*
+- **Culori, mod AUTOMAT (implicit):** clientul alege O culoare principală, iar restul paletei se
+  calculează din ea — inclusiv **fundalurile, care se colorează după culoarea aleasă** (tentă
+  verzuie la verde etc.), fundalul închis, textul (aproape negru, cu tentă), accentul de pe fundal
+  închis. Nu e „doar accentul" (varianta mai îngustă din 5 oct.). În modul automat lizibilitatea e
+  GARANTATĂ: pe fiecare pereche text–fundal se verifică WCAG 4,5:1 și se ajustează luminozitatea.
+- **Culori, mod MANUAL:** *vizibil, nu ascuns*, cu un text care explică ce e. Pornește de la paleta
+  calculată; clientul schimbă fiecare culoare în parte; **lizibilitatea NU mai e garantată, iar el
+  își asumă** (proprietarul: „nu contează dacă e lizibil sau nu, își asumă"). Propunerea sesiunii
+  (încă neconfirmată): ~opt culori cu nume pe înțelesul lui („Fundal", „Fundal nuanțat", „Fundal
+  închis", „Text", „Text mai discret", „Culoarea principală", „Text pe butoane", „Accent pe fundal
+  închis"), restul (chenare, eroare) rămân calculate; avertisment galben NEBLOCANT lângă o pereche
+  greu de citit + bifă „înțeleg că poate fi greu de citit"; buton „Revino la culorile șablonului".
+- **Fonturi:** unul pentru text și unul pentru titluri, dintr-o listă ALEASĂ (de sesiune, de arătat
+  proprietarului înainte să se construiască). Limită tehnică, nu de gust: fonturile se servesc de pe
+  domeniul clientului (`next/font`, descărcate la build — fără cereri către Google, ca politica să
+  rămână adevărată), iar `next/font` cere argumente scrise în cod, deci nu se poate „orice font din
+  Google"; fiecare font trebuie verificat că are `latin-ext` (ă, â, î, ș, ț).
+- **Pentru TOȚI clienții, FĂRĂ plată** (nu modul plătit ca Programările). *(Proprietarul a scris
+  „pachetele și fonturile"; înțeles: culorile și fonturile.)*
+*Cum s-ar face (propunere, fără SQL):* ecran nou „Aspect" în panou, cu previzualizare live; valorile
+stau în `site_settings.brand` (JSONB); `templateStyle(template)` din `src/lib/templates/index.ts` e
+singurul loc prin care culorile și fonturile ajung în CSS, deci acolo se aplică suprascrierea —
+componentele de secțiune nu se ating. Paleta calculată trebuie să păstreze CARACTERUL fiecărui din
+cele cinci șabloane (crem cald la Căldură, al doilea accent cald la Apropiere etc.) și s-ar proba cu
+sute de culori la întâmplare, pe aceleași perechi pe care le verifică `e2e/contrast-sabloane.proba.mjs`.
+Site-urile existente nu se schimbă până nu alege clientul. *Estimare, cu rezerve:* culori 2–3
+sesiuni, fonturi o jumătate–una. *Riscuri spuse proprietarului:* un client își poate strica site-ul în
+modul manual și va scrie proprietarului (de aici butonul de revenire și avertismentul); șabloanele au
+caractere diferite, deci paleta calculată cere grijă. *Rămas de hotărât:* **ordinea** (propunerea
+sesiunii: întâi fonturile — mai mici, schelet de ecran „Aspect" —, apoi culorile, automat înainte de
+manual) și **lista de fonturi**.
 
 **„Motivul programării" a fost SCOS (15 oct. 2026, „da, scoate-l" al proprietarului; pe branch,
 NEPUBLICAT — așteaptă „fă pe master").** Era o listă cu două intrări, „Evaluări psihologice" și
