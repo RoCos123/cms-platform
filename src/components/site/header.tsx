@@ -216,7 +216,8 @@ export function SiteHeader({ data, friendly }: { data: SiteHeaderData; friendly?
               height: "44px",
               paddingInline: "clamp(14px, 3vw, 20px)",
               borderRadius: "var(--t-raza-buton)",
-              background: "var(--t-fundal-inchis)",
+              // Mătasea benzii, doar cu culori alese; altfel culoarea plină de până acum.
+              background: "var(--t-fundal-inchis-matase, var(--t-fundal-inchis))",
               color: "var(--t-text-pe-inchis)",
               fontSize: "15px",
               fontWeight: 600,

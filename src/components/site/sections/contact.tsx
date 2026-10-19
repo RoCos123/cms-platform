@@ -149,7 +149,8 @@ export function Contact({
     rămână lizibil — la fel ca la „Apropiere", fiindcă formularul își ia culorile
     din tonul secțiunii (deschis, „relief"). La dreapta, datele cabinetului ca
     rânduri etichetă/valoare în serif, direct pe închis. Fără iconițe. Cardul e
-    mereu închis (`--t-…`), deci iese în relief pe banda deschisă.
+    mereu închis (`--t-…`), deci iese în relief pe banda deschisă; cu culori
+    alese, are mătasea benzii.
   */
   if (card) {
     return (
@@ -157,7 +158,7 @@ export function Contact({
         <div
           style={{
             borderRadius: "clamp(24px, 3vw, 34px)",
-            background: "var(--t-fundal-inchis)",
+            background: "var(--t-fundal-inchis-matase, var(--t-fundal-inchis))",
             color: "var(--t-text-pe-inchis)",
             padding: "clamp(32px, 5vw, 72px)",
             display: "grid",

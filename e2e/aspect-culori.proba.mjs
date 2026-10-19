@@ -895,7 +895,7 @@ test("banda cu servicii a „Clarității”: piatră caldă pe un site cu culor
   ));
 });
 
-test("mătasea („Silk & Velvet”): pe benzi, subsol și butoanele pline — DOAR ca fundal, doar cu culori alese", () => {
+test("mătasea („Silk & Velvet”): pe benzi, subsol, cartonașele închise și butoanele pline — DOAR ca fundal, doar cu culori alese", () => {
   // Niciun șablon n-are mătase: fără culori alese, totul cade pe culoarea plină de până acum.
   for (const sablon of listTemplates()) {
     for (const rol of ["fundalInchisMatase", "accentMatase"]) assert.equal(rol in sablon.paleta, false, `${sablon.nume}: ${rol}`);
@@ -914,7 +914,11 @@ test("mătasea („Silk & Velvet”): pe benzi, subsol și butoanele pline — D
   // chenarul ar dispărea. Deci harta lui nu are voie să atingă mătasea.
   const butonFundal = sectiune.slice(sectiune.indexOf("const BUTON_FUNDAL"), sectiune.indexOf("};", sectiune.indexOf("const BUTON_FUNDAL")));
   assert.ok(butonFundal.length > 20 && !butonFundal.includes("matase"), butonFundal);
-  assert.ok(citeste("src/components/site/footer.tsx").includes('background: "var(--t-fundal-inchis-matase, var(--t-fundal-inchis))"'));
+  // Subsolul și cartonașele mici închise (antetul, „Despre mine", „Contact") au mătasea benzii.
+  for (const cale of ["src/components/site/footer.tsx", "src/components/site/header.tsx", "src/components/site/sections/about-teaser.tsx", "src/components/site/sections/contact.tsx"]) {
+    assert.ok(citeste(cale).includes('background: "var(--t-fundal-inchis-matase, var(--t-fundal-inchis))"'), cale);
+    assert.ok(!citeste(cale).includes('background: "var(--t-fundal-inchis)"'), `${cale}: a rămas un fundal închis plin, fără mătase`);
+  }
   for (const cale of ["src/components/site/sections/hero.tsx", "src/components/site/sections/about-teaser.tsx", "src/components/site/form-parts.tsx"]) {
     assert.ok(citeste(cale).includes('background: "var(--s-buton-matase, var(--s-buton-fundal))"'), cale);
   }

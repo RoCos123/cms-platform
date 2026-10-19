@@ -238,7 +238,7 @@ export function AboutTeaser({
               (`--t-fundal-inchis`/`--t-text-pe-inchis`), nu din tonul secțiunii:
               cardul e mereu închis, oricare ar fi banda pe care stă. Cifra mare e
               în serif-ul de accent, verde-deschis (`--t-accent-pe-inchis`), ca la
-              sursă. Fără iconițe.
+              sursă. Fără iconițe. Cu culori alese, cardul are mătasea benzii.
             */}
             {reperPeImagine && (
               <div
@@ -249,7 +249,7 @@ export function AboutTeaser({
                   maxWidth: "260px",
                   padding: "22px 26px",
                   borderRadius: "18px",
-                  background: "var(--t-fundal-inchis)",
+                  background: "var(--t-fundal-inchis-matase, var(--t-fundal-inchis))",
                   color: "var(--t-text-pe-inchis)",
                   boxShadow: "0 24px 50px -24px rgba(0, 0, 0, 0.5)",
                 }}

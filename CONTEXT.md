@@ -425,9 +425,17 @@ arătat proprietarului ÎNAINTE să se construiască).
     subsolul (`footer.tsx`), butoanele pline din hero, „Despre mine" și formulare. **NU** în
     `--s-buton-fundal` — acela e și culoare de chenar (orele din calendar), unde un gradient e nevalid
     și chenarul ar dispărea (o probă păzește asta). Fără culori alese, totul cade pe culoarea plină.
-    La hover, butonul devine plin, pe culoarea linkurilor. Neaplicată (încă) pe cartonașele mici închise
-    din „Contact", „Despre mine" și meniul de pe telefon (`contact.tsx:160`, `about-teaser.tsx:252`,
-    `header.tsx:219`) — rămân pline, aceeași culoare a benzii.
+    La hover, butonul devine plin, pe culoarea linkurilor. **Cartonașele mici închise** (cerut de
+    proprietar, 19 oct. 2026: „fă și cartonașele mici închise mătăsoase") au aceeași mătase ca banda,
+    cu rezervă pe culoarea plină: butonul de telefon din antet (`header.tsx`; pe Claritate se vede
+    doar el, și doar dacă site-ul are telefon și nu are pastila „Programează"), cardul de pe portret
+    din „Despre mine" și cardul închis din „Contact" (`about-teaser.tsx`, `contact.tsx` — amândouă
+    DOAR pe Liniște, deci pe `model-claritate` nu se văd). Textele de pe ele sunt cele ale benzii,
+    deja păzite pe lumina mătăsii. Probă: aceleași patru fișiere (subsol + cele trei) n-au voie să
+    aibă un fundal închis plin; 3 stricări, toate prinse. Browser (`ana.test` + `liniste` TEMPORAR
+    în poartă): toate trei `#003923 → #002515 → #00180C` cu Smarald, pline fără culori alese.
+    Rămân pline (nu sunt „cartonașe mici"): cardurile cu poză din „Servicii" la Liniște, al căror
+    gradient de jos se stinge în culoarea plină a benzii.
   - **Pe bandă:** fildeș `#FAF6F0`, mătase crudă `#D6CFC4`, aur-șampanie `#DFC59B` (cifre, accente,
     linkurile din subsol). Garda de contrast verifică totul și pe LUMINA mătăsii (cea mai luminoasă
     parte); la fel textul alb al butonului pe lumina butonului (un verde-măsliniu ca `#4B6E0B` se
