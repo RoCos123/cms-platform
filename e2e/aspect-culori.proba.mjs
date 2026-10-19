@@ -158,22 +158,21 @@ for (const sablon of listTemplates()) {
   });
 }
 
-test("fundalurile iau nuanța culorii alese — nu doar accentul", () => {
-  const caldura = getTemplate("caldura").paleta;
-  const { paleta } = paletaDinCuloare(caldura, "#2E7D5B"); // verde: HSL h ≈ 155, OKLCH h ≈ 162
-  // Rolurile calculate în OKLCH (fundalul paginii, relieful, textul): nuanța OKLCH a verdelui.
-  for (const rol of ["fundal", "fundalRelief", "text"]) {
-    const o = oklchDinHex(paleta[rol]);
-    assert.ok(o.c > 0.004, `${rol} a rămas fără nicio tentă`);
-    assert.ok(Math.abs(o.h - 162) < 12, `${rol}: nuanța ${o.h.toFixed(0)} nu urmează verdele (162)`);
+test("suprafețele mari sunt neutru-calde, aceleași pentru orice culoare; doar banda închisă păstrează subtonul culorii", () => {
+  // A doua rundă premium (19 oct.): pe Smarald, fundalurile verzui arătau „verde de spital”.
+  const cald = (hex) => { const o = oklchDinHex(hex); return o.c <= 0.009 && (o.c < 0.002 || (o.h > 55 && o.h < 125)); };
+  for (const culoare of ["#0E3A2F", "#0B4249", "#5E121D", "#281B52", "#FFEB3B", "#808080"]) {
+    const { paleta } = paletaDinCuloare(getTemplate("claritate").paleta, culoare);
+    for (const rol of ["fundal", "fundalNuantat", "fundalRelief", "chenar", "text", "textSecundar", "textPeInchis", "textSecundarPeInchis"]) {
+      assert.ok(cald(paleta[rol]), `${culoare}: ${rol} = ${paleta[rol]} nu e neutru-cald`);
+    }
+    assert.equal(paleta.fundalNuantat, "#F8F7F4", "cardurile: alabastrul din referința proprietarului");
+    assert.equal(paleta.chenar, "#DFDEDB", "chenarul: piatră caldă");
+    assert.equal(paleta.accentPeInchis, "#CDC3AF", "cifrele și accentele de pe bandă: șampanie");
   }
-  // Rolurile premium (HSL): nuanța HSL a verdelui.
-  for (const rol of ["fundalNuantat", "fundalInchis", "chenar"]) {
-    const h = hslDinHex(paleta[rol]).h;
-    assert.ok(Math.abs(h - 155) < 12, `${rol}: nuanța HSL ${h.toFixed(0)} nu urmează verdele (155)`);
-  }
-  // Și șablonul nu mai are tenta lui crem (h ≈ 68).
-  assert.ok(Math.abs(oklchDinHex(paleta.fundal).h - 68) > 40);
+  // Banda închisă păstrează subtonul culorii (Smarald: verde-obsidian), nu devine neagră pură.
+  const banda = oklchDinHex(paletaDinCuloare(getTemplate("claritate").paleta, "#0E3A2F").paleta.fundalInchis);
+  assert.ok(banda.c > 0.015 && Math.abs(banda.h - oklchDinHex("#0E3A2F").h) < 8, JSON.stringify(banda));
 });
 
 test("„Claritate”: fără culori alese își păstrează albul pur; cu o culoare aleasă, cardurile capătă tenta fină (hotărârea proprietarului)", () => {
@@ -644,19 +643,28 @@ const intre = (v, jos, sus) => Math.min(sus, Math.max(jos, v));
 const gri = (hsl) => hsl.s < 5;
 
 for (const sablon of listTemplates()) {
-  test(`„${sablon.nume}”: regulile premium (HSL) pe ${CULORI.length} de culori — iar unde nu se citește, contrastul câștigă`, () => {
+  test(`„${sablon.nume}”: regulile premium pe ${CULORI.length} de culori — iar unde nu se citește, contrastul câștigă`, () => {
     const gresite = [];
     for (const culoare of CULORI) {
       const hsl = hslDinHex(culoare);
       const { paleta: p } = paletaDinCuloare(sablon.paleta, culoare);
       const asteptat = (nume, valoare) => { if (p[nume] !== valoare) gresite.push(`${culoare} ${nume}: ${p[nume]} în loc de ${valoare}`); };
 
-      // Banda închisă: H, S ≤ 65, L între 11 și 15.
-      asteptat("fundalInchis", hexDinHsl({ h: hsl.h, s: Math.min(hsl.s, 65), l: intre(hsl.l, 11, 15) }));
-      // Fundalul nuanțat: H, S între 10 și 16, L între 95 și 97 (un gri rămâne gri).
-      asteptat("fundalNuantat", hexDinHsl({ h: hsl.h, s: gri(hsl) ? hsl.s : intre(hsl.s, 10, 16), l: intre(hsl.l, 95, 97) }));
-      // Chenarul: H, S 15, L 88 (un gri rămâne gri).
-      asteptat("chenar", hexDinHsl({ h: hsl.h, s: gri(hsl) ? hsl.s : 15, l: 88 }));
+      // A doua rundă (19 oct.), în OKLCH. Banda închisă: obsidian — L 0,21, cromă ≤ 0,025, nuanța aleasă.
+      const o = oklchDinHex(culoare);
+      asteptat("fundalInchis", hexDinOklch({ l: 0.21, c: Math.min(o.c, 0.025), h: o.h }));
+      // Suprafețele mari: neutru-calde (h 90). Cardurile alabastru, chenarul piatră caldă; fundalul
+      // paginii și relieful cu luminozitatea șablonului.
+      asteptat("fundalNuantat", hexDinOklch({ l: 0.975, c: 0.004, h: 90 }));
+      asteptat("chenar", hexDinOklch({ l: 0.9, c: 0.004, h: 90 }));
+      asteptat("fundal", hexDinOklch({ l: oklchDinHex(sablon.paleta.fundal).l, c: 0.004, h: 90 }));
+      asteptat("fundalRelief", hexDinOklch({ l: oklchDinHex(sablon.paleta.fundalRelief).l, c: 0.005, h: 90 }));
+      // Pe bandă: șampanie (garda nu mai are ce face: contrastul e ~10:1).
+      asteptat("accentPeInchis", hexDinOklch({ l: 0.82, c: 0.03, h: 85 }));
+      // Textele: cromă infimă, caldă (C ≤ 0,008, cu toleranța rotunjirii la 8 biți).
+      for (const rol of ["text", "textSecundar", "textPeInchis", "textSecundarPeInchis"]) {
+        if (oklchDinHex(p[rol]).c > 0.009) gresite.push(`${culoare} ${rol}: cromă ${oklchDinHex(p[rol]).c.toFixed(3)}`);
+      }
 
       const deschise = [p.fundal, p.fundalNuantat, p.fundalRelief];
       const trece = (hex, fundaluri) => fundaluri.every((f) => contrast(hex, f) >= 4.6);
@@ -787,12 +795,15 @@ test("linkurile din text și hover-ul pe butoane: legate de rolul nou, cu rezerv
   }
 });
 
-test("mostrele culorilor gata alese: trei fâșii (65% butoane, 20% linkuri, 15% fundal), calculate ca pe site", () => {
+test("mostrele culorilor gata alese: trei fâșii (50% banda închisă, 30% butoane, 20% linkuri), calculate ca pe site", () => {
   const ecran = citeste("src/app/dashboard/aspect/formular.tsx");
   assert.ok(ecran.includes("paleta: paletaDinCuloare(sablon.paleta, preset.hex).paleta"), "aceeași funcție ca pe site");
-  assert.ok(ecran.includes('style={{ flex: "65 1 0", background: preset.paleta.accent }}'));
+  assert.ok(ecran.includes('style={{ flex: "50 1 0", background: preset.paleta.fundalInchis }}'));
+  assert.ok(ecran.includes('style={{ flex: "30 1 0", background: preset.paleta.accent }}'));
   assert.ok(ecran.includes('style={{ flex: "20 1 0", background: preset.paleta.accentInteractiv }}'));
-  assert.ok(ecran.includes('style={{ flex: "15 1 0", background: preset.paleta.fundalNuantat }}'));
+  // Fundalul cardurilor e același la toate culorile, deci nu mai are ce căuta în mostră.
+  assert.ok(!ecran.includes("background: preset.paleta.fundalNuantat"));
+  assert.ok(ecran.includes("de la stânga: banda închisă, butoanele și linkurile"));
   // Safir doar propus în câmp: nu se salvează până nu alege omul.
   assert.ok(ecran.includes("valoare={stare.principala ?? CULOARE_PROPUSA}"));
   assert.ok(ecran.includes("const baza = bazaManuala(sablon.paleta, stare.principala);"));

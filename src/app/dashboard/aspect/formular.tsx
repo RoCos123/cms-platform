@@ -174,7 +174,7 @@ export function FormularAspect({
   const baza = bazaManuala(sablon.paleta, stare.principala);
 
   // Mostrele culorilor gata alese: paleta fiecăreia, calculată pe șablonul ACESTUI site, ca
-  // fâșiile să arate exact ce iese (butoane, linkuri, fundalul cardurilor).
+  // fâșiile să arate exact ce iese (banda închisă, butoanele, linkurile).
   const mostre = PRESETURI_CULOARE.map((preset) => ({
     ...preset,
     paleta: paletaDinCuloare(sablon.paleta, preset.hex).paleta,
@@ -285,7 +285,7 @@ export function FormularAspect({
               <div>
                 <p className="mb-1 text-xs font-medium text-muted-foreground">Sau pornește de la una gata aleasă</p>
                 <p className="mb-2 text-xs text-muted-foreground">
-                  Fiecare mostră arată, de la stânga: butoanele, linkurile și fundalul cardurilor.
+                  Fiecare mostră arată, de la stânga: banda închisă, butoanele și linkurile.
                 </p>
                 <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                   {mostre.map((preset) => {
@@ -302,17 +302,15 @@ export function FormularAspect({
                             activ ? "border-foreground" : "border-border",
                           )}
                         >
-                          {/* Trei fâșii, nu o pată: butoanele (65%), linkurile (20%) și
-                              fundalul cardurilor (15%), exact cum ies pe site. */}
+                          {/* Trei fâșii, nu o pată: banda închisă (50%), butoanele (30%) și
+                              linkurile (20%), exact cum ies pe site. Fundalul cardurilor nu e aici:
+                              e același alabastru la toate culorile. */}
                           <span aria-hidden className="flex h-8 w-full gap-0.5">
-                            <span className="rounded-sm" style={{ flex: "65 1 0", background: preset.paleta.accent }} />
+                            <span className="rounded-sm" style={{ flex: "50 1 0", background: preset.paleta.fundalInchis }} />
+                            <span className="rounded-sm" style={{ flex: "30 1 0", background: preset.paleta.accent }} />
                             <span
                               className="rounded-sm"
                               style={{ flex: "20 1 0", background: preset.paleta.accentInteractiv }}
-                            />
-                            <span
-                              className="rounded-sm border border-border"
-                              style={{ flex: "15 1 0", background: preset.paleta.fundalNuantat }}
                             />
                           </span>
                           {preset.nume}

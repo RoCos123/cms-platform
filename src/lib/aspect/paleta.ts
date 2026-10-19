@@ -7,34 +7,37 @@ import { contrast, hexDinHsl, hexDinOklch, hslDinHex, oklchDinHex, type Hsl, typ
  * CE FACE. Clientul alege „culoarea principală". Din ea se scoate toată paleta, ca site-ul
  * să arate ca și cum șablonul ar fi fost desenat pentru culoarea aia.
  *
- * PALETA „PREMIUM" (19 oct. 2026, cerută de proprietar: „Premium / Quiet Luxury"). Cinci roluri
- * urmează reguli scrise de el în HSL — numere pe care le poate verifica cu orice selector:
+ * PALETA „PREMIUM" (19 oct. 2026, cerută de proprietar: „Premium / Quiet Luxury"), în două runde.
+ *
+ * CULOAREA STĂ PE SUPRAFEȚE MICI. Doar două roluri poartă culoarea aleasă din plin, după reguli
+ * scrise de proprietar în HSL (numere pe care le poate verifica cu orice selector):
  *
  * • `accent` (butoane, accente mari) — culoarea aleasă; dacă e foarte deschisă (L > 50%),
  *   coboară la L 28%;
- * • `fundalInchis` (benzi închise, subsol) — nuanța aleasă, S ≤ 65%, L între 11 și 15%;
  * • `accentInteractiv` (linkuri, hover pe butoane) — nuanța aleasă, S + 12% (cel mult 85%),
- *   L între 32 și 38%;
- * • `fundalNuantat` (carduri, secțiuni alternative) — nuanța aleasă, S între 10 și 16%,
- *   L între 95 și 97% (fildeș / alabastru / gheață), fără nicio transparență;
- * • `chenar` (borduri fine) — nuanța aleasă, S 15%, L 88%.
+ *   L între 32 și 38%. La un gri (S < 5%) nuanța nu înseamnă nimic — HSL îi dă 0, adică roșu —,
+ *   deci griul rămâne gri.
  *
- * La un gri (S < 5%) nuanța nu înseamnă nimic — HSL îi dă 0, adică roșu —, așa că griul
- * rămâne gri: saturația nu se forțează în sus (altfel un client care alege antracit pur ar
- * primi fundaluri roz).
+ * SUPRAFEȚELE MARI SUNT NEUTRE (a doua rundă: pe Smarald, prima ieșise „tablă școlară / verde de
+ * spital"). Un verde sau un albastru arată scump pe hârtie caldă, nu pe verde-pal; iar o bandă pe
+ * toată lățimea nu trebuie să „strige" culoarea, ci să fie obsidian cu o reflexie din ea. Toate
+ * în OKLCH, fiindcă lângă alb și lângă negru procentele HSL înșală (referința proprietarului,
+ * `#F8F7F4`, are în HSL S = 22%, dar cromă OKLCH abia 0,004):
  *
- * Restul rolurilor (fundalul paginii, fundalul de relief, textele, accentul de pe fundal
- * închis, erorile) se calculează ca înainte: luminozitatea și „cât de colorat" ale
- * șablonului, cu nuanța culorii alese (OKLCH).
+ * • fundalul paginii și relieful — luminozitatea șablonului, neutru-cald (C 0,004–0,005, h 90);
+ * • `fundalNuantat` (carduri) — alabastru `#F8F7F4`; `chenar` — piatră caldă `#DFDEDB`;
+ *   aceleași pentru orice culoare aleasă;
+ * • `fundalInchis` (benzi, subsol) — L 0,21, cromă cel mult 0,025, nuanța aleasă;
+ * • textele — gri-cărbune cald (C ≤ 0,008) pe deschis, alb cald și argintiu cald pe închis;
+ * • `accentPeInchis` (cifrele, linkurile și ghilimelele de pe bandă) — șampanie `#CDC3AF`.
  *
  * LIZIBILITATEA E GARANTATĂ ȘI CÂȘTIGĂ MEREU (hotărârea proprietarului, 19 oct.). După ce
- * fiecare rol își primește ținta din regulile de mai sus, se verifică pe fiecare pereche
- * text–fundal care apare pe ecran (aceleași pe care le verifică `contrast-sabloane.proba.mjs`,
- * plus linkurile și hover-ul) raportul WCAG de cel puțin 4,5:1. Unde ținta nu ajunge (Petrol
- * și Smarald au linkurile pe 32–38% sub prag; un galben scris de mână nu se citește deloc),
- * culoarea se întunecă exact cât trebuie. Întunecarea se face în OKLCH, nu în HSL: acolo
- * nuanța percepută rămâne aceeași (un albastru întunecat în HSL „trage" spre violet).
- * Butonul se verifică direct cu textul de pe el, nu doar cu pragul „L > 50%".
+ * fiecare rol își primește ținta, se verifică pe fiecare pereche text–fundal care apare pe ecran
+ * (aceleași pe care le verifică `contrast-sabloane.proba.mjs`, plus linkurile și hover-ul)
+ * raportul WCAG de cel puțin 4,5:1. Unde ținta nu ajunge (Petrol și Smarald au linkurile pe
+ * 32–38% sub prag; un galben scris de mână nu se citește deloc), culoarea se întunecă exact cât
+ * trebuie. Întunecarea se face în OKLCH, nu în HSL: acolo nuanța percepută rămâne aceeași (un
+ * albastru întunecat în HSL „trage" spre violet). Butonul se verifică direct cu textul de pe el.
  *
  * Funcție pură, fără „use client" și fără `server-only`: o rulează și site-ul, și
  * previzualizarea din panou, și probele din Node (sute de culori la întâmplare).
@@ -49,22 +52,27 @@ export const PRAG_CONTRAST = 4.5;
  */
 const TINTA = 4.6;
 
-/** Cel mai mare chroma care se ia din culoarea aleasă pentru tente (peste, fundalurile ar arăta vopsite). */
-const CHROMA_MAXIM_TENTA = 0.2;
-
-/** Cât de colorat poate fi un rol calculat în OKLCH: fundalul paginii, relieful, textele. */
-const PLAFON = { fundalDeschis: 0.03, relief: 0.04, text: 0.06 } as const;
-
 /** Sub atâta saturație (HSL), o culoare e gri: nuanța ei nu înseamnă nimic. */
 const PRAG_GRI = 5;
 
-/** Regulile proprietarului (HSL, procente). Un singur loc, ca probele să le citească de aici. */
+/**
+ * Regulile proprietarului. Un singur loc, ca să se poată citi și schimba ușor. `accent` și
+ * `accentInteractiv` sunt în HSL (procente); restul în OKLCH (L 0–1, C, h în grade).
+ */
 export const REGULI_PREMIUM = {
   accent: { pragLuminos: 50, luminozitate: 28 },
-  fundalInchis: { saturatieMaxima: 65, luminozitate: [11, 15] },
   accentInteractiv: { saturatieInPlus: 12, saturatieMaxima: 85, luminozitate: [32, 38] },
-  fundalNuantat: { saturatie: [10, 16], luminozitate: [95, 97] },
-  chenar: { saturatie: 15, luminozitate: 88 },
+  /** Nuanța „hârtie / alabastru / piatră caldă" a suprafețelor mari. */
+  nuantaCalda: 90,
+  fundal: { croma: 0.004 },
+  fundalRelief: { croma: 0.005 },
+  fundalNuantat: { l: 0.975, croma: 0.004 },
+  chenar: { l: 0.9, croma: 0.004 },
+  fundalInchis: { l: 0.21, cromaMaxima: 0.025 },
+  text: { croma: 0.006 },
+  textPeInchis: { l: 0.96, croma: 0.005 },
+  textSecundarPeInchis: { l: 0.82, croma: 0.005 },
+  accentPeInchis: { l: 0.82, croma: 0.03, h: 85 },
 } as const;
 
 export type RezultatPaleta = {
@@ -110,20 +118,6 @@ function ajusteaza(
   return hexDinOklch({ ...culoare, l: sigur });
 }
 
-/** Luminozitatea și cromatica unui rol din șablon, cu nuanța culorii alese (OKLCH). */
-function tintata(
-  hexSablon: string,
-  aleasa: Oklch,
-  cromaDeReferinta: number,
-  plafon: number,
-): Oklch {
-  const rol = oklchDinHex(hexSablon);
-  // Cât de colorat e rolul față de accentul șablonului. Plafonat: un rol aproape la fel de
-  // colorat ca accentul n-ar trebui să urmeze culoarea aleasă până la a o egala.
-  const raport = Math.min(rol.c / cromaDeReferinta, 0.9);
-  return { l: rol.l, c: Math.min(raport * Math.min(aleasa.c, CHROMA_MAXIM_TENTA), plafon), h: aleasa.h };
-}
-
 /** Saturația dorită de o regulă — dar un gri rămâne gri (vezi `PRAG_GRI`). */
 function saturatie(aleasa: Hsl, dorita: number): number {
   return aleasa.s < PRAG_GRI ? aleasa.s : dorita;
@@ -152,39 +146,30 @@ export function accentInteractivDin(culoare: string, deschise: string[], textBut
 export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): RezultatPaleta {
   const aleasa = oklchDinHex(culoare);
   const hsl = hslDinHex(culoare);
-  // Referința pentru „cât de colorat e un rol": accentul șablonului, cu un minim ca un
-  // șablon cu accent aproape gri să nu împartă la ~zero.
-  const referinta = Math.max(oklchDinHex(sablon.accent).c, 0.05);
-  const tinteaza = (hex: string, plafon: number) => tintata(hex, aleasa, referinta, plafon);
+  const r = REGULI_PREMIUM;
+  const cald = (l: number, c: number, h: number = r.nuantaCalda): Oklch => ({ l, c, h });
 
-  // 1. Fundalurile.
-  //    Fundalul paginii și cel de relief: luminozitatea șablonului, nuanța culorii alese.
-  const fundal = hexDinOklch(tinteaza(sablon.fundal, PLAFON.fundalDeschis));
-  const fundalRelief = hexDinOklch(tinteaza(sablon.fundalRelief, PLAFON.relief));
-  //    Fundalul nuanțat, banda închisă și chenarul: regulile premium (HSL).
-  const rn = REGULI_PREMIUM.fundalNuantat;
-  const fundalNuantat = hexDinHsl({
-    h: hsl.h,
-    s: saturatie(hsl, intre(hsl.s, rn.saturatie)),
-    l: intre(hsl.l, rn.luminozitate),
+  // 1. Suprafețele mari: neutru-calde, aceleași pentru orice culoare aleasă. Fundalul paginii și
+  //    relieful păstrează luminozitatea șablonului (o pagină mai închisă decât cardurile rămâne).
+  const fundal = hexDinOklch(cald(oklchDinHex(sablon.fundal).l, r.fundal.croma));
+  const fundalRelief = hexDinOklch(cald(oklchDinHex(sablon.fundalRelief).l, r.fundalRelief.croma));
+  const fundalNuantat = hexDinOklch(cald(r.fundalNuantat.l, r.fundalNuantat.croma));
+  const chenar = hexDinOklch(cald(r.chenar.l, r.chenar.croma));
+  //    Banda închisă: obsidian cu subtonul culorii alese (un gri rămâne gri: cromă mai mică).
+  const fundalInchis = hexDinOklch({
+    l: r.fundalInchis.l,
+    c: Math.min(aleasa.c, r.fundalInchis.cromaMaxima),
+    h: aleasa.h,
   });
-  const ri = REGULI_PREMIUM.fundalInchis;
-  const fundalInchis = hexDinHsl({
-    h: hsl.h,
-    s: Math.min(hsl.s, ri.saturatieMaxima),
-    l: intre(hsl.l, ri.luminozitate),
-  });
-  const rc = REGULI_PREMIUM.chenar;
-  const chenar = hexDinHsl({ h: hsl.h, s: saturatie(hsl, rc.saturatie), l: rc.luminozitate });
   const deschise = [fundal, fundalNuantat, fundalRelief];
 
-  // 2. Ce se scrie peste ele. Pornește de la luminozitatea din șablon și se mută doar cât
-  //    trebuie ca să treacă pragul pe cel mai greu fundal.
-  const text = ajusteaza(tinteaza(sablon.text, PLAFON.text), deschise, "inchide");
-  const textSecundar = ajusteaza(tinteaza(sablon.textSecundar, PLAFON.text), deschise, "inchide");
-  const textPeInchis = ajusteaza(tinteaza(sablon.textPeInchis, PLAFON.text), [fundalInchis], "deschide");
+  // 2. Textele: gri-cărbune cald pe deschis (luminozitatea șablonului), alb și argintiu cald pe
+  //    închis — apoi garda, doar cât trebuie ca să treacă pragul pe cel mai greu fundal.
+  const text = ajusteaza(cald(oklchDinHex(sablon.text).l, r.text.croma), deschise, "inchide");
+  const textSecundar = ajusteaza(cald(oklchDinHex(sablon.textSecundar).l, r.text.croma), deschise, "inchide");
+  const textPeInchis = ajusteaza(cald(r.textPeInchis.l, r.textPeInchis.croma), [fundalInchis], "deschide");
   const textSecundarPeInchis = ajusteaza(
-    tinteaza(sablon.textSecundarPeInchis, PLAFON.text),
+    cald(r.textSecundarPeInchis.l, r.textSecundarPeInchis.croma),
     [fundalInchis],
     "deschide",
   );
@@ -192,7 +177,7 @@ export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): Rezu
   // 3. Accentul (butoane, accente mari). O culoare foarte deschisă coboară întâi la L 28%
   //    (regula proprietarului); apoi garda: textul ALB de pe buton trebuie să se citească pe
   //    el, iar accentul scris ca text (cuvintele colorate din titluri) pe fundalurile deschise.
-  const ra = REGULI_PREMIUM.accent;
+  const ra = r.accent;
   const pornire = hsl.l > ra.pragLuminos ? hexDinHsl({ ...hsl, l: ra.luminozitate }) : culoare;
   const accent = ajusteaza(oklchDinHex(pornire), [...deschise, "#FFFFFF"], "inchide");
 
@@ -201,15 +186,12 @@ export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): Rezu
   const accentText = [sablon.accentText, "#FFFFFF"].find((candidat) => contrast(candidat, accent) >= TINTA)
     ?? "#FFFFFF";
 
-  // 4. Linkurile și hover-ul pe butoane (rolul nou).
+  // 4. Linkurile și hover-ul pe butoane.
   const accentInteractiv = accentInteractivDin(culoare, deschise, accentText);
 
-  // Pe fundal închis: nuanța și cromatica culorii alese, luminozitatea rolului din șablon.
-  const accentPeInchis = ajusteaza(
-    { l: oklchDinHex(sablon.accentPeInchis).l, c: aleasa.c, h: aleasa.h },
-    [fundalInchis],
-    "deschide",
-  );
+  // Pe banda închisă: șampanie — nu o variantă pastelată a culorii („mentolat" pe Smarald).
+  const rp = r.accentPeInchis;
+  const accentPeInchis = ajusteaza(cald(rp.l, rp.croma, rp.h), [fundalInchis], "deschide");
 
   // Roșul erorilor nu urmează culoarea aleasă (o eroare verde ar fi o minciună), dar trebuie
   // să rămână lizibil pe fundalurile noi.

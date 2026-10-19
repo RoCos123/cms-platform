@@ -367,6 +367,38 @@ arătat proprietarului ÎNAINTE să se construiască).
     linkuri `#00707E`, carduri `#F0F4F4`, bandă `#0D393F`; pe site hover `#0B4249` → `#00707E`; Mihai
     (fără culori) — niciun hover; manual: 9 culori, „Linkurile" precompletată, avertisment la linkuri
     deschise; 375 px fără derulare în lateral; nicio eroare JavaScript.
+- **PALETA PREMIUM, A DOUA RUNDĂ (19 oct. 2026).** Proprietarul a încercat Smarald în browser: „nu arată
+  premium — pare tablă școlară sau verde de spital". Cauzele, găsite în calcul: banda închisă era EXACT
+  culoarea butonului (Smaraldul are deja L 14%, S 61%, deci regula HSL 11–15% îl lăsa neschimbat);
+  cardurile și chenarul erau verzui-reci; cifrele de pe bandă mentolate; textul verzui. Valorile au fost
+  arătate întâi dintr-un prototip, apoi aplicate cu deciziile lui:
+  - **Culoarea stă doar pe suprafețe mici:** `accent` (butoane) și `accentInteractiv` (linkuri, hover)
+    rămân bogate, cu regulile HSL din prima rundă. Smarald: `#0E3A2F` și `#007359`.
+  - **Suprafețele mari sunt neutru-calde (OKLCH, nuanța 90 — „hârtie / alabastru / piatră caldă"),
+    ACELEAȘI pentru orice culoare:** carduri `#F8F7F4` (exact referința lui), chenar `#DFDEDB`; fundalul
+    paginii și relieful cu luminozitatea șablonului (pe Claritate `#F3F1EF` și `#E6E5E1`).
+  - **Banda închisă: obsidian cu subtonul culorii** — L 0,21, cromă ≤ 0,025 (Smarald `#0B1C17`).
+  - **Textele:** gri-cărbune cald pe deschis (cromă 0,006: `#141310`, `#555450`), alb cald `#F3F2EE` și
+    argintiu cald `#C5C4C0` pe bandă; **cifrele / accentele / linkurile de pe bandă: șampanie `#CDC3AF`**
+    (ales de el dintre șampanie și argint).
+  - **De ce OKLCH și nu HSL pentru neutre:** lângă alb, procentele HSL înșală — `#F8F7F4` are în HSL S 22%,
+    dar cromă OKLCH abia 0,004; HSL-ul rămâne doar pentru butoane și linkuri.
+  - **Mostrele:** 50% banda închisă, 30% butoanele, 20% linkurile (fundalul cardurilor a ieșit din mostră:
+    e același la toate culorile).
+  - **Consecință de știut:** caracterul cromatic al șabloanelor (cremul de la Căldură, albastrul Liniștei)
+    nu se mai păstrează pe un site cu culori alese — suprafețele devin neutru-calde, doar luminozitățile
+    rămân ale șablonului. Fără culori alese, șabloanele rămân neatinse.
+  - **Probe:** `aspect-culori.proba.mjs` — 56 de teste, regulile scrise cu numerele lui pe 386 de culori ×
+    5 șabloane; 11 stricări noi (banda mai deschisă / mai colorată, carduri colorate, nuanța caldă
+    schimbată, pagina sau relieful pe nuanța aleasă, text colorat, cifre mentolate, chenar, argintiu
+    colorat, mostra greșită), toate prinse. Tot: 497 de probe. **Browser** (stiva reală, `ana.test` pus
+    TEMPORAR în poartă): fundalurile secțiunilor `#F3F1EF #F8F7F4 #E6E5E1 #0B1C17`, niciun verzui;
+    „Cum decurge colaborarea" pe `#0B1C17` cu cifrele `#CDC3AF` și paragrafele `#C5C4C0`; subsolul pe
+    aceeași bandă, linkuri șampanie; mostrele 50/30/20 exacte; hover, Mihai, manual, 375 px — toate ok.
+  - **Găsit, NEATINS (nu era în listă, propus proprietarului):** banda cu servicii de la Claritate
+    (`bandaServiciiDiscreta`) își face fundalul singură, `color-mix(… var(--t-accent) 8%, var(--t-fundal))`,
+    deci pe Smarald iese tot gri-verzui. Reparația propusă: un rol opțional doar în paleta calculată (ca
+    `accentInteractiv`), pe care banda îl folosește cu rezervă pe amestecul de acum — șabloanele neatinse.
 - **Unde stau datele:** `site_settings.brand.aspect.culori` = `{mod, principala, manual, asumat}`;
   fără migrare, fără SQL. Fonturile vor sta lângă ele, în `brand.aspect`.
 - **Cum ajung pe site:** `getTemplate(id, culori)` întoarce EXACT obiectul șablonului când nu sunt
