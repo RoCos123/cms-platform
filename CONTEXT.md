@@ -335,8 +335,15 @@ arătat proprietarului ÎNAINTE să se construiască).
     programare). Fiindcă niciun șablon nu are `accentInteractiv`, pe un site fără culori alese
     variabila e nevalidă și butonul NU capătă hover — hotărârea proprietarului. *Nu am pus hover* pe
     butoanele din „Pachete" (au variantă proprie la Apropiere) și pe cele de pe benzile închise
-    (butonul de acolo e inversat). *În previzualizarea din panou hover-ul nu se poate încerca cu
-    mausul* (fereastra e `inert` dinadins: „se privește, nu se folosește"); se vede pe site.
+    (butonul de acolo e inversat). **Hover-ul se vede și în previzualizarea din „Aspect"** (cerut de
+    proprietar, 19 oct.: „aș vrea să se vadă și hover în previzualizare"). Fereastra rămâne `inert`
+    (un Tab din formular nu intră în site-ul fals, click-ul nu face nimic), deci `:hover` nu se aprinde;
+    `CadruPrevizualizare` ascultă mausul pe documentul ferestrei, găsește butonul de sub el după
+    dreptunghi (`elementsFromPoint` NU vede elementele inerte — verificat în Chromium) și îi pune
+    `data-hover`, tratat în `globals.css` exact ca `:hover`. Pornit DOAR în „Aspect" (prop
+    `hoverPeButoane`); celelalte previzualizări din panou rămân cum erau — se poate porni și acolo cu
+    un cuvânt, dacă se cere. Încercat cu mausul adevărat: fără culori nimic; Petrol → `#00707E` sub
+    maus, înapoi la plecare; click fără efect; după altă culoare, hover-ul urmează culoarea nouă.
   - **Modul manual are a 9-a culoare, „Linkurile"**, precompletată cu valoarea calculată (și când nu
     e aleasă nicio culoare principală: atunci se calculează din accentul șablonului — `bazaManuala`,
     aceeași funcție pentru ecran și site). Avertismentele includ linkurile și textul butonului la hover.
@@ -346,7 +353,8 @@ arătat proprietarului ÎNAINTE să se construiască).
     alege o culoare (tentă L 95–97; acceptat de proprietar); banda închisă și chenarul urmează regulile
     lui, nu luminozitatea șablonului; site-ul de probă `model-claritate` (dacă a salvat deja o culoare)
     se recalculează după regulile noi la publicare.
-  - **Probe:** `e2e/aspect-culori.proba.mjs` — 55 de teste; regulile proprietarului scrise în probă cu
+  - **Probe:** `e2e/aspect-culori.proba.mjs` — 56 de teste (al 56-lea: hover-ul din previzualizare, 6
+    stricări prinse); regulile proprietarului scrise în probă cu
     numerele lui (nu importate), pe 386 de culori × 5 șabloane; 20 de stricări (limite schimbate, +12
     scos, gardă scoasă, regula L > 50 scoasă, griul colorat, preseturi/culoare propusă greșite, linkuri
     sau hover fără/cu rezervă, `!important` scos, a 9-a culoare scoasă, Claritate modificat…), toate

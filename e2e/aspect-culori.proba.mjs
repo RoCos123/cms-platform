@@ -797,3 +797,28 @@ test("mostrele culorilor gata alese: trei fâșii (65% butoane, 20% linkuri, 15%
   assert.ok(ecran.includes("valoare={stare.principala ?? CULOARE_PROPUSA}"));
   assert.ok(ecran.includes("const baza = bazaManuala(sablon.paleta, stare.principala);"));
 });
+
+test("hover-ul se vede și în previzualizarea din „Aspect”, fără ca previzualizarea să devină folosibilă", () => {
+  const cadru = citeste("src/components/dashboard/cadru-previzualizare.tsx");
+  // `inert` rămâne: un Tab din formular nu aterizează în butoanele site-ului fals, click-ul nu face nimic.
+  assert.ok(cadru.includes('doc.body.setAttribute("inert", "");'));
+  // Hover-ul e oprit implicit și pornit doar la cerere.
+  assert.ok(cadru.includes("hoverPeButoane = false,"));
+  assert.ok(cadru.includes("if (!hoverPeButoane || !document_) return;"));
+  // Butonul de sub maus se găsește după dreptunghi (`elementsFromPoint` nu vede elementele inerte).
+  assert.ok(cadru.includes('doc.querySelectorAll(".buton-plin")') && cadru.includes("getBoundingClientRect()"));
+  assert.ok(cadru.includes('buton?.setAttribute("data-hover", "")') && cadru.includes('activ?.removeAttribute("data-hover")'));
+  // Și se curăță: la ieșirea mausului și la demontare.
+  assert.ok(cadru.includes('addEventListener("mouseleave", pleaca)') && cadru.includes('removeEventListener("mousemove", muta)'));
+
+  // Aceeași culoare ca hover-ul adevărat, fără media query (previzualizarea n-are `:hover`).
+  const css = citeste("src/app/globals.css");
+  assert.match(css, /\n\.buton-plin\[data-hover\]:not\(:disabled\) \{\s*background: var\(--s-buton-hover, var\(--s-buton-fundal\)\) !important;/);
+
+  // Doar „Aspect” îl pornește; restul previzualizărilor rămân cum erau.
+  assert.ok(citeste("src/components/dashboard/panou-previzualizare.tsx").includes("<CadruPrevizualizare latime={latime} hoverPeButoane={hoverPeButoane}>"));
+  assert.match(citeste("src/app/dashboard/aspect/formular.tsx"), /titlu="Cum arată cu aceste culori"[\s\S]{0,140}hoverPeButoane\n/);
+  for (const cale of ["src/app/dashboard/sectiuni/[id]/editor.tsx", "src/app/dashboard/setari/formular.tsx"]) {
+    assert.ok(!citeste(cale).includes("hoverPeButoane"), cale);
+  }
+});

@@ -438,6 +438,8 @@ export function FormularAspect({
         template={efectiv}
         cheie={semnatura(culori)}
         titlu="Cum arată cu aceste culori"
+        // Ca proprietarul să vadă și culoarea butoanelor la hover, nu doar pe site.
+        hoverPeButoane
         nota={
           previzualizare
             ? "Ce vezi e site-ul tău, cu textele și pozele tale, colorat cu ce alegi. Se actualizează pe măsură ce alegi; derulează pagina ca să vezi tot. Modificările ajung pe site abia după ce apeși Salvează."

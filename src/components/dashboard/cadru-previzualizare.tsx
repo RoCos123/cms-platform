@@ -17,10 +17,13 @@ import { createPortal } from "react-dom";
  */
 export function CadruPrevizualizare({
   latime,
+  hoverPeButoane = false,
   children,
 }: {
   /** Lățimea ferestrei simulate, în pixeli. 1180 = laptop, 390 = telefon. */
   latime: number;
+  /** Arată culoarea de hover a butoanelor pline când treci cu mausul peste ele (vezi mai jos). */
+  hoverPeButoane?: boolean;
   children: ReactNode;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -65,6 +68,48 @@ export function CadruPrevizualizare({
     observator.observe(document.head, { childList: true });
     return () => observator.disconnect();
   }, []);
+
+  /*
+   * Hover-ul butoanelor pline, deși previzualizarea e `inert` (cerut de proprietar, 19 oct. 2026:
+   * „aș vrea să se vadă și hover în previzualizare", pentru culorile din „Aspect").
+   *
+   * `inert` rămâne — fără el, un Tab din formular ar ateriza în butoanele site-ului fals —, dar
+   * tot el oprește `:hover`. Iar `elementsFromPoint` nu vede elementele inerte (verificat în
+   * Chromium: întoarce doar `<html>`). Așa că mișcarea mausului se ascultă pe documentul
+   * ferestrei (acolo ajunge), butonul de sub maus se găsește după dreptunghiul lui, iar pe el se
+   * pune `data-hover` — pe care regula `.buton-plin` din `globals.css` îl tratează exact ca pe
+   * `:hover`. Click-ul tot nu face nimic: elementele rămân inerte.
+   */
+  useEffect(() => {
+    if (!hoverPeButoane || !document_) return;
+    const doc = document_;
+    let activ: Element | null = null;
+
+    const seteaza = (buton: Element | null) => {
+      if (buton === activ) return;
+      activ?.removeAttribute("data-hover");
+      buton?.setAttribute("data-hover", "");
+      doc.documentElement.style.cursor = buton ? "pointer" : "";
+      activ = buton;
+    };
+
+    const muta = (e: MouseEvent) => {
+      const sub = Array.from(doc.querySelectorAll(".buton-plin")).find((buton) => {
+        const r = buton.getBoundingClientRect();
+        return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      });
+      seteaza(sub ?? null);
+    };
+    const pleaca = () => seteaza(null);
+
+    doc.addEventListener("mousemove", muta);
+    doc.documentElement.addEventListener("mouseleave", pleaca);
+    return () => {
+      doc.removeEventListener("mousemove", muta);
+      doc.documentElement.removeEventListener("mouseleave", pleaca);
+      seteaza(null);
+    };
+  }, [hoverPeButoane, document_]);
 
   // Înălțimea iframe-ului urmează conținutul: altfel ar avea o înălțime fixă și
   // ori ar tăia secțiunea, ori ar lăsa gol sub ea.

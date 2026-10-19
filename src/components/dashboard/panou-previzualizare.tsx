@@ -26,6 +26,7 @@ export function PanouPrevizualizare({
   cheie,
   titlu = "Cum arată pe site",
   nota,
+  hoverPeButoane = false,
   children,
 }: {
   template: Template;
@@ -34,6 +35,8 @@ export function PanouPrevizualizare({
   /** De obicei un text; poate fi și un comutator (ex. „Prima pagină / Pagina de servicii"). */
   titlu?: ReactNode;
   nota: ReactNode;
+  /** Butoanele pline își arată culoarea de hover sub maus (doar „Aspect" o cere; vezi `CadruPrevizualizare`). */
+  hoverPeButoane?: boolean;
   children: ReactNode;
 }) {
   const [latime, setLatime] = useState<number>(LATIMI[0].valoare);
@@ -181,7 +184,7 @@ export function PanouPrevizualizare({
             </div>
           }
         >
-          <CadruPrevizualizare latime={latime}>
+          <CadruPrevizualizare latime={latime} hoverPeButoane={hoverPeButoane}>
             <div
               style={{
                 ...templateStyle(template),

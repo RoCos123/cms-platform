@@ -474,6 +474,14 @@ body {
   }
 }
 
+/*
+ * Același hover în previzualizarea din „Aspect": fereastra de acolo e `inert`, deci `:hover` nu
+ * se aprinde niciodată; `CadruPrevizualizare` pune `data-hover` pe butonul de sub maus.
+ */
+.buton-plin[data-hover]:not(:disabled) {
+  background: var(--s-buton-hover, var(--s-buton-fundal)) !important;
+}
+
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .buton-plin {
     transition: background-color 160ms ease;
