@@ -388,17 +388,22 @@ arătat proprietarului ÎNAINTE să se construiască).
   - **Consecință de știut:** caracterul cromatic al șabloanelor (cremul de la Căldură, albastrul Liniștei)
     nu se mai păstrează pe un site cu culori alese — suprafețele devin neutru-calde, doar luminozitățile
     rămân ale șablonului. Fără culori alese, șabloanele rămân neatinse.
-  - **Probe:** `aspect-culori.proba.mjs` — 56 de teste, regulile scrise cu numerele lui pe 386 de culori ×
+  - **Probe:** `aspect-culori.proba.mjs` — 56 de teste (57 cu banda), regulile scrise cu numerele lui pe 386 de culori ×
     5 șabloane; 11 stricări noi (banda mai deschisă / mai colorată, carduri colorate, nuanța caldă
     schimbată, pagina sau relieful pe nuanța aleasă, text colorat, cifre mentolate, chenar, argintiu
     colorat, mostra greșită), toate prinse. Tot: 497 de probe. **Browser** (stiva reală, `ana.test` pus
     TEMPORAR în poartă): fundalurile secțiunilor `#F3F1EF #F8F7F4 #E6E5E1 #0B1C17`, niciun verzui;
     „Cum decurge colaborarea" pe `#0B1C17` cu cifrele `#CDC3AF` și paragrafele `#C5C4C0`; subsolul pe
     aceeași bandă, linkuri șampanie; mostrele 50/30/20 exacte; hover, Mihai, manual, 375 px — toate ok.
-  - **Găsit, NEATINS (nu era în listă, propus proprietarului):** banda cu servicii de la Claritate
-    (`bandaServiciiDiscreta`) își face fundalul singură, `color-mix(… var(--t-accent) 8%, var(--t-fundal))`,
-    deci pe Smarald iese tot gri-verzui. Reparația propusă: un rol opțional doar în paleta calculată (ca
-    `accentInteractiv`), pe care banda îl folosește cu rezervă pe amestecul de acum — șabloanele neatinse.
+  - **Banda cu servicii (cerută de proprietar după ce i-am arătat-o, 19 oct.):** la Claritate
+    (`bandaServiciiDiscreta`, delimitată) își făcea fundalul singură, `color-mix(… var(--t-accent) 8%,
+    var(--t-fundal))`, deci pe Smarald ieșea gri-verzui. Acum: rolul opțional `fundalBanda` (doar în paleta
+    calculată, egal cu relieful — piatră caldă, Smarald `#E6E5E1`), variabila `--t-fundal-banda`, iar
+    banda folosește `var(--t-fundal-banda, <amestecul vechi>)` — fără culori alese, șabloanele rămân exact
+    cum erau (verificat în browser: fără culori, banda Anei pe Claritate păstrează amestecul albăstrui).
+    În modul manual, banda se mută odată cu relieful. Probă nouă + 4 stricări prinse.
+    *De știut pentru când „Aspect" se deschide și pe alte șabloane:* acolo banda NU e discretă, ci plină,
+    pe culoarea butonului (`var(--t-accent)`) — o fâșie subțire pe toată lățimea, în culoarea aleasă.
 - **Unde stau datele:** `site_settings.brand.aspect.culori` = `{mod, principala, manual, asumat}`;
   fără migrare, fără SQL. Fonturile vor sta lângă ele, în `brand.aspect`.
 - **Cum ajung pe site:** `getTemplate(id, culori)` întoarce EXACT obiectul șablonului când nu sunt

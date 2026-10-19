@@ -833,3 +833,28 @@ test("hover-ul se vede și în previzualizarea din „Aspect”, fără ca previ
     assert.ok(!citeste(cale).includes("hoverPeButoane"), cale);
   }
 });
+
+test("banda cu servicii a „Clarității”: piatră caldă pe un site cu culori alese, amestecul de până acum fără", () => {
+  // Pe Smarald, amestecul de 8% din culoarea butonului ieșea gri-verzui (găsit în browser, 19 oct.).
+  for (const sablon of listTemplates()) {
+    assert.equal("fundalBanda" in sablon.paleta, false, `${sablon.nume}: niciun șablon nu are rolul`);
+    assert.equal(templateStyle(sablon)["--t-fundal-banda"], undefined);
+  }
+  for (const culoare of ["#0E3A2F", "#0B4249", "#5E121D", "#FFEB3B"]) {
+    const p = paletaDinCuloare(getTemplate("claritate").paleta, culoare).paleta;
+    assert.equal(p.fundalBanda, p.fundalRelief, culoare);
+    const o = oklchDinHex(p.fundalBanda);
+    assert.ok(o.c <= 0.009 && o.h > 55 && o.h < 125, `${culoare}: ${p.fundalBanda} nu e neutru-cald`);
+    // Textul discret și steaua (accentul) se citesc pe ea.
+    assert.ok(contrast(p.textSecundar, p.fundalBanda) >= 4.5 && contrast(p.accent, p.fundalBanda) >= 4.5, culoare);
+  }
+  const ales = getTemplate("claritate", { mod: "auto", principala: "#0E3A2F" });
+  assert.equal(templateStyle(ales)["--t-fundal-banda"], ales.paleta.fundalRelief);
+  // Modul manual: schimbi fundalul paginii → relieful și banda se mută împreună.
+  const manual = paletaEfectiva(getTemplate("claritate").paleta, citesteAspectCulori({ mod: "manual", principala: "#0E3A2F", manual: { fundal: "#FFF0F0" } }));
+  assert.equal(manual.fundalBanda, manual.fundalRelief);
+  // Componenta: rolul nou, CU rezervă pe amestecul vechi.
+  assert.ok(citeste("src/components/site/sections/banda-servicii.tsx").includes(
+    '"var(--t-fundal-banda, color-mix(in oklab, var(--t-accent) 8%, var(--t-fundal)))"',
+  ));
+});

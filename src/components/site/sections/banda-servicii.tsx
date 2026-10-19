@@ -66,7 +66,9 @@ export function BandaServicii({
         position: "relative",
         background: discreta
           ? delimitata
-            ? "color-mix(in oklab, var(--t-accent) 8%, var(--t-fundal))"
+            ? // Pe un site cu culori alese, piatra caldă a paletei (`--t-fundal-banda`, 19 oct. 2026);
+              // fără, amestecul de până acum — deci șabloanele neatinse rămân exact cum erau.
+              "var(--t-fundal-banda, color-mix(in oklab, var(--t-accent) 8%, var(--t-fundal)))"
             : "var(--t-fundal)"
           : "var(--t-accent)",
         // FĂRĂ linii pe margini (cerut de proprietar, 2 oct. 2026: „să nu aibă

@@ -29,7 +29,8 @@ import { contrast, hexDinHsl, hexDinOklch, hslDinHex, oklchDinHex, type Hsl, typ
  *   aceleași pentru orice culoare aleasă;
  * • `fundalInchis` (benzi, subsol) — L 0,21, cromă cel mult 0,025, nuanța aleasă;
  * • textele — gri-cărbune cald (C ≤ 0,008) pe deschis, alb cald și argintiu cald pe închis;
- * • `accentPeInchis` (cifrele, linkurile și ghilimelele de pe bandă) — șampanie `#CDC3AF`.
+ * • `accentPeInchis` (cifrele, linkurile și ghilimelele de pe bandă) — șampanie `#CDC3AF`;
+ * • `fundalBanda` (banda cu servicii a „Clarității") — aceeași piatră caldă ca relieful.
  *
  * LIZIBILITATEA E GARANTATĂ ȘI CÂȘTIGĂ MEREU (hotărârea proprietarului, 19 oct.). După ce
  * fiecare rol își primește ținta, se verifică pe fiecare pereche text–fundal care apare pe ecran
@@ -211,6 +212,10 @@ export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): Rezu
     accentText,
     accentPeInchis,
     accentInteractiv,
+    // Banda cu servicii: pe aceeași piatră caldă ca relieful, nu amestecată cu culoarea aleasă
+    // (pe Smarald, amestecul de 8% ieșea tot gri-verzui). Textul și steaua ei sunt deja verificate
+    // pe relief, prin garda de mai sus.
+    fundalBanda: fundalRelief,
     eroare,
     eroarePeInchis,
     chenar,

@@ -154,6 +154,8 @@ export function paletaEfectiva(sablon: TemplatePalette, aspect: AspectCulori): T
   if (aspect.manual.fundal) {
     paleta.fundalRelief = dinFundalNou(baza, aspect.manual.fundal, baza.fundalRelief);
     paleta.chenar = paleta.fundalRelief;
+    // Banda cu servicii stă pe relief: se mută odată cu el.
+    if (paleta.fundalBanda) paleta.fundalBanda = paleta.fundalRelief;
   }
 
   return paleta;

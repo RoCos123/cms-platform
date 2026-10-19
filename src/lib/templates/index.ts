@@ -77,6 +77,8 @@ export function templateStyle(template: Template): CSSProperties {
     // Doar în paleta calculată dintr-o culoare aleasă (linkuri + hover). La șabloane e
     // nedefinită, iar React nu scrie deloc o proprietate `undefined`.
     "--t-accent-interactiv": p.accentInteractiv,
+    // La fel, doar în paleta calculată: fundalul benzii cu servicii (vezi `banda-servicii.tsx`).
+    "--t-fundal-banda": p.fundalBanda,
     // Doar „Apropiere" le pune; la restul rămân nedefinite, iar componentele
     // care le folosesc cad pe forma dinainte prin `var(--…, implicit)`.
     "--t-accent-cald": p.accentCald,

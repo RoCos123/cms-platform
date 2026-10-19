@@ -59,6 +59,12 @@ export type TemplatePalette = {
    * rămân exact cum erau, inclusiv fără hover pe butoane.
    */
   accentInteractiv?: string;
+  /**
+   * Fundalul benzii cu servicii delimitate („Claritate"), pe un site cu culori alese: neutru-cald,
+   * ca restul suprafețelor mari (a doua rundă premium, 19 oct. 2026). Niciun șablon nu-l are; banda
+   * cade atunci pe amestecul ei de până acum (`color-mix` din accent și fundal).
+   */
+  fundalBanda?: string;
   /** Culoarea erorilor de formular, pe fundal deschis și pe fundal închis. */
   eroare: string;
   eroarePeInchis: string;
