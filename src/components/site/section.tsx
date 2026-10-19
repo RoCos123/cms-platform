@@ -5,7 +5,8 @@ const FUNDAL: Record<SectionTone, string> = {
   deschis: "var(--t-fundal)",
   nuantat: "var(--t-fundal-nuantat)",
   relief: "var(--t-fundal-relief)",
-  inchis: "var(--t-fundal-inchis)",
+  // Mătasea (gradient), doar pe un site cu culori alese; altfel culoarea plină, ca până acum.
+  inchis: "var(--t-fundal-inchis-matase, var(--t-fundal-inchis))",
 };
 
 const TEXT: Record<SectionTone, string> = {
@@ -59,6 +60,19 @@ const BUTON_HOVER: Record<SectionTone, string> = {
   deschis: "var(--t-accent-interactiv)",
   nuantat: "var(--t-accent-interactiv)",
   relief: "var(--t-accent-interactiv)",
+  inchis: "initial",
+};
+
+/**
+ * Fundalul MĂTĂSOS al butonului plin (gradient), doar pe tonurile deschise și doar pe un site cu
+ * culori alese — altfel variabila e nevalidă, iar butonul cade pe `--s-buton-fundal`, ca până acum.
+ * Separat de `--s-buton-fundal` dinadins: acela e folosit și ca CULOARE de chenar (orele din
+ * calendar), unde un gradient n-ar fi valid și chenarul ar dispărea.
+ */
+const BUTON_MATASE: Record<SectionTone, string> = {
+  deschis: "var(--t-accent-matase)",
+  nuantat: "var(--t-accent-matase)",
+  relief: "var(--t-accent-matase)",
   inchis: "initial",
 };
 
@@ -131,6 +145,7 @@ export function Section({
         ["--s-buton-fundal" as string]: BUTON_FUNDAL[tone],
         ["--s-buton-text" as string]: BUTON_TEXT[tone],
         ["--s-buton-hover" as string]: BUTON_HOVER[tone],
+        ["--s-buton-matase" as string]: BUTON_MATASE[tone],
         paddingBlock: "var(--t-spatiere)",
         ...(decor ? { position: "relative", overflow: "hidden", isolation: "isolate" } : {}),
       }}

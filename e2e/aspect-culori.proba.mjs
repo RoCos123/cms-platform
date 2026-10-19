@@ -71,6 +71,19 @@ function culoriDeProba(cate = 360) {
 
 const CULORI = culoriDeProba();
 
+/**
+ * Lumina mătăsii (a treia rundă premium, 19 oct.), scrisă din nou aici, cu numerele proprietarului:
+ * aceeași nuanță, L + 0,07, C + 0,02 (un gri nu capătă cromă).
+ */
+function luminaMatase(hex) {
+  const o = oklchDinHex(hex);
+  return hexDinOklch({ l: Math.min(1, o.l + 0.07), c: o.c < 0.01 ? o.c : o.c + 0.02, h: o.h });
+}
+function umbraMatase(hex) {
+  const o = oklchDinHex(hex);
+  return hexDinOklch({ l: Math.max(0, o.l - 0.05), c: o.c, h: o.h });
+}
+
 /** Perechile care apar pe ecran — copiate din proba șabloanelor, nu importate din cod. */
 function perechiIndependente(p) {
   const lista = [];
@@ -81,6 +94,13 @@ function perechiIndependente(p) {
   for (const rol of ["textPeInchis", "textSecundarPeInchis", "accentPeInchis", "eroarePeInchis"]) {
     lista.push([`${rol} pe fundalInchis`, p[rol], p.fundalInchis]);
   }
+  // Mătasea: ce stă pe bandă, și textul butonului, se citesc și pe partea LUMINOASĂ a gradientului.
+  if (p.fundalInchisMatase) {
+    for (const rol of ["textPeInchis", "textSecundarPeInchis", "accentPeInchis", "eroarePeInchis"]) {
+      lista.push([`${rol} pe lumina benzii`, p[rol], luminaMatase(p.fundalInchis)]);
+    }
+  }
+  if (p.accentMatase) lista.push(["accentText pe lumina butonului", p.accentText, luminaMatase(p.accent)]);
   // Paleta premium (19 oct.): linkurile pe fundalurile deschise și textul butonului la hover.
   if (p.accentInteractiv) {
     for (const [numeFundal, fundal] of [["fundal", p.fundal], ["fundalNuantat", p.fundalNuantat], ["fundalRelief", p.fundalRelief]]) {
@@ -139,40 +159,46 @@ for (const sablon of listTemplates()) {
       assert.ok(luminanta(paleta.fundal) > 0.5, `${culoare}: fundal nu mai e deschis (${paleta.fundal})`);
       assert.ok(luminanta(paleta.fundalInchis) < 0.15, `${culoare}: fundalInchis nu mai e închis (${paleta.fundalInchis})`);
 
-      // Luminozitatea fundalului paginii și a reliefului rămâne a șablonului (rotunjirea și
-      // decolorarea în sRGB ierte). Fundalul nuanțat, banda închisă și chenarul urmează din
-      // 19 oct. regulile premium — vezi testul lor, mai jos.
-      for (const rol of ["fundal", "fundalRelief"]) {
-        const dorit = oklchDinHex(sablon.paleta[rol]).l;
-        const obtinut = oklchDinHex(paleta[rol]).l;
-        assert.ok(Math.abs(dorit - obtinut) < 0.03, `${culoare}: ${rol} și-a schimbat luminozitatea (${dorit.toFixed(3)} → ${obtinut.toFixed(3)})`);
-      }
+      // Fundalurile deschise sunt, din a treia rundă (19 oct.), calcarul cald al proprietarului,
+      // același la orice șablon — vezi testul regulilor, mai jos.
 
       // Roșul erorilor rămâne roșu: o eroare verde ar fi o minciună.
       const h = oklchDinHex(paleta.eroare).h;
       assert.ok(h < 50 || h > 350, `${culoare}: eroarea nu mai e roșie (h=${h.toFixed(0)})`);
 
-      // Toate rolurile sunt culori valide.
-      for (const [rol, valoare] of Object.entries(paleta)) assert.ok(esteHexValid(valoare), `${culoare}: ${rol} = ${valoare}`);
+      // Toate rolurile sunt culori valide; cele „Matase" sunt gradiente cu trei culori valide.
+      for (const [rol, valoare] of Object.entries(paleta)) {
+        if (rol.endsWith("Matase")) {
+          assert.match(valoare, /^linear-gradient\(135deg, #[0-9A-F]{6} 20%, #[0-9A-F]{6} 50%, #[0-9A-F]{6} 90%\)$/, `${culoare}: ${rol}`);
+        } else {
+          assert.ok(esteHexValid(valoare), `${culoare}: ${rol} = ${valoare}`);
+        }
+      }
     }
   });
 }
 
-test("suprafețele mari sunt neutru-calde, aceleași pentru orice culoare; doar banda închisă păstrează subtonul culorii", () => {
-  // A doua rundă premium (19 oct.): pe Smarald, fundalurile verzui arătau „verde de spital”.
-  const cald = (hex) => { const o = oklchDinHex(hex); return o.c <= 0.009 && (o.c < 0.002 || (o.h > 55 && o.h < 125)); };
-  for (const culoare of ["#0E3A2F", "#0B4249", "#5E121D", "#281B52", "#FFEB3B", "#808080"]) {
+test("„Silk & Velvet”: calcar cald pe deschis, același la orice culoare; banda bogată, cu subtonul culorii", () => {
+  // A treia rundă (19 oct.): a doua, cu banda la cromă 0,025, ieșise „plată, ștearsă".
+  for (const culoare of ["#083D27", "#0A3D44", "#4F0D1A", "#1F1646", "#FFEB3B", "#808080"]) {
     const { paleta } = paletaDinCuloare(getTemplate("claritate").paleta, culoare);
-    for (const rol of ["fundal", "fundalNuantat", "fundalRelief", "chenar", "text", "textSecundar", "textPeInchis", "textSecundarPeInchis"]) {
-      assert.ok(cald(paleta[rol]), `${culoare}: ${rol} = ${paleta[rol]} nu e neutru-cald`);
-    }
-    assert.equal(paleta.fundalNuantat, "#F8F7F4", "cardurile: alabastrul din referința proprietarului");
-    assert.equal(paleta.chenar, "#DFDEDB", "chenarul: piatră caldă");
-    assert.equal(paleta.accentPeInchis, "#CDC3AF", "cifrele și accentele de pe bandă: șampanie");
+    assert.equal(paleta.fundal, "#F2EFE9", "pagina: calcar deschis");
+    assert.equal(paleta.fundalNuantat, "#FAF8F5", "cardurile: fildeș mătăsos");
+    assert.equal(paleta.fundalRelief, "#E8E2D5", "relieful: calcar mai pronunțat");
+    assert.equal(paleta.chenar, "#E2DDD3", "chenarul: cald");
+    assert.equal(paleta.textPeInchis, "#FAF6F0");
+    assert.equal(paleta.textSecundarPeInchis, "#D6CFC4");
+    assert.equal(paleta.accentPeInchis, "#DFC59B", "cifrele și accentele de pe bandă: aur-șampanie");
+    for (const rol of ["text", "textSecundar"]) assert.ok(oklchDinHex(paleta[rol]).c <= 0.009, `${culoare}: ${rol} colorat`);
   }
-  // Banda închisă păstrează subtonul culorii (Smarald: verde-obsidian), nu devine neagră pură.
-  const banda = oklchDinHex(paletaDinCuloare(getTemplate("claritate").paleta, "#0E3A2F").paleta.fundalInchis);
-  assert.ok(banda.c > 0.015 && Math.abs(banda.h - oklchDinHex("#0E3A2F").h) < 8, JSON.stringify(banda));
+  // Banda NU mai e stinsă: la culorile cromatice păstrează croma (≥ 0,065, cât permite ecranul).
+  for (const [hex, minim] of [["#4F0D1A", 0.065], ["#1F1646", 0.065], ["#0A3463", 0.065], ["#3A0A26", 0.065]]) {
+    const c = oklchDinHex(paletaDinCuloare(getTemplate("claritate").paleta, hex).paleta.fundalInchis).c;
+    assert.ok(c >= minim - 0.003, `${hex}: banda are cromă ${c.toFixed(3)}`);
+  }
+  // O culoare temperată rămâne temperată (Eucalipt: verde mineral, nu neon).
+  const eucalipt = oklchDinHex(paletaDinCuloare(getTemplate("claritate").paleta, "#3A4637").paleta.fundalInchis);
+  assert.ok(eucalipt.c < 0.03, `Eucalipt: banda are cromă ${eucalipt.c.toFixed(3)}`);
 });
 
 test("„Claritate”: fără culori alese își păstrează albul pur; cu o culoare aleasă, cardurile capătă tenta fină (hotărârea proprietarului)", () => {
@@ -650,19 +676,27 @@ for (const sablon of listTemplates()) {
       const { paleta: p } = paletaDinCuloare(sablon.paleta, culoare);
       const asteptat = (nume, valoare) => { if (p[nume] !== valoare) gresite.push(`${culoare} ${nume}: ${p[nume]} în loc de ${valoare}`); };
 
-      // A doua rundă (19 oct.), în OKLCH. Banda închisă: obsidian — L 0,21, cromă ≤ 0,025, nuanța aleasă.
+      // A treia rundă (19 oct.), „Silk & Velvet". Banda: L 0,235, 82% din cromă; o culoare
+      // cromatică (C ≥ 0,05) păstrează cel puțin min(0,065, croma ei).
       const o = oklchDinHex(culoare);
-      asteptat("fundalInchis", hexDinOklch({ l: 0.21, c: Math.min(o.c, 0.025), h: o.h }));
-      // Suprafețele mari: neutru-calde (h 90). Cardurile alabastru, chenarul piatră caldă; fundalul
-      // paginii și relieful cu luminozitatea șablonului.
-      asteptat("fundalNuantat", hexDinOklch({ l: 0.975, c: 0.004, h: 90 }));
-      asteptat("chenar", hexDinOklch({ l: 0.9, c: 0.004, h: 90 }));
-      asteptat("fundal", hexDinOklch({ l: oklchDinHex(sablon.paleta.fundal).l, c: 0.004, h: 90 }));
-      asteptat("fundalRelief", hexDinOklch({ l: oklchDinHex(sablon.paleta.fundalRelief).l, c: 0.005, h: 90 }));
-      // Pe bandă: șampanie (garda nu mai are ce face: contrastul e ~10:1).
-      asteptat("accentPeInchis", hexDinOklch({ l: 0.82, c: 0.03, h: 85 }));
-      // Textele: cromă infimă, caldă (C ≤ 0,008, cu toleranța rotunjirii la 8 biți).
-      for (const rol of ["text", "textSecundar", "textPeInchis", "textSecundarPeInchis"]) {
+      const cromaBanda = o.c < 0.05 ? o.c * 0.82 : Math.max(o.c * 0.82, Math.min(0.065, o.c));
+      asteptat("fundalInchis", hexDinOklch({ l: 0.235, c: cromaBanda, h: o.h }));
+      // Mătasea benzii și a butonului: lumina 20%, baza 50%, umbra 90%, la 135°.
+      asteptat("fundalInchisMatase", `linear-gradient(135deg, ${luminaMatase(p.fundalInchis)} 20%, ${p.fundalInchis} 50%, ${umbraMatase(p.fundalInchis)} 90%)`);
+      asteptat("accentMatase", `linear-gradient(135deg, ${luminaMatase(p.accent)} 20%, ${p.accent} 50%, ${umbraMatase(p.accent)} 90%)`);
+      // Calcarul cald, exact valorile proprietarului.
+      asteptat("fundal", "#F2EFE9");
+      asteptat("fundalNuantat", "#FAF8F5");
+      asteptat("fundalRelief", "#E8E2D5");
+      asteptat("chenar", "#E2DDD3");
+      // Pe bandă: fildeș, mătase crudă, aur-șampanie (garda nu mai are ce face: banda e închisă).
+      asteptat("textPeInchis", "#FAF6F0");
+      asteptat("textSecundarPeInchis", "#D6CFC4");
+      asteptat("accentPeInchis", "#DFC59B");
+      // Textul alb al butonului se citește și pe lumina mătăsii lui.
+      if (contrast(p.accentText, luminaMatase(p.accent)) < 4.5) gresite.push(`${culoare} textul butonului pe lumina mătăsii`);
+      // Textele pe deschis: cromă infimă, caldă (C ≤ 0,008, cu toleranța rotunjirii la 8 biți).
+      for (const rol of ["text", "textSecundar"]) {
         if (oklchDinHex(p[rol]).c > 0.009) gresite.push(`${culoare} ${rol}: cromă ${oklchDinHex(p[rol]).c.toFixed(3)}`);
       }
 
@@ -687,7 +721,9 @@ for (const sablon of listTemplates()) {
       if (hsl.l > 50 && hslDinHex(p.accent).l > 28.6) gresite.push(`${culoare} buton: L ${hslDinHex(p.accent).l.toFixed(1)} > 28`);
       if (contrast(p.accentText, p.accent) < 4.5) gresite.push(`${culoare} textul butonului: ${contrast(p.accentText, p.accent).toFixed(2)}`);
       // O culoare închisă care se citește oricum rămâne EXACT cea aleasă.
-      if (hsl.l <= 50 && trece(culoare, [...deschise, "#FFFFFF"]) && p.accent !== culoare) gresite.push(`${culoare} buton schimbat degeaba: ${p.accent}`);
+      // (Din a treia rundă, „se citește” înseamnă și textul alb pe LUMINA mătăsii butonului.)
+      const seCiteste = trece(culoare, [...deschise, "#FFFFFF"]) && contrast("#FFFFFF", luminaMatase(culoare)) >= 4.6;
+      if (hsl.l <= 50 && seCiteste && p.accent !== culoare) gresite.push(`${culoare} buton schimbat degeaba: ${p.accent}`);
     }
     assert.deepEqual(gresite.slice(0, 10), [], `${gresite.length} abateri:\n  ${gresite.slice(0, 10).join("\n  ")}`);
   });
@@ -707,16 +743,16 @@ test("Petrol și Smarald: linkurile pe 32–38% nu s-ar citi — se întunecă e
   }
 });
 
-test("cele 12 culori premium: exact numele și codurile proprietarului, în ordinea lui; Safir e cea propusă", () => {
+test("cele 12 culori „Silk & Velvet”: exact numele și codurile proprietarului, în ordinea lui; Safir e cea propusă", () => {
   assert.deepEqual(
     PRESETURI_CULOARE.map((p) => `${p.nume} ${p.hex}`),
     [
-      "Arămiu #6E2C1B", "Burgundy #5E121D", "Ametist #5A2241", "Aubergine #38142C",
-      "Indigo #281B52", "Bleumarin #0F1E36", "Safir #0D3B66", "Petrol #0B4249",
-      "Smarald #0E3A2F", "Chiparos #2C3522", "Espresso #362218", "Antracit #222930",
+      "Rosewood #5C1D24", "Bordeaux #4F0D1A", "Aubergine #3A0A26", "Plum #42163B",
+      "Indigo #1F1646", "Bleumarin #0D1B38", "Safir #0A3463", "Teal #0A3D44",
+      "Smarald #083D27", "Eucalipt #3A4637", "Oliv #3B3E19", "Espresso #2E1D14",
     ],
   );
-  assert.equal(CULOARE_PROPUSA, "#0D3B66");
+  assert.equal(CULOARE_PROPUSA, "#0A3463");
   assert.equal(PRESETURI_CULOARE.find((p) => p.hex === CULOARE_PROPUSA)?.nume, "Safir");
   // Șablonul Claritate își păstrează culoarea: site-urile fără culori alese nu se schimbă.
   assert.equal(getTemplate("claritate").paleta.accent, "#1B5C99");
@@ -798,8 +834,9 @@ test("linkurile din text și hover-ul pe butoane: legate de rolul nou, cu rezerv
 test("mostrele culorilor gata alese: trei fâșii (50% banda închisă, 30% butoane, 20% linkuri), calculate ca pe site", () => {
   const ecran = citeste("src/app/dashboard/aspect/formular.tsx");
   assert.ok(ecran.includes("paleta: paletaDinCuloare(sablon.paleta, preset.hex).paleta"), "aceeași funcție ca pe site");
-  assert.ok(ecran.includes('style={{ flex: "50 1 0", background: preset.paleta.fundalInchis }}'));
-  assert.ok(ecran.includes('style={{ flex: "30 1 0", background: preset.paleta.accent }}'));
+  // Banda și butonul arătate cu mătasea lor, ca pe site.
+  assert.ok(ecran.includes('style={{ flex: "50 1 0", background: preset.paleta.fundalInchisMatase ?? preset.paleta.fundalInchis }}'));
+  assert.ok(ecran.includes('style={{ flex: "30 1 0", background: preset.paleta.accentMatase ?? preset.paleta.accent }}'));
   assert.ok(ecran.includes('style={{ flex: "20 1 0", background: preset.paleta.accentInteractiv }}'));
   // Fundalul cardurilor e același la toate culorile, deci nu mai are ce căuta în mostră.
   assert.ok(!ecran.includes("background: preset.paleta.fundalNuantat"));
@@ -843,8 +880,7 @@ test("banda cu servicii a „Clarității”: piatră caldă pe un site cu culor
   for (const culoare of ["#0E3A2F", "#0B4249", "#5E121D", "#FFEB3B"]) {
     const p = paletaDinCuloare(getTemplate("claritate").paleta, culoare).paleta;
     assert.equal(p.fundalBanda, p.fundalRelief, culoare);
-    const o = oklchDinHex(p.fundalBanda);
-    assert.ok(o.c <= 0.009 && o.h > 55 && o.h < 125, `${culoare}: ${p.fundalBanda} nu e neutru-cald`);
+    assert.equal(p.fundalBanda, "#E8E2D5", `${culoare}: banda cu servicii pe calcar`);
     // Textul discret și steaua (accentul) se citesc pe ea.
     assert.ok(contrast(p.textSecundar, p.fundalBanda) >= 4.5 && contrast(p.accent, p.fundalBanda) >= 4.5, culoare);
   }
@@ -857,4 +893,46 @@ test("banda cu servicii a „Clarității”: piatră caldă pe un site cu culor
   assert.ok(citeste("src/components/site/sections/banda-servicii.tsx").includes(
     '"var(--t-fundal-banda, color-mix(in oklab, var(--t-accent) 8%, var(--t-fundal)))"',
   ));
+});
+
+test("mătasea („Silk & Velvet”): pe benzi, subsol și butoanele pline — DOAR ca fundal, doar cu culori alese", () => {
+  // Niciun șablon n-are mătase: fără culori alese, totul cade pe culoarea plină de până acum.
+  for (const sablon of listTemplates()) {
+    for (const rol of ["fundalInchisMatase", "accentMatase"]) assert.equal(rol in sablon.paleta, false, `${sablon.nume}: ${rol}`);
+    assert.equal(templateStyle(sablon)["--t-fundal-inchis-matase"], undefined);
+    assert.equal(templateStyle(sablon)["--t-accent-matase"], undefined);
+  }
+  const ales = getTemplate("claritate", { mod: "auto", principala: "#083D27" });
+  assert.equal(templateStyle(ales)["--t-fundal-inchis-matase"], ales.paleta.fundalInchisMatase);
+  assert.equal(templateStyle(ales)["--t-accent-matase"], ales.paleta.accentMatase);
+
+  const sectiune = citeste("src/components/site/section.tsx");
+  assert.ok(sectiune.includes('inchis: "var(--t-fundal-inchis-matase, var(--t-fundal-inchis))",'), "banda: mătase cu rezervă pe culoarea plină");
+  assert.equal((sectiune.match(/: "var\(--t-accent-matase\)",/g) ?? []).length, 3, "butoanele pe deschis: mătase FĂRĂ rezervă");
+  assert.ok(sectiune.includes('["--s-buton-matase" as string]: BUTON_MATASE[tone]'));
+  // `--s-buton-fundal` e și culoare de CHENAR (orele din calendar): acolo un gradient e nevalid și
+  // chenarul ar dispărea. Deci harta lui nu are voie să atingă mătasea.
+  const butonFundal = sectiune.slice(sectiune.indexOf("const BUTON_FUNDAL"), sectiune.indexOf("};", sectiune.indexOf("const BUTON_FUNDAL")));
+  assert.ok(butonFundal.length > 20 && !butonFundal.includes("matase"), butonFundal);
+  assert.ok(citeste("src/components/site/footer.tsx").includes('background: "var(--t-fundal-inchis-matase, var(--t-fundal-inchis))"'));
+  for (const cale of ["src/components/site/sections/hero.tsx", "src/components/site/sections/about-teaser.tsx", "src/components/site/form-parts.tsx"]) {
+    assert.ok(citeste(cale).includes('background: "var(--s-buton-matase, var(--s-buton-fundal))"'), cale);
+  }
+  // Gradientul nu ajunge NICIODATĂ într-o culoare de chenar sau de text: orele din calendar își
+  // țin chenarul pe `--s-buton-fundal`, care rămâne culoare plină.
+  for (const cale of ["src/components/site/calendar.tsx", "src/components/site/sections/programare-rapida.tsx", "src/app/programare/formular.tsx"]) {
+    const text = citeste(cale);
+    assert.ok(text.includes('"1px solid var(--s-buton-fundal)"'), cale);
+    assert.ok(!text.includes("matase"), `${cale}: mătasea nu are ce căuta în chenare`);
+  }
+  assert.ok(!/--t-accent\b[^-]/.test(templateStyle(ales)["--t-accent-matase"]), "gradientul e făcut din culori, nu din variabile");
+
+  // Modul manual: mătasea se reface din culorile FINALE.
+  const manual = paletaEfectiva(getTemplate("claritate").paleta, citesteAspectCulori({ mod: "manual", principala: "#083D27", manual: { fundalInchis: "#102030", accent: "#5C1D24" } }));
+  assert.ok(manual.fundalInchisMatase.includes(" #102030 50%"), manual.fundalInchisMatase);
+  assert.ok(manual.accentMatase.includes(" #5C1D24 50%"), manual.accentMatase);
+  // Avertismentele includ și partea luminoasă a benzii (unde contrastul e cel mai mic).
+  const nume = perechiDeContrast(manual).map((x) => x.nume);
+  assert.ok(nume.includes("Textul de pe fundalul închis, pe partea luminoasă a benzii"), nume.join(" | "));
+  assert.ok(nume.includes("Textul de pe butoane, pe partea luminoasă a butonului"));
 });

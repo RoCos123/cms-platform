@@ -326,7 +326,7 @@ export function AboutTeaser({
                 marginTop: "32px",
                 paddingInline: "26px",
                 borderRadius: "var(--t-raza-buton)",
-                background: "var(--s-buton-fundal)",
+                background: "var(--s-buton-matase, var(--s-buton-fundal))",
                 color: "var(--s-buton-text)",
                 fontSize: "15px",
                 fontWeight: 600,

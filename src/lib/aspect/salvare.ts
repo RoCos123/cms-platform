@@ -8,24 +8,24 @@ import { ROLURI_MANUALE, type AspectCulori, type RolManual } from "./culori";
  */
 
 /**
- * Culorile gata alese — paleta „premium" (19 oct. 2026, cerută de proprietar: luminozitate
- * scăzută, saturație adâncă, „Quiet Luxury"). Numele și codurile sunt exact cele date de el.
- * Fiind toate închise, apar pe site exact așa (proba `aspect-culori` o verifică pe toate
- * cinci șabloanele); doar linkurile lor se calculează separat (`accentInteractiv`).
+ * Culorile gata alese — „Silk & Velvet" (a treia rundă, 19 oct. 2026): pigment pur, saturat și
+ * adânc, după referințele vizuale ale proprietarului. Numele și codurile sunt exact cele date de el.
+ * Fiind toate închise, apar pe butoane exact așa (proba `aspect-culori` o verifică pe toate cinci
+ * șabloanele); linkurile, banda și mătasea lor se calculează din ele.
  */
 export const PRESETURI_CULOARE = [
-  { nume: "Arămiu", hex: "#6E2C1B" },
-  { nume: "Burgundy", hex: "#5E121D" },
-  { nume: "Ametist", hex: "#5A2241" },
-  { nume: "Aubergine", hex: "#38142C" },
-  { nume: "Indigo", hex: "#281B52" },
-  { nume: "Bleumarin", hex: "#0F1E36" },
-  { nume: "Safir", hex: "#0D3B66" },
-  { nume: "Petrol", hex: "#0B4249" },
-  { nume: "Smarald", hex: "#0E3A2F" },
-  { nume: "Chiparos", hex: "#2C3522" },
-  { nume: "Espresso", hex: "#362218" },
-  { nume: "Antracit", hex: "#222930" },
+  { nume: "Rosewood", hex: "#5C1D24" },
+  { nume: "Bordeaux", hex: "#4F0D1A" },
+  { nume: "Aubergine", hex: "#3A0A26" },
+  { nume: "Plum", hex: "#42163B" },
+  { nume: "Indigo", hex: "#1F1646" },
+  { nume: "Bleumarin", hex: "#0D1B38" },
+  { nume: "Safir", hex: "#0A3463" },
+  { nume: "Teal", hex: "#0A3D44" },
+  { nume: "Smarald", hex: "#083D27" },
+  { nume: "Eucalipt", hex: "#3A4637" },
+  { nume: "Oliv", hex: "#3B3E19" },
+  { nume: "Espresso", hex: "#2E1D14" },
 ] as const;
 
 /**
@@ -33,7 +33,7 @@ export const PRESETURI_CULOARE = [
  * în câmp: nu se salvează și nu schimbă site-ul până nu apasă omul pe ceva. Șablonul Claritate
  * își păstrează propria culoare (`#1B5C99`), deci site-urile fără culori alese rămân neatinse.
  */
-export const CULOARE_PROPUSA = "#0D3B66";
+export const CULOARE_PROPUSA = "#0A3463";
 
 export type RezultatValidare = { ok: true; culori: AspectCulori } | { ok: false; mesaj: string };
 

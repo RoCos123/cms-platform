@@ -79,6 +79,9 @@ export function templateStyle(template: Template): CSSProperties {
     "--t-accent-interactiv": p.accentInteractiv,
     // La fel, doar în paleta calculată: fundalul benzii cu servicii (vezi `banda-servicii.tsx`).
     "--t-fundal-banda": p.fundalBanda,
+    // Mătasea (gradiente, doar ca `background`): banda închisă și butoanele pline.
+    "--t-fundal-inchis-matase": p.fundalInchisMatase,
+    "--t-accent-matase": p.accentMatase,
     // Doar „Apropiere" le pune; la restul rămân nedefinite, iar componentele
     // care le folosesc cad pe forma dinainte prin `var(--…, implicit)`.
     "--t-accent-cald": p.accentCald,

@@ -96,7 +96,8 @@ export function SiteFooter({ data }: { data: SiteFooterData }) {
   return (
     <footer
       style={{
-        background: "var(--t-fundal-inchis)",
+        // Mătasea benzii, pe un site cu culori alese; altfel culoarea plină, ca până acum.
+        background: "var(--t-fundal-inchis-matase, var(--t-fundal-inchis))",
         color: "var(--t-text-pe-inchis)",
         paddingBlock: "clamp(56px, 7vw, 88px) 40px",
       }}

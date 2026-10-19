@@ -37,7 +37,7 @@ export function stilButonTrimite(seLucreaza: boolean): CSSProperties {
     paddingInline: "30px",
     border: "none",
     borderRadius: "var(--t-raza-buton)",
-    background: "var(--s-buton-fundal)",
+    background: "var(--s-buton-matase, var(--s-buton-fundal))",
     color: "var(--s-buton-text)",
     font: "inherit",
     fontSize: "16px",

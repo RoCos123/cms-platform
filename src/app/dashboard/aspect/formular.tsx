@@ -306,8 +306,14 @@ export function FormularAspect({
                               linkurile (20%), exact cum ies pe site. Fundalul cardurilor nu e aici:
                               e același alabastru la toate culorile. */}
                           <span aria-hidden className="flex h-8 w-full gap-0.5">
-                            <span className="rounded-sm" style={{ flex: "50 1 0", background: preset.paleta.fundalInchis }} />
-                            <span className="rounded-sm" style={{ flex: "30 1 0", background: preset.paleta.accent }} />
+                            <span
+                              className="rounded-sm"
+                              style={{ flex: "50 1 0", background: preset.paleta.fundalInchisMatase ?? preset.paleta.fundalInchis }}
+                            />
+                            <span
+                              className="rounded-sm"
+                              style={{ flex: "30 1 0", background: preset.paleta.accentMatase ?? preset.paleta.accent }}
+                            />
                             <span
                               className="rounded-sm"
                               style={{ flex: "20 1 0", background: preset.paleta.accentInteractiv }}

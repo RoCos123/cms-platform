@@ -404,6 +404,47 @@ arătat proprietarului ÎNAINTE să se construiască).
     În modul manual, banda se mută odată cu relieful. Probă nouă + 4 stricări prinse.
     *De știut pentru când „Aspect" se deschide și pe alte șabloane:* acolo banda NU e discretă, ci plină,
     pe culoarea butonului (`var(--t-accent)`) — o fâșie subțire pe toată lățimea, în culoarea aleasă.
+- **A TREIA RUNDĂ: „SILK & VELVET" (19 oct. 2026).** Proprietarul: banda obsidian cu cromă 0,025 „a
+  ucis tot pigmentul, arată plat/șters"; vrea culori „cu pigment pur, saturat și adânc, ca mătasea sau
+  catifeaua iluminată", pe calcar cald, cu accente de aur-șampanie — după referințe vizuale proprii.
+  Valorile i-au fost arătate în chat; e PE BRANCH până la „fă pe master". Ce s-a schimbat:
+  - **12 culori noi**, exact cum le-a dat: Rosewood `#5C1D24`, Bordeaux `#4F0D1A`, Aubergine `#3A0A26`,
+    Plum `#42163B`, Indigo `#1F1646`, Bleumarin `#0D1B38`, Safir `#0A3463` (propus în câmp), Teal
+    `#0A3D44`, Smarald `#083D27`, Eucalipt `#3A4637`, Oliv `#3B3E19`, Espresso `#2E1D14` (Antracit a ieșit).
+  - **Fundalurile deschise: calcar cald, fix, la orice culoare și orice șablon** — pagina `#F2EFE9`,
+    cardurile `#FAF8F5`, relieful (și banda cu servicii) `#E8E2D5`, chenarul `#E2DDD3`.
+  - **Banda închisă: bogată** — OKLCH L 0,235, 82% din croma culorii; o culoare cromatică (C ≥ 0,05)
+    păstrează cel puțin min(0,065, croma ei). *Excepțiile mele, spuse proprietarului:* Eucalipt și
+    Espresso sunt culori temperate (C ~0,03) — forțate la 0,065 ar fi ieșit verde-neon și ruginiu, deci
+    rămân temperate; verdele și teal-ul foarte închise nu pot avea C 0,065 în sRGB (ecranul nu le are),
+    deci croma se oprește la cât se afișează (Teal ~0,040, Smarald ~0,053).
+  - **MĂTASEA:** banda și butoanele pline sunt un gradient la 135° — lumina 20% (L + 0,07, C + 0,02),
+    baza 50%, umbra 90% (L − 0,05). Roluri NOI în paletă, `fundalInchisMatase` și `accentMatase`
+    (gradiente CSS, nu culori), variabilele `--t-fundal-inchis-matase` / `--t-accent-matase` și, în
+    secțiune, `--s-buton-matase`. Folosite DOAR ca `background`: benzile `inchis` (`section.tsx`),
+    subsolul (`footer.tsx`), butoanele pline din hero, „Despre mine" și formulare. **NU** în
+    `--s-buton-fundal` — acela e și culoare de chenar (orele din calendar), unde un gradient e nevalid
+    și chenarul ar dispărea (o probă păzește asta). Fără culori alese, totul cade pe culoarea plină.
+    La hover, butonul devine plin, pe culoarea linkurilor. Neaplicată (încă) pe cartonașele mici închise
+    din „Contact", „Despre mine" și meniul de pe telefon (`contact.tsx:160`, `about-teaser.tsx:252`,
+    `header.tsx:219`) — rămân pline, aceeași culoare a benzii.
+  - **Pe bandă:** fildeș `#FAF6F0`, mătase crudă `#D6CFC4`, aur-șampanie `#DFC59B` (cifre, accente,
+    linkurile din subsol). Garda de contrast verifică totul și pe LUMINA mătăsii (cea mai luminoasă
+    parte); la fel textul alb al butonului pe lumina butonului (un verde-măsliniu ca `#4B6E0B` se
+    întunecă de aceea cu o treaptă).
+  - **Modul manual:** mătasea se reface din culorile finale; avertismentele includ „…pe partea
+    luminoasă a benzii / a butonului".
+  - **Smarald pe Claritate:** bandă `#003923 → #002515 → #00180C`, buton `#035335 → #083D27 →
+    #002F1C`, linkuri `#007245`, text `#151310` / `#565450`. Contrast minim pe bandă (pe lumină): 7,8
+    (șampanie); alb pe lumina butonului 9,2.
+  - **Probe:** `aspect-culori.proba.mjs` 58 de teste (regulile cu numerele lui, pe 386 de culori × 5
+    șabloane, inclusiv perechile pe lumina mătăsii); 15 stricări (banda stinsă / mai deschisă, Eucalipt
+    forțat, lumina / umbra / ordinea gradientului, garda butonului pe lumină, calcarul, șampania veche,
+    banda / subsolul fără mătase, mătasea în `--s-buton-fundal`, manualul cu mătase veche, Safir vechi),
+    toate prinse — una (mătasea în chenare) abia după ce am adăugat paza ei. Tot: 499. **Browser**
+    (stiva reală, `ana.test` TEMPORAR în poartă): banda și subsolul au gradientul exact, butonul la fel,
+    la hover devine plin `#007245`; fundalurile `#F2EFE9 #FAF8F5 #E8E2D5`; cifre `#DFC59B`; fără culori
+    alese — nicio mătase; cele 12 mostre în ordine.
 - **Unde stau datele:** `site_settings.brand.aspect.culori` = `{mod, principala, manual, asumat}`;
   fără migrare, fără SQL. Fonturile vor sta lângă ele, în `brand.aspect`.
 - **Cum ajung pe site:** `getTemplate(id, culori)` întoarce EXACT obiectul șablonului când nu sunt

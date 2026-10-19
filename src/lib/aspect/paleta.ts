@@ -18,19 +18,24 @@ import { contrast, hexDinHsl, hexDinOklch, hslDinHex, oklchDinHex, type Hsl, typ
  *   L între 32 și 38%. La un gri (S < 5%) nuanța nu înseamnă nimic — HSL îi dă 0, adică roșu —,
  *   deci griul rămâne gri.
  *
- * SUPRAFEȚELE MARI SUNT NEUTRE (a doua rundă: pe Smarald, prima ieșise „tablă școlară / verde de
- * spital"). Un verde sau un albastru arată scump pe hârtie caldă, nu pe verde-pal; iar o bandă pe
- * toată lățimea nu trebuie să „strige" culoarea, ci să fie obsidian cu o reflexie din ea. Toate
- * în OKLCH, fiindcă lângă alb și lângă negru procentele HSL înșală (referința proprietarului,
- * `#F8F7F4`, are în HSL S = 22%, dar cromă OKLCH abia 0,004):
+ * SUPRAFEȚELE DESCHISE SUNT CALCAR CALD, CELE ÎNCHISE MĂTASE (a treia rundă, „Silk & Velvet",
+ * 19 oct. 2026). Prima rundă ieșise „verde de spital"; a doua — banda obsidian, cromă 0,025 —
+ * „plată, ștearsă, fără viață". Acum, după referințele vizuale ale proprietarului:
  *
- * • fundalul paginii și relieful — luminozitatea șablonului, neutru-cald (C 0,004–0,005, h 90);
- * • `fundalNuantat` (carduri) — alabastru `#F8F7F4`; `chenar` — piatră caldă `#DFDEDB`;
- *   aceleași pentru orice culoare aleasă;
- * • `fundalInchis` (benzi, subsol) — L 0,21, cromă cel mult 0,025, nuanța aleasă;
- * • textele — gri-cărbune cald (C ≤ 0,008) pe deschis, alb cald și argintiu cald pe închis;
- * • `accentPeInchis` (cifrele, linkurile și ghilimelele de pe bandă) — șampanie `#CDC3AF`;
- * • `fundalBanda` (banda cu servicii a „Clarității") — aceeași piatră caldă ca relieful.
+ * • fundalurile deschise: calcar cald, aceleași pentru orice culoare — pagina `#F2EFE9`, cardurile
+ *   (fildeș mătăsos) `#FAF8F5`, relieful `#E8E2D5`, chenarul `#E2DDD3`;
+ * • `fundalInchis` (benzi, subsol): culoarea aleasă, BOGATĂ — L 0,235 și 82% din cromă (minim
+ *   0,065 la culorile cromatice; o culoare temperată, ca Eucalipt sau Espresso, rămâne temperată);
+ * • MĂTASEA: banda și butoanele nu sunt un dreptunghi plat, ci un gradient la 135° — lumina (sus-
+ *   stânga, 20%: L + 0,07, C + 0,02), baza (50%), umbra (jos-dreapta, 90%: L − 0,05). Gradientul
+ *   stă în roluri separate (`fundalInchisMatase`, `accentMatase`), folosite DOAR ca `background`;
+ *   culoarea plină rămâne pentru chenare, text și verificările de contrast;
+ * • pe bandă: fildeș `#FAF6F0`, mătase crudă `#D6CFC4` și aur-șampanie `#DFC59B` (cifrele,
+ *   accentele, linkurile din subsol);
+ * • textele pe deschis: gri-cărbune cald (cromă 0,006).
+ *
+ * Unde ecranul nu are atâta culoare (un verde sau un teal foarte închis nu poate avea cromă 0,065 în
+ * sRGB), croma se oprește singură la cât se poate afișa.
  *
  * LIZIBILITATEA E GARANTATĂ ȘI CÂȘTIGĂ MEREU (hotărârea proprietarului, 19 oct.). După ce
  * fiecare rol își primește ținta, se verifică pe fiecare pereche text–fundal care apare pe ecran
@@ -63,18 +68,37 @@ const PRAG_GRI = 5;
 export const REGULI_PREMIUM = {
   accent: { pragLuminos: 50, luminozitate: 28 },
   accentInteractiv: { saturatieInPlus: 12, saturatieMaxima: 85, luminozitate: [32, 38] },
-  /** Nuanța „hârtie / alabastru / piatră caldă" a suprafețelor mari. */
-  nuantaCalda: 90,
-  fundal: { croma: 0.004 },
-  fundalRelief: { croma: 0.005 },
-  fundalNuantat: { l: 0.975, croma: 0.004 },
-  chenar: { l: 0.9, croma: 0.004 },
-  fundalInchis: { l: 0.21, cromaMaxima: 0.025 },
-  text: { croma: 0.006 },
-  textPeInchis: { l: 0.96, croma: 0.005 },
-  textSecundarPeInchis: { l: 0.82, croma: 0.005 },
-  accentPeInchis: { l: 0.82, croma: 0.03, h: 85 },
+  /** Calcarul cald: aceleași pentru orice culoare aleasă (referințele proprietarului). */
+  fundal: "#F2EFE9",
+  fundalNuantat: "#FAF8F5",
+  fundalRelief: "#E8E2D5",
+  chenar: "#E2DDD3",
+  /** Banda închisă: culoarea aleasă, bogată (OKLCH). */
+  fundalInchis: { l: 0.235, procentCroma: 0.82, cromaMinima: 0.065, pragCromatic: 0.05 },
+  /** Mătasea (OKLCH): cât urcă lumina și cât coboară umbra față de bază. */
+  matase: { lumina: { l: 0.07, c: 0.02 }, umbra: { l: -0.05 } },
+  /** Pe bandă: fildeș, mătase crudă, aur-șampanie. */
+  textPeInchis: "#FAF6F0",
+  textSecundarPeInchis: "#D6CFC4",
+  accentPeInchis: "#DFC59B",
+  /** Textele pe deschis: gri-cărbune cald (OKLCH, nuanța calcarului). */
+  text: { croma: 0.006, h: 80 },
 } as const;
+
+/** Cele trei faze ale mătăsii pentru o culoare, plus gradientul CSS gata de pus ca `background`. */
+export type Matase = { lumina: string; baza: string; umbra: string; css: string };
+
+/**
+ * Mătasea unei culori: lumina (sus-stânga), baza, umbra (jos-dreapta), la 135°. Un gri rămâne gri
+ * (croma nu urcă unde nuanța n-are sens).
+ */
+export function matase(hex: string): Matase {
+  const o = oklchDinHex(hex);
+  const r = REGULI_PREMIUM.matase;
+  const lumina = hexDinOklch({ l: Math.min(1, o.l + r.lumina.l), c: o.c < 0.01 ? o.c : o.c + r.lumina.c, h: o.h });
+  const umbra = hexDinOklch({ l: Math.max(0, o.l + r.umbra.l), c: o.c, h: o.h });
+  return { lumina, baza: hex, umbra, css: `linear-gradient(135deg, ${lumina} 20%, ${hex} 50%, ${umbra} 90%)` };
+}
 
 export type RezultatPaleta = {
   paleta: TemplatePalette;
@@ -98,10 +122,12 @@ function ajusteaza(
   fundaluri: string[],
   directie: "inchide" | "deschide",
   tinta = TINTA,
+  /** O condiție în plus, tot monotonă (ex.: textul alb să se citească și pe lumina mătăsii). */
+  siConditia: (hex: string) => boolean = () => true,
 ): string {
   const trece = (l: number) => {
     const hex = hexDinOklch({ ...culoare, l });
-    return fundaluri.every((fundal) => contrast(hex, fundal) >= tinta);
+    return fundaluri.every((fundal) => contrast(hex, fundal) >= tinta) && siConditia(hex);
   };
 
   if (trece(culoare.l)) return hexDinOklch(culoare);
@@ -148,56 +174,59 @@ export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): Rezu
   const aleasa = oklchDinHex(culoare);
   const hsl = hslDinHex(culoare);
   const r = REGULI_PREMIUM;
-  const cald = (l: number, c: number, h: number = r.nuantaCalda): Oklch => ({ l, c, h });
 
-  // 1. Suprafețele mari: neutru-calde, aceleași pentru orice culoare aleasă. Fundalul paginii și
-  //    relieful păstrează luminozitatea șablonului (o pagină mai închisă decât cardurile rămâne).
-  const fundal = hexDinOklch(cald(oklchDinHex(sablon.fundal).l, r.fundal.croma));
-  const fundalRelief = hexDinOklch(cald(oklchDinHex(sablon.fundalRelief).l, r.fundalRelief.croma));
-  const fundalNuantat = hexDinOklch(cald(r.fundalNuantat.l, r.fundalNuantat.croma));
-  const chenar = hexDinOklch(cald(r.chenar.l, r.chenar.croma));
-  //    Banda închisă: obsidian cu subtonul culorii alese (un gri rămâne gri: cromă mai mică).
-  const fundalInchis = hexDinOklch({
-    l: r.fundalInchis.l,
-    c: Math.min(aleasa.c, r.fundalInchis.cromaMaxima),
-    h: aleasa.h,
-  });
+  // 1. Fundalurile deschise: calcarul cald, același pentru orice culoare.
+  const { fundal, fundalNuantat, fundalRelief, chenar } = r;
+  //    Banda închisă: culoarea aleasă, bogată. O culoare cromatică păstrează cel puțin 0,065 din
+  //    cromă (fără să depășească croma ei); una temperată rămâne temperată.
+  const ri = r.fundalInchis;
+  const cromaBanda = aleasa.c < ri.pragCromatic
+    ? aleasa.c * ri.procentCroma
+    : Math.max(aleasa.c * ri.procentCroma, Math.min(ri.cromaMinima, aleasa.c));
+  const fundalInchis = hexDinOklch({ l: ri.l, c: cromaBanda, h: aleasa.h });
+  const banda = matase(fundalInchis);
   const deschise = [fundal, fundalNuantat, fundalRelief];
+  //    Ce stă pe bandă trebuie să se citească peste TOATĂ mătasea: și pe baza ei, și pe lumină.
+  const peBanda = [fundalInchis, banda.lumina];
 
-  // 2. Textele: gri-cărbune cald pe deschis (luminozitatea șablonului), alb și argintiu cald pe
-  //    închis — apoi garda, doar cât trebuie ca să treacă pragul pe cel mai greu fundal.
-  const text = ajusteaza(cald(oklchDinHex(sablon.text).l, r.text.croma), deschise, "inchide");
-  const textSecundar = ajusteaza(cald(oklchDinHex(sablon.textSecundar).l, r.text.croma), deschise, "inchide");
-  const textPeInchis = ajusteaza(cald(r.textPeInchis.l, r.textPeInchis.croma), [fundalInchis], "deschide");
-  const textSecundarPeInchis = ajusteaza(
-    cald(r.textSecundarPeInchis.l, r.textSecundarPeInchis.croma),
-    [fundalInchis],
-    "deschide",
-  );
+  // 2. Textele: gri-cărbune cald pe deschis (luminozitatea șablonului); fildeș și mătase crudă pe
+  //    bandă — apoi garda, doar cât trebuie ca să treacă pragul pe cel mai greu fundal.
+  const cald = (l: number): Oklch => ({ l, c: r.text.croma, h: r.text.h });
+  const text = ajusteaza(cald(oklchDinHex(sablon.text).l), deschise, "inchide");
+  const textSecundar = ajusteaza(cald(oklchDinHex(sablon.textSecundar).l), deschise, "inchide");
+  const textPeInchis = ajusteaza(oklchDinHex(r.textPeInchis), peBanda, "deschide");
+  const textSecundarPeInchis = ajusteaza(oklchDinHex(r.textSecundarPeInchis), peBanda, "deschide");
 
   // 3. Accentul (butoane, accente mari). O culoare foarte deschisă coboară întâi la L 28%
-  //    (regula proprietarului); apoi garda: textul ALB de pe buton trebuie să se citească pe
-  //    el, iar accentul scris ca text (cuvintele colorate din titluri) pe fundalurile deschise.
+  //    (regula proprietarului); apoi garda: textul ALB de pe buton se citește pe el ȘI pe lumina
+  //    mătăsii lui, iar accentul scris ca text (cuvintele colorate din titluri) pe fundalurile deschise.
   const ra = r.accent;
   const pornire = hsl.l > ra.pragLuminos ? hexDinHsl({ ...hsl, l: ra.luminozitate }) : culoare;
-  const accent = ajusteaza(oklchDinHex(pornire), [...deschise, "#FFFFFF"], "inchide");
+  const accent = ajusteaza(
+    oklchDinHex(pornire),
+    [...deschise, "#FFFFFF"],
+    "inchide",
+    TINTA,
+    (hex) => contrast("#FFFFFF", matase(hex).lumina) >= TINTA,
+  );
+  const butonMatase = matase(accent);
 
   // Textul de pe butonul plin: alb (garda de mai sus îl asigură); dacă șablonul are alt text
-  // deschis care trece și el, îl păstrează pe al șablonului.
-  const accentText = [sablon.accentText, "#FFFFFF"].find((candidat) => contrast(candidat, accent) >= TINTA)
-    ?? "#FFFFFF";
+  // deschis care trece și el, peste toată mătasea, îl păstrează pe al șablonului.
+  const accentText = [sablon.accentText, "#FFFFFF"].find(
+    (candidat) => contrast(candidat, accent) >= TINTA && contrast(candidat, butonMatase.lumina) >= TINTA,
+  ) ?? "#FFFFFF";
 
   // 4. Linkurile și hover-ul pe butoane.
   const accentInteractiv = accentInteractivDin(culoare, deschise, accentText);
 
-  // Pe banda închisă: șampanie — nu o variantă pastelată a culorii („mentolat" pe Smarald).
-  const rp = r.accentPeInchis;
-  const accentPeInchis = ajusteaza(cald(rp.l, rp.croma, rp.h), [fundalInchis], "deschide");
+  // Pe bandă: aur-șampanie — nu o variantă pastelată a culorii („mentolat" pe Smarald).
+  const accentPeInchis = ajusteaza(oklchDinHex(r.accentPeInchis), peBanda, "deschide");
 
   // Roșul erorilor nu urmează culoarea aleasă (o eroare verde ar fi o minciună), dar trebuie
   // să rămână lizibil pe fundalurile noi.
   const eroare = ajusteaza(oklchDinHex(sablon.eroare), deschise, "inchide");
-  const eroarePeInchis = ajusteaza(oklchDinHex(sablon.eroarePeInchis), [fundalInchis], "deschide");
+  const eroarePeInchis = ajusteaza(oklchDinHex(sablon.eroarePeInchis), peBanda, "deschide");
 
   const paleta: TemplatePalette = {
     fundal,
@@ -216,6 +245,9 @@ export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): Rezu
     // (pe Smarald, amestecul de 8% ieșea tot gri-verzui). Textul și steaua ei sunt deja verificate
     // pe relief, prin garda de mai sus.
     fundalBanda: fundalRelief,
+    // Mătasea: gradientele, folosite DOAR ca `background` (banda și butoanele pline).
+    fundalInchisMatase: banda.css,
+    accentMatase: butonMatase.css,
     eroare,
     eroarePeInchis,
     chenar,
@@ -310,6 +342,23 @@ export function perechiDeContrast(paleta: TemplatePalette): PerecheContrast[] {
 
   for (const [rolText, numeText] of TEXTE_PE_INCHIS) {
     lista.push({ nume: numeText, text: paleta[rolText], fundal: paleta.fundalInchis, minim: PRAG_CONTRAST });
+  }
+
+  // Mătasea: ce stă pe bandă și textul butoanelor trebuie să se citească și pe partea LUMINOASĂ a
+  // gradientului, nu doar pe bază — doar unde există mătasea (paletele calculate și cele manuale).
+  if (paleta.fundalInchisMatase) {
+    const lumina = matase(paleta.fundalInchis).lumina;
+    for (const [rolText, numeText] of TEXTE_PE_INCHIS) {
+      lista.push({ nume: `${numeText}, pe partea luminoasă a benzii`, text: paleta[rolText], fundal: lumina, minim: PRAG_CONTRAST });
+    }
+  }
+  if (paleta.accentMatase) {
+    lista.push({
+      nume: "Textul de pe butoane, pe partea luminoasă a butonului",
+      text: paleta.accentText,
+      fundal: matase(paleta.accent).lumina,
+      minim: PRAG_CONTRAST,
+    });
   }
 
   // Linkurile și hover-ul — doar unde există rolul (paletele calculate, nu șabloanele).

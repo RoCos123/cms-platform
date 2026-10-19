@@ -21,6 +21,8 @@ const CUNOSCUTE = new Set([
   "--s-buton-fundal",
   // Fundalul butonului plin la hover (paleta premium, 19 oct. 2026); îl citește `.buton-plin` din globals.css.
   "--s-buton-hover",
+  // Fundalul mătăsos al butonului plin (gradient; paleta premium, a treia rundă, 19 oct. 2026).
+  "--s-buton-matase",
   "--s-buton-text",
   "--s-eroare",
   // Linkurile din text (paleta premium, 19 oct. 2026).

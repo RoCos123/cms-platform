@@ -262,7 +262,7 @@ export function Hero({
                 height: "54px",
                 paddingInline: "30px",
                 borderRadius: "var(--t-raza-buton)",
-                background: "var(--s-buton-fundal)",
+                background: "var(--s-buton-matase, var(--s-buton-fundal))",
                 color: "var(--s-buton-text)",
                 fontSize: "16px",
                 fontWeight: 600,

@@ -65,6 +65,13 @@ export type TemplatePalette = {
    * cade atunci pe amestecul ei de până acum (`color-mix` din accent și fundal).
    */
   fundalBanda?: string;
+  /**
+   * MĂTASEA (a treia rundă premium, „Silk & Velvet", 19 oct. 2026): gradiente CSS, NU culori — se
+   * pun doar ca `background` (banda închisă și butoanele pline), lângă culoarea plină, care rămâne
+   * pentru chenare, text și contrast. Doar în paleta calculată; fără ele, totul cade pe culoarea plină.
+   */
+  fundalInchisMatase?: string;
+  accentMatase?: string;
   /** Culoarea erorilor de formular, pe fundal deschis și pe fundal închis. */
   eroare: string;
   eroarePeInchis: string;
