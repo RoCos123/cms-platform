@@ -19,8 +19,12 @@ import path from "node:path";
 const CUNOSCUTE = new Set([
   "--s-accent",
   "--s-buton-fundal",
+  // Fundalul butonului plin la hover (paleta premium, 19 oct. 2026); îl citește `.buton-plin` din globals.css.
+  "--s-buton-hover",
   "--s-buton-text",
   "--s-eroare",
+  // Linkurile din text (paleta premium, 19 oct. 2026).
+  "--s-link",
   "--s-text-secundar",
 ]);
 

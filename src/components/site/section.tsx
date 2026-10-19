@@ -37,6 +37,32 @@ const EROARE: Record<SectionTone, string> = {
 };
 
 /**
+ * Linkurile din text (rolul `accentInteractiv` al paletei premium, 19 oct. 2026). Pe tonurile
+ * deschise: culoarea linkurilor, dacă site-ul are culori alese — altfel `var(…, …)` cade pe
+ * accentul de până acum, deci un șablon neatins arată exact ca înainte. Pe închis, ca înainte.
+ */
+const LINK: Record<SectionTone, string> = {
+  deschis: "var(--t-accent-interactiv, var(--t-accent))",
+  nuantat: "var(--t-accent-interactiv, var(--t-accent))",
+  relief: "var(--t-accent-interactiv, var(--t-accent))",
+  inchis: "var(--t-accent-pe-inchis)",
+};
+
+/**
+ * Fundalul butonului plin când treci cu mausul peste el (regula `.buton-plin` din
+ * `globals.css`). Doar pe tonurile deschise și doar pe site-urile cu culori alese: fără
+ * `--t-accent-interactiv` (orice șablon neatins), variabila rămâne nevalidă, iar regula cade pe
+ * fundalul obișnuit al butonului — adică niciun hover, ca până acum. Pe închis, `initial`: butonul
+ * de acolo e inversat (text deschis ca fundal), iar culoarea linkurilor n-ar avea ce căuta pe el.
+ */
+const BUTON_HOVER: Record<SectionTone, string> = {
+  deschis: "var(--t-accent-interactiv)",
+  nuantat: "var(--t-accent-interactiv)",
+  relief: "var(--t-accent-interactiv)",
+  inchis: "initial",
+};
+
+/**
  * Butonul plin de pe fundalul secțiunii. Pe tonurile deschise e accentul; pe cel
  * închis se inversează, fiindcă un buton terracotta pe maro-închis e o pată care
  * abia se distinge de fundal (2,51:1, sub pragul de 3:1 pentru componente).
@@ -100,9 +126,11 @@ export function Section({
         color: TEXT[tone],
         ["--s-text-secundar" as string]: TEXT_SECUNDAR[tone],
         ["--s-accent" as string]: ACCENT[tone],
+        ["--s-link" as string]: LINK[tone],
         ["--s-eroare" as string]: EROARE[tone],
         ["--s-buton-fundal" as string]: BUTON_FUNDAL[tone],
         ["--s-buton-text" as string]: BUTON_TEXT[tone],
+        ["--s-buton-hover" as string]: BUTON_HOVER[tone],
         paddingBlock: "var(--t-spatiere)",
         ...(decor ? { position: "relative", overflow: "hidden", isolation: "isolate" } : {}),
       }}

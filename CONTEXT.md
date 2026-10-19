@@ -260,20 +260,21 @@ arătat proprietarului ÎNAINTE să se construiască).
 *Starea culorilor (18 oct. 2026, pe branch `claude/sleepy-tesla-aanhq7`; „fă pe master" nu s-a spus):*
 - **Ce vede clientul:** intrare nouă „Aspect" în meniu (înaintea Setărilor), ecran `/dashboard/aspect`.
   Două moduri, ambele vizibile, fiecare cu explicația lui: **Automat** (o culoare: pătrățel + cod
-  `#RRGGBB` + 12 culori gata alese; se acceptă și codul fără „#") și **Manual** (opt culori cu nume
+  `#RRGGBB` + 12 culori gata alese; se acceptă și codul fără „#") și **Manual** (nouă culori cu nume
   pe înțelesul lui, fiecare cu „Revino la cea calculată"; pornește de la paleta calculată din
   culoarea principală, sau de la a șablonului dacă n-a ales una). Previzualizare vie (antet, hero,
   servicii, citat, întrebări pe fundal închis, subsol — toate cele patru fundaluri, la orice șablon).
   „Revino la culorile șablonului" + Salvează ⇒ cheia dispare din bază, site-ul e identic cu cel de
   dinainte. Un cod greșit nu strică nimic: eroare lângă câmp, la ieșire revine ultima valoare bună.
-- **Automat:** paleta se calculează în OKLCH din culoarea aleasă (`src/lib/aspect/paleta.ts`): se
-  schimbă DOAR nuanța; luminozitatea fiecărui rol și „cât de colorat e față de accent" rămân ale
-  șablonului (Claritate își păstrează albul pur, Lumină fundalul închis intens, Apropiere piersica).
+- **Automat:** paleta se calculează din culoarea aleasă (`src/lib/aspect/paleta.ts`). *Din 19 oct.
+  (paleta premium, mai jos)* cinci roluri urmează regulile HSL ale proprietarului; restul (fundalul
+  paginii, relieful, textele, accentul de pe închis, erorile) păstrează luminozitatea și „cât de
+  colorat" ale șablonului, cu nuanța aleasă (OKLCH). Apropiere își păstrează piersica.
   Pe fiecare pereche text–fundal contrastul e ≥ 4,5:1 — verificat pe 386 de culori × 5 șabloane,
   inclusiv galben, magenta, alb, negru, gri. **O culoare prea deschisă se întunecă** doar cât să se
   citească pe fundal deschis, iar panoul o spune („Pe site apare puțin mai închisă"); galbenul
   `#FFEB3B` ajunge un măsliniu închis (`#695F00`) — așa cere fizica contrastului, nu un defect.
-  Cele 12 culori gata alese nu se întunecă vizibil pe niciun șablon (la Căldură, cel mult o treaptă).
+  Cele 12 culori gata alese (premium, din 19 oct.) apar pe butoane EXACT cum sunt, pe toate șabloanele.
 - **Manual:** ce alege omul se aplică EXACT, fără corecții. Pe ecran apare o listă galbenă
   **neblocantă** cu perechile sub 4,5:1, cu nume pe înțelesul lui („Textul pe fundalul paginii:
   contrast 1,0:1 (se recomandă cel puțin 4,5:1)") și „Poți salva oricum — alegerea e a ta". Dacă
@@ -302,6 +303,62 @@ arătat proprietarului ÎNAINTE să se construiască).
   accentul și fundalul, iar textul și poza rămân; o secțiune ascunsă nu apare; fără secțiuni vizibile →
   exemplul; 375 px fără derulare în lateral. *Local, pixelii pozei nu se încarcă* (depozitul de probă
   n-are fișiere) — la fel și pe site-ul local; contează adresa, care e identică.
+- **PALETA „PREMIUM" (19 oct. 2026, cerută de proprietar: „Premium / High-Status / Quiet Luxury" —
+  culorile de dinainte „par șterse și ieftine"; plan arătat întâi, toate cele 5 recomandări
+  acceptate).** Pe branch, NEPUBLICATĂ până la „fă pe master".
+  - **Cele 12 culori gata alese**, exact cum le-a dat el: Arămiu `#6E2C1B`, Burgundy `#5E121D`, Ametist
+    `#5A2241`, Aubergine `#38142C`, Indigo `#281B52`, Bleumarin `#0F1E36`, Safir `#0D3B66`, Petrol
+    `#0B4249`, Smarald `#0E3A2F`, Chiparos `#2C3522`, Espresso `#362218`, Antracit `#222930`
+    (`PRESETURI_CULOARE` în `src/lib/aspect/salvare.ts`).
+  - **Safir e doar PROPUS în câmp** (`CULOARE_PROPUSA`) cât timp clientul n-a ales nimic: nu se
+    salvează și nu schimbă site-ul. `claritate.ts` NU s-a atins (accentul lui rămâne `#1B5C99`), deci
+    site-urile fără culori alese rămân identice — hotărârea proprietarului.
+  - **Regulile (HSL, procente, `REGULI_PREMIUM` în `paleta.ts`)**, legate de rolurile existente `--t-*`
+    (NU `--color-*`: numele alea sunt ale panoului, în `globals.css`): `accent` (butoane, accente
+    mari) = culoarea aleasă, iar dacă L > 50 coboară la L 28; `fundalInchis` (benzi, subsol) = H, S ≤ 65,
+    L 11–15; `accentInteractiv` (ROL NOU: linkuri, hover pe butoane) = H, S + 12 (≤ 85), L 32–38;
+    `fundalNuantat` (carduri, secțiuni alternative) = H, S 10–16, L 95–97, fără transparență; `chenar`
+    = H, S 15, L 88. *Excepție a mea:* un gri (S < 5) rămâne gri — HSL îi dă nuanța 0 (roșu), iar
+    regulile i-ar fi dat fundaluri roz.
+  - **Contrastul câștigă MEREU** (hotărârea proprietarului): după ținta HSL, fiecare rol se verifică
+    pe toate perechile text–fundal (≥ 4,5:1) și, dacă nu trece, se întunecă exact cât trebuie, în OKLCH
+    (acolo nuanța percepută nu fuge; HSL e folosit doar pentru ținte, fiindcă numerele lui sunt cele pe
+    care le poate verifica proprietarul). Butonul se verifică DIRECT cu textul alb de pe el. Exemple:
+    Petrol și Smarald au linkurile sub prag pe 32–38% → ies pe ~25% (Petrol: `#00707E`, 5,24:1); un
+    galben scris de mână → butonul coboară la L ≤ 28 și se mai întunecă.
+  - **Linkurile și hover-ul:** `section.tsx` pune `--s-link` (pe deschis
+    `var(--t-accent-interactiv, var(--t-accent))`, pe închis ca înainte) și `--s-buton-hover` (pe
+    deschis `var(--t-accent-interactiv)` FĂRĂ rezervă, pe închis `initial`). Linkurile reale care o
+    folosesc: „Citește mai mult" (servicii), „Citește →" (cartonașele de articole), „Toate articolele"
+    (secțiunea de pe prima pagină și capătul unui articol), linkul politicii de lângă bifă. Hover: regula `.buton-plin` din `globals.css`, pe butonul principal din
+    hero, butonul din „Despre mine" și butoanele de trimitere ale formularelor (contact, newsletter,
+    programare). Fiindcă niciun șablon nu are `accentInteractiv`, pe un site fără culori alese
+    variabila e nevalidă și butonul NU capătă hover — hotărârea proprietarului. *Nu am pus hover* pe
+    butoanele din „Pachete" (au variantă proprie la Apropiere) și pe cele de pe benzile închise
+    (butonul de acolo e inversat). *În previzualizarea din panou hover-ul nu se poate încerca cu
+    mausul* (fereastra e `inert` dinadins: „se privește, nu se folosește"); se vede pe site.
+  - **Modul manual are a 9-a culoare, „Linkurile"**, precompletată cu valoarea calculată (și când nu
+    e aleasă nicio culoare principală: atunci se calculează din accentul șablonului — `bazaManuala`,
+    aceeași funcție pentru ecran și site). Avertismentele includ linkurile și textul butonului la hover.
+  - **Mostrele:** fiecare card arată 3 fâșii rotunjite — 65% butoanele, 20% linkurile, 15% fundalul
+    cardurilor —, calculate cu aceeași funcție ca site-ul, pe șablonul site-ului.
+  - **Ce s-a schimbat față de 18 oct.:** cardurile de la Claritate nu mai rămân alb pur când clientul
+    alege o culoare (tentă L 95–97; acceptat de proprietar); banda închisă și chenarul urmează regulile
+    lui, nu luminozitatea șablonului; site-ul de probă `model-claritate` (dacă a salvat deja o culoare)
+    se recalculează după regulile noi la publicare.
+  - **Probe:** `e2e/aspect-culori.proba.mjs` — 55 de teste; regulile proprietarului scrise în probă cu
+    numerele lui (nu importate), pe 386 de culori × 5 șabloane; 20 de stricări (limite schimbate, +12
+    scos, gardă scoasă, regula L > 50 scoasă, griul colorat, preseturi/culoare propusă greșite, linkuri
+    sau hover fără/cu rezervă, `!important` scos, a 9-a culoare scoasă, Claritate modificat…), toate
+    prinse în afară de una care nu schimbă nimic (textul alb din garda butonului e redundant cu
+    fundalurile deschise; păstrat fiindcă proprietarul a cerut verificarea directă).
+    `e2e/culori-sectiuni.proba.mjs` știe de `--s-link` și `--s-buton-hover`. Tot: 496 de probe.
+  - **Încercat în browser** (stiva reală, `ana.test` pus TEMPORAR în poartă, Ana pe Claritate): 12
+    mostre în ordine, fiecare cu 3 fâșii ~65/20/15% și EXACT culorile calculate; Safir propus fără să
+    schimbe nimic; fără culori: fără hover, linkuri pe accentul vechi; Petrol: butoane `#0B4249`,
+    linkuri `#00707E`, carduri `#F0F4F4`, bandă `#0D393F`; pe site hover `#0B4249` → `#00707E`; Mihai
+    (fără culori) — niciun hover; manual: 9 culori, „Linkurile" precompletată, avertisment la linkuri
+    deschise; 375 px fără derulare în lateral; nicio eroare JavaScript.
 - **Unde stau datele:** `site_settings.brand.aspect.culori` = `{mod, principala, manual, asumat}`;
   fără migrare, fără SQL. Fonturile vor sta lângă ele, în `brand.aspect`.
 - **Cum ajung pe site:** `getTemplate(id, culori)` întoarce EXACT obiectul șablonului când nu sunt

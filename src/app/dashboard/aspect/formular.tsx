@@ -13,9 +13,9 @@ import { cn } from "@/lib/cn";
 import { getTemplate } from "@/lib/templates";
 import type { Serviciu } from "@/lib/servicii";
 import { normalizeazaHex } from "@/lib/aspect/culoare";
-import { paletaDinCuloare, verificaPerechi, PRAG_CONTRAST } from "@/lib/aspect/paleta";
+import { bazaManuala, paletaDinCuloare, verificaPerechi, PRAG_CONTRAST } from "@/lib/aspect/paleta";
 import { ROLURI_MANUALE, type AspectCulori, type ModCulori, type RolManual } from "@/lib/aspect/culori";
-import { PRESETURI_CULOARE } from "@/lib/aspect/salvare";
+import { CULOARE_PROPUSA, PRESETURI_CULOARE } from "@/lib/aspect/salvare";
 import type { PrevizualizareSite } from "@/lib/aspect/previzualizare";
 import { salveazaCulori } from "./actions";
 
@@ -169,9 +169,16 @@ export function FormularAspect({
   const nimicAles = !stare.principala && Object.keys(stare.manual).length === 0;
 
   // Paleta calculată din culoarea principală (sau a șablonului, dacă n-a ales una): de la ea
-  // pornește modul manual și cu ea se compară ce a schimbat omul.
+  // pornește modul manual și cu ea se compară ce a schimbat omul. Aceeași funcție ca pe site.
   const calculat = stare.principala ? paletaDinCuloare(sablon.paleta, stare.principala) : null;
-  const baza = calculat?.paleta ?? sablon.paleta;
+  const baza = bazaManuala(sablon.paleta, stare.principala);
+
+  // Mostrele culorilor gata alese: paleta fiecăreia, calculată pe șablonul ACESTUI site, ca
+  // fâșiile să arate exact ce iese (butoane, linkuri, fundalul cardurilor).
+  const mostre = PRESETURI_CULOARE.map((preset) => ({
+    ...preset,
+    paleta: paletaDinCuloare(sablon.paleta, preset.hex).paleta,
+  }));
 
   // Site-ul adevărat, dacă are secțiuni vizibile; altfel pagina de exemplu (de jos).
   const antet = previzualizare?.header ?? {
@@ -271,14 +278,17 @@ export function FormularAspect({
               <CampCuloare
                 id="culoare-principala"
                 eticheta="Culoarea principală"
-                valoare={stare.principala ?? sablon.paleta.accent}
+                valoare={stare.principala ?? CULOARE_PROPUSA}
                 onChange={(hex) => setStare((s) => ({ ...s, principala: hex }))}
               />
 
               <div>
-                <p className="mb-2 text-xs font-medium text-muted-foreground">Sau pornește de la una gata aleasă</p>
+                <p className="mb-1 text-xs font-medium text-muted-foreground">Sau pornește de la una gata aleasă</p>
+                <p className="mb-2 text-xs text-muted-foreground">
+                  Fiecare mostră arată, de la stânga: butoanele, linkurile și fundalul cardurilor.
+                </p>
                 <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                  {PRESETURI_CULOARE.map((preset) => {
+                  {mostre.map((preset) => {
                     const activ = stare.principala === preset.hex;
                     return (
                       <li key={preset.hex}>
@@ -292,11 +302,19 @@ export function FormularAspect({
                             activ ? "border-foreground" : "border-border",
                           )}
                         >
-                          <span
-                            aria-hidden
-                            className="block h-8 w-full rounded-sm border border-border"
-                            style={{ background: preset.hex }}
-                          />
+                          {/* Trei fâșii, nu o pată: butoanele (65%), linkurile (20%) și
+                              fundalul cardurilor (15%), exact cum ies pe site. */}
+                          <span aria-hidden className="flex h-8 w-full gap-0.5">
+                            <span className="rounded-sm" style={{ flex: "65 1 0", background: preset.paleta.accent }} />
+                            <span
+                              className="rounded-sm"
+                              style={{ flex: "20 1 0", background: preset.paleta.accentInteractiv }}
+                            />
+                            <span
+                              className="rounded-sm border border-border"
+                              style={{ flex: "15 1 0", background: preset.paleta.fundalNuantat }}
+                            />
+                          </span>
                           {preset.nume}
                         </button>
                       </li>
@@ -355,7 +373,7 @@ export function FormularAspect({
                       <CampCuloare
                         id={id}
                         eticheta={rol.nume}
-                        valoare={stare.manual[rol.cheie] ?? baza[rol.cheie]}
+                        valoare={stare.manual[rol.cheie] ?? baza[rol.cheie] ?? baza.accent}
                         onChange={(hex) => setStare((s) => ({ ...s, manual: { ...s.manual, [rol.cheie]: hex } }))}
                       />
                       {schimbat && (

@@ -1,6 +1,6 @@
 import type { TemplatePalette } from "@/lib/templates/types";
 import { normalizeazaHex, oklchDinHex, hexDinOklch } from "./culoare";
-import { paletaDinCuloare } from "./paleta";
+import { bazaManuala } from "./paleta";
 
 /**
  * Culorile alese de un client pentru site-ul lui (meniul „Aspect").
@@ -23,8 +23,8 @@ import { paletaDinCuloare } from "./paleta";
 export type ModCulori = "auto" | "manual";
 
 /**
- * Cele opt culori pe care le poate schimba un client în modul manual, cu numele lor pe
- * înțelesul lui. Restul rolurilor din paletă (chenarele, culoarea erorilor, fundalul
+ * Cele nouă culori pe care le poate schimba un client în modul manual, cu numele lor pe
+ * înțelesul lui (a noua, „Linkurile", din 19 oct. 2026, odată cu paleta premium). Restul rolurilor din paletă (chenarele, culoarea erorilor, fundalul
  * secțiunilor mai închise) se calculează din ele: n-ar spune nimic unui psiholog.
  */
 export const ROLURI_MANUALE = [
@@ -63,6 +63,11 @@ export const ROLURI_MANUALE = [
     cheie: "accentPeInchis",
     nume: "Culoarea principală pe fundal închis",
     explicatie: "Aceeași culoare principală, dar așa cum apare pe benzile închise.",
+  },
+  {
+    cheie: "accentInteractiv",
+    nume: "Linkurile",
+    explicatie: "Linkurile din text și culoarea butoanelor când treci cu mausul peste ele.",
   },
 ] as const;
 
@@ -135,7 +140,9 @@ function dinFundalNou(baza: TemplatePalette, fundalNou: string, rolDeBaza: strin
 
 /** Paleta care ajunge efectiv pe site: a șablonului, rafinată de ce a ales clientul. */
 export function paletaEfectiva(sablon: TemplatePalette, aspect: AspectCulori): TemplatePalette {
-  const baza = aspect.principala ? paletaDinCuloare(sablon, aspect.principala).paleta : { ...sablon };
+  // În modul automat `principala` există mereu (`citesteAspectCulori` o cere), deci baza e
+  // paleta calculată; în cel manual poate lipsi, iar baza e a șablonului (plus linkurile).
+  const baza = bazaManuala(sablon, aspect.principala);
   if (aspect.mod === "auto") return baza;
 
   const paleta: TemplatePalette = { ...baza };

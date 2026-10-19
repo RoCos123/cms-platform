@@ -8,25 +8,32 @@ import { ROLURI_MANUALE, type AspectCulori, type RolManual } from "./culori";
  */
 
 /**
- * Culorile gata alese, de unde clientul poate porni. Toate sunt destul de închise ca să se
- * citească pe fundalul deschis al oricărui șablon, deci panoul nu trebuie să-i spună niciodată
- * „am întunecat-o". Pe „Căldură" (fundal de relief mai închis) unele ies cu 1–3 trepte pe
- * canal mai închise decât aici — nu se vede, iar proba `aspect-culori` o măsoară pe toate cinci.
+ * Culorile gata alese — paleta „premium" (19 oct. 2026, cerută de proprietar: luminozitate
+ * scăzută, saturație adâncă, „Quiet Luxury"). Numele și codurile sunt exact cele date de el.
+ * Fiind toate închise, apar pe site exact așa (proba `aspect-culori` o verifică pe toate
+ * cinci șabloanele); doar linkurile lor se calculează separat (`accentInteractiv`).
  */
 export const PRESETURI_CULOARE = [
-  { nume: "Teracotă", hex: "#904D39" },
-  { nume: "Cărămiziu", hex: "#A8312F" },
-  { nume: "Roz prăfuit", hex: "#9C3F65" },
-  { nume: "Prună", hex: "#8E3B5F" },
-  { nume: "Violet", hex: "#6B4FA0" },
-  { nume: "Bleumarin", hex: "#1D3557" },
-  { nume: "Albastru", hex: "#1D5C99" },
-  { nume: "Turcoaz", hex: "#0F6B6B" },
-  { nume: "Verde", hex: "#2F6B4E" },
-  { nume: "Oliv", hex: "#576515" },
-  { nume: "Maro", hex: "#7A5230" },
-  { nume: "Gri-albăstrui", hex: "#4A6070" },
+  { nume: "Arămiu", hex: "#6E2C1B" },
+  { nume: "Burgundy", hex: "#5E121D" },
+  { nume: "Ametist", hex: "#5A2241" },
+  { nume: "Aubergine", hex: "#38142C" },
+  { nume: "Indigo", hex: "#281B52" },
+  { nume: "Bleumarin", hex: "#0F1E36" },
+  { nume: "Safir", hex: "#0D3B66" },
+  { nume: "Petrol", hex: "#0B4249" },
+  { nume: "Smarald", hex: "#0E3A2F" },
+  { nume: "Chiparos", hex: "#2C3522" },
+  { nume: "Espresso", hex: "#362218" },
+  { nume: "Antracit", hex: "#222930" },
 ] as const;
+
+/**
+ * Culoarea arătată în selector cât timp clientul n-a ales nimic (Safir). E DOAR o propunere
+ * în câmp: nu se salvează și nu schimbă site-ul până nu apasă omul pe ceva. Șablonul Claritate
+ * își păstrează propria culoare (`#1B5C99`), deci site-urile fără culori alese rămân neatinse.
+ */
+export const CULOARE_PROPUSA = "#0D3B66";
 
 export type RezultatValidare = { ok: true; culori: AspectCulori } | { ok: false; mesaj: string };
 

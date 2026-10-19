@@ -192,7 +192,7 @@ export function FormularProgramare({
         />
       )}
 
-      <button type="submit" disabled={seLucreaza} style={stilButonTrimite(seLucreaza)}>
+      <button type="submit" disabled={seLucreaza} className="buton-plin" style={stilButonTrimite(seLucreaza)}>
         {seLucreaza ? "Se trimite…" : "Cere ora aceasta"}
       </button>
     </form>

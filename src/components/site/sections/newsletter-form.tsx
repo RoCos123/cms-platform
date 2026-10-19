@@ -63,7 +63,7 @@ export function NewsletterForm({
           style={{ ...stilControl(Boolean(eroareEmail)), flex: "1 1 240px", width: "auto" }}
         />
 
-        <button type="submit" disabled={seLucreaza} style={stilButonTrimite(seLucreaza)}>
+        <button type="submit" disabled={seLucreaza} className="buton-plin" style={stilButonTrimite(seLucreaza)}>
           {seLucreaza ? "Se trimite…" : textButon}
         </button>
       </div>

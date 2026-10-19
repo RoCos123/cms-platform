@@ -317,6 +317,7 @@ export function AboutTeaser({
 
           {data.buton?.text && (
             <a
+              className="buton-plin"
               href={data.buton.href}
               style={{
                 display: "inline-flex",

@@ -460,6 +460,27 @@ body {
 }
 
 /*
+ * Butonul plin când treci cu mausul peste el (paleta premium, 19 oct. 2026): ia culoarea
+ * linkurilor (`accentInteractiv`). DOAR pe site-urile cu culori alese: `--s-buton-hover` vine
+ * din `section.tsx` și e valid numai când paleta are `--t-accent-interactiv` (niciun șablon nu-l
+ * are). Altfel `var()` cade pe fundalul obișnuit al butonului, deci un șablon neatins nu capătă
+ * niciun hover. `!important` fiindcă fundalul butonului e scris inline.
+ *
+ * Doar unde există maus, ca la cartonașe. Un buton dezactivat (formular în lucru) nu reacționează.
+ */
+@media (hover: hover) {
+  .buton-plin:not(:disabled):hover {
+    background: var(--s-buton-hover, var(--s-buton-fundal)) !important;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .buton-plin {
+    transition: background-color 160ms ease;
+  }
+}
+
+/*
  * Oglindirea unei secțiuni pe două coloane: ce stă în cod primul ajunge al
  * doilea pe ecran. Folosită de prima secțiune și de „Despre mine" la Lumină,
  * ca pagina să alterneze părțile în loc să repete aceeași.

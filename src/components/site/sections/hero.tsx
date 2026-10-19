@@ -255,6 +255,7 @@ export function Hero({
           {data.butonPrincipal?.text && (
             <a
               href={data.butonPrincipal.href}
+              className="buton-plin"
               style={{
                 display: "inline-flex",
                 alignItems: "center",

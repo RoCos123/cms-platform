@@ -212,7 +212,7 @@ export function ProgramareRapida({
             />
           )}
 
-          <button type="submit" disabled={seLucreaza} style={stilButonTrimite(seLucreaza)}>
+          <button type="submit" disabled={seLucreaza} className="buton-plin" style={stilButonTrimite(seLucreaza)}>
             {seLucreaza ? "Se trimite…" : textButon || "Cere ora aceasta"}
           </button>
         </div>

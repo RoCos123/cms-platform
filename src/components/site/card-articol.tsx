@@ -151,7 +151,7 @@ export function CardArticol({
               paddingTop: "8px",
               fontSize: "15px",
               fontWeight: 600,
-              color: "var(--t-accent)",
+              color: "var(--t-accent-interactiv, var(--t-accent))",
             }}
           >
             {friendly ? "Citește mai departe →" : "Citește →"}

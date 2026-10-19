@@ -148,3 +148,42 @@ export function hexDinOklch(culoare: Oklch): string {
   const taie = (v: number) => Math.min(1, Math.max(0, v));
   return hexDinRgb(canalSrgb(taie(r)), canalSrgb(taie(g)), canalSrgb(taie(b)));
 }
+
+/**
+ * HSL — nuanța (0–360), saturația și luminozitatea (0–100), ca în orice selector de culori.
+ *
+ * DE CE ȘI HSL, lângă OKLCH. Regulile paletei „premium" (19 oct. 2026) sunt scrise de
+ * proprietar în HSL („S între 10 și 16%, L între 95 și 97%"): sunt numerele pe care le poate
+ * verifica el însuși, cu orice selector. Deci ținta fiecărui rol se construiește în HSL, iar
+ * ce urmează — corecția de contrast — se face în OKLCH, unde întunecarea păstrează nuanța
+ * percepută (în HSL, un albastru întunecat „trage" spre violet).
+ */
+export type Hsl = { h: number; s: number; l: number };
+
+/** Din `#RRGGBB` în HSL. La un gri (saturație 0), nuanța e 0 — n-are nicio nuanță. */
+export function hslDinHex(hex: string): Hsl {
+  const [r, g, b] = rgbDinHex(hex).map((v) => v / 255);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return { h: 0, s: 0, l: l * 100 };
+
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  h *= 60;
+  return { h, s: s * 100, l: l * 100 };
+}
+
+/** Din HSL în `#RRGGBB`. Valorile din afara intervalelor se aduc la margine. */
+export function hexDinHsl({ h, s, l }: Hsl): string {
+  const sat = Math.min(100, Math.max(0, s)) / 100;
+  const lum = Math.min(100, Math.max(0, l)) / 100;
+  const nuanta = ((h % 360) + 360) % 360;
+  const a = sat * Math.min(lum, 1 - lum);
+  const canal = (n: number) => {
+    const k = (n + nuanta / 30) % 12;
+    return (lum - a * Math.max(-1, Math.min(k - 3, 9 - k, 1))) * 255;
+  };
+  return hexDinRgb(canal(0), canal(8), canal(4));
+}

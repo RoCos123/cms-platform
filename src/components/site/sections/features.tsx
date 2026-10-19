@@ -279,7 +279,7 @@ function Linie({
               // Ancoră simplă, nu `next/link` — vezi explicația de la cartonașe.
               <a
                 href={`/servicii#${serviciu.slug}`}
-                style={{ fontSize: "15px", fontWeight: 600, color: "var(--s-accent)", textDecoration: "none" }}
+                style={{ fontSize: "15px", fontWeight: 600, color: "var(--s-link, var(--s-accent))", textDecoration: "none" }}
               >
                 Citește mai mult →
               </a>
@@ -362,7 +362,9 @@ function ServiciiFriendly({
               style={{ fontSize: "15px", color: "var(--t-text-secundar)" }}
             />
             {paginaDetaliata && (
-              <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--t-accent)" }}>Citește mai mult</span>
+              <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--t-accent-interactiv, var(--t-accent))" }}>
+                Citește mai mult
+              </span>
             )}
             {serviciu.pret && (
               <div

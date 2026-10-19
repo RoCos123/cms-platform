@@ -199,7 +199,7 @@ export function ContactForm({
             />
           )}
 
-      <button type="submit" disabled={seLucreaza} style={stilButonTrimite(seLucreaza)}>
+      <button type="submit" disabled={seLucreaza} className="buton-plin" style={stilButonTrimite(seLucreaza)}>
         {seLucreaza ? (vanzare ? texte.seTrimite : "Se trimite…") : textButon}
       </button>
     </form>
@@ -257,7 +257,7 @@ function Acord({
               // numai prin culoare pică WCAG 1.4.1 (și dispare pentru cine nu
               // deosebește nuanțele).
               style={{
-                color: "var(--s-accent)",
+                color: "var(--s-link, var(--s-accent))",
                 textDecoration: "underline",
                 textDecorationThickness: "1px",
                 textUnderlineOffset: "2px",

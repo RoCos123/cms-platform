@@ -51,6 +51,14 @@ export type TemplatePalette = {
    * mărimea unui titlu. Aceeași corecție ca la verde. Opțional: doar „Apropiere".
    */
   accentCaldInchis?: string;
+  /**
+   * Linkurile din text și butoanele când treci cu mausul peste ele (rolul „interactive" din
+   * paleta premium, 19 oct. 2026). DOAR în paleta calculată dintr-o culoare aleasă de client
+   * (`src/lib/aspect/paleta.ts`); niciun șablon nu-l are, iar componentele cad pe `accent`
+   * prin `var(--t-accent-interactiv, var(--t-accent))` — deci site-urile fără culori alese
+   * rămân exact cum erau, inclusiv fără hover pe butoane.
+   */
+  accentInteractiv?: string;
   /** Culoarea erorilor de formular, pe fundal deschis și pe fundal închis. */
   eroare: string;
   eroarePeInchis: string;

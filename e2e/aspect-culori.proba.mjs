@@ -7,19 +7,21 @@ import { getTemplate, listTemplates, templateStyle } from "@/lib/templates";
 import {
   contrast,
   esteHexValid,
+  hexDinHsl,
   hexDinOklch,
+  hslDinHex,
   luminanta,
   normalizeazaHex,
   oklchDinHex,
 } from "@/lib/aspect/culoare";
-import { PRAG_CONTRAST, paletaDinCuloare, perechiDeContrast, verificaPerechi } from "@/lib/aspect/paleta";
+import { PRAG_CONTRAST, bazaManuala, paletaDinCuloare, perechiDeContrast, verificaPerechi } from "@/lib/aspect/paleta";
 import {
   ROLURI_MANUALE,
   citesteAspectCulori,
   culoriDinBrand,
   paletaEfectiva,
 } from "@/lib/aspect/culori";
-import { PRESETURI_CULOARE, brandCuCulori, valideazaCulori } from "@/lib/aspect/salvare";
+import { CULOARE_PROPUSA, PRESETURI_CULOARE, brandCuCulori, valideazaCulori } from "@/lib/aspect/salvare";
 import { DOMENII_CU_ASPECT, SABLOANE_CU_ASPECT, aspectPermis, culoriPermise } from "@/lib/aspect/acces";
 
 /**
@@ -79,6 +81,13 @@ function perechiIndependente(p) {
   for (const rol of ["textPeInchis", "textSecundarPeInchis", "accentPeInchis", "eroarePeInchis"]) {
     lista.push([`${rol} pe fundalInchis`, p[rol], p.fundalInchis]);
   }
+  // Paleta premium (19 oct.): linkurile pe fundalurile deschise și textul butonului la hover.
+  if (p.accentInteractiv) {
+    for (const [numeFundal, fundal] of [["fundal", p.fundal], ["fundalNuantat", p.fundalNuantat], ["fundalRelief", p.fundalRelief]]) {
+      lista.push([`accentInteractiv pe ${numeFundal}`, p.accentInteractiv, fundal]);
+    }
+    lista.push(["accentText pe accentInteractiv (hover)", p.accentText, p.accentInteractiv]);
+  }
   return lista;
 }
 
@@ -130,8 +139,10 @@ for (const sablon of listTemplates()) {
       assert.ok(luminanta(paleta.fundal) > 0.5, `${culoare}: fundal nu mai e deschis (${paleta.fundal})`);
       assert.ok(luminanta(paleta.fundalInchis) < 0.15, `${culoare}: fundalInchis nu mai e închis (${paleta.fundalInchis})`);
 
-      // Luminozitatea fundalurilor rămâne a șablonului (rotunjirea și decolorarea în sRGB ierte).
-      for (const rol of ["fundal", "fundalNuantat", "fundalRelief", "fundalInchis"]) {
+      // Luminozitatea fundalului paginii și a reliefului rămâne a șablonului (rotunjirea și
+      // decolorarea în sRGB ierte). Fundalul nuanțat, banda închisă și chenarul urmează din
+      // 19 oct. regulile premium — vezi testul lor, mai jos.
+      for (const rol of ["fundal", "fundalRelief"]) {
         const dorit = oklchDinHex(sablon.paleta[rol]).l;
         const obtinut = oklchDinHex(paleta[rol]).l;
         assert.ok(Math.abs(dorit - obtinut) < 0.03, `${culoare}: ${rol} și-a schimbat luminozitatea (${dorit.toFixed(3)} → ${obtinut.toFixed(3)})`);
@@ -149,21 +160,30 @@ for (const sablon of listTemplates()) {
 
 test("fundalurile iau nuanța culorii alese — nu doar accentul", () => {
   const caldura = getTemplate("caldura").paleta;
-  const { paleta } = paletaDinCuloare(caldura, "#2E7D5B"); // verde, h ≈ 162
-  for (const rol of ["fundal", "fundalNuantat", "fundalRelief", "fundalInchis", "text"]) {
+  const { paleta } = paletaDinCuloare(caldura, "#2E7D5B"); // verde: HSL h ≈ 155, OKLCH h ≈ 162
+  // Rolurile calculate în OKLCH (fundalul paginii, relieful, textul): nuanța OKLCH a verdelui.
+  for (const rol of ["fundal", "fundalRelief", "text"]) {
     const o = oklchDinHex(paleta[rol]);
     assert.ok(o.c > 0.004, `${rol} a rămas fără nicio tentă`);
     assert.ok(Math.abs(o.h - 162) < 12, `${rol}: nuanța ${o.h.toFixed(0)} nu urmează verdele (162)`);
+  }
+  // Rolurile premium (HSL): nuanța HSL a verdelui.
+  for (const rol of ["fundalNuantat", "fundalInchis", "chenar"]) {
+    const h = hslDinHex(paleta[rol]).h;
+    assert.ok(Math.abs(h - 155) < 12, `${rol}: nuanța HSL ${h.toFixed(0)} nu urmează verdele (155)`);
   }
   // Și șablonul nu mai are tenta lui crem (h ≈ 68).
   assert.ok(Math.abs(oklchDinHex(paleta.fundal).h - 68) > 40);
 });
 
-test("„Claritate” își păstrează albul pur, oricare ar fi culoarea", () => {
+test("„Claritate”: fără culori alese își păstrează albul pur; cu o culoare aleasă, cardurile capătă tenta fină (hotărârea proprietarului)", () => {
   const claritate = getTemplate("claritate").paleta;
-  assert.equal(claritate.fundalNuantat, "#FFFFFF");
-  for (const culoare of ["#2E7D5B", "#E91E63", "#FFEB3B", "#808080"]) {
-    assert.equal(paletaDinCuloare(claritate, culoare).paleta.fundalNuantat, "#FFFFFF", culoare);
+  assert.equal(claritate.fundalNuantat, "#FFFFFF", "șablonul neatins rămâne exact cum era");
+  for (const culoare of ["#0D3B66", "#2E7D5B", "#E91E63"]) {
+    const nuantat = paletaDinCuloare(claritate, culoare).paleta.fundalNuantat;
+    assert.notEqual(nuantat, "#FFFFFF", culoare);
+    const l = hslDinHex(nuantat).l;
+    assert.ok(l >= 94.5 && l <= 97.5, `${culoare}: L ${l.toFixed(1)}`);
   }
 });
 
@@ -300,11 +320,14 @@ test("o combinație greu de citit nu e oprită, doar semnalată — cu numele pe
   assert.deepEqual(verificaPerechi(sablon).filter((p) => !p.trece), []);
 });
 
-test("cele opt culori ale modului manual: nume pe înțelesul unui client, fără duplicate, toate roluri reale", () => {
-  assert.equal(ROLURI_MANUALE.length, 8);
+test("cele nouă culori ale modului manual: nume pe înțelesul unui client, fără duplicate, toate roluri reale", () => {
+  assert.equal(ROLURI_MANUALE.length, 9);
   const chei = ROLURI_MANUALE.map((rol) => rol.cheie);
   assert.equal(new Set(chei).size, chei.length);
-  const paleta = getTemplate("caldura").paleta;
+  // A noua (19 oct.): linkurile, cu nume pe înțelesul omului.
+  const linkuri = ROLURI_MANUALE.find((rol) => rol.cheie === "accentInteractiv");
+  assert.equal(linkuri?.nume, "Linkurile");
+  const paleta = paletaDinCuloare(getTemplate("caldura").paleta, "#0D3B66").paleta;
   for (const rol of ROLURI_MANUALE) {
     assert.ok(rol.cheie in paleta, `${rol.cheie} nu e un rol din paletă`);
     assert.ok(rol.nume.length > 3 && rol.explicatie.length > 10);
@@ -610,4 +633,167 @@ test("ecranul „Aspect” ia `siteId` din sesiune pentru previzualizare și cad
   assert.ok(marcaj.includes("context={{ ...context, asezari: efectiv.asezari }}"), "așezările vin din șablonul cu culorile alese");
   assert.ok(marcaj.includes("Ce vezi e site-ul tău"), "nota spune clar că e site-ul lui");
   assert.ok(marcaj.includes("nicio secțiune vizibilă"), "iar la exemplu, nota o spune");
+});
+
+// ───────────────────────── paleta „premium” (19 oct. 2026) ─────────────────────────
+//
+// Regulile proprietarului scrise AICI din nou, cu numerele lui, nu importate din cod: dacă
+// cineva schimbă o limită în `paleta.ts`, proba asta trebuie să pice.
+
+const intre = (v, jos, sus) => Math.min(sus, Math.max(jos, v));
+const gri = (hsl) => hsl.s < 5;
+
+for (const sablon of listTemplates()) {
+  test(`„${sablon.nume}”: regulile premium (HSL) pe ${CULORI.length} de culori — iar unde nu se citește, contrastul câștigă`, () => {
+    const gresite = [];
+    for (const culoare of CULORI) {
+      const hsl = hslDinHex(culoare);
+      const { paleta: p } = paletaDinCuloare(sablon.paleta, culoare);
+      const asteptat = (nume, valoare) => { if (p[nume] !== valoare) gresite.push(`${culoare} ${nume}: ${p[nume]} în loc de ${valoare}`); };
+
+      // Banda închisă: H, S ≤ 65, L între 11 și 15.
+      asteptat("fundalInchis", hexDinHsl({ h: hsl.h, s: Math.min(hsl.s, 65), l: intre(hsl.l, 11, 15) }));
+      // Fundalul nuanțat: H, S între 10 și 16, L între 95 și 97 (un gri rămâne gri).
+      asteptat("fundalNuantat", hexDinHsl({ h: hsl.h, s: gri(hsl) ? hsl.s : intre(hsl.s, 10, 16), l: intre(hsl.l, 95, 97) }));
+      // Chenarul: H, S 15, L 88 (un gri rămâne gri).
+      asteptat("chenar", hexDinHsl({ h: hsl.h, s: gri(hsl) ? hsl.s : 15, l: 88 }));
+
+      const deschise = [p.fundal, p.fundalNuantat, p.fundalRelief];
+      const trece = (hex, fundaluri) => fundaluri.every((f) => contrast(hex, f) >= 4.6);
+
+      // Linkurile: H, S + 12 (cel mult 85), L între 32 și 38. Dacă ținta se citește, EXACT ea;
+      // altfel mai închisă, cât să treacă (contrastul câștigă), cu aceeași nuanță.
+      const tintaLink = hexDinHsl({ h: hsl.h, s: gri(hsl) ? hsl.s : Math.min(hsl.s + 12, 85), l: intre(hsl.l, 32, 38) });
+      if (trece(tintaLink, [...deschise, p.accentText])) {
+        asteptat("accentInteractiv", tintaLink);
+      } else {
+        if (!(oklchDinHex(p.accentInteractiv).l < oklchDinHex(tintaLink).l)) gresite.push(`${culoare} linkuri: nu s-au întunecat`);
+        const ht = oklchDinHex(tintaLink);
+        const hl = oklchDinHex(p.accentInteractiv);
+        const dif = Math.abs(((ht.h - hl.h + 540) % 360) - 180);
+        if (ht.c > 0.04 && dif > 8) gresite.push(`${culoare} linkuri: nuanța a fugit (${ht.h.toFixed(0)} → ${hl.h.toFixed(0)})`);
+      }
+
+      // Butonul: o culoare foarte deschisă (L > 50) coboară la L ≤ 28; iar textul de pe buton
+      // se citește MEREU (se verifică direct, nu doar prin pragul L > 50).
+      if (hsl.l > 50 && hslDinHex(p.accent).l > 28.6) gresite.push(`${culoare} buton: L ${hslDinHex(p.accent).l.toFixed(1)} > 28`);
+      if (contrast(p.accentText, p.accent) < 4.5) gresite.push(`${culoare} textul butonului: ${contrast(p.accentText, p.accent).toFixed(2)}`);
+      // O culoare închisă care se citește oricum rămâne EXACT cea aleasă.
+      if (hsl.l <= 50 && trece(culoare, [...deschise, "#FFFFFF"]) && p.accent !== culoare) gresite.push(`${culoare} buton schimbat degeaba: ${p.accent}`);
+    }
+    assert.deepEqual(gresite.slice(0, 10), [], `${gresite.length} abateri:\n  ${gresite.slice(0, 10).join("\n  ")}`);
+  });
+}
+
+test("Petrol și Smarald: linkurile pe 32–38% nu s-ar citi — se întunecă exact cât trebuie (contrastul câștigă)", () => {
+  for (const sablon of listTemplates()) {
+    for (const hex of ["#0B4249", "#0E3A2F"]) {
+      const { paleta: p } = paletaDinCuloare(sablon.paleta, hex);
+      const hsl = hslDinHex(hex);
+      const tinta = hexDinHsl({ h: hsl.h, s: Math.min(hsl.s + 12, 85), l: intre(hsl.l, 32, 38) });
+      assert.ok(contrast(tinta, p.fundalNuantat) < 4.5, `${hex}: ținta trecea oricum — proba n-ar mai dovedi nimic`);
+      for (const f of [p.fundal, p.fundalNuantat, p.fundalRelief]) assert.ok(contrast(p.accentInteractiv, f) >= 4.5, `${sablon.nume} ${hex}`);
+      // Și doar cât trebuie: nu mult sub prag (cel mult ~1 punct peste).
+      assert.ok(Math.min(...[p.fundal, p.fundalNuantat, p.fundalRelief].map((f) => contrast(p.accentInteractiv, f))) < 5.6);
+    }
+  }
+});
+
+test("cele 12 culori premium: exact numele și codurile proprietarului, în ordinea lui; Safir e cea propusă", () => {
+  assert.deepEqual(
+    PRESETURI_CULOARE.map((p) => `${p.nume} ${p.hex}`),
+    [
+      "Arămiu #6E2C1B", "Burgundy #5E121D", "Ametist #5A2241", "Aubergine #38142C",
+      "Indigo #281B52", "Bleumarin #0F1E36", "Safir #0D3B66", "Petrol #0B4249",
+      "Smarald #0E3A2F", "Chiparos #2C3522", "Espresso #362218", "Antracit #222930",
+    ],
+  );
+  assert.equal(CULOARE_PROPUSA, "#0D3B66");
+  assert.equal(PRESETURI_CULOARE.find((p) => p.hex === CULOARE_PROPUSA)?.nume, "Safir");
+  // Șablonul Claritate își păstrează culoarea: site-urile fără culori alese nu se schimbă.
+  assert.equal(getTemplate("claritate").paleta.accent, "#1B5C99");
+  // Toate 12 apar pe butoane EXACT cum sunt (sunt destul de închise pe orice șablon).
+  for (const preset of PRESETURI_CULOARE) {
+    for (const sablon of listTemplates()) assert.equal(paletaDinCuloare(sablon.paleta, preset.hex).paleta.accent, preset.hex, `${preset.nume} pe ${sablon.nume}`);
+  }
+});
+
+test("niciun șablon nu are culoarea linkurilor: fără culori alese, nici linkuri noi, nici hover", () => {
+  for (const sablon of listTemplates()) {
+    assert.equal("accentInteractiv" in sablon.paleta, false, sablon.nume);
+    assert.equal(templateStyle(sablon)["--t-accent-interactiv"], undefined, sablon.nume);
+  }
+  const ales = getTemplate("claritate", { mod: "auto", principala: "#0D3B66" });
+  assert.equal(templateStyle(ales)["--t-accent-interactiv"], ales.paleta.accentInteractiv);
+  assert.ok(esteHexValid(ales.paleta.accentInteractiv));
+});
+
+test("modul manual: „Linkurile” pornesc de la valoarea calculată și se pot schimba separat", () => {
+  const sablon = getTemplate("claritate").paleta;
+  // Fără culoare principală: paleta șablonului + DOAR culoarea linkurilor, citibilă.
+  const baza = bazaManuala(sablon, null);
+  assert.deepEqual({ ...baza, accentInteractiv: undefined }, { ...sablon, accentInteractiv: undefined });
+  for (const f of [sablon.fundal, sablon.fundalNuantat, sablon.fundalRelief]) assert.ok(contrast(baza.accentInteractiv, f) >= 4.5);
+  // Cu culoare principală: exact paleta calculată.
+  assert.deepEqual(bazaManuala(sablon, "#0B4249"), paletaDinCuloare(sablon, "#0B4249").paleta);
+  // Ecranul și site-ul pornesc din același loc.
+  const efectiva = paletaEfectiva(sablon, citesteAspectCulori({ mod: "manual", manual: { text: "#111111" } }));
+  assert.equal(efectiva.accentInteractiv, baza.accentInteractiv);
+  // Schimbată de mână: se aplică exact, chiar dacă nu se citește — și se semnalează.
+  const manuala = paletaEfectiva(sablon, citesteAspectCulori({ mod: "manual", principala: "#0D3B66", manual: { accentInteractiv: "#F0F0F0" } }));
+  assert.equal(manuala.accentInteractiv, "#F0F0F0");
+  const slabe = verificaPerechi(manuala).filter((x) => !x.trece).map((x) => x.nume);
+  assert.ok(slabe.includes("Linkurile pe fundalul paginii"), slabe.join(" | "));
+  // Salvarea acceptă a noua culoare.
+  assert.equal(valideazaCulori({ mod: "manual", manual: { accentInteractiv: "#123456" } }).culori.manual.accentInteractiv, "#123456");
+});
+
+test("linkurile din text și hover-ul pe butoane: legate de rolul nou, cu rezervă pe culoarea veche", () => {
+  const sectiune = citeste("src/components/site/section.tsx");
+  // Linkurile: pe deschis, culoarea linkurilor CU rezervă pe accentul vechi; pe închis, ca înainte.
+  assert.equal((sectiune.match(/: "var\(--t-accent-interactiv, var\(--t-accent\)\)",/g) ?? []).length, 3);
+  assert.ok(sectiune.includes('inchis: "var(--t-accent-pe-inchis)",'));
+  assert.ok(sectiune.includes('["--s-link" as string]: LINK[tone]'));
+  // Hover: FĂRĂ rezervă (altfel ar apărea și la șabloane), iar pe închis `initial`.
+  assert.equal((sectiune.match(/: "var\(--t-accent-interactiv\)",/g) ?? []).length, 3);
+  assert.ok(sectiune.includes('inchis: "initial",'));
+  assert.ok(sectiune.includes('["--s-buton-hover" as string]: BUTON_HOVER[tone]'));
+
+  const css = citeste("src/app/globals.css");
+  assert.match(css, /@media \(hover: hover\) \{\s*\.buton-plin:not\(:disabled\):hover \{\s*background: var\(--s-buton-hover, var\(--s-buton-fundal\)\) !important;/);
+
+  // Butoanele pline au clasa; linkurile reale au culoarea linkurilor.
+  for (const cale of ["src/components/site/sections/hero.tsx", "src/components/site/sections/about-teaser.tsx"]) {
+    assert.ok(citeste(cale).includes('className="buton-plin"'), cale);
+  }
+  for (const cale of [
+    "src/components/site/sections/contact-form.tsx",
+    "src/components/site/sections/newsletter-form.tsx",
+    "src/components/site/sections/programare-rapida.tsx",
+    "src/app/programare/formular.tsx",
+  ]) {
+    assert.ok(citeste(cale).includes('className="buton-plin" style={stilButonTrimite(seLucreaza)}'), cale);
+  }
+  for (const cale of [
+    "src/components/site/sections/features.tsx",
+    "src/components/site/sections/latest-posts.tsx",
+    "src/components/site/sections/articol-complet.tsx",
+    "src/components/site/sections/contact-form.tsx",
+  ]) {
+    assert.ok(citeste(cale).includes('color: "var(--s-link, var(--s-accent))"'), cale);
+  }
+  for (const cale of ["src/components/site/card-articol.tsx", "src/components/site/sections/features.tsx"]) {
+    assert.ok(citeste(cale).includes('color: "var(--t-accent-interactiv, var(--t-accent))"'), cale);
+  }
+});
+
+test("mostrele culorilor gata alese: trei fâșii (65% butoane, 20% linkuri, 15% fundal), calculate ca pe site", () => {
+  const ecran = citeste("src/app/dashboard/aspect/formular.tsx");
+  assert.ok(ecran.includes("paleta: paletaDinCuloare(sablon.paleta, preset.hex).paleta"), "aceeași funcție ca pe site");
+  assert.ok(ecran.includes('style={{ flex: "65 1 0", background: preset.paleta.accent }}'));
+  assert.ok(ecran.includes('style={{ flex: "20 1 0", background: preset.paleta.accentInteractiv }}'));
+  assert.ok(ecran.includes('style={{ flex: "15 1 0", background: preset.paleta.fundalNuantat }}'));
+  // Safir doar propus în câmp: nu se salvează până nu alege omul.
+  assert.ok(ecran.includes("valoare={stare.principala ?? CULOARE_PROPUSA}"));
+  assert.ok(ecran.includes("const baza = bazaManuala(sablon.paleta, stare.principala);"));
 });
