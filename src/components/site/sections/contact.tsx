@@ -203,7 +203,7 @@ export function Contact({
                   <span
                     style={{
                       fontFamily: "var(--t-font-secundar)",
-                      fontStyle: "var(--t-stil-accent)",
+                      fontStyle: "var(--t-stil-accent-titlu, var(--t-stil-accent))",
                       fontWeight: 400,
                       color: "var(--t-accent-pe-inchis)",
                     }}

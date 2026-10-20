@@ -192,7 +192,7 @@ export function Hero({
             <span
               style={{
                 fontFamily: "var(--t-font-secundar)",
-                fontStyle: "var(--t-stil-accent)",
+                fontStyle: "var(--t-stil-accent-titlu, var(--t-stil-accent))",
                 // La „Apropiere" coada scrisă de mână e mai apăsată și verde, ca
                 // la sursă („din nou."); la restul rămâne subțire, în culoarea
                 // titlului.

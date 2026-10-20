@@ -58,7 +58,7 @@ export function SectionHeading({
               <span
                 style={{
                   fontFamily: "var(--t-font-secundar)",
-                  fontStyle: "var(--t-stil-accent)",
+                  fontStyle: "var(--t-stil-accent-titlu, var(--t-stil-accent))",
                   // La „Apropiere" accentul scris de mână e piersică apăsat, ca
                   // la sursă („care", „rânduri."); la restul rămâne subțire, în
                   // culoarea titlului.

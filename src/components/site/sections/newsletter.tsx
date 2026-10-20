@@ -87,7 +87,7 @@ export function Newsletter({
           {data.titluAccent && (
             <>
               {" "}
-              <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent)", fontWeight: 300 }}>
+              <span style={{ fontFamily: "var(--t-font-secundar)", fontStyle: "var(--t-stil-accent-titlu, var(--t-stil-accent))", fontWeight: 300 }}>
                 {data.titluAccent}
               </span>
             </>

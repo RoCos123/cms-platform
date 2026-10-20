@@ -137,6 +137,7 @@ test("`getTemplate` fără fonturi întoarce EXACT șablonul — site-urile exis
     const stil = templateStyle(sablon);
     assert.equal(stil["--t-greutate-titlu-ales"], undefined, sablon.nume);
     assert.equal(stil["--t-cursiv-secundar"], undefined, sablon.nume);
+    assert.equal(stil["--t-stil-accent-titlu"], undefined, sablon.nume);
     assert.equal(sablon.tipografie.fontTitlu, undefined, `${sablon.nume}: niciun șablon nu are fontTitlu`);
   }
 });
@@ -167,6 +168,8 @@ function asteptat(sablon, titluri, text) {
     greutate: ft ? ft.greutate : t.greutateTitlu,
     accentInItalic: ft ? t.accentInItalic && ft.cursive : t.accentInItalic,
     faraCursive: ft ? !ft.cursive : undefined,
+    // Partea evidențiată din titluri: cursivă la orice font ales care are cursive (20 oct.).
+    titluCursiv: ft ? ft.cursive : undefined,
   };
 }
 
@@ -185,11 +188,13 @@ test("regula, pe toate combinațiile × cele cinci șabloane: textul schimbă te
         assert.equal(t.greutateTitlu, e.greutate, caz);
         assert.equal(t.accentInItalic, e.accentInItalic, caz);
         assert.equal(t.secundarFaraCursive, e.faraCursive, caz);
+        assert.equal(t.accentTitluCursiv, e.titluCursiv, caz);
 
         const stil = templateStyle(getTemplate(sablon.id, undefined, { titluri, text }));
         assert.equal(stil["--t-greutate-titlu-ales"], String(e.greutate), caz);
         assert.equal(stil["--t-cursiv-secundar"], e.faraCursive ? "normal" : undefined, caz);
         assert.equal(stil["--t-stil-accent"], e.accentInItalic ? "italic" : "normal", caz);
+        assert.equal(stil["--t-stil-accent-titlu"], e.titluCursiv ? "italic" : undefined, caz);
         n++;
       }
     }
@@ -234,6 +239,51 @@ test("cursivele scrise de mână în cod pe fontul secundar ascultă de un font 
   assert.deepEqual(gasite, [], "orice cursiv fix pe fontul secundar trebuie să treacă prin --t-cursiv-secundar");
   assert.equal((citeste("src/components/site/sections/banda-servicii.tsx").match(/var\(--t-cursiv-secundar, italic\)/g) ?? []).length, 2);
   assert.equal((citeste("src/components/site/sections/hero.tsx").match(/var\(--t-cursiv-secundar, italic\)/g) ?? []).length, 1);
+});
+
+test("a doua parte a titlului: cursivă cu un font ales care are cursive — doar în titluri, fără culoare", () => {
+  // Prins de proprietar: pe Claritate singura diferență era grosimea, iar Playfair, Instrument
+  // Serif, Tenor Sans, Caveat n-au tăietură subțire — „în ritmul tău" arăta ca prima parte.
+  // A ales: „doar cursiv acolo unde se poate, fără culoare".
+  const titluri = [
+    "src/components/site/sections/hero.tsx",
+    "src/components/site/section-heading.tsx",
+    "src/components/site/sections/about-teaser.tsx",
+    "src/components/site/sections/testimonials.tsx",
+    "src/components/site/sections/contact.tsx",
+    "src/components/site/sections/how-it-works.tsx",
+    "src/components/site/sections/faq.tsx",
+    "src/components/site/sections/newsletter.tsx",
+  ];
+  const gasite = execFileSync("sh", ["-c", "grep -rln 'var(--t-stil-accent-titlu, var(--t-stil-accent))' src/components || true"], { encoding: "utf8" })
+    .split("\n").filter(Boolean).sort();
+  assert.deepEqual(gasite, [...titluri].sort());
+  for (const cale of titluri) {
+    // Fiecare stă pe partea evidențiată a unui titlu, nu pe un citat.
+    const sursa = citeste(cale);
+    const i = sursa.indexOf("var(--t-stil-accent-titlu, var(--t-stil-accent))");
+    assert.ok(sursa.lastIndexOf("titluAccent", i) > sursa.lastIndexOf("</h", i), `${cale}: nu e în partea evidențiată a unui titlu`);
+  }
+  // Citatele, recenziile, fraza din „Despre mine" și datele din „Contact" rămân pe regula șablonului.
+  const rest = execFileSync("sh", ["-c", `grep -rn 'fontStyle: "var(--t-stil-accent)"' src/components || true`], { encoding: "utf8" })
+    .split("\n").filter(Boolean).map((l) => l.split(":")[0]).sort();
+  assert.deepEqual(rest, [
+    "src/components/site/sections/about-teaser.tsx",
+    "src/components/site/sections/about-teaser.tsx",
+    "src/components/site/sections/contact.tsx",
+    "src/components/site/sections/quote.tsx",
+    "src/components/site/sections/quote.tsx",
+    "src/components/site/sections/testimonials.tsx",
+  ]);
+  // Pe Claritate: Playfair → titluri cursive, citatele drepte; Tenor Sans → nimic cursiv.
+  const playfair = templateStyle(getTemplate("claritate", undefined, { titluri: "Playfair Display" }));
+  assert.equal(playfair["--t-stil-accent-titlu"], "italic");
+  assert.equal(playfair["--t-stil-accent"], "normal", "citatele rămân drepte, ca pe Claritate");
+  const tenor = templateStyle(getTemplate("claritate", undefined, { titluri: "Tenor Sans" }));
+  assert.equal(tenor["--t-stil-accent-titlu"], undefined);
+  assert.equal(tenor["--t-stil-accent"], "normal");
+  // Fără culoare: nicio variabilă nouă de culoare pentru titluri.
+  assert.equal(playfair["--t-accent-titlu"], undefined);
 });
 
 // ───────────────────────── salvarea și poarta ─────────────────────────

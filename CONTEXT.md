@@ -574,6 +574,19 @@ arătat proprietarului ÎNAINTE să se construiască).
     titlul mare, „Cum decurge", „Despre mine" și cifrele în Fraunces 500, textul și meniul în
     Figtree; doar Lora la text → toate titlurile rămân Inter 700; Quicksand → banda dreaptă;
     „Revino" → cheia dispare, site-ul identic cu cel de la început; telefon 390px fără depășire.
+  - **A doua parte a titlului, cursivă (20 oct., după master):** proprietarul a prins că la
+    Playfair, Instrument Serif, Tenor Sans, Cormorant, Fraunces, Caveat „în ritmul tău" arăta
+    aproape ca prima parte — pe Claritate singura diferență era grosimea (300 față de titlu), iar
+    fonturile astea n-au tăietură subțire (sau sunt fine peste tot). I-am arătat o planșă (acum /
+    cursiv / culoare / cursiv + culoare); a ales „doar cursiv acolo unde se poate, fără culoare".
+    Făcut: cu un font de titlu ales care ARE cursive, partea evidențiată din titluri e cursivă
+    (`accentTitluCursiv` → `--t-stil-accent-titlu`, în cele opt locuri cu `titluAccent`: titlul
+    mare, `SectionHeading` și cele șase secțiuni care își scriu singure titlul). Citatele,
+    recenziile, fraza din „Despre mine" și datele din „Contact" rămân pe regula șablonului
+    (`--t-stil-accent`), deci pe Claritate drepte. Tenor Sans, Caveat, Quicksand, Bricolage și
+    Inter n-au cursive: rămân ca înainte — la Tenor Sans și Caveat diferența rămâne mică, spus
+    proprietarului. Probă nouă + 6 stricări prinse; tot: 520. Browser: Playfair, Instrument,
+    Cormorant, Fraunces → titlul mare și „Ce poți întreba" cursive, citatul drept, aceeași culoare.
   - **De știut:** la titlul uriaș din hero, la unele fonturi (văzut la Instrument Serif) virgula
     de sub „Ș" poate atinge căciulița lui „î" de pe rândul următor — nereparat încă, de hotărât
     dacă merită aer în plus. Dacă „Aspect" se deschide pe alte șabloane: pe Apropiere, un font de

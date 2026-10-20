@@ -124,6 +124,11 @@ export type TemplateTypography = {
   fallbackTitlu?: string;
   /** Fontul secundar ales n-are cursive: textele cursive scrise cu el rămân drepte, nu înclinate de browser. */
   secundarFaraCursive?: boolean;
+  /**
+   * Partea evidențiată din titluri („în ritmul tău") se scrie cursiv — doar cu un font de titlu ales
+   * care ARE cursive (`--t-stil-accent-titlu`). Fără, rămâne cum o face șablonul (`accentInItalic`).
+   */
+  accentTitluCursiv?: boolean;
 };
 
 /**

@@ -111,7 +111,7 @@ export function Testimonials({
             <span
               style={{
                 fontFamily: "var(--t-font-secundar)",
-                fontStyle: "var(--t-stil-accent)",
+                fontStyle: "var(--t-stil-accent-titlu, var(--t-stil-accent))",
                 // Ca la celelalte titluri de secțiune: piersică apăsat pe
                 // „Apropiere", subțire în culoarea titlului la rest.
                 fontWeight: "var(--t-greutate-accent-titlu, 300)" as unknown as number,

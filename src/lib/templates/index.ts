@@ -133,6 +133,7 @@ export function templateStyle(template: Template): CSSProperties {
     // iar componentele cad pe valorile de până acum.
     ...(t.fontTitlu && { "--t-greutate-titlu-ales": String(t.greutateTitlu) }),
     ...(t.secundarFaraCursive && { "--t-cursiv-secundar": "normal" }),
+    ...(t.accentTitluCursiv && { "--t-stil-accent-titlu": "italic" }),
     "--t-raza": f.raza,
     "--t-raza-buton": f.razaButon,
     "--t-spatiere": f.spatiereSectiune,

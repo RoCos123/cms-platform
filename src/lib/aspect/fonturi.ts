@@ -138,6 +138,12 @@ export function fonturiDinBrand(brand: unknown): unknown {
  *
  * Fără cursive (Quicksand, Bricolage, Tenor Sans, Caveat), accentele rămân drepte: altfel le-ar
  * înclina browserul, cum se ferea deja „Apropiere" cu Caveat.
+ *
+ * Partea evidențiată din TITLURI („în ritmul tău") se scrie cursiv la orice font ales care are
+ * cursive, chiar dacă șablonul o ține dreaptă (Claritate): pe Claritate singura diferență era
+ * grosimea, iar Playfair, Instrument Serif, Tenor Sans, Caveat n-au o tăietură subțire — a doua
+ * parte arăta ca prima (prins de proprietar). A ales, din planșa cu variante, „doar cursiv acolo
+ * unde se poate, fără culoare". Citatele și recenziile nu se schimbă: ele ascultă tot de șablon.
  */
 export function tipografieEfectiva(sablon: TemplateTypography, fonturi: AspectFonturi): TemplateTypography {
   const tipografie: TemplateTypography = { ...sablon };
@@ -165,6 +171,7 @@ export function tipografieEfectiva(sablon: TemplateTypography, fonturi: AspectFo
     tipografie.greutateTitlu = titlu.greutate;
     tipografie.accentInItalic = sablon.accentInItalic && titlu.cursive;
     tipografie.secundarFaraCursive = !titlu.cursive;
+    tipografie.accentTitluCursiv = titlu.cursive;
   }
 
   return tipografie;
