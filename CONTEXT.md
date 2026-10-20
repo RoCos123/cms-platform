@@ -598,8 +598,7 @@ arătat proprietarului ÎNAINTE să se construiască).
     titlurilor la 60% din culoarea titlului (`accentGri` → `--t-estompare-accent-titlu`,
     `color-mix(in srgb, currentColor 60%, transparent)`): gri pe deschis, fildeș stins pe banda
     închisă; contrast minim 3,2:1 pe orice fundal și culoare aleasă (probat, prag 3:1 pentru titlu
-    mare). Doar la Tenor Sans; Caveat are aceeași problemă — întrebat proprietarul dacă vrea și
-    acolo gri. Probe: 3 teste noi, 6 stricări prinse; tot: 524. Browser: Playfair 500 / 300
+    mare). La Tenor Sans și (cerut apoi, „da, fă gri și la Caveat") la Caveat. Probe: 3 teste noi, 6 stricări prinse; tot: 524. Browser: Playfair 500 / 300
     cursiv; „Playfair Display" salvat → Playfair; Tenor: partea a doua la 60% pe titlul mare,
     pe bandă și la întrebări; fără fonturi alese, nimic gri; testul pe pixeli trece la toate 11.
   - **Căciulița lui „î" (20 oct., „da, rezolvă asta cu căciulița"):** la titlul mare, virgula de
@@ -613,8 +612,12 @@ arătat proprietarului ÎNAINTE să se construiască).
     de acum. Verificat pe pixeli (un rând complet gol între fiecare două rânduri ale titlului):
     pe starea veche picau exact Playfair, Cormorant, Instrument; după, trec toate 11. Rămas:
     un „Î"/„Â" MARE la început de rând, sub o virgulă, ar cere ~1,1–1,27 — nu acoperit, ar
-    face titlurile prea aerisite. Inter fără font ales (0,98): în titlul de probă nu se atinge
-    (rândurile se rup altfel), dar cu alt text ar putea — întrebat proprietarul dacă vrea și acolo. Dacă „Aspect" se deschide pe alte șabloane: pe Apropiere, un font de
+    face titlurile prea aerisite. **Și pe Claritate fără font ales** (cerut: „vreau protecția…
+    dacă distanța ar crește până la 1,05"): la Inter, 0,98 lăsa un „î" pus sub un „Ș"/„p" să le
+    atingă (pe pixeli, cel mai rău caz); 1,05 lasă ~6px la mărimea de laptop (1,03 ar fi fost
+    minimul). Pus în șablon (`claritate.ts`, `interlinieMinimaTitlu: 1.05`), deci pe TOATE
+    site-urile Claritate, nu doar în poarta „Aspect"; titlurile secțiunilor rămân 1,08; „Inter"
+    ales din listă trece și el pe 1,05; celelalte șabloane neatinse (Căldură verificat: 0,98). Dacă „Aspect" se deschide pe alte șabloane: pe Apropiere, un font de
     titlu ales înlocuiește și scrisul de mână (Caveat) al accentelor — e regula hotărâtă, dar se
     vede.
 

@@ -141,7 +141,8 @@ test("`getTemplate` fără fonturi întoarce EXACT șablonul — site-urile exis
     assert.equal(stil["--t-greutate-titlu-ales"], undefined, sablon.nume);
     assert.equal(stil["--t-cursiv-secundar"], undefined, sablon.nume);
     assert.equal(stil["--t-stil-accent-titlu"], undefined, sablon.nume);
-    assert.equal(stil["--t-interlinie-minima-titlu"], undefined, sablon.nume);
+    // Singura excepție: Claritate are de la sine o distanță minimă (1,05) la titluri, pentru căciulița lui „î".
+    assert.equal(stil["--t-interlinie-minima-titlu"], sablon.id === "claritate" ? "1.05" : undefined, sablon.nume);
     assert.equal(sablon.tipografie.fontTitlu, undefined, `${sablon.nume}: niciun șablon nu are fontTitlu`);
   }
 });
@@ -174,7 +175,7 @@ function asteptat(sablon, titluri, text) {
     faraCursive: ft ? !ft.cursive : undefined,
     // Partea evidențiată din titluri: cursivă la orice font ales care are cursive (20 oct.).
     titluCursiv: ft ? ft.cursive : undefined,
-    interlinie: ft ? ft.interlinie : undefined,
+    interlinie: ft ? ft.interlinie : t.interlinieMinimaTitlu,
   };
 }
 
@@ -298,7 +299,7 @@ test("căciulița lui î nu mai atinge rândul de deasupra: fiecare font ales ar
   // coada lui p/g + cât urcă căciulița lui î/â, la grosimea titlului și a părții evidențiate, plus
   // 0,04 aer. Prins de proprietar la Instrument Serif și Cormorant.
   assert.deepEqual(Object.fromEntries(FONTURI_TITLU.map((f) => [f.nume, f.interlinie])), {
-    Inter: 1.08, "Josefin Sans": 0.97, Quicksand: 1.06, "Bricolage Grotesque": 1.06, Playfair: 0.94,
+    Inter: 1.05, "Josefin Sans": 0.97, Quicksand: 1.06, "Bricolage Grotesque": 1.06, Playfair: 0.94,
     "Cormorant Garamond": 1.08, Fraunces: 1.03, "Zilla Slab": 0.97, "Tenor Sans": 1.01, "Instrument Serif": 1.11, Caveat: 0.87,
   });
   // Doar o limită de jos, pusă peste distanța de până acum a fiecărui titlu — care rămâne aceeași.
@@ -328,8 +329,8 @@ test("„De revistă”: Playfair (cel nou, cu 300), nu Playfair Display — iar
   assert.equal(getTemplate("claritate", undefined, { titluri: "Playfair Display" }).tipografie.fontTitlu, "Playfair");
 });
 
-test("„Aerisit”: la Tenor Sans (o grosime, fără cursive), partea a doua a titlului e gri — doar acolo", () => {
-  assert.deepEqual(FONTURI_TITLU.filter((f) => f.accentGri).map((f) => f.nume), ["Tenor Sans"]);
+test("la Tenor Sans și Caveat (fără cursive, fără tăietură subțire), partea a doua a titlului e gri — doar acolo", () => {
+  assert.deepEqual(FONTURI_TITLU.filter((f) => f.accentGri).map((f) => f.nume), ["Tenor Sans", "Caveat"]);
   for (const sablon of listTemplates()) {
     for (const f of FONTURI_TITLU) {
       const stil = templateStyle(getTemplate(sablon.id, undefined, { titluri: f.nume }));
@@ -366,6 +367,17 @@ test("griul se citește: 60% din culoarea titlului rămâne peste 3:1 (titlu mar
     }
   }
   assert.ok(min < 3.6, `cel mai slab caz (${min.toFixed(2)}) — dacă urcă mult, griul s-a întunecat și nu se mai deosebește`);
+});
+
+test("Claritate, și fără font ales: titlul mare nu mai coboară sub 1,05 (cerut de proprietar), restul șabloanelor neatinse", () => {
+  // Măsurat pe pixeli: la 0,98, un „î" sub un „Ș" sau un „p" se atinge; la 1,05 rămân ~6px.
+  for (const sablon of listTemplates()) {
+    assert.equal(sablon.tipografie.interlinieMinimaTitlu, sablon.id === "claritate" ? 1.05 : undefined, sablon.nume);
+  }
+  // „Inter” ales din listă arată la fel ca „Ca în șablon”.
+  assert.equal(FONTURI_TITLU.find((f) => f.nume === "Inter").interlinie, getTemplate("claritate").tipografie.interlinieMinimaTitlu);
+  // Doar un font de TEXT ales nu schimbă distanța titlurilor.
+  assert.equal(getTemplate("claritate", undefined, { text: "Lora" }).tipografie.interlinieMinimaTitlu, 1.05);
 });
 
 // ───────────────────────── salvarea și poarta ─────────────────────────

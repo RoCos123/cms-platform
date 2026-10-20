@@ -70,6 +70,10 @@ export const claritate: Template = {
     titluriInSecundar: false,
     accentInItalic: false,
     greutateTitlu: 700,
+    // Titlul mare stă la 0,98, iar la Inter un „î" pus sub un „Ș" sau un „p" se atingea (măsurat pe
+    // pixeli). Cerut de proprietar, 20 oct. 2026: „vreau protecția… dacă distanța ar crește până la
+    // 1,05" — la 1,05 rămân ~6px între ele la mărimea de laptop. Titlurile secțiunilor (1,08) rămân.
+    interlinieMinimaTitlu: 1.05,
   },
 
   forme: {

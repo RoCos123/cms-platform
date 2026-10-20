@@ -46,9 +46,9 @@ export type FontTitlu = {
   interlinie: number;
   rezerve: string;
   /**
-   * Partea a doua a titlului („în ritmul tău") în gri, ca textul discret. Doar pentru un font cu o
-   * singură grosime și fără cursive, unde nimic altceva n-o deosebește de prima (Tenor Sans — ales
-   * de proprietar: „la aerisit, varianta cu gri").
+   * Partea a doua a titlului („în ritmul tău") în gri, ca textul discret. Doar pentru un font fără
+   * cursive și fără o tăietură subțire, unde nimic altceva n-o deosebește de prima: Tenor Sans
+   * („la aerisit, varianta cu gri") și Caveat („da, fă gri și la Caveat") — alese de proprietar.
    */
   accentGri?: boolean;
 };
@@ -62,7 +62,8 @@ export type FontText = {
 /** Fonturile pentru titluri — câte unul din fiecare stil, în ordinea arătată proprietarului. */
 export const FONTURI_TITLU: readonly FontTitlu[] = [
   // Inter e declarat fără cursive (`fonturi.ts`, ca până acum), deci „fără" aici.
-  { nume: "Inter", stil: "Neutru", greutate: 700, cursive: false, interlinie: 1.08, rezerve: REZERVE.sans },
+  // 1,05, cât are Claritate fără font ales (cerut de proprietar), ca „Inter" și „Ca în șablon" să arate la fel.
+  { nume: "Inter", stil: "Neutru", greutate: 700, cursive: false, interlinie: 1.05, rezerve: REZERVE.sans },
   { nume: "Josefin Sans", stil: "Geometric", greutate: 600, cursive: true, interlinie: 0.97, rezerve: REZERVE.sans },
   { nume: "Quicksand", stil: "Rotunjit, prietenos", greutate: 600, cursive: false, interlinie: 1.06, rezerve: REZERVE.rotunjit },
   { nume: "Bricolage Grotesque", stil: "Cu personalitate", greutate: 600, cursive: false, interlinie: 1.06, rezerve: REZERVE.sans },
@@ -74,7 +75,7 @@ export const FONTURI_TITLU: readonly FontTitlu[] = [
   { nume: "Zilla Slab", stil: "Solid", greutate: 600, cursive: true, interlinie: 0.97, rezerve: REZERVE.serif },
   { nume: "Tenor Sans", stil: "Sculptat, aerisit", greutate: 400, cursive: false, interlinie: 1.01, rezerve: REZERVE.sans, accentGri: true },
   { nume: "Instrument Serif", stil: "Îngust, rafinat", greutate: 400, cursive: true, interlinie: 1.11, rezerve: REZERVE.serif },
-  { nume: "Caveat", stil: "Scris de mână", greutate: 600, cursive: false, interlinie: 0.87, rezerve: REZERVE.deMana },
+  { nume: "Caveat", stil: "Scris de mână", greutate: 600, cursive: false, interlinie: 0.87, rezerve: REZERVE.deMana, accentGri: true },
 ];
 
 /** Fonturile pentru text. Aici e firesc să semene: toate trebuie să se citească ușor. */
