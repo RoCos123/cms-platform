@@ -48,6 +48,10 @@ export const caldura: Template = {
     titluriInSecundar: false,
     accentInItalic: true,
     greutateTitlu: 700,
+    // Titlul mare stătea la 0,98, iar virgula lui „Ș"/„ț" atingea rândul de dedesubt — cel mai rău
+    // sub un „î" din partea a doua (Cormorant cursiv, cu căciulița foarte sus): măsurat pe pixeli,
+    // se desparte abia la 1,08 (la 1,05 tot se atinge). Cerut de proprietar, 20 oct. 2026: „1, pune 1,08".
+    interlinieMinimaTitlu: 1.08,
   },
 
   forme: {

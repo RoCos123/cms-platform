@@ -239,7 +239,8 @@ legat de „Aspect" (șablonul de dinainte, pe toate site-urile Căldură): la t
 partea a doua în Cormorant cursiv, la 0,98), virgula lui „Ș"/„ț" atinge rândul de dedesubt;
 măsurat pe pixeli: „…psihoterapie, / în ritmul tău" se desparte de la 1,00, dar „Ședințe pentru
 tine / îți ascult povestea" (căciulița înaltă a lui „î" în Cormorant) abia la 1,08 — 1,05 nu
-ajunge. Propus proprietarului: 1,08 pe Căldură (ca la Claritate, în șablon); așteaptă răspunsul. Întâi a fost doar discutat (proprietarul: „momentan nu facem
+ajunge. Proprietarul: „1, pune 1,08 și fă pe master" → `caldura.ts`, `interlinieMinimaTitlu: 1.08`,
+pe TOATE site-urile Căldură; verificat pe pixeli (ambele titluri despărțite: 11px, 4px). Întâi a fost doar discutat (proprietarul: „momentan nu facem
 nimic, doar discutăm"); apoi a cerut „hai sa facem partea cu culorile si fonturile… Mai intai
 culorile". Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
 *Hotărâri confirmate:*

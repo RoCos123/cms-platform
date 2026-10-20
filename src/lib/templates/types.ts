@@ -131,7 +131,7 @@ export type TemplateTypography = {
   accentTitluCursiv?: boolean;
   /**
    * Distanța minimă dintre rândurile titlurilor (`--t-interlinie-minima-titlu`), ca diacriticele să
-   * nu se atingă: a fontului de titlu ales, sau a șablonului (Claritate: 1,05).
+   * nu se atingă: a fontului de titlu ales, sau a șablonului (Claritate: 1,05; Căldură: 1,08).
    */
   interlinieMinimaTitlu?: number;
   /** Partea a doua a titlului în gri (`--t-estompare-accent-titlu`): font ales fără grosimi și fără cursive. */
