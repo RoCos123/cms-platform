@@ -231,7 +231,15 @@ aleasă, tenta lavandă a Luminii devine calcarul cald (ca pe Claritate); fără
 de la sine titluri amestecate (Cormorant la unele, sans gros la „Despre mine", „Ce spun",
 „Întrebări", „Newsletter", „Cum decurge") — așa e șablonul; cu un font de titlu ales se unifică.
 Domeniul `model-lumina.vercel.app` e presupus după modelul celui de Claritate — dacă e altul,
-meniul nu apare (fără stricăciuni) și se corectează în `acces.ts`. Întâi a fost doar discutat (proprietarul: „momentan nu facem
+meniul nu apare (fără stricăciuni) și se corectează în `acces.ts`.
+*Lumină pe master* (`d52057e`); proprietarul: „merge". *CĂLDURĂ pe `model-caldura.vercel.app`*
+(„merge, hai la Căldură") — PE BRANCH. Verificat local: fără culori neschimbat; cu Safir, Smarald +
+„Elegant", Bordeaux + „De revistă" — nimic stricat, nicio eroare; meniul și pagina apar. Găsit, NU
+legat de „Aspect" (șablonul de dinainte, pe toate site-urile Căldură): la titlul mare (Manrope 700 +
+partea a doua în Cormorant cursiv, la 0,98), virgula lui „Ș"/„ț" atinge rândul de dedesubt;
+măsurat pe pixeli: „…psihoterapie, / în ritmul tău" se desparte de la 1,00, dar „Ședințe pentru
+tine / îți ascult povestea" (căciulița înaltă a lui „î" în Cormorant) abia la 1,08 — 1,05 nu
+ajunge. Propus proprietarului: 1,08 pe Căldură (ca la Claritate, în șablon); așteaptă răspunsul. Întâi a fost doar discutat (proprietarul: „momentan nu facem
 nimic, doar discutăm"); apoi a cerut „hai sa facem partea cu culorile si fonturile… Mai intai
 culorile". Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
 *Hotărâri confirmate:*
