@@ -106,6 +106,8 @@ export const PERECHI_FONTURI: readonly { nume: string; titluri: string; text: st
   { nume: "Rafinat", titluri: "Instrument Serif", text: "Inter" },
   { nume: "Retro", titluri: "Josefin Sans", text: "Lora" },
   { nume: "Aerisit", titluri: "Tenor Sans", text: "Literata" },
+  // Cerută de proprietar, 20 oct. 2026: „o pereche gata aleasă cu Caveat ca titlu și Manrope în rest".
+  { nume: "Personal", titluri: "Caveat", text: "Manrope" },
 ];
 
 export type AspectFonturi = {

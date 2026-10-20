@@ -546,7 +546,8 @@ arătat proprietarului ÎNAINTE să se construiască).
     salvare pentru amândouă. La Fonturi: 8 **perechi gata alese** (Elegant: Cormorant + DM Sans; De
     revistă: Playfair + Source Sans 3; Cald: Fraunces + Figtree; Prietenos: Quicksand + Nunito;
     Modern: Bricolage + Inter; Rafinat: Instrument Serif + Inter; Retro: Josefin Sans + Lora;
-    Aerisit: Tenor Sans + Literata — alese de sesiune, se schimbă ușor), apoi **fontul titlurilor**
+    Aerisit: Tenor Sans + Literata — alese de sesiune, se schimbă ușor; a noua, Personal: Caveat +
+    Manrope, cerută de proprietar pe 20 oct.), apoi **fontul titlurilor**
     (11) și **fontul textului** (10), fiecare scris cu el însuși pe un text cu diacritice, plus „Ca
     în șablon" și „Revino la fonturile șablonului". Previzualizarea din dreapta se schimbă pe loc.
   - **Unde stau:** `site_settings.brand.aspect.fonturi` = `{ titluri, text }` (nume din liste;

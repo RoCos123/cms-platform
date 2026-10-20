@@ -108,6 +108,8 @@ test("fiecare font de titlu are lățimea literei măsurată (reperele din „De
 
 test("perechile gata alese: cel puțin 5, cu nume unice, din fonturile listelor, fără dubluri", () => {
   assert.ok(PERECHI_FONTURI.length >= 5);
+  // Cerută de proprietar: Caveat la titluri, Manrope în rest.
+  assert.deepEqual(PERECHI_FONTURI.find((p) => p.nume === "Personal"), { nume: "Personal", titluri: "Caveat", text: "Manrope" });
   assert.equal(new Set(PERECHI_FONTURI.map((p) => p.nume)).size, PERECHI_FONTURI.length);
   assert.equal(new Set(PERECHI_FONTURI.map((p) => `${p.titluri}|${p.text}`)).size, PERECHI_FONTURI.length);
   for (const p of PERECHI_FONTURI) {
