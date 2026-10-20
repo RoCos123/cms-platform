@@ -10,7 +10,7 @@ import {
   type Social,
 } from "@/lib/setari";
 import { catreEditor } from "@/lib/sectiuni-editare";
-import { culoriPermise } from "@/lib/aspect/acces";
+import { culoriPermise, fonturiPermise } from "@/lib/aspect/acces";
 import { getTemplate } from "@/lib/templates";
 import { FormularSetari } from "./formular";
 import { ComutatorPublicare } from "./comutator-publicare";
@@ -116,6 +116,7 @@ export default async function SetariPage() {
         template={getTemplate(
           site?.template as string | null,
           culoriPermise(brand, { domain: site?.domain as string | null, template: site?.template as string | null }),
+          fonturiPermise(brand, { domain: site?.domain as string | null, template: site?.template as string | null }),
         )}
       />
     </div>

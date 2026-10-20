@@ -1,4 +1,5 @@
 import { culoriDinBrand } from "./culori";
+import { fonturiDinBrand } from "./fonturi";
 
 /**
  * Cine are meniul „Aspect" — deocamdată doar în probă.
@@ -14,9 +15,9 @@ import { culoriDinBrand } from "./culori";
  * măsură de prudență. O ține un SINGUR loc, aici. Ce hotărăște:
  *
  * • meniul „Aspect" din panou și pagina `/dashboard/aspect` (altfel: „Pagina nu există");
- * • salvarea culorilor (altfel refuzată, chiar dacă cineva trimite cererea de mână);
- * • aplicarea culorilor pe site-ul public și în toate previzualizările din panou — un site
- *   din afara probei le ignoră, chiar dacă în bază ar sta culori salvate.
+ * • salvarea culorilor și fonturilor (altfel refuzată, chiar dacă cineva trimite cererea de mână);
+ * • aplicarea lor pe site-ul public și în toate previzualizările din panou — un site din afara
+ *   probei le ignoră, chiar dacă în bază ar sta culori sau fonturi salvate.
  *
  * Ca să deschizi pentru toți clienții: fă `aspectPermis` să întoarcă `true`. Nu mai e nimic de
  * schimbat în restul codului, iar culorile deja salvate rămân.
@@ -58,4 +59,9 @@ export function aspectPermis(site: SiteAspect, liste: ListeAspect = LISTE_REALE)
  */
 export function culoriPermise(brand: unknown, site: SiteAspect, liste: ListeAspect = LISTE_REALE): unknown {
   return aspectPermis(site, liste) ? culoriDinBrand(brand) : undefined;
+}
+
+/** Fonturile alese, DOAR dacă site-ul are „Aspect" — același drum ca la culori. */
+export function fonturiPermise(brand: unknown, site: SiteAspect, liste: ListeAspect = LISTE_REALE): unknown {
+  return aspectPermis(site, liste) ? fonturiDinBrand(brand) : undefined;
 }

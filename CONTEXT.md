@@ -219,9 +219,9 @@ să pară „versiunea oficială în engleză"; (d) comutatorul ar fi opțional 
 de mai sus iese bine; programările/formularele într-o limbă străină sunt partea necunoscută.
 *Limbi:* nehotărât; propunerea sesiunii: engleza întâi.
 
-**Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE, ÎN PROBĂ DOAR PE
-`model-claritate.vercel.app` (Claritate), PE BRANCH, NEPUBLICATE (18 oct. 2026); FONTURILE,
-NEÎNCEPUTE.** Întâi a fost doar discutat (proprietarul: „momentan nu facem
+**Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE ȘI PE MASTER, ÎN PROBĂ
+DOAR PE `model-claritate.vercel.app` (Claritate); FONTURILE FĂCUTE PE 20 OCT. 2026, PE BRANCH,
+NEPUBLICATE (așteaptă „fă pe master"), în aceeași probă.** Întâi a fost doar discutat (proprietarul: „momentan nu facem
 nimic, doar discutăm"); apoi a cerut „hai sa facem partea cu culorile si fonturile… Mai intai
 culorile". Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
 *Hotărâri confirmate:*
@@ -508,10 +508,10 @@ arătat proprietarului ÎNAINTE să se construiască).
   sine (nu există local) — se vede abia după „fă pe master".
 - **Rămas:** (1) „fă pe master" de la proprietar; (2) FONTURILE — lista curată, arătată lui înainte;
   (3) opțional: bifa „înțeleg…", ordonarea culorilor gata alese după gustul lui.
-- **FONTURILE — lista propusă (20 oct. 2026, „hai sa facem fonturile acum"; NEÎNCEPUTE, așteaptă
-  aprobarea listei).** Arătată ca mostre (titlu cu cuvânt colorat + cursiv; paragraf cu bold și
-  cursiv). *Titluri:* prima listă (Inter, Manrope, Cormorant, Playfair, Fraunces, Lora, EB Garamond, DM
-  Serif Display) i s-a părut proprietarului „cam asemănătoare între ele" — avea dreptate: șase din
+- **FONTURILE — lista (20 oct. 2026, „hai sa facem fonturile acum"; aprobată, apoi FĂCUTE — vezi
+  „FONTURILE — construite" mai jos).** Arătată ca mostre (titlu cu cuvânt colorat + cursiv;
+  paragraf cu bold și cursiv). *Titluri:* prima listă (Inter, Manrope, Cormorant, Playfair,
+  Fraunces, Lora, EB Garamond, DM Serif Display) i s-a părut proprietarului „cam asemănătoare între ele" — avea dreptate: șase din
   opt erau serife de carte. A doua propunere, CÂTE UNUL DIN FIECARE STIL (11): Inter 700 (neutru),
   Josefin Sans 600 (geometric), Quicksand 600 (rotunjit), Bricolage Grotesque 600 (cu
   personalitate), Playfair Display 500 (de revistă), Cormorant Garamond 500 (clasic, fin), Fraunces
@@ -539,6 +539,46 @@ arătat proprietarului ÎNAINTE să se construiască).
   (2) la titlul uriaș din hero, cu interlinia lui strânsă, virgula de sub „Ș" poate atinge căciulița
   lui „î" de pe rândul următor (văzut la Instrument Serif) — de dat puțin aer la fonturile cu accente
   înalte. Lista de text: imagini trimise, așteaptă răspunsul.
+- **FONTURILE — construite (20 oct. 2026, pe branch; „fă pe master" nu s-a spus).** Proprietarul:
+  „da, le păstrez pe toate" (cele 10 de text) și „facem 5 combinații sau mai multe, pe lângă
+  alegerea liberă".
+  - **Ce vede clientul:** în „Aspect", două file, **Culori** și **Fonturi**, o singură bară de
+    salvare pentru amândouă. La Fonturi: 8 **perechi gata alese** (Elegant: Cormorant + DM Sans; De
+    revistă: Playfair + Source Sans 3; Cald: Fraunces + Figtree; Prietenos: Quicksand + Nunito;
+    Modern: Bricolage + Inter; Rafinat: Instrument Serif + Inter; Retro: Josefin Sans + Lora;
+    Aerisit: Tenor Sans + Literata — alese de sesiune, se schimbă ușor), apoi **fontul titlurilor**
+    (11) și **fontul textului** (10), fiecare scris cu el însuși pe un text cu diacritice, plus „Ca
+    în șablon" și „Revino la fonturile șablonului". Previzualizarea din dreapta se schimbă pe loc.
+  - **Unde stau:** `site_settings.brand.aspect.fonturi` = `{ titluri, text }` (nume din liste;
+    `null` = al șablonului). Fără migrare, fără SQL. Salvarea (`salveazaAspect`) scrie culorile și
+    fonturile deodată, după poartă și după validarea amândurora; numele din afara listelor se spun,
+    nu se salvează; la citire, se ignoră în tăcere.
+  - **Regula** (`src/lib/aspect/fonturi.ts`, `tipografieEfectiva`): TEXTUL schimbă doar fontul
+    principal; TITLUL schimbă titlurile, cuvintele colorate, cifrele mari și citatele (fontul
+    secundar), cu grosimea LUI (Inter 700, Josefin/Quicksand/Bricolage/Zilla/Caveat 600,
+    Playfair/Cormorant/Fraunces 500, Tenor/Instrument 400). Cu orice alegere, titlurile au un font
+    explicit (`fontTitlu`), iar cele cinci secțiuni fără `titluSerif` îl folosesc prin
+    `--t-font-titlu-ales` / `--t-greutate-titlu-ales` — fără alegere, variabilele nu există și cad
+    exact pe ce aveau (fontul moștenit, 700). Fonturile fără cursive (Inter cum e declarat,
+    Quicksand, Bricolage, Tenor, Caveat) opresc cursivele accentelor și, prin `--t-cursiv-secundar`,
+    cursivele fixe din banda cu servicii și de sub titlul mare.
+  - **Servite de la noi:** toate în `src/lib/templates/fonturi.ts` (20 declarații: 6 ale
+    șabloanelor + 14 noi), `latin-ext`, `swap`, fără preîncărcare; build: 162 de fișiere woff2,
+    zero cereri către Google; un vizitator descarcă doar cele două folosite. Costul: regulile
+    `@font-face` ale tuturor în CSS-ul paginii, ~7 KB comprimat. Lățimea literei măsurată pentru
+    fiecare font de titlu (reperele din „Despre mine").
+  - **Probe:** `e2e/aspect-fonturi.proba.mjs`, 20 de teste (listele, declarațiile, regula pe
+    655 de combinații × șabloane, salvarea, poarta, componentele); 18 stricări, toate prinse. Tot:
+    519. **Browser** (stiva reală, `ana.test` TEMPORAR în poartă): panoul → perechea „Cald" →
+    previzualizarea Fraunces 500 / Figtree → Salvează → în bază, culorile neatinse → pe site
+    titlul mare, „Cum decurge", „Despre mine" și cifrele în Fraunces 500, textul și meniul în
+    Figtree; doar Lora la text → toate titlurile rămân Inter 700; Quicksand → banda dreaptă;
+    „Revino" → cheia dispare, site-ul identic cu cel de la început; telefon 390px fără depășire.
+  - **De știut:** la titlul uriaș din hero, la unele fonturi (văzut la Instrument Serif) virgula
+    de sub „Ș" poate atinge căciulița lui „î" de pe rândul următor — nereparat încă, de hotărât
+    dacă merită aer în plus. Dacă „Aspect" se deschide pe alte șabloane: pe Apropiere, un font de
+    titlu ales înlocuiește și scrisul de mână (Caveat) al accentelor — e regula hotărâtă, dar se
+    vede.
 
 **„Motivul programării" a fost SCOS (15 oct. 2026, „da, scoate-l" al proprietarului; pe branch,
 NEPUBLICAT — așteaptă „fă pe master").** Era o listă cu două intrări, „Evaluări psihologice" și

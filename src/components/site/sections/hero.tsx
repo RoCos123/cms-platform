@@ -224,7 +224,8 @@ export function Hero({
             // titlu nu e text curent, e o continuare a titlului. Păstrat și la
             // poza lată (aceleași două șabloane), ca să nu se schimbe vocea.
             fontFamily: titluLat || pozaLata ? "var(--t-font-secundar)" : undefined,
-            fontStyle: titluLat || pozaLata ? "italic" : undefined,
+            // Un font de titlu ales fără cursive (`--t-cursiv-secundar`) rămâne drept, nu înclinat de browser.
+            fontStyle: titluLat || pozaLata ? "var(--t-cursiv-secundar, italic)" : undefined,
             maxWidth: "34em",
             // La poza lată textul e centrat sub poză, la mijlocul ei (cerut de
             // proprietar): `marginInline: auto` centrează blocul, `textAlign`

@@ -16,8 +16,10 @@ import { normalizeazaHex } from "@/lib/aspect/culoare";
 import { bazaManuala, paletaDinCuloare, verificaPerechi, PRAG_CONTRAST } from "@/lib/aspect/paleta";
 import { ROLURI_MANUALE, type AspectCulori, type ModCulori, type RolManual } from "@/lib/aspect/culori";
 import { CULOARE_PROPUSA, PRESETURI_CULOARE } from "@/lib/aspect/salvare";
+import type { AspectFonturi } from "@/lib/aspect/fonturi";
 import type { PrevizualizareSite } from "@/lib/aspect/previzualizare";
-import { salveazaCulori } from "./actions";
+import { salveazaAspect } from "./actions";
+import { AlegereFonturi } from "./alegere-fonturi";
 
 type Stare = {
   mod: ModCulori;
@@ -54,6 +56,12 @@ function semnatura(culori: AspectCulori | null): string {
     culori.asumat,
   ]);
 }
+
+/** Fonturile de salvat: `null` când nu e ales nimic (fonturile șablonului). */
+const fonturiDeSalvat = (fonturi: AspectFonturi): AspectFonturi | null =>
+  fonturi.titluri || fonturi.text ? fonturi : null;
+
+const semnaturaFonturi = (fonturi: AspectFonturi | null) => JSON.stringify([fonturi?.titluri ?? null, fonturi?.text ?? null]);
 
 const formatRaport = (raport: number) => raport.toFixed(1).replace(".", ",");
 
@@ -137,12 +145,14 @@ export function FormularAspect({
   numeSablon,
   numeSite,
   initiale,
+  initialeFonturi,
   previzualizare,
 }: {
   sablonId: string;
   numeSablon: string;
   numeSite: string;
   initiale: AspectCulori | null;
+  initialeFonturi: AspectFonturi | null;
   /** Site-ul adevărat al clientului. `null` = nicio secțiune vizibilă: se arată pagina de exemplu. */
   previzualizare: PrevizualizareSite | null;
 }) {
@@ -152,6 +162,9 @@ export function FormularAspect({
     manual: initiale?.manual ?? {},
   });
   const [referinta, setReferinta] = useState<AspectCulori | null>(initiale);
+  const [fonturi, setFonturi] = useState<AspectFonturi>(initialeFonturi ?? { titluri: null, text: null });
+  const [referintaFonturi, setReferintaFonturi] = useState<AspectFonturi | null>(initialeFonturi);
+  const [fila, setFila] = useState<"culori" | "fonturi">("culori");
   const [seSalveaza, setSeSalveaza] = useState(false);
   const [eroare, setEroare] = useState<string | undefined>();
   const { show } = useToast();
@@ -160,12 +173,15 @@ export function FormularAspect({
 
   // Paleta pe care o vede omul acum. „Asumat" se hotărăște din ea, deci se calculează după.
   const fara = catreSalvare(stare, false);
-  const efectiv = getTemplate(sablonId, fara);
+  const fonturiAlese = fonturiDeSalvat(fonturi);
+  const efectiv = getTemplate(sablonId, fara, fonturiAlese);
   const slabe = verificaPerechi(efectiv.paleta).filter((pereche) => !pereche.trece);
   const asumat = stare.mod === "manual" && slabe.length > 0;
   const culori = catreSalvare(stare, asumat);
 
-  const modificat = semnatura(culori) !== semnatura(referinta);
+  const culoriModificate = semnatura(culori) !== semnatura(referinta);
+  const fonturiModificate = semnaturaFonturi(fonturiAlese) !== semnaturaFonturi(referintaFonturi);
+  const modificat = culoriModificate || fonturiModificate;
   const nimicAles = !stare.principala && Object.keys(stare.manual).length === 0;
 
   // Paleta calculată din culoarea principală (sau a șablonului, dacă n-a ales una): de la ea
@@ -208,7 +224,7 @@ export function FormularAspect({
     setSeSalveaza(true);
     setEroare(undefined);
 
-    const rezultat = await salveazaCulori(culori);
+    const rezultat = await salveazaAspect(culori, fonturiAlese);
     setSeSalveaza(false);
 
     if (!rezultat.ok) {
@@ -217,10 +233,8 @@ export function FormularAspect({
     }
 
     setReferinta(culori);
-    show(
-      culori ? "Culorile au fost salvate." : "Site-ul a revenit la culorile șablonului.",
-      "success",
-    );
+    setReferintaFonturi(fonturiAlese);
+    show(mesajSalvat(culoriModificate ? culori : undefined, fonturiModificate ? fonturiAlese : undefined), "success");
   }
 
   function reiaDeLaSablon() {
@@ -230,224 +244,255 @@ export function FormularAspect({
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-6 pb-24 lg:grid-cols-[minmax(0,440px)_minmax(0,1fr)] lg:gap-8">
       <div className="space-y-6">
-        <Card>
-          <CardHeader
-            title="Cum alegi culorile"
-            description={
-              <>
-                Acum site-ul folosește {culori ? "culorile alese de tine" : <>culorile șablonului „{numeSablon}”</>}.
-                Modificările ajung pe site abia după ce apeși Salvează.
-              </>
-            }
+        {/* Două file, nu un ecran lung: culorile și fonturile se aleg separat, dar se văd împreună
+            în dreapta și se salvează cu același buton. */}
+        <div className="inline-flex rounded-base border border-border bg-surface p-1" role="group" aria-label="Ce alegi">
+          {(["culori", "fonturi"] as const).map((f) => (
+            <button
+              key={f}
+              type="button"
+              aria-pressed={fila === f}
+              onClick={() => setFila(f)}
+              className={cn(
+                "rounded-sm px-4 py-1.5 text-sm font-medium",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                fila === f ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {f === "culori" ? "Culori" : "Fonturi"}
+            </button>
+          ))}
+        </div>
+
+        {fila === "fonturi" ? (
+          <AlegereFonturi
+            valoare={fonturi}
+            onChange={setFonturi}
+            tipografieSablon={sablon.tipografie}
+            numeSablon={numeSablon}
           />
-          <CardBody>
-            <fieldset className="space-y-3">
-              <legend className="sr-only">Modul de alegere a culorilor</legend>
-
-              <ModDeAlegere
-                valoare="auto"
-                ales={stare.mod === "auto"}
-                titlu="Automat"
-                recomandat
-                onAlege={() => setStare((s) => ({ ...s, mod: "auto" }))}
-              >
-                Alegi o singură culoare, iar restul se potrivește singur cu ea: fundalurile capătă o nuanță din
-                culoarea ta și textul rămâne ușor de citit pe toate. Nu poți face un site greu de citit.
-              </ModDeAlegere>
-
-              <ModDeAlegere
-                valoare="manual"
-                ales={stare.mod === "manual"}
-                titlu="Manual"
-                onAlege={() => setStare((s) => ({ ...s, mod: "manual" }))}
-              >
-                Alegi tu fiecare culoare în parte, pe cont propriu. Ai libertate deplină, dar nu mai verificăm noi
-                dacă se citește bine: un text galben pe fundal alb va arăta exact așa. Te avertizăm, dar nu te oprim.
-              </ModDeAlegere>
-            </fieldset>
-          </CardBody>
-        </Card>
-
-        {stare.mod === "auto" ? (
-          <Card>
-            <CardHeader
-              title="Culoarea principală"
-              description="Din ea se calculează butoanele, linkurile, fundalurile și benzile închise."
-            />
-            <CardBody className="space-y-5">
-              <CampCuloare
-                id="culoare-principala"
-                eticheta="Culoarea principală"
-                valoare={stare.principala ?? CULOARE_PROPUSA}
-                onChange={(hex) => setStare((s) => ({ ...s, principala: hex }))}
-              />
-
-              <div>
-                <p className="mb-1 text-xs font-medium text-muted-foreground">Sau pornește de la una gata aleasă</p>
-                <p className="mb-2 text-xs text-muted-foreground">
-                  Fiecare mostră arată, de la stânga: banda închisă, butoanele și linkurile.
-                </p>
-                <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                  {mostre.map((preset) => {
-                    const activ = stare.principala === preset.hex;
-                    return (
-                      <li key={preset.hex}>
-                        <button
-                          type="button"
-                          aria-pressed={activ}
-                          onClick={() => setStare((s) => ({ ...s, principala: preset.hex }))}
-                          className={cn(
-                            "flex w-full flex-col items-center gap-1.5 rounded-base border p-2 text-xs text-foreground",
-                            "hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                            activ ? "border-foreground" : "border-border",
-                          )}
-                        >
-                          {/* Trei fâșii, nu o pată: banda închisă (50%), butoanele (30%) și
-                              linkurile (20%), exact cum ies pe site. Fundalul cardurilor nu e aici:
-                              e același alabastru la toate culorile. */}
-                          <span aria-hidden className="flex h-8 w-full gap-0.5">
-                            <span
-                              className="rounded-sm"
-                              style={{ flex: "50 1 0", background: preset.paleta.fundalInchisMatase ?? preset.paleta.fundalInchis }}
-                            />
-                            <span
-                              className="rounded-sm"
-                              style={{ flex: "30 1 0", background: preset.paleta.accentMatase ?? preset.paleta.accent }}
-                            />
-                            <span
-                              className="rounded-sm"
-                              style={{ flex: "20 1 0", background: preset.paleta.accentInteractiv }}
-                            />
-                          </span>
-                          {preset.nume}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-
-              {calculat?.accentAjustat && (
-                <p className="rounded-base bg-warning-surface px-3 py-2 text-xs text-foreground" role="status">
-                  <span
-                    aria-hidden
-                    className="mr-1.5 inline-block size-3 translate-y-0.5 rounded-sm border border-border"
-                    style={{ background: calculat.accentObtinut }}
-                  />
-                  Culoarea aleasă ({calculat.culoareaAleasa}) e prea deschisă ca butoanele și linkurile scrise cu ea să
-                  se citească pe un fundal deschis. Pe site apare puțin mai închisă ({calculat.accentObtinut}), ca
-                  să se vadă bine.
-                </p>
-              )}
-
-              {stare.principala && !calculat?.accentAjustat && (
-                <p className="text-xs text-muted-foreground">
-                  Verificat: toate textele de pe site se citesc pe fundalurile lor (contrast de cel puțin{" "}
-                  {formatRaport(PRAG_CONTRAST)}:1).
-                </p>
-              )}
-            </CardBody>
-          </Card>
         ) : (
+          <>
           <Card>
             <CardHeader
-              title="Fiecare culoare, separat"
+              title="Cum alegi culorile"
               description={
-                stare.principala ? (
-                  <>
-                    Pornești de la culorile calculate din {stare.principala}. Ca să schimbi punctul de pornire, treci pe
-                    Automat, alege altă culoare și revino aici.
-                  </>
-                ) : (
-                  <>Pornești de la culorile șablonului „{numeSablon}”.</>
-                )
+                <>
+                  Acum site-ul folosește {culori ? "culorile alese de tine" : <>culorile șablonului „{numeSablon}”</>}.
+                  Modificările ajung pe site abia după ce apeși Salvează.
+                </>
               }
             />
-            <CardBody className="space-y-5">
-              {ROLURI_MANUALE.map((rol) => {
-                const schimbat = stare.manual[rol.cheie] !== undefined;
-                const id = `culoare-${rol.cheie}`;
-                return (
-                  <div key={rol.cheie} className="space-y-1.5">
-                    <label htmlFor={id} className="block text-sm font-medium text-foreground">
-                      {rol.nume}
-                    </label>
-                    <p className="text-xs text-muted-foreground">{rol.explicatie}</p>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <CampCuloare
-                        id={id}
-                        eticheta={rol.nume}
-                        valoare={stare.manual[rol.cheie] ?? baza[rol.cheie] ?? baza.accent}
-                        onChange={(hex) => setStare((s) => ({ ...s, manual: { ...s.manual, [rol.cheie]: hex } }))}
-                      />
-                      {schimbat && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() =>
-                            setStare((s) => {
-                              const manual = { ...s.manual };
-                              delete manual[rol.cheie];
-                              return { ...s, manual };
-                            })
-                          }
-                        >
-                          Revino la cea calculată
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+            <CardBody>
+              <fieldset className="space-y-3">
+                <legend className="sr-only">Modul de alegere a culorilor</legend>
 
-              {slabe.length > 0 ? (
-                <div className="space-y-2 rounded-base bg-warning-surface px-3 py-3 text-xs text-foreground" role="status">
-                  <p className="font-medium">Atenție: unele combinații se citesc greu</p>
-                  <ul className="list-disc space-y-1 pl-4">
-                    {slabe.map((pereche) => (
-                      <li key={pereche.nume}>
-                        {pereche.nume}: contrast {formatRaport(pereche.raport)}:1 (se recomandă cel puțin{" "}
-                        {formatRaport(pereche.minim)}:1)
-                      </li>
-                    ))}
-                  </ul>
-                  <p>
-                    Poți salva oricum — alegerea e a ta, iar site-ul va arăta exact cum ai ales. Dacă vrei să fii sigur
-                    că se citește, treci pe Automat.
-                  </p>
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Cu culorile de acum, textele se citesc bine pe fundalurile lor.
-                </p>
-              )}
+                <ModDeAlegere
+                  valoare="auto"
+                  ales={stare.mod === "auto"}
+                  titlu="Automat"
+                  recomandat
+                  onAlege={() => setStare((s) => ({ ...s, mod: "auto" }))}
+                >
+                  Alegi o singură culoare, iar restul se potrivește singur cu ea: fundalurile capătă o nuanță din
+                  culoarea ta și textul rămâne ușor de citit pe toate. Nu poți face un site greu de citit.
+                </ModDeAlegere>
+
+                <ModDeAlegere
+                  valoare="manual"
+                  ales={stare.mod === "manual"}
+                  titlu="Manual"
+                  onAlege={() => setStare((s) => ({ ...s, mod: "manual" }))}
+                >
+                  Alegi tu fiecare culoare în parte, pe cont propriu. Ai libertate deplină, dar nu mai verificăm noi
+                  dacă se citește bine: un text galben pe fundal alb va arăta exact așa. Te avertizăm, dar nu te oprim.
+                </ModDeAlegere>
+              </fieldset>
             </CardBody>
           </Card>
-        )}
 
-        <Card>
-          <CardBody className="flex flex-wrap items-center justify-between gap-3">
-            <p className="max-w-xs text-xs text-muted-foreground">
-              Vrei să renunți la tot ce ai ales? Site-ul revine la culorile șablonului „{numeSablon}”. Se aplică
-              după ce apeși Salvează.
-            </p>
-            <Button variant="secondary" size="sm" onClick={reiaDeLaSablon} disabled={nimicAles}>
-              Revino la culorile șablonului
-            </Button>
-          </CardBody>
-        </Card>
+          {stare.mod === "auto" ? (
+            <Card>
+              <CardHeader
+                title="Culoarea principală"
+                description="Din ea se calculează butoanele, linkurile, fundalurile și benzile închise."
+              />
+              <CardBody className="space-y-5">
+                <CampCuloare
+                  id="culoare-principala"
+                  eticheta="Culoarea principală"
+                  valoare={stare.principala ?? CULOARE_PROPUSA}
+                  onChange={(hex) => setStare((s) => ({ ...s, principala: hex }))}
+                />
+
+                <div>
+                  <p className="mb-1 text-xs font-medium text-muted-foreground">Sau pornește de la una gata aleasă</p>
+                  <p className="mb-2 text-xs text-muted-foreground">
+                    Fiecare mostră arată, de la stânga: banda închisă, butoanele și linkurile.
+                  </p>
+                  <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                    {mostre.map((preset) => {
+                      const activ = stare.principala === preset.hex;
+                      return (
+                        <li key={preset.hex}>
+                          <button
+                            type="button"
+                            aria-pressed={activ}
+                            onClick={() => setStare((s) => ({ ...s, principala: preset.hex }))}
+                            className={cn(
+                              "flex w-full flex-col items-center gap-1.5 rounded-base border p-2 text-xs text-foreground",
+                              "hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                              activ ? "border-foreground" : "border-border",
+                            )}
+                          >
+                            {/* Trei fâșii, nu o pată: banda închisă (50%), butoanele (30%) și
+                                linkurile (20%), exact cum ies pe site. Fundalul cardurilor nu e aici:
+                                e același alabastru la toate culorile. */}
+                            <span aria-hidden className="flex h-8 w-full gap-0.5">
+                              <span
+                                className="rounded-sm"
+                                style={{ flex: "50 1 0", background: preset.paleta.fundalInchisMatase ?? preset.paleta.fundalInchis }}
+                              />
+                              <span
+                                className="rounded-sm"
+                                style={{ flex: "30 1 0", background: preset.paleta.accentMatase ?? preset.paleta.accent }}
+                              />
+                              <span
+                                className="rounded-sm"
+                                style={{ flex: "20 1 0", background: preset.paleta.accentInteractiv }}
+                              />
+                            </span>
+                            {preset.nume}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+
+                {calculat?.accentAjustat && (
+                  <p className="rounded-base bg-warning-surface px-3 py-2 text-xs text-foreground" role="status">
+                    <span
+                      aria-hidden
+                      className="mr-1.5 inline-block size-3 translate-y-0.5 rounded-sm border border-border"
+                      style={{ background: calculat.accentObtinut }}
+                    />
+                    Culoarea aleasă ({calculat.culoareaAleasa}) e prea deschisă ca butoanele și linkurile scrise cu ea să
+                    se citească pe un fundal deschis. Pe site apare puțin mai închisă ({calculat.accentObtinut}), ca
+                    să se vadă bine.
+                  </p>
+                )}
+
+                {stare.principala && !calculat?.accentAjustat && (
+                  <p className="text-xs text-muted-foreground">
+                    Verificat: toate textele de pe site se citesc pe fundalurile lor (contrast de cel puțin{" "}
+                    {formatRaport(PRAG_CONTRAST)}:1).
+                  </p>
+                )}
+              </CardBody>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader
+                title="Fiecare culoare, separat"
+                description={
+                  stare.principala ? (
+                    <>
+                      Pornești de la culorile calculate din {stare.principala}. Ca să schimbi punctul de pornire, treci pe
+                      Automat, alege altă culoare și revino aici.
+                    </>
+                  ) : (
+                    <>Pornești de la culorile șablonului „{numeSablon}”.</>
+                  )
+                }
+              />
+              <CardBody className="space-y-5">
+                {ROLURI_MANUALE.map((rol) => {
+                  const schimbat = stare.manual[rol.cheie] !== undefined;
+                  const id = `culoare-${rol.cheie}`;
+                  return (
+                    <div key={rol.cheie} className="space-y-1.5">
+                      <label htmlFor={id} className="block text-sm font-medium text-foreground">
+                        {rol.nume}
+                      </label>
+                      <p className="text-xs text-muted-foreground">{rol.explicatie}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <CampCuloare
+                          id={id}
+                          eticheta={rol.nume}
+                          valoare={stare.manual[rol.cheie] ?? baza[rol.cheie] ?? baza.accent}
+                          onChange={(hex) => setStare((s) => ({ ...s, manual: { ...s.manual, [rol.cheie]: hex } }))}
+                        />
+                        {schimbat && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() =>
+                              setStare((s) => {
+                                const manual = { ...s.manual };
+                                delete manual[rol.cheie];
+                                return { ...s, manual };
+                              })
+                            }
+                          >
+                            Revino la cea calculată
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {slabe.length > 0 ? (
+                  <div className="space-y-2 rounded-base bg-warning-surface px-3 py-3 text-xs text-foreground" role="status">
+                    <p className="font-medium">Atenție: unele combinații se citesc greu</p>
+                    <ul className="list-disc space-y-1 pl-4">
+                      {slabe.map((pereche) => (
+                        <li key={pereche.nume}>
+                          {pereche.nume}: contrast {formatRaport(pereche.raport)}:1 (se recomandă cel puțin{" "}
+                          {formatRaport(pereche.minim)}:1)
+                        </li>
+                      ))}
+                    </ul>
+                    <p>
+                      Poți salva oricum — alegerea e a ta, iar site-ul va arăta exact cum ai ales. Dacă vrei să fii sigur
+                      că se citește, treci pe Automat.
+                    </p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    Cu culorile de acum, textele se citesc bine pe fundalurile lor.
+                  </p>
+                )}
+              </CardBody>
+            </Card>
+          )}
+
+          <Card>
+            <CardBody className="flex flex-wrap items-center justify-between gap-3">
+              <p className="max-w-xs text-xs text-muted-foreground">
+                Vrei să renunți la tot ce ai ales? Site-ul revine la culorile șablonului „{numeSablon}”. Se aplică
+                după ce apeși Salvează.
+              </p>
+              <Button variant="secondary" size="sm" onClick={reiaDeLaSablon} disabled={nimicAles}>
+                Revino la culorile șablonului
+              </Button>
+            </CardBody>
+          </Card>
+          </>
+        )}
       </div>
 
       <PanouPrevizualizare
         template={efectiv}
-        cheie={semnatura(culori)}
-        titlu="Cum arată cu aceste culori"
+        cheie={`${semnatura(culori)}|${semnaturaFonturi(fonturiAlese)}`}
+        titlu="Cum arată cu ce ai ales"
         // Ca proprietarul să vadă și culoarea butoanelor la hover, nu doar pe site.
         hoverPeButoane
         nota={
           previzualizare
-            ? "Ce vezi e site-ul tău, cu textele și pozele tale, colorat cu ce alegi. Se actualizează pe măsură ce alegi; derulează pagina ca să vezi tot. Modificările ajung pe site abia după ce apeși Salvează."
-            : "Site-ul tău nu are încă nicio secțiune vizibilă, așa că aici vezi o pagină de exemplu, ca să se vadă culorile. Se actualizează pe măsură ce alegi; derulează pagina ca să vezi tot. Modificările ajung pe site abia după ce apeși Salvează."
+            ? "Ce vezi e site-ul tău, cu textele și pozele tale, cu culorile și fonturile pe care le alegi. Se actualizează pe măsură ce alegi; derulează pagina ca să vezi tot. Modificările ajung pe site abia după ce apeși Salvează."
+            : "Site-ul tău nu are încă nicio secțiune vizibilă, așa că aici vezi o pagină de exemplu, ca să se vadă culorile și fonturile. Se actualizează pe măsură ce alegi; derulează pagina ca să vezi tot. Modificările ajung pe site abia după ce apeși Salvează."
         }
       >
         <SiteHeader data={antet} friendly={efectiv.asezari.antetPastila} />
@@ -465,12 +510,20 @@ export function FormularAspect({
             principala: referinta?.principala ?? null,
             manual: referinta?.manual ?? {},
           });
+          setFonturi(referintaFonturi ?? { titluri: null, text: null });
           setEroare(undefined);
         }}
         error={eroare}
       />
     </div>
   );
+}
+
+/** Ce i se spune omului după salvare: doar despre ce a schimbat (`undefined` = neschimbat). */
+function mesajSalvat(culori: AspectCulori | null | undefined, fonturi: AspectFonturi | null | undefined): string {
+  if (culori !== undefined && fonturi !== undefined) return "Culorile și fonturile au fost salvate.";
+  if (fonturi !== undefined) return fonturi ? "Fonturile au fost salvate." : "Site-ul a revenit la fonturile șablonului.";
+  return culori ? "Culorile au fost salvate." : "Site-ul a revenit la culorile șablonului.";
 }
 
 function ModDeAlegere({

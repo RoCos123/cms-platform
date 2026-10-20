@@ -5,24 +5,27 @@ import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
 import { aspectPermis } from "@/lib/aspect/acces";
-import { brandCuCulori, valideazaCulori } from "@/lib/aspect/salvare";
+import { brandCuCulori, brandCuFonturi, valideazaCulori, valideazaFonturi } from "@/lib/aspect/salvare";
 
 export type RezultatAspect = { ok: true } | { ok: false; mesaj: string };
 
 /**
- * Salvează culorile alese de client pentru site-ul lui (meniul „Aspect").
+ * Salvează culorile și fonturile alese de client pentru site-ul lui (meniul „Aspect"), dintr-o
+ * dată: ecranul are un singur buton Salvează pentru amândouă.
  *
- * `null` = „revino la culorile șablonului": cheia dispare din bază, iar site-ul arată din nou
- * exact cum l-a făcut șablonul.
+ * `null` = „revino la culorile / fonturile șablonului": cheia dispare din bază, iar site-ul arată
+ * din nou exact cum l-a făcut șablonul.
  *
- * Culorile stau în `site_settings.brand.aspect.culori`, lângă datele din Setări. De aceea se
- * citește `brand`-ul de acum și se scrie înapoi ÎNTREG, doar cu `aspect.culori` schimbat
- * (`brandCuCulori`): ce n-am citit și n-am pus la loc ar dispărea.
+ * Stau în `site_settings.brand.aspect` (`culori`, `fonturi`), lângă datele din Setări. De aceea se
+ * citește `brand`-ul de acum și se scrie înapoi ÎNTREG, doar cu `aspect.culori` și
+ * `aspect.fonturi` schimbate (`brandCuCulori`, `brandCuFonturi`): ce n-am citit și n-am pus la loc
+ * ar dispărea.
  *
- * Ce trimite browserul se verifică de la zero (`valideazaCulori`), nu se crede: o valoare
- * care nu e `#RRGGBB` ar ajunge, prin variabilele CSS, direct în stilul fiecărei pagini.
+ * Ce trimite browserul se verifică de la zero (`valideazaCulori`, `valideazaFonturi`), nu se
+ * crede: o valoare care nu e `#RRGGBB` ar ajunge, prin variabilele CSS, direct în stilul fiecărei
+ * pagini, iar un font din afara listei n-ar fi descărcat deloc.
  */
-export async function salveazaCulori(brut: unknown): Promise<RezultatAspect> {
+export async function salveazaAspect(brut: unknown, brutFonturi: unknown): Promise<RezultatAspect> {
   const session = await verifySession();
   const supabase = await createClient();
 
@@ -31,7 +34,7 @@ export async function salveazaCulori(brut: unknown): Promise<RezultatAspect> {
   // niciodată din ce trimite browserul.
   const { data: site } = await supabase.from("sites").select("domain, template").eq("id", session.siteId).single();
   if (!aspectPermis({ domain: site?.domain, template: site?.template })) {
-    return { ok: false, mesaj: "Culorile nu sunt pornite pentru site-ul tău încă." };
+    return { ok: false, mesaj: "Culorile și fonturile nu sunt pornite pentru site-ul tău încă." };
   }
 
   let culori = null;
@@ -41,6 +44,10 @@ export async function salveazaCulori(brut: unknown): Promise<RezultatAspect> {
     culori = verificat.culori;
   }
 
+  const verificateFonturi = valideazaFonturi(brutFonturi);
+  if (!verificateFonturi.ok) return { ok: false, mesaj: verificateFonturi.mesaj };
+  const fonturi = verificateFonturi.fonturi;
+
   const { data: existente, error: eroareCitire } = await supabase
     .from("site_settings")
     .select("brand")
@@ -48,8 +55,8 @@ export async function salveazaCulori(brut: unknown): Promise<RezultatAspect> {
     .maybeSingle();
 
   if (eroareCitire) {
-    console.error("Citirea setărilor înainte de salvarea culorilor a eșuat:", eroareCitire);
-    return { ok: false, mesaj: "Nu am putut salva culorile. Încearcă din nou." };
+    console.error("Citirea setărilor înainte de salvarea aspectului a eșuat:", eroareCitire);
+    return { ok: false, mesaj: "Nu am putut salva. Încearcă din nou." };
   }
 
   // `upsert` pe `site_id`, ca la Setări: rândul poate lipsi. Se scrie DOAR `brand`; `seo` și
@@ -57,13 +64,13 @@ export async function salveazaCulori(brut: unknown): Promise<RezultatAspect> {
   const { error } = await supabase
     .from("site_settings")
     .upsert(
-      { site_id: session.siteId, brand: brandCuCulori(existente?.brand, culori) },
+      { site_id: session.siteId, brand: brandCuFonturi(brandCuCulori(existente?.brand, culori), fonturi) },
       { onConflict: "site_id" },
     );
 
   if (error) {
-    console.error("Salvarea culorilor a eșuat:", error);
-    return { ok: false, mesaj: "Nu am putut salva culorile. Încearcă din nou." };
+    console.error("Salvarea aspectului a eșuat:", error);
+    return { ok: false, mesaj: "Nu am putut salva. Încearcă din nou." };
   }
 
   await scrieInJurnal({
@@ -72,16 +79,21 @@ export async function salveazaCulori(brut: unknown): Promise<RezultatAspect> {
     actiune: "update",
     entitate: "SiteSettings",
     diff: {
-      rezumat: !culori
-        ? "Site-ul a revenit la culorile șablonului."
-        : culori.mod === "auto"
-          ? "Culorile site-ului au fost schimbate (culoare principală aleasă)."
-          : "Culorile site-ului au fost schimbate (alese manual).",
+      rezumat: [
+        !culori
+          ? "Culorile: ale șablonului."
+          : culori.mod === "auto"
+            ? "Culorile: alese din culoarea principală."
+            : "Culorile: alese manual.",
+        !fonturi
+          ? "Fonturile: ale șablonului."
+          : `Fonturile: titluri ${fonturi.titluri ?? "ca în șablon"}, text ${fonturi.text ?? "ca în șablon"}.`,
+      ].join(" "),
     },
   });
 
   revalidatePath("/dashboard", "layout");
-  // Culorile se văd pe TOATE paginile publice, nu doar pe prima.
+  // Culorile și fonturile se văd pe TOATE paginile publice, nu doar pe prima.
   revalidatePath("/", "layout");
 
   return { ok: true };

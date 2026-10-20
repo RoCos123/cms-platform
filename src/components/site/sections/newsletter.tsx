@@ -74,7 +74,12 @@ export function Newsletter({
                   fontFamily: "var(--t-font-titlu)",
                   fontWeight: "var(--t-greutate-titlu)" as unknown as number,
                 }
-              : { fontWeight: 700 }),
+              : {
+                  // Cu fonturi alese în „Aspect", fontul și grosimea titlurilor; fără, ca până acum
+                  // (fontul moștenit, adică cel de text, la 700).
+                  fontFamily: "var(--t-font-titlu-ales, inherit)",
+                  fontWeight: "var(--t-greutate-titlu-ales, 700)" as unknown as number,
+                }),
             textWrap: "balance",
           }}
         >

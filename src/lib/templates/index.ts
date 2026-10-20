@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { citesteAspectCulori, paletaEfectiva } from "@/lib/aspect/culori";
+import { citesteAspectFonturi, tipografieEfectiva } from "@/lib/aspect/fonturi";
 import type { Template, TemplateId } from "./types";
 import { caldura } from "./caldura";
 import { liniste } from "./liniste";
@@ -29,16 +30,21 @@ const TEMPLATES: Record<string, Template> = {
  * Șablonul unui site. Necunoscut sau lipsă → cel implicit: un site public trebuie să
  * se randeze mereu, chiar dacă rândul din baza de date a rămas în urma codului.
  */
-export function getTemplate(id: string | null | undefined, culori?: unknown): Template {
+export function getTemplate(id: string | null | undefined, culori?: unknown, fonturi?: unknown): Template {
   const sablon = TEMPLATES[id ?? ""] ?? caldura;
 
-  // Culorile alese de client (meniul „Aspect"). Fără ele — sau cu un JSON care nu e valid —
-  // se întoarce EXACT obiectul șablonului, nu o copie: site-urile care n-au ales nimic
+  // Culorile și fonturile alese de client (meniul „Aspect"). Fără ele — sau cu un JSON care nu
+  // e valid — se întoarce EXACT obiectul șablonului, nu o copie: site-urile care n-au ales nimic
   // rămân identice, iar un conținut stricat din bază nu poate strica un site public.
   const aspect = citesteAspectCulori(culori);
-  if (!aspect) return sablon;
+  const alese = citesteAspectFonturi(fonturi);
+  if (!aspect && !alese) return sablon;
 
-  return { ...sablon, paleta: paletaEfectiva(sablon.paleta, aspect) };
+  return {
+    ...sablon,
+    ...(aspect && { paleta: paletaEfectiva(sablon.paleta, aspect) }),
+    ...(alese && { tipografie: tipografieEfectiva(sablon.tipografie, alese) }),
+  };
 }
 
 export function listTemplates(): Template[] {
@@ -122,6 +128,11 @@ export function templateStyle(template: Template): CSSProperties {
      */
     "--t-stil-accent": t.accentInItalic ? "italic" : "normal",
     "--t-greutate-titlu": String(t.greutateTitlu),
+    // Doar cu fonturi alese în „Aspect": grosimea titlurilor din secțiunile care altfel ar sta pe
+    // fontul de text, și cursivele oprite pentru un font secundar fără ele. Fără alegere nu există,
+    // iar componentele cad pe valorile de până acum.
+    ...(t.fontTitlu && { "--t-greutate-titlu-ales": String(t.greutateTitlu) }),
+    ...(t.secundarFaraCursive && { "--t-cursiv-secundar": "normal" }),
     "--t-raza": f.raza,
     "--t-raza-buton": f.razaButon,
     "--t-spatiere": f.spatiereSectiune,

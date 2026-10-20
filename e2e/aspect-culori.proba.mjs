@@ -865,7 +865,7 @@ test("hover-ul se vede și în previzualizarea din „Aspect”, fără ca previ
 
   // Doar „Aspect” îl pornește; restul previzualizărilor rămân cum erau.
   assert.ok(citeste("src/components/dashboard/panou-previzualizare.tsx").includes("<CadruPrevizualizare latime={latime} hoverPeButoane={hoverPeButoane}>"));
-  assert.match(citeste("src/app/dashboard/aspect/formular.tsx"), /titlu="Cum arată cu aceste culori"[\s\S]{0,140}hoverPeButoane\n/);
+  assert.match(citeste("src/app/dashboard/aspect/formular.tsx"), /titlu="Cum arată cu ce ai ales"[\s\S]{0,140}hoverPeButoane\n/);
   for (const cale of ["src/app/dashboard/sectiuni/[id]/editor.tsx", "src/app/dashboard/setari/formular.tsx"]) {
     assert.ok(!citeste(cale).includes("hoverPeButoane"), cale);
   }

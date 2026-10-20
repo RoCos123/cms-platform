@@ -115,6 +115,15 @@ export type TemplateTypography = {
    * Ajunge la componente ca `--t-stil-accent`, nu ca `if` prin zece fișiere.
    */
   accentInItalic: boolean;
+  /**
+   * Fontul titlurilor, pus DOAR când clientul și-a ales fonturi în „Aspect" (`tipografieEfectiva`);
+   * niciun șablon nu-l are. Atunci toate titlurile îl folosesc, și cele din secțiunile care altfel
+   * ar lua fontul de text (`--t-font-titlu-ales`).
+   */
+  fontTitlu?: string;
+  fallbackTitlu?: string;
+  /** Fontul secundar ales n-are cursive: textele cursive scrise cu el rămân drepte, nu înclinate de browser. */
+  secundarFaraCursive?: boolean;
 };
 
 /**

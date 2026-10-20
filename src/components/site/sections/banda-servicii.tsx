@@ -110,7 +110,8 @@ export function BandaServicii({
             <span
               style={{
                 fontFamily: "var(--t-font-secundar)",
-                fontStyle: "italic",
+                // Un font de titlu ales fără cursive rămâne drept, nu înclinat de browser.
+                fontStyle: "var(--t-cursiv-secundar, italic)",
                 fontSize: "clamp(18px, 2vw, 26px)",
                 lineHeight: 1.2,
                 paddingInline: "clamp(22px, 3.4vw, 48px)",
@@ -129,7 +130,7 @@ export function BandaServicii({
                 // ~60% din înălțimea literelor mari — la referință steaua e
                 // cât o literă mare, un sparkle plin, nu o punctuație firavă.
                 fontFamily: discreta ? "var(--t-font-secundar)" : undefined,
-                fontStyle: discreta ? "italic" : undefined,
+                fontStyle: discreta ? "var(--t-cursiv-secundar, italic)" : undefined,
                 fontSize: discreta ? "clamp(18px, 2vw, 26px)" : "clamp(11px, 1.1vw, 15px)",
               }}
             >

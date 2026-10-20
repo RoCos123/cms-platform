@@ -1,9 +1,10 @@
 import { normalizeazaHex } from "./culoare";
 import { ROLURI_MANUALE, type AspectCulori, type RolManual } from "./culori";
+import { fontText, fontTitlu, type AspectFonturi } from "./fonturi";
 
 /**
- * Salvarea culorilor alese în meniul „Aspect": ce se acceptă de la browser și cum se pune
- * în `site_settings.brand`. Fișier fără „use server" și fără `server-only`, ca să-l poată
+ * Salvarea culorilor și fonturilor alese în meniul „Aspect": ce se acceptă de la browser și cum
+ * se pune în `site_settings.brand`. Fișier fără „use server" și fără `server-only`, ca să-l poată
  * citi și panoul (lista de culori gata alese), și acțiunea, și probele din Node.
  */
 
@@ -96,8 +97,8 @@ const esteObiect = (valoare: unknown): valoare is Record<string, unknown> =>
 /**
  * `brand`-ul cu culorile puse (sau scoase, la `null`), fără să atingă nimic altceva.
  *
- * `brand` ține și datele cabinetului din Setări, iar `brand.aspect` va ține în curând și
- * fonturile: scrierea culorilor trebuie să lase neatinse și una, și cealaltă. La `null` cheia
+ * `brand` ține și datele cabinetului din Setări, iar `brand.aspect` ține și fonturile:
+ * scrierea culorilor trebuie să lase neatinse și una, și cealaltă. La `null` cheia
  * `culori` dispare (nu rămâne un `null` în bază), iar un `aspect` rămas gol dispare și el.
  */
 export function brandCuCulori(brand: unknown, culori: AspectCulori | null): Record<string, unknown> {
@@ -106,6 +107,42 @@ export function brandCuCulori(brand: unknown, culori: AspectCulori | null): Reco
 
   if (culori) aspect.culori = culori;
   else delete aspect.culori;
+
+  if (Object.keys(aspect).length === 0) delete rezultat.aspect;
+  else rezultat.aspect = aspect;
+
+  return rezultat;
+}
+
+export type RezultatValidareFonturi = { ok: true; fonturi: AspectFonturi | null } | { ok: false; mesaj: string };
+
+/**
+ * Fonturile trimise de browser, verificate de la zero. Doar nume din liste: un font necunoscut
+ * nu e descărcat la build, deci pe site ar ieși fontul de rezervă — se SPUNE, nu se salvează.
+ * `null` (sau ambele goale) = fonturile șablonului.
+ */
+export function valideazaFonturi(brut: unknown): RezultatValidareFonturi {
+  if (brut === null) return { ok: true, fonturi: null };
+  if (typeof brut !== "object" || Array.isArray(brut)) return { ok: false, mesaj: MESAJ_FONTURI_STRICAT };
+
+  const sursa = brut as Record<string, unknown>;
+  const titluri = lipseste(sursa.titluri) ? null : fontTitlu(sursa.titluri)?.nume;
+  const text = lipseste(sursa.text) ? null : fontText(sursa.text)?.nume;
+  if (titluri === undefined) return { ok: false, mesaj: "Fontul ales pentru titluri nu e în listă. Alege unul de acolo." };
+  if (text === undefined) return { ok: false, mesaj: "Fontul ales pentru text nu e în listă. Alege unul de acolo." };
+
+  return { ok: true, fonturi: titluri || text ? { titluri, text } : null };
+}
+
+const MESAJ_FONTURI_STRICAT = "Ce am primit nu arată a fonturi. Reîncarcă pagina și încearcă din nou.";
+
+/** `brand`-ul cu fonturile puse (sau scoase, la `null`) — aceeași regulă ca la culori. */
+export function brandCuFonturi(brand: unknown, fonturi: AspectFonturi | null): Record<string, unknown> {
+  const rezultat: Record<string, unknown> = esteObiect(brand) ? { ...brand } : {};
+  const aspect: Record<string, unknown> = esteObiect(rezultat.aspect) ? { ...rezultat.aspect } : {};
+
+  if (fonturi) aspect.fonturi = fonturi;
+  else delete aspect.fonturi;
 
   if (Object.keys(aspect).length === 0) delete rezultat.aspect;
   else rezultat.aspect = aspect;

@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { metaSectiune } from "@/lib/sectiuni";
 import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate, type SectionTone } from "@/lib/templates";
-import { culoriPermise } from "@/lib/aspect/acces";
+import { culoriPermise, fonturiPermise } from "@/lib/aspect/acces";
 import { serviciiPublicate } from "@/lib/servicii-publice";
 import { articolePublicate } from "@/lib/blog-public";
 import { paginaEsteActiva, type Pagini } from "@/lib/setari";
@@ -152,6 +152,7 @@ export default async function EditorSectiunePage({
       template={getTemplate(
         site?.template as string | null,
         culoriPermise(setari?.brand, { domain: site?.domain as string | null, template: site?.template as string | null }),
+        fonturiPermise(setari?.brand, { domain: site?.domain as string | null, template: site?.template as string | null }),
       )}
       // Goale când blogul e oprit — exact ca pe site, ca previzualizarea să nu
       // arate o secțiune care în realitate nu apare.

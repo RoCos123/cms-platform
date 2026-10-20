@@ -1,5 +1,26 @@
 import type { CSSProperties } from "react";
-import { Caveat, Cormorant_Garamond, DM_Sans, Inter, Manrope, Nunito } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  Caveat,
+  Cormorant_Garamond,
+  DM_Sans,
+  Figtree,
+  Fraunces,
+  Instrument_Serif,
+  Inter,
+  Josefin_Sans,
+  Literata,
+  Lora,
+  Manrope,
+  Newsreader,
+  Nunito,
+  Playfair_Display,
+  Quicksand,
+  Source_Sans_3,
+  Source_Serif_4,
+  Tenor_Sans,
+  Zilla_Slab,
+} from "next/font/google";
 import type { Template } from "@/lib/templates/types";
 
 /**
@@ -17,11 +38,11 @@ import type { Template } from "@/lib/templates/types";
  * mai pleacă din browserul vizitatorului către altcineva. (Fonturile panoului,
  * din `src/app/layout.tsx`, erau deja așa — problema era doar la șabloane.)
  *
- * DE CE TOATE ȘASE, ÎNTR-UN SINGUR FIȘIER. `next/font` cere ca fontul să fie
+ * DE CE TOATE, ÎNTR-UN SINGUR FIȘIER. `next/font` cere ca fontul să fie
  * cerut cu argumente scrise în cod, nu calculate: nu se poate „încarcă fontul al
- * cărui nume tocmai l-am citit din baza de date". Șabloanele sunt patru și
- * fonturile lor șase, deci se declară toate aici, iar șablonul își alege
- * familia din tabelul de mai jos.
+ * cărui nume tocmai l-am citit din baza de date". Fonturile șabloanelor și cele
+ * din meniul „Aspect" se declară deci toate aici, iar șablonul (sau clientul)
+ * își alege familia din tabelul de mai jos.
  *
  * `latin-ext` NU e opțional. Fără el, ă, â, î, ș și ț n-ar fi în font și ar
  * cădea pe fontul de sistem — pe un site românesc, jumătate din cuvinte ar fi
@@ -67,6 +88,43 @@ const cormorant = Cormorant_Garamond({
 // (`accentInItalic: false`) și nu le cere.
 const caveat = Caveat({ subsets: ["latin", "latin-ext"], display: "swap", preload: false });
 
+/*
+ * Fonturile din meniul „Aspect" (20 oct. 2026), pe care și le aleg clienții — lista și de ce e
+ * închisă: `src/lib/aspect/fonturi.ts`. Aceleași reguli ca mai sus: `latin-ext`, `swap`, fără
+ * preîncărcare (un site descarcă doar cele două fonturi pe care le folosește, cele nefolosite
+ * rămân doar câteva rânduri `@font-face` în CSS). Cursivele se cer unde fontul le are, ca
+ * browserul să nu le fabrice; Quicksand, Bricolage și Tenor Sans n-au.
+ */
+// Pentru titluri.
+const josefinSans = Josefin_Sans({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
+const quicksand = Quicksand({ subsets: ["latin", "latin-ext"], display: "swap", preload: false });
+const bricolage = Bricolage_Grotesque({ subsets: ["latin", "latin-ext"], display: "swap", preload: false });
+const playfair = Playfair_Display({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
+const fraunces = Fraunces({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
+// Zilla Slab și cele două de mai jos nu sunt variabile: greutățile se cer una câte una.
+const zillaSlab = Zilla_Slab({
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  preload: false,
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+const tenorSans = Tenor_Sans({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, weight: "400" });
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  preload: false,
+  weight: "400",
+  style: ["normal", "italic"],
+});
+// Pentru text.
+const sourceSans = Source_Sans_3({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
+const figtree = Figtree({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
+const lora = Lora({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
+const sourceSerif = Source_Serif_4({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
+const literata = Literata({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
+const newsreader = Newsreader({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
+
 /**
  * Numele din șablon → familia adevărată, așa cum a numit-o Next după ce a
  * descărcat fontul. Numele generat NU e „Manrope”, ci ceva de forma
@@ -80,6 +138,20 @@ const FAMILII: Record<string, string> = {
   Nunito: nunito.style.fontFamily,
   "Cormorant Garamond": cormorant.style.fontFamily,
   Caveat: caveat.style.fontFamily,
+  "Josefin Sans": josefinSans.style.fontFamily,
+  Quicksand: quicksand.style.fontFamily,
+  "Bricolage Grotesque": bricolage.style.fontFamily,
+  "Playfair Display": playfair.style.fontFamily,
+  Fraunces: fraunces.style.fontFamily,
+  "Zilla Slab": zillaSlab.style.fontFamily,
+  "Tenor Sans": tenorSans.style.fontFamily,
+  "Instrument Serif": instrumentSerif.style.fontFamily,
+  "Source Sans 3": sourceSans.style.fontFamily,
+  Figtree: figtree.style.fontFamily,
+  Lora: lora.style.fontFamily,
+  "Source Serif 4": sourceSerif.style.fontFamily,
+  Literata: literata.style.fontFamily,
+  Newsreader: newsreader.style.fontFamily,
 };
 
 /**
@@ -120,6 +192,16 @@ const LATIME_LITERA: Record<string, number> = {
   Caveat: 0.38,
   "Cormorant Garamond": 0.47,
   Inter: 0.53,
+  // Fonturile de titlu din „Aspect" (devin fontul secundar), măsurate la fel pe 20 oct. 2026, plus
+  // „Experiență" și „Certificări": cel mai lat cuvânt, rotunjit în sus cu o sutime.
+  "Josefin Sans": 0.51,
+  Quicksand: 0.51,
+  "Bricolage Grotesque": 0.52,
+  "Playfair Display": 0.51,
+  Fraunces: 0.54,
+  "Zilla Slab": 0.49,
+  "Tenor Sans": 0.54,
+  "Instrument Serif": 0.39,
 };
 
 /** Numele declarate aici, pentru probe și pentru verificarea șabloanelor. */
@@ -136,12 +218,19 @@ export const FONTURI_DECLARATE = Object.keys(FAMILII);
 export function templateFontStyle(template: Template): CSSProperties {
   const t = template.tipografie;
 
+  // Cu fonturi alese în „Aspect", titlurile au fontul lor explicit (vezi `tipografieEfectiva`).
+  const titlu = t.fontTitlu
+    ? familiaFontului(t.fontTitlu, t.fallbackTitlu ?? t.fallbackSecundar)
+    : t.titluriInSecundar
+      ? familiaFontului(t.fontSecundar, t.fallbackSecundar)
+      : familiaFontului(t.fontPrincipal, t.fallbackPrincipal);
+
   return {
     "--t-font-principal": familiaFontului(t.fontPrincipal, t.fallbackPrincipal),
     "--t-font-secundar": familiaFontului(t.fontSecundar, t.fallbackSecundar),
     "--t-latime-litera-secundar": String(LATIME_LITERA[t.fontSecundar] ?? 0.53),
-    "--t-font-titlu": t.titluriInSecundar
-      ? familiaFontului(t.fontSecundar, t.fallbackSecundar)
-      : familiaFontului(t.fontPrincipal, t.fallbackPrincipal),
+    "--t-font-titlu": titlu,
+    // Doar cu fonturi alese: și titlurile secțiunilor care altfel ar sta pe fontul de text.
+    ...(t.fontTitlu && { "--t-font-titlu-ales": titlu }),
   } as CSSProperties;
 }
