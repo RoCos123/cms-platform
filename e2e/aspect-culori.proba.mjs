@@ -546,15 +546,17 @@ test("previzualizarea din „Aspect” arată toate cele patru fundaluri — inc
 
 // ───────────────────────── poarta „în probă” ─────────────────────────
 
-// Proprietarul a cerut „Aspect" pe „model claritate" (site-ul lui), NU pe sitepsihologi (18 oct.).
+// Proprietarul a cerut „Aspect" pe „model claritate" (site-ul lui), NU pe sitepsihologi (18 oct.);
+// apoi, câte un șablon pe rând, Lumină pe „model-lumina" (20 oct.).
 const DOMENIU_PERMIS = "model-claritate.vercel.app";
+const DOMENIU_LUMINA = "model-lumina.vercel.app";
 // Un domeniu de probă și listele cu care se încearcă REGULA (listele reale se verifică separat).
 const DOMENIU_PROBA = "cabinet-proba.test";
 const LISTE_PROBA = { sabloane: ["claritate"], domenii: [DOMENIU_PROBA] };
 
-test("listele reale: Claritate + model-claritate, și NICIODATĂ sitepsihologi", () => {
-  assert.deepEqual([...SABLOANE_CU_ASPECT], ["claritate"]);
-  assert.deepEqual([...DOMENII_CU_ASPECT], [DOMENIU_PERMIS]);
+test("listele reale: Claritate + model-claritate, Lumină + model-lumina, și NICIODATĂ sitepsihologi", () => {
+  assert.deepEqual([...SABLOANE_CU_ASPECT], ["claritate", "lumina"]);
+  assert.deepEqual([...DOMENII_CU_ASPECT], [DOMENIU_PERMIS, DOMENIU_LUMINA]);
   for (const domeniu of DOMENII_CU_ASPECT) {
     assert.ok(!/sitepsihologi/i.test(domeniu), "proprietarul a cerut „Aspect” NU pe sitepsihologi");
     assert.equal(domeniu, domeniu.toLowerCase().trim(), "domeniile se scriu cu litere mici, fără spații");
@@ -563,8 +565,14 @@ test("listele reale: Claritate + model-claritate, și NICIODATĂ sitepsihologi",
   // Cu listele reale: „model claritate" pe Claritate are poarta deschisă, orice altceva nu.
   assert.equal(aspectPermis({ domain: DOMENIU_PERMIS, template: "claritate" }), true);
   assert.equal(aspectPermis({ domain: DOMENIU_PERMIS, template: "caldura" }), false);
-  for (const altul of ["sitepsihologi.vercel.app", "sitepsihologi.ro", "model-liniste.vercel.app", "model-caldura.vercel.app", "cosmin-claritate.vercel.app"]) {
-    assert.equal(aspectPermis({ domain: altul, template: "claritate" }), false, altul);
+  assert.equal(aspectPermis({ domain: DOMENIU_LUMINA, template: "lumina" }), true);
+  assert.equal(aspectPermis({ domain: DOMENIU_LUMINA, template: "liniste" }), false);
+  for (const altul of ["sitepsihologi.vercel.app", "sitepsihologi.ro", "model-liniste.vercel.app", "model-caldura.vercel.app", "cosmin-claritate.vercel.app", "alt-cabinet.vercel.app"]) {
+    for (const sablon of ["claritate", "lumina"]) assert.equal(aspectPermis({ domain: altul, template: sablon }), false, `${altul} (${sablon})`);
+  }
+  // Șabloanele încă nedeschise rămân închise, oricare ar fi domeniul.
+  for (const sablon of ["caldura", "liniste", "apropiere"]) {
+    for (const domeniu of DOMENII_CU_ASPECT) assert.equal(aspectPermis({ domain: domeniu, template: sablon }), false, `${sablon} pe ${domeniu}`);
   }
   assert.equal(culoriPermise({ aspect: { culori: { mod: "auto", principala: "#2E7D5B" } } }, { domain: "sitepsihologi.vercel.app", template: "claritate" }), undefined);
 });

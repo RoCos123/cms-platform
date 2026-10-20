@@ -221,7 +221,17 @@ de mai sus iese bine; programările/formularele într-o limbă străină sunt pa
 
 **Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE ȘI PE MASTER, ÎN PROBĂ
 DOAR PE `model-claritate.vercel.app` (Claritate); FONTURILE FĂCUTE PE 20 OCT. 2026, ȘI ELE PE
-MASTER (`fc6e863`, CI verde, rularea 221), în aceeași probă.** Întâi a fost doar discutat (proprietarul: „momentan nu facem
+MASTER (`fc6e863`, CI verde, rularea 221), în aceeași probă. DESCHIDERE TREPTATĂ, CÂTE UN ȘABLON
+(proprietarul, 20 oct.: „hai să aplicăm treptat, pe fiecare șablon în parte"): LUMINĂ pe
+`model-lumina.vercel.app` („pe model-lumina frate, pe asta să apară") — PE BRANCH, așteaptă „fă pe
+master". Ordinea propusă după: Căldură, Liniște, Apropiere, fiecare pe site-ul lui model.**
+*Lumină, verificat local (stiva reală, `ana.test` pe Lumină):* fără culori — neschimbat; cu Safir,
+Smarald + „Elegant", Bordeaux + „De revistă" — nimic stricat, nicio eroare. De știut: cu o culoare
+aleasă, tenta lavandă a Luminii devine calcarul cald (ca pe Claritate); fără font ales, Lumină are
+de la sine titluri amestecate (Cormorant la unele, sans gros la „Despre mine", „Ce spun",
+„Întrebări", „Newsletter", „Cum decurge") — așa e șablonul; cu un font de titlu ales se unifică.
+Domeniul `model-lumina.vercel.app` e presupus după modelul celui de Claritate — dacă e altul,
+meniul nu apare (fără stricăciuni) și se corectează în `acces.ts`. Întâi a fost doar discutat (proprietarul: „momentan nu facem
 nimic, doar discutăm"); apoi a cerut „hai sa facem partea cu culorile si fonturile… Mai intai
 culorile". Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
 *Hotărâri confirmate:*

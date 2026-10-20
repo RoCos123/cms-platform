@@ -11,6 +11,10 @@ import { fonturiDinBrand } from "./fonturi";
  * Claritate al altui client nu primește nimic; nici site-ul proprietarului, dacă ar trece pe alt
  * șablon.
  *
+ * Apoi, câte un șablon pe rând (proprietarul, 20 oct. 2026: „hai să aplicăm treptat, pe fiecare
+ * șablon în parte"), fiecare pe site-ul lui model: Lumină pe `model-lumina` („pe model-lumina
+ * frate, pe asta să apară"). Ordinea propusă: Lumină, Căldură, Liniște, Apropiere.
+ *
  * Poarta nu e o nevoie tehnică (paleta calculată e probată pe toate cinci șabloanele), ci o
  * măsură de prudență. O ține un SINGUR loc, aici. Ce hotărăște:
  *
@@ -24,7 +28,7 @@ import { fonturiDinBrand } from "./fonturi";
  */
 
 /** Șabloanele pe care e pornit „Aspect". */
-export const SABLOANE_CU_ASPECT: readonly string[] = ["claritate"];
+export const SABLOANE_CU_ASPECT: readonly string[] = ["claritate", "lumina"];
 
 /**
  * Domeniile (`sites.domain`) pe care e pornit „Aspect". Potrivire EXACTĂ, nu „conține".
@@ -34,7 +38,7 @@ export const SABLOANE_CU_ASPECT: readonly string[] = ["claritate"];
  * `cosmin-claritate` → `model-claritate`), poarta se închide singură — fără stricăciuni; se pune
  * noul domeniu aici. Dacă vreodată e nevoie de ceva mai stabil, se trece pe id.
  */
-export const DOMENII_CU_ASPECT: readonly string[] = ["model-claritate.vercel.app"];
+export const DOMENII_CU_ASPECT: readonly string[] = ["model-claritate.vercel.app", "model-lumina.vercel.app"];
 
 export type SiteAspect = {
   domain: string | null | undefined;
