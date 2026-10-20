@@ -156,7 +156,7 @@ export function Hero({
             poza && !titluLat && !pozaLata
               ? "clamp(40px, 5.2vw, 72px)"
               : "clamp(48px, 9vw, 118px)",
-          lineHeight: 0.98,
+          lineHeight: "max(0.98, var(--t-interlinie-minima-titlu, 0))",
           letterSpacing: "-0.035em",
           fontFamily: "var(--t-font-titlu)",
           fontWeight: "var(--t-greutate-titlu)" as unknown as number,

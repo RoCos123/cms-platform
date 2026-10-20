@@ -36,6 +36,14 @@ export type FontTitlu = {
   greutate: number;
   /** Are tăietură cursivă? Fără ea, browserul ar înclina el literele drepte. */
   cursive: boolean;
+  /**
+   * Distanța minimă dintre rândurile unui titlu (cât `line-height`), ca diacriticele să nu se
+   * atingă: virgula de sub ș/ț sau coada lui p/g de pe un rând față de căciulița lui î/â de pe
+   * rândul de dedesubt. Măsurată în Chromium pe fișierele adevărate (20 oct. 2026), la grosimea
+   * titlului și la a părții evidențiate, plus 0,04 aer. Doar o limită de jos: un titlu care are
+   * deja mai mult spațiu nu se schimbă.
+   */
+  interlinie: number;
   rezerve: string;
 };
 
@@ -48,17 +56,17 @@ export type FontText = {
 /** Fonturile pentru titluri — câte unul din fiecare stil, în ordinea arătată proprietarului. */
 export const FONTURI_TITLU: readonly FontTitlu[] = [
   // Inter e declarat fără cursive (`fonturi.ts`, ca până acum), deci „fără" aici.
-  { nume: "Inter", stil: "Neutru", greutate: 700, cursive: false, rezerve: REZERVE.sans },
-  { nume: "Josefin Sans", stil: "Geometric", greutate: 600, cursive: true, rezerve: REZERVE.sans },
-  { nume: "Quicksand", stil: "Rotunjit, prietenos", greutate: 600, cursive: false, rezerve: REZERVE.rotunjit },
-  { nume: "Bricolage Grotesque", stil: "Cu personalitate", greutate: 600, cursive: false, rezerve: REZERVE.sans },
-  { nume: "Playfair Display", stil: "De revistă", greutate: 500, cursive: true, rezerve: REZERVE.serif },
-  { nume: "Cormorant Garamond", stil: "Clasic, fin", greutate: 500, cursive: true, rezerve: REZERVE.serif },
-  { nume: "Fraunces", stil: "Moale, cald", greutate: 500, cursive: true, rezerve: REZERVE.serif },
-  { nume: "Zilla Slab", stil: "Solid", greutate: 600, cursive: true, rezerve: REZERVE.serif },
-  { nume: "Tenor Sans", stil: "Sculptat, aerisit", greutate: 400, cursive: false, rezerve: REZERVE.sans },
-  { nume: "Instrument Serif", stil: "Îngust, rafinat", greutate: 400, cursive: true, rezerve: REZERVE.serif },
-  { nume: "Caveat", stil: "Scris de mână", greutate: 600, cursive: false, rezerve: REZERVE.deMana },
+  { nume: "Inter", stil: "Neutru", greutate: 700, cursive: false, interlinie: 1.08, rezerve: REZERVE.sans },
+  { nume: "Josefin Sans", stil: "Geometric", greutate: 600, cursive: true, interlinie: 0.97, rezerve: REZERVE.sans },
+  { nume: "Quicksand", stil: "Rotunjit, prietenos", greutate: 600, cursive: false, interlinie: 1.06, rezerve: REZERVE.rotunjit },
+  { nume: "Bricolage Grotesque", stil: "Cu personalitate", greutate: 600, cursive: false, interlinie: 1.06, rezerve: REZERVE.sans },
+  { nume: "Playfair Display", stil: "De revistă", greutate: 500, cursive: true, interlinie: 1.11, rezerve: REZERVE.serif },
+  { nume: "Cormorant Garamond", stil: "Clasic, fin", greutate: 500, cursive: true, interlinie: 1.08, rezerve: REZERVE.serif },
+  { nume: "Fraunces", stil: "Moale, cald", greutate: 500, cursive: true, interlinie: 1.03, rezerve: REZERVE.serif },
+  { nume: "Zilla Slab", stil: "Solid", greutate: 600, cursive: true, interlinie: 0.97, rezerve: REZERVE.serif },
+  { nume: "Tenor Sans", stil: "Sculptat, aerisit", greutate: 400, cursive: false, interlinie: 1.01, rezerve: REZERVE.sans },
+  { nume: "Instrument Serif", stil: "Îngust, rafinat", greutate: 400, cursive: true, interlinie: 1.11, rezerve: REZERVE.serif },
+  { nume: "Caveat", stil: "Scris de mână", greutate: 600, cursive: false, interlinie: 0.87, rezerve: REZERVE.deMana },
 ];
 
 /** Fonturile pentru text. Aici e firesc să semene: toate trebuie să se citească ușor. */
@@ -172,6 +180,8 @@ export function tipografieEfectiva(sablon: TemplateTypography, fonturi: AspectFo
     tipografie.accentInItalic = sablon.accentInItalic && titlu.cursive;
     tipografie.secundarFaraCursive = !titlu.cursive;
     tipografie.accentTitluCursiv = titlu.cursive;
+    // Căciulița lui î atingea rândul de deasupra (Instrument Serif, Cormorant — prins de proprietar).
+    tipografie.interlinieMinimaTitlu = titlu.interlinie;
   }
 
   return tipografie;

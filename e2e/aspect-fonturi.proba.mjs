@@ -138,6 +138,7 @@ test("`getTemplate` fără fonturi întoarce EXACT șablonul — site-urile exis
     assert.equal(stil["--t-greutate-titlu-ales"], undefined, sablon.nume);
     assert.equal(stil["--t-cursiv-secundar"], undefined, sablon.nume);
     assert.equal(stil["--t-stil-accent-titlu"], undefined, sablon.nume);
+    assert.equal(stil["--t-interlinie-minima-titlu"], undefined, sablon.nume);
     assert.equal(sablon.tipografie.fontTitlu, undefined, `${sablon.nume}: niciun șablon nu are fontTitlu`);
   }
 });
@@ -170,6 +171,7 @@ function asteptat(sablon, titluri, text) {
     faraCursive: ft ? !ft.cursive : undefined,
     // Partea evidențiată din titluri: cursivă la orice font ales care are cursive (20 oct.).
     titluCursiv: ft ? ft.cursive : undefined,
+    interlinie: ft ? ft.interlinie : undefined,
   };
 }
 
@@ -189,12 +191,14 @@ test("regula, pe toate combinațiile × cele cinci șabloane: textul schimbă te
         assert.equal(t.accentInItalic, e.accentInItalic, caz);
         assert.equal(t.secundarFaraCursive, e.faraCursive, caz);
         assert.equal(t.accentTitluCursiv, e.titluCursiv, caz);
+        assert.equal(t.interlinieMinimaTitlu, e.interlinie, caz);
 
         const stil = templateStyle(getTemplate(sablon.id, undefined, { titluri, text }));
         assert.equal(stil["--t-greutate-titlu-ales"], String(e.greutate), caz);
         assert.equal(stil["--t-cursiv-secundar"], e.faraCursive ? "normal" : undefined, caz);
         assert.equal(stil["--t-stil-accent"], e.accentInItalic ? "italic" : "normal", caz);
         assert.equal(stil["--t-stil-accent-titlu"], e.titluCursiv ? "italic" : undefined, caz);
+        assert.equal(stil["--t-interlinie-minima-titlu"], e.interlinie ? String(e.interlinie) : undefined, caz);
         n++;
       }
     }
@@ -284,6 +288,29 @@ test("a doua parte a titlului: cursivă cu un font ales care are cursive — doa
   assert.equal(tenor["--t-stil-accent"], "normal");
   // Fără culoare: nicio variabilă nouă de culoare pentru titluri.
   assert.equal(playfair["--t-accent-titlu"], undefined);
+});
+
+test("căciulița lui î nu mai atinge rândul de deasupra: fiecare font ales are distanța lui minimă", () => {
+  // Măsurate în Chromium pe fișierele adevărate (20 oct. 2026): cât coboară virgula de sub ș/ț și
+  // coada lui p/g + cât urcă căciulița lui î/â, la grosimea titlului și a părții evidențiate, plus
+  // 0,04 aer. Prins de proprietar la Instrument Serif și Cormorant.
+  assert.deepEqual(Object.fromEntries(FONTURI_TITLU.map((f) => [f.nume, f.interlinie])), {
+    Inter: 1.08, "Josefin Sans": 0.97, Quicksand: 1.06, "Bricolage Grotesque": 1.06, "Playfair Display": 1.11,
+    "Cormorant Garamond": 1.08, Fraunces: 1.03, "Zilla Slab": 0.97, "Tenor Sans": 1.01, "Instrument Serif": 1.11, Caveat: 0.87,
+  });
+  // Doar o limită de jos, pusă peste distanța de până acum a fiecărui titlu — care rămâne aceeași.
+  for (const [cale, baza] of [
+    ["src/components/site/sections/hero.tsx", "0.98"],
+    ["src/components/site/section-heading.tsx", "1.08"],
+    ["src/components/site/sections/how-it-works.tsx", "1.08"],
+    ["src/components/site/sections/faq.tsx", "1.08"],
+    ["src/components/site/sections/newsletter.tsx", "1.1"],
+    ["src/components/site/sections/about-teaser.tsx", "1.08"],
+    ["src/components/site/sections/testimonials.tsx", "1.08"],
+    ["src/components/site/sections/contact.tsx", "1.1"],
+  ]) {
+    assert.ok(citeste(cale).includes(`lineHeight: "max(${baza}, var(--t-interlinie-minima-titlu, 0))",`), cale);
+  }
 });
 
 // ───────────────────────── salvarea și poarta ─────────────────────────

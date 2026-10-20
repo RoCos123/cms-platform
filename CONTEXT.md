@@ -587,9 +587,19 @@ arătat proprietarului ÎNAINTE să se construiască).
     Inter n-au cursive: rămân ca înainte — la Tenor Sans și Caveat diferența rămâne mică, spus
     proprietarului. Probă nouă + 6 stricări prinse; tot: 520. Browser: Playfair, Instrument,
     Cormorant, Fraunces → titlul mare și „Ce poți întreba" cursive, citatul drept, aceeași culoare.
-  - **De știut:** la titlul uriaș din hero, la unele fonturi (văzut la Instrument Serif) virgula
-    de sub „Ș" poate atinge căciulița lui „î" de pe rândul următor — nereparat încă, de hotărât
-    dacă merită aer în plus. Dacă „Aspect" se deschide pe alte șabloane: pe Apropiere, un font de
+  - **Căciulița lui „î" (20 oct., „da, rezolvă asta cu căciulița"):** la titlul mare, virgula de
+    sub „Ș"/„ț" sau coada lui „p" atingea căciulița lui „î" de pe rândul de dedesubt (Playfair,
+    Cormorant, Instrument Serif). Măsurat în Chromium, pe fișierele adevărate, pentru fiecare font
+    de titlu: cât coboară virgula/coada și cât urcă căciulița (î, â mici), la grosimea titlului și a
+    părții evidențiate, + 0,04 aer → `interlinie` în catalog (Inter 1,08; Josefin 0,97; Quicksand și
+    Bricolage 1,06; Playfair 1,11; Cormorant 1,08; Fraunces 1,03; Zilla 0,97; Tenor 1,01;
+    Instrument 1,11; Caveat 0,87). Doar o limită de jos (`--t-interlinie-minima-titlu`), pusă cu
+    `max(<distanța de acum>, …)` pe cele opt titluri; fără font ales, distanța rămâne exact cea
+    de acum. Verificat pe pixeli (un rând complet gol între fiecare două rânduri ale titlului):
+    pe starea veche picau exact Playfair, Cormorant, Instrument; după, trec toate 11. Rămas:
+    un „Î"/„Â" MARE la început de rând, sub o virgulă, ar cere ~1,1–1,27 — nu acoperit, ar
+    face titlurile prea aerisite. Inter fără font ales (0,98): în titlul de probă nu se atinge
+    (rândurile se rup altfel), dar cu alt text ar putea — întrebat proprietarul dacă vrea și acolo. Dacă „Aspect" se deschide pe alte șabloane: pe Apropiere, un font de
     titlu ales înlocuiește și scrisul de mână (Caveat) al accentelor — e regula hotărâtă, dar se
     vede.
 

@@ -64,7 +64,7 @@ export function Newsletter({
           style={{
             margin: 0,
             fontSize: "clamp(30px, 4vw, 48px)",
-            lineHeight: 1.1,
+            lineHeight: "max(1.1, var(--t-interlinie-minima-titlu, 0))",
             letterSpacing: "-0.025em",
             // Fontul de titlu al șablonului, ca la `SectionHeading` — DOAR când
             // `titluSerif` e pornit (Liniește). Fără el, rămâne fontWeight 700

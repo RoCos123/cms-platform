@@ -44,7 +44,7 @@ export function SectionHeading({
             margin: 0,
             maxWidth: maxWidthTitlu,
             fontSize: "clamp(32px, 4.4vw, 54px)",
-            lineHeight: 1.08,
+            lineHeight: "max(1.08, var(--t-interlinie-minima-titlu, 0))",
             letterSpacing: "-0.025em",
             fontFamily: "var(--t-font-titlu)",
             fontWeight: "var(--t-greutate-titlu)" as unknown as number,

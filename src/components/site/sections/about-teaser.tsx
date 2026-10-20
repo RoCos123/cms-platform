@@ -116,7 +116,7 @@ export function AboutTeaser({
         style={{
           margin: 0,
           fontSize: "clamp(32px, 4.4vw, 54px)",
-          lineHeight: 1.08,
+          lineHeight: "max(1.08, var(--t-interlinie-minima-titlu, 0))",
           letterSpacing: "-0.025em",
           // Fontul de titlu al șablonului, ca la `SectionHeading` — DOAR când
           // `titluSerif` e pornit (Liniește). Fără el, rămâne fontWeight 700

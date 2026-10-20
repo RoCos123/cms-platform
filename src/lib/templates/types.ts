@@ -129,6 +129,8 @@ export type TemplateTypography = {
    * care ARE cursive (`--t-stil-accent-titlu`). Fără, rămâne cum o face șablonul (`accentInItalic`).
    */
   accentTitluCursiv?: boolean;
+  /** Distanța minimă dintre rândurile titlurilor, pentru fontul de titlu ales (`--t-interlinie-minima-titlu`). */
+  interlinieMinimaTitlu?: number;
 };
 
 /**

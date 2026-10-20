@@ -188,7 +188,7 @@ export function Contact({
               style={{
                 margin: 0,
                 fontSize: "clamp(30px, 4vw, 50px)",
-                lineHeight: 1.1,
+                lineHeight: "max(1.1, var(--t-interlinie-minima-titlu, 0))",
                 letterSpacing: "-0.02em",
                 fontWeight: "var(--t-greutate-titlu)" as unknown as number,
                 fontFamily: "var(--t-font-titlu)",

@@ -134,6 +134,7 @@ export function templateStyle(template: Template): CSSProperties {
     ...(t.fontTitlu && { "--t-greutate-titlu-ales": String(t.greutateTitlu) }),
     ...(t.secundarFaraCursive && { "--t-cursiv-secundar": "normal" }),
     ...(t.accentTitluCursiv && { "--t-stil-accent-titlu": "italic" }),
+    ...(t.interlinieMinimaTitlu && { "--t-interlinie-minima-titlu": String(t.interlinieMinimaTitlu) }),
     "--t-raza": f.raza,
     "--t-raza-buton": f.razaButon,
     "--t-spatiere": f.spatiereSectiune,
