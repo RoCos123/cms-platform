@@ -530,6 +530,15 @@ arătat proprietarului ÎNAINTE să se construiască).
   grosimea lui de titlu (cea din mostră), nu a șablonului; fără alegere = fonturile șablonului, cu
   „Revino la fonturile șablonului"; aceeași poartă ca la culori; un font fără cursive oprește
   singur cursivele accentelor (ca la Caveat pe Apropiere). Întrebat: și câteva perechi gata făcute?
+  *20 oct., după imaginile pe site:* proprietarul: „da, pe toate le vreau" — **păstrează toate 11
+  fonturile de titlu.** Imaginile (fiecare font pus pe un site Claritate cu Safir, doar în browserul
+  de captură) au scos două lucruri de știut la construcție: (1) pe Claritate, titlurile din cinci
+  secțiuni („Cum decurge", Despre, Păreri, Întrebări, Newsletter) NU folosesc `--t-font-titlu` — iau
+  fontul de TEXT, fiindcă `titluSerif` e oprit; cu un font ales, trebuie legate de fontul titlurilor
+  (altfel un font de text ales schimbă jumătate din titluri, iar unul de titlu doar titlul de sus);
+  (2) la titlul uriaș din hero, cu interlinia lui strânsă, virgula de sub „Ș" poate atinge căciulița
+  lui „î" de pe rândul următor (văzut la Instrument Serif) — de dat puțin aer la fonturile cu accente
+  înalte. Lista de text: imagini trimise, așteaptă răspunsul.
 
 **„Motivul programării" a fost SCOS (15 oct. 2026, „da, scoate-l" al proprietarului; pe branch,
 NEPUBLICAT — așteaptă „fă pe master").** Era o listă cu două intrări, „Evaluări psihologice" și
