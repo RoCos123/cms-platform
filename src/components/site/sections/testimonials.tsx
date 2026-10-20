@@ -115,7 +115,7 @@ export function Testimonials({
                 // Ca la celelalte titluri de secțiune: piersică apăsat pe
                 // „Apropiere", subțire în culoarea titlului la rest.
                 fontWeight: "var(--t-greutate-accent-titlu, 300)" as unknown as number,
-                color: "var(--t-accent-titlu, inherit)",
+                color: "var(--t-accent-titlu, var(--t-estompare-accent-titlu, inherit))",
               }}
             >
               {data.titluAccent}

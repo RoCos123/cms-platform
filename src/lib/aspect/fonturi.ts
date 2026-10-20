@@ -45,6 +45,12 @@ export type FontTitlu = {
    */
   interlinie: number;
   rezerve: string;
+  /**
+   * Partea a doua a titlului („în ritmul tău") în gri, ca textul discret. Doar pentru un font cu o
+   * singură grosime și fără cursive, unde nimic altceva n-o deosebește de prima (Tenor Sans — ales
+   * de proprietar: „la aerisit, varianta cu gri").
+   */
+  accentGri?: boolean;
 };
 
 export type FontText = {
@@ -60,11 +66,13 @@ export const FONTURI_TITLU: readonly FontTitlu[] = [
   { nume: "Josefin Sans", stil: "Geometric", greutate: 600, cursive: true, interlinie: 0.97, rezerve: REZERVE.sans },
   { nume: "Quicksand", stil: "Rotunjit, prietenos", greutate: 600, cursive: false, interlinie: 1.06, rezerve: REZERVE.rotunjit },
   { nume: "Bricolage Grotesque", stil: "Cu personalitate", greutate: 600, cursive: false, interlinie: 1.06, rezerve: REZERVE.sans },
-  { nume: "Playfair Display", stil: "De revistă", greutate: 500, cursive: true, interlinie: 1.11, rezerve: REZERVE.serif },
+  // „Playfair" (versiunea nouă), nu „Playfair Display": acela nu coboară sub 400, deci partea a doua
+  // a titlului (cerută la 300) ieșea cât prima. Ales de proprietar din planșă, 20 oct. 2026.
+  { nume: "Playfair", stil: "De revistă", greutate: 500, cursive: true, interlinie: 0.94, rezerve: REZERVE.serif },
   { nume: "Cormorant Garamond", stil: "Clasic, fin", greutate: 500, cursive: true, interlinie: 1.08, rezerve: REZERVE.serif },
   { nume: "Fraunces", stil: "Moale, cald", greutate: 500, cursive: true, interlinie: 1.03, rezerve: REZERVE.serif },
   { nume: "Zilla Slab", stil: "Solid", greutate: 600, cursive: true, interlinie: 0.97, rezerve: REZERVE.serif },
-  { nume: "Tenor Sans", stil: "Sculptat, aerisit", greutate: 400, cursive: false, interlinie: 1.01, rezerve: REZERVE.sans },
+  { nume: "Tenor Sans", stil: "Sculptat, aerisit", greutate: 400, cursive: false, interlinie: 1.01, rezerve: REZERVE.sans, accentGri: true },
   { nume: "Instrument Serif", stil: "Îngust, rafinat", greutate: 400, cursive: true, interlinie: 1.11, rezerve: REZERVE.serif },
   { nume: "Caveat", stil: "Scris de mână", greutate: 600, cursive: false, interlinie: 0.87, rezerve: REZERVE.deMana },
 ];
@@ -90,7 +98,7 @@ export const FONTURI_TEXT: readonly FontText[] = [
  */
 export const PERECHI_FONTURI: readonly { nume: string; titluri: string; text: string }[] = [
   { nume: "Elegant", titluri: "Cormorant Garamond", text: "DM Sans" },
-  { nume: "De revistă", titluri: "Playfair Display", text: "Source Sans 3" },
+  { nume: "De revistă", titluri: "Playfair", text: "Source Sans 3" },
   { nume: "Cald", titluri: "Fraunces", text: "Figtree" },
   { nume: "Prietenos", titluri: "Quicksand", text: "Nunito" },
   { nume: "Modern", titluri: "Bricolage Grotesque", text: "Inter" },
@@ -106,7 +114,16 @@ export type AspectFonturi = {
   text: string | null;
 };
 
-export const fontTitlu = (nume: unknown) => FONTURI_TITLU.find((font) => font.nume === nume);
+/**
+ * Nume scoase din listă, cu fontul care le-a luat locul: ce e deja salvat în bază sub numele vechi
+ * nu cade pe fontul șablonului, ci trece singur pe cel nou.
+ */
+const NUME_VECHI: Record<string, string> = { "Playfair Display": "Playfair" };
+
+export const fontTitlu = (nume: unknown) => {
+  const cautat = typeof nume === "string" ? (NUME_VECHI[nume] ?? nume) : nume;
+  return FONTURI_TITLU.find((font) => font.nume === cautat);
+};
 export const fontText = (nume: unknown) => FONTURI_TEXT.find((font) => font.nume === nume);
 
 /**
@@ -152,6 +169,9 @@ export function fonturiDinBrand(brand: unknown): unknown {
  * grosimea, iar Playfair, Instrument Serif, Tenor Sans, Caveat n-au o tăietură subțire — a doua
  * parte arăta ca prima (prins de proprietar). A ales, din planșa cu variante, „doar cursiv acolo
  * unde se poate, fără culoare". Citatele și recenziile nu se schimbă: ele ascultă tot de șablon.
+ * Apoi (aceeași zi), la „De revistă" și „Aerisit" partea a doua tot părea cât prima: Playfair
+ * Display a fost înlocuit cu Playfair (are 300), iar la Tenor Sans — o grosime, fără cursive —
+ * partea a doua e gri (`accentGri`), alegerile proprietarului din planșă.
  */
 export function tipografieEfectiva(sablon: TemplateTypography, fonturi: AspectFonturi): TemplateTypography {
   const tipografie: TemplateTypography = { ...sablon };
@@ -182,6 +202,7 @@ export function tipografieEfectiva(sablon: TemplateTypography, fonturi: AspectFo
     tipografie.accentTitluCursiv = titlu.cursive;
     // Căciulița lui î atingea rândul de deasupra (Instrument Serif, Cormorant — prins de proprietar).
     tipografie.interlinieMinimaTitlu = titlu.interlinie;
+    if (titlu.accentGri) tipografie.accentTitluEstompat = true;
   }
 
   return tipografie;

@@ -63,7 +63,7 @@ export function SectionHeading({
                   // la sursă („care", „rânduri."); la restul rămâne subțire, în
                   // culoarea titlului.
                   fontWeight: "var(--t-greutate-accent-titlu, 300)" as unknown as number,
-                  color: "var(--t-accent-titlu, inherit)",
+                  color: "var(--t-accent-titlu, var(--t-estompare-accent-titlu, inherit))",
                 }}
               >
                 {titluAccent}

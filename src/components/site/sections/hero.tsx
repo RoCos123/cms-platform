@@ -198,7 +198,7 @@ export function Hero({
                 // titlului.
                 fontWeight: titluFriendly ? 700 : 300,
                 letterSpacing: "-0.01em",
-                color: titluFriendly ? "var(--t-accent)" : undefined,
+                color: titluFriendly ? "var(--t-accent)" : "var(--t-estompare-accent-titlu, inherit)",
               }}
             >
               {data.titluAccent}

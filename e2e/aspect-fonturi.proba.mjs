@@ -14,6 +14,9 @@ import {
 } from "@/lib/aspect/fonturi";
 import { brandCuCulori, brandCuFonturi, valideazaFonturi } from "@/lib/aspect/salvare";
 import { fonturiPermise } from "@/lib/aspect/acces";
+import { contrast } from "@/lib/aspect/culoare";
+import { matase } from "@/lib/aspect/paleta";
+import { PRESETURI_CULOARE } from "@/lib/aspect/salvare";
 
 /**
  * Fonturile alese de client (meniul „Aspect"). `pnpm test:logica`.
@@ -44,7 +47,7 @@ test("fonturile de titlu: exact cele 11 aprobate, câte unul din fiecare stil, �
       ["Geometric", "Josefin Sans", 600],
       ["Rotunjit, prietenos", "Quicksand", 600],
       ["Cu personalitate", "Bricolage Grotesque", 600],
-      ["De revistă", "Playfair Display", 500],
+      ["De revistă", "Playfair", 500],
       ["Clasic, fin", "Cormorant Garamond", 500],
       ["Moale, cald", "Fraunces", 500],
       ["Solid", "Zilla Slab", 600],
@@ -280,7 +283,7 @@ test("a doua parte a titlului: cursivă cu un font ales care are cursive — doa
     "src/components/site/sections/testimonials.tsx",
   ]);
   // Pe Claritate: Playfair → titluri cursive, citatele drepte; Tenor Sans → nimic cursiv.
-  const playfair = templateStyle(getTemplate("claritate", undefined, { titluri: "Playfair Display" }));
+  const playfair = templateStyle(getTemplate("claritate", undefined, { titluri: "Playfair" }));
   assert.equal(playfair["--t-stil-accent-titlu"], "italic");
   assert.equal(playfair["--t-stil-accent"], "normal", "citatele rămân drepte, ca pe Claritate");
   const tenor = templateStyle(getTemplate("claritate", undefined, { titluri: "Tenor Sans" }));
@@ -295,7 +298,7 @@ test("căciulița lui î nu mai atinge rândul de deasupra: fiecare font ales ar
   // coada lui p/g + cât urcă căciulița lui î/â, la grosimea titlului și a părții evidențiate, plus
   // 0,04 aer. Prins de proprietar la Instrument Serif și Cormorant.
   assert.deepEqual(Object.fromEntries(FONTURI_TITLU.map((f) => [f.nume, f.interlinie])), {
-    Inter: 1.08, "Josefin Sans": 0.97, Quicksand: 1.06, "Bricolage Grotesque": 1.06, "Playfair Display": 1.11,
+    Inter: 1.08, "Josefin Sans": 0.97, Quicksand: 1.06, "Bricolage Grotesque": 1.06, Playfair: 0.94,
     "Cormorant Garamond": 1.08, Fraunces: 1.03, "Zilla Slab": 0.97, "Tenor Sans": 1.01, "Instrument Serif": 1.11, Caveat: 0.87,
   });
   // Doar o limită de jos, pusă peste distanța de până acum a fiecărui titlu — care rămâne aceeași.
@@ -311,6 +314,58 @@ test("căciulița lui î nu mai atinge rândul de deasupra: fiecare font ales ar
   ]) {
     assert.ok(citeste(cale).includes(`lineHeight: "max(${baza}, var(--t-interlinie-minima-titlu, 0))",`), cale);
   }
+});
+
+test("„De revistă”: Playfair (cel nou, cu 300), nu Playfair Display — iar ce era salvat sub numele vechi trece singur", () => {
+  // Playfair Display nu coboară sub 400: partea a doua a titlului (cerută la 300) ieșea cât prima.
+  assert.ok(!FONTURI_TITLU.some((f) => f.nume === "Playfair Display"));
+  assert.equal(PERECHI_FONTURI.find((p) => p.nume === "De revistă").titluri, "Playfair");
+  assert.ok(!FONTURI_TS.includes("Playfair_Display"), "fontul vechi nu se mai descarcă");
+  assert.match(FONTURI_TS, /const playfair = Playfair\(\{[\s\S]*?axes: \["opsz"\],[\s\S]*?\}\);/, "cu axa opsz, ca la titlul mare să aibă forma de titlu");
+  // Un site care salvase deja „Playfair Display” nu cade pe fontul șablonului.
+  assert.deepEqual(citesteAspectFonturi({ titluri: "Playfair Display", text: "Source Sans 3" }), { titluri: "Playfair", text: "Source Sans 3" });
+  assert.deepEqual(valideazaFonturi({ titluri: "Playfair Display" }), { ok: true, fonturi: { titluri: "Playfair", text: null } });
+  assert.equal(getTemplate("claritate", undefined, { titluri: "Playfair Display" }).tipografie.fontTitlu, "Playfair");
+});
+
+test("„Aerisit”: la Tenor Sans (o grosime, fără cursive), partea a doua a titlului e gri — doar acolo", () => {
+  assert.deepEqual(FONTURI_TITLU.filter((f) => f.accentGri).map((f) => f.nume), ["Tenor Sans"]);
+  for (const sablon of listTemplates()) {
+    for (const f of FONTURI_TITLU) {
+      const stil = templateStyle(getTemplate(sablon.id, undefined, { titluri: f.nume }));
+      assert.equal(stil["--t-estompare-accent-titlu"], f.accentGri ? "color-mix(in srgb, currentColor 60%, transparent)" : undefined, `${sablon.nume}: ${f.nume}`);
+    }
+    assert.equal(templateStyle(sablon)["--t-estompare-accent-titlu"], undefined, "fără fonturi alese, nimic gri");
+  }
+  // Partea a doua din toate titlurile o citește (cu rezervă pe culoarea de până acum); citatele nu.
+  assert.ok(citeste("src/components/site/sections/hero.tsx").includes('color: titluFriendly ? "var(--t-accent)" : "var(--t-estompare-accent-titlu, inherit)",'));
+  for (const cale of ["src/components/site/section-heading.tsx", "src/components/site/sections/about-teaser.tsx", "src/components/site/sections/testimonials.tsx"]) {
+    assert.ok(citeste(cale).includes('color: "var(--t-accent-titlu, var(--t-estompare-accent-titlu, inherit))",'), cale);
+  }
+  for (const cale of ["src/components/site/sections/how-it-works.tsx", "src/components/site/sections/faq.tsx", "src/components/site/sections/newsletter.tsx"]) {
+    assert.ok(citeste(cale).includes('fontWeight: 300, color: "var(--t-estompare-accent-titlu, inherit)" }}>'), cale);
+  }
+  assert.equal(execFileSync("sh", ["-c", "grep -rl 't-estompare-accent-titlu' src/components | wc -l"], { encoding: "utf8" }).trim(), "7");
+});
+
+test("griul se citește: 60% din culoarea titlului rămâne peste 3:1 (titlu mare) pe orice fundal, la orice culoare aleasă", () => {
+  // Scris din nou aici: amestecul cu transparent, peste fundal, în sRGB — cum îl compune browserul.
+  const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const gri = (text, fundal) => "#" + rgb(text).map((v, i) => Math.round(v * 0.6 + rgb(fundal)[i] * 0.4).toString(16).padStart(2, "0")).join("").toUpperCase();
+  let min = 99;
+  for (const sablon of listTemplates()) {
+    for (const culori of [undefined, ...PRESETURI_CULOARE.map((p) => ({ mod: "auto", principala: p.hex }))]) {
+      const p = getTemplate(sablon.id, culori, { titluri: "Tenor Sans" }).paleta;
+      const perechi = [[p.text, p.fundal], [p.text, p.fundalNuantat], [p.text, p.fundalRelief], [p.textPeInchis, p.fundalInchis]];
+      if (p.fundalInchisMatase) perechi.push([p.textPeInchis, matase(p.fundalInchis).lumina]);
+      for (const [text, fundal] of perechi) {
+        const r = contrast(gri(text, fundal), fundal);
+        min = Math.min(min, r);
+        assert.ok(r >= 3, `${sablon.nume} ${culori?.principala ?? ""}: ${text} pe ${fundal} → ${r.toFixed(2)}`);
+      }
+    }
+  }
+  assert.ok(min < 3.6, `cel mai slab caz (${min.toFixed(2)}) — dacă urcă mult, griul s-a întunecat și nu se mai deosebește`);
 });
 
 // ───────────────────────── salvarea și poarta ─────────────────────────

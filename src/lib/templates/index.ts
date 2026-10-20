@@ -135,6 +135,8 @@ export function templateStyle(template: Template): CSSProperties {
     ...(t.secundarFaraCursive && { "--t-cursiv-secundar": "normal" }),
     ...(t.accentTitluCursiv && { "--t-stil-accent-titlu": "italic" }),
     ...(t.interlinieMinimaTitlu && { "--t-interlinie-minima-titlu": String(t.interlinieMinimaTitlu) }),
+    // Culoarea titlului, estompată: pe deschis iese un gri, pe banda închisă un fildeș mai stins.
+    ...(t.accentTitluEstompat && { "--t-estompare-accent-titlu": "color-mix(in srgb, currentColor 60%, transparent)" }),
     "--t-raza": f.raza,
     "--t-raza-buton": f.razaButon,
     "--t-spatiere": f.spatiereSectiune,

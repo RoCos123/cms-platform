@@ -556,7 +556,7 @@ arătat proprietarului ÎNAINTE să se construiască).
   - **Regula** (`src/lib/aspect/fonturi.ts`, `tipografieEfectiva`): TEXTUL schimbă doar fontul
     principal; TITLUL schimbă titlurile, cuvintele colorate, cifrele mari și citatele (fontul
     secundar), cu grosimea LUI (Inter 700, Josefin/Quicksand/Bricolage/Zilla/Caveat 600,
-    Playfair/Cormorant/Fraunces 500, Tenor/Instrument 400). Cu orice alegere, titlurile au un font
+    Playfair/Cormorant/Fraunces 500, Tenor/Instrument 400; Playfair Display înlocuit apoi cu Playfair). Cu orice alegere, titlurile au un font
     explicit (`fontTitlu`), iar cele cinci secțiuni fără `titluSerif` îl folosesc prin
     `--t-font-titlu-ales` / `--t-greutate-titlu-ales` — fără alegere, variabilele nu există și cad
     exact pe ce aveau (fontul moștenit, 700). Fonturile fără cursive (Inter cum e declarat,
@@ -587,6 +587,21 @@ arătat proprietarului ÎNAINTE să se construiască).
     Inter n-au cursive: rămân ca înainte — la Tenor Sans și Caveat diferența rămâne mică, spus
     proprietarului. Probă nouă + 6 stricări prinse; tot: 520. Browser: Playfair, Instrument,
     Cormorant, Fraunces → titlul mare și „Ce poți întreba" cursive, citatul drept, aceeași culoare.
+  - **Partea a doua tot „bolduită" la De revistă și Aerisit (20 oct.):** chiar și cursivă, la
+    Playfair Display „în ritmul tău" părea cât prima parte (Playfair Display nu coboară sub 400:
+    titlul 500, partea a doua cerută la 300 → 400), iar Tenor Sans are o singură grosime și n-are
+    cursive. Planșă cu variante; proprietarul: „la playfair facem playfair nou, iar la aerisit,
+    varianta cu gri". Făcut: **Playfair Display → Playfair** (versiunea nouă, 300–900, cu axa
+    `opsz` — la titlul mare ia singur forma contrastată), în catalog, în perechea „De revistă" și
+    în `next/font`; ce era salvat ca „Playfair Display" trece singur pe „Playfair" (`NUME_VECHI`
+    în `fonturi.ts`), deci nimic nu cade pe fontul șablonului. **Tenor Sans:** partea a doua a
+    titlurilor la 60% din culoarea titlului (`accentGri` → `--t-estompare-accent-titlu`,
+    `color-mix(in srgb, currentColor 60%, transparent)`): gri pe deschis, fildeș stins pe banda
+    închisă; contrast minim 3,2:1 pe orice fundal și culoare aleasă (probat, prag 3:1 pentru titlu
+    mare). Doar la Tenor Sans; Caveat are aceeași problemă — întrebat proprietarul dacă vrea și
+    acolo gri. Probe: 3 teste noi, 6 stricări prinse; tot: 524. Browser: Playfair 500 / 300
+    cursiv; „Playfair Display" salvat → Playfair; Tenor: partea a doua la 60% pe titlul mare,
+    pe bandă și la întrebări; fără fonturi alese, nimic gri; testul pe pixeli trece la toate 11.
   - **Căciulița lui „î" (20 oct., „da, rezolvă asta cu căciulița"):** la titlul mare, virgula de
     sub „Ș"/„ț" sau coada lui „p" atingea căciulița lui „î" de pe rândul de dedesubt (Playfair,
     Cormorant, Instrument Serif). Măsurat în Chromium, pe fișierele adevărate, pentru fiecare font

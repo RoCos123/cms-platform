@@ -14,7 +14,7 @@ import {
   Manrope,
   Newsreader,
   Nunito,
-  Playfair_Display,
+  Playfair,
   Quicksand,
   Source_Sans_3,
   Source_Serif_4,
@@ -99,7 +99,15 @@ const caveat = Caveat({ subsets: ["latin", "latin-ext"], display: "swap", preloa
 const josefinSans = Josefin_Sans({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
 const quicksand = Quicksand({ subsets: ["latin", "latin-ext"], display: "swap", preload: false });
 const bricolage = Bricolage_Grotesque({ subsets: ["latin", "latin-ext"], display: "swap", preload: false });
-const playfair = Playfair_Display({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
+// Cu axa `opsz`: literele își schimbă singure forma după mărime — subțiri și contrastate la titlul
+// mare, mai robuste la cele mici.
+const playfair = Playfair({
+  subsets: ["latin", "latin-ext"],
+  display: "swap",
+  preload: false,
+  style: ["normal", "italic"],
+  axes: ["opsz"],
+});
 const fraunces = Fraunces({ subsets: ["latin", "latin-ext"], display: "swap", preload: false, style: ["normal", "italic"] });
 // Zilla Slab și cele două de mai jos nu sunt variabile: greutățile se cer una câte una.
 const zillaSlab = Zilla_Slab({
@@ -141,7 +149,7 @@ const FAMILII: Record<string, string> = {
   "Josefin Sans": josefinSans.style.fontFamily,
   Quicksand: quicksand.style.fontFamily,
   "Bricolage Grotesque": bricolage.style.fontFamily,
-  "Playfair Display": playfair.style.fontFamily,
+  Playfair: playfair.style.fontFamily,
   Fraunces: fraunces.style.fontFamily,
   "Zilla Slab": zillaSlab.style.fontFamily,
   "Tenor Sans": tenorSans.style.fontFamily,
@@ -197,7 +205,7 @@ const LATIME_LITERA: Record<string, number> = {
   "Josefin Sans": 0.51,
   Quicksand: 0.51,
   "Bricolage Grotesque": 0.52,
-  "Playfair Display": 0.51,
+  Playfair: 0.48,
   Fraunces: 0.54,
   "Zilla Slab": 0.49,
   "Tenor Sans": 0.54,
