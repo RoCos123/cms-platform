@@ -510,11 +510,17 @@ arătat proprietarului ÎNAINTE să se construiască).
   (3) opțional: bifa „înțeleg…", ordonarea culorilor gata alese după gustul lui.
 - **FONTURILE — lista propusă (20 oct. 2026, „hai sa facem fonturile acum"; NEÎNCEPUTE, așteaptă
   aprobarea listei).** Arătată ca mostre (titlu cu cuvânt colorat + cursiv; paragraf cu bold și
-  cursiv). *Titluri (8):* Inter 700, Manrope 700 (fără cursive), Cormorant Garamond 500, Playfair
-  Display 500, Fraunces 500, Lora 600, EB Garamond 500, DM Serif Display 400; rezerve: Newsreader,
-  Libre Baskerville, Instrument Serif, Literata. *Text (8):* Inter, DM Sans, Nunito, Source Sans 3,
+  cursiv). *Titluri:* prima listă (Inter, Manrope, Cormorant, Playfair, Fraunces, Lora, EB Garamond, DM
+  Serif Display) i s-a părut proprietarului „cam asemănătoare între ele" — avea dreptate: șase din
+  opt erau serife de carte. A doua propunere, CÂTE UNUL DIN FIECARE STIL (11): Inter 700 (neutru),
+  Josefin Sans 600 (geometric), Quicksand 600 (rotunjit), Bricolage Grotesque 600 (cu
+  personalitate), Playfair Display 500 (de revistă), Cormorant Garamond 500 (clasic, fin), Fraunces
+  500 (moale), Zilla Slab 600 (solid), Tenor Sans 400 (sculptat), Instrument Serif 400 (îngust),
+  Caveat 600 (scris de mână). Fără cursive: Quicksand, Bricolage, Tenor Sans, Caveat. Excluse
+  pentru că N-AU ș/ț deși Next le declară cu `latin-ext`: Marcellus, Philosopher (ș, ț), Poiret
+  One (ț) — capcana exactă de care trebuie păzit orice font nou. *Text (8):* Inter, DM Sans, Nunito, Source Sans 3,
   Figtree, Lora, Source Serif 4, Literata; rezerve: Manrope (fără cursive — browserul le-ar
-  fabrica în articole), Newsreader (pare mai mic). Toate 18 verificate pe fișierele adevărate
+  fabrica în articole), Newsreader (pare mai mic). Toate verificate pe fișierele adevărate
   (latin + latin-ext, drept și cursiv): au ă â î ș ț Ă Â Î Ș Ț, iar ș/ț sunt cu VIRGULĂ, glife
   separate de ş/ţ cu sedilă; încercat și mărit în Chromium. De știut: la Cormorant căciulița de pe
   â/î stă sus, departe de literă — e desenul fontului (îl au deja Liniște și Lumină). Toate sunt
