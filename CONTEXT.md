@@ -220,8 +220,8 @@ de mai sus iese bine; programările/formularele într-o limbă străină sunt pa
 *Limbi:* nehotărât; propunerea sesiunii: engleza întâi.
 
 **Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE ȘI PE MASTER, ÎN PROBĂ
-DOAR PE `model-claritate.vercel.app` (Claritate); FONTURILE FĂCUTE PE 20 OCT. 2026, PE BRANCH,
-NEPUBLICATE (așteaptă „fă pe master"), în aceeași probă.** Întâi a fost doar discutat (proprietarul: „momentan nu facem
+DOAR PE `model-claritate.vercel.app` (Claritate); FONTURILE FĂCUTE PE 20 OCT. 2026, ȘI ELE PE
+MASTER (`fc6e863`, CI verde, rularea 221), în aceeași probă.** Întâi a fost doar discutat (proprietarul: „momentan nu facem
 nimic, doar discutăm"); apoi a cerut „hai sa facem partea cu culorile si fonturile… Mai intai
 culorile". Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
 *Hotărâri confirmate:*
@@ -539,7 +539,7 @@ arătat proprietarului ÎNAINTE să se construiască).
   (2) la titlul uriaș din hero, cu interlinia lui strânsă, virgula de sub „Ș" poate atinge căciulița
   lui „î" de pe rândul următor (văzut la Instrument Serif) — de dat puțin aer la fonturile cu accente
   înalte. Lista de text: imagini trimise, așteaptă răspunsul.
-- **FONTURILE — construite (20 oct. 2026, pe branch; „fă pe master" nu s-a spus).** Proprietarul:
+- **FONTURILE — construite (20 oct. 2026; „fă pe master" → `fc6e863`, CI verde).** Proprietarul:
   „da, le păstrez pe toate" (cele 10 de text) și „facem 5 combinații sau mai multe, pe lângă
   alegerea liberă".
   - **Ce vede clientul:** în „Aspect", două file, **Culori** și **Fonturi**, o singură bară de
