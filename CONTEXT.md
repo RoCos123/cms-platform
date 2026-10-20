@@ -508,6 +508,22 @@ arătat proprietarului ÎNAINTE să se construiască).
   sine (nu există local) — se vede abia după „fă pe master".
 - **Rămas:** (1) „fă pe master" de la proprietar; (2) FONTURILE — lista curată, arătată lui înainte;
   (3) opțional: bifa „înțeleg…", ordonarea culorilor gata alese după gustul lui.
+- **FONTURILE — lista propusă (20 oct. 2026, „hai sa facem fonturile acum"; NEÎNCEPUTE, așteaptă
+  aprobarea listei).** Arătată ca mostre (titlu cu cuvânt colorat + cursiv; paragraf cu bold și
+  cursiv). *Titluri (8):* Inter 700, Manrope 700 (fără cursive), Cormorant Garamond 500, Playfair
+  Display 500, Fraunces 500, Lora 600, EB Garamond 500, DM Serif Display 400; rezerve: Newsreader,
+  Libre Baskerville, Instrument Serif, Literata. *Text (8):* Inter, DM Sans, Nunito, Source Sans 3,
+  Figtree, Lora, Source Serif 4, Literata; rezerve: Manrope (fără cursive — browserul le-ar
+  fabrica în articole), Newsreader (pare mai mic). Toate 18 verificate pe fișierele adevărate
+  (latin + latin-ext, drept și cursiv): au ă â î ș ț Ă Â Î Ș Ț, iar ș/ț sunt cu VIRGULĂ, glife
+  separate de ş/ţ cu sedilă; încercat și mărit în Chromium. De știut: la Cormorant căciulița de pe
+  â/î stă sus, departe de literă — e desenul fontului (îl au deja Liniște și Lumină). Toate sunt
+  în `next/font/google` (deci auto-găzduite, ca acum); un vizitator descarcă doar cele două folosite.
+  *Propuse, de confirmat:* fontul titlurilor = titlurile + cuvintele colorate din ele + cifrele mari
+  (`fontSecundar` + `titluriInSecundar`), ca un titlu să nu aibă două fonturi; fiecare font cu
+  grosimea lui de titlu (cea din mostră), nu a șablonului; fără alegere = fonturile șablonului, cu
+  „Revino la fonturile șablonului"; aceeași poartă ca la culori; un font fără cursive oprește
+  singur cursivele accentelor (ca la Caveat pe Apropiere). Întrebat: și câteva perechi gata făcute?
 
 **„Motivul programării" a fost SCOS (15 oct. 2026, „da, scoate-l" al proprietarului; pe branch,
 NEPUBLICAT — așteaptă „fă pe master").** Era o listă cu două intrări, „Evaluări psihologice" și
