@@ -223,8 +223,9 @@ de mai sus iese bine; programările/formularele într-o limbă străină sunt pa
 DOAR PE `model-claritate.vercel.app` (Claritate); FONTURILE FĂCUTE PE 20 OCT. 2026, ȘI ELE PE
 MASTER (`fc6e863`, CI verde, rularea 221), în aceeași probă. DESCHIDERE TREPTATĂ, CÂTE UN ȘABLON
 (proprietarul, 20 oct.: „hai să aplicăm treptat, pe fiecare șablon în parte"): LUMINĂ pe
-`model-lumina.vercel.app` („pe model-lumina frate, pe asta să apară") — PE BRANCH, așteaptă „fă pe
-master". Ordinea propusă după: Căldură, Liniște, Apropiere, fiecare pe site-ul lui model.**
+`model-lumina.vercel.app` („pe model-lumina frate, pe asta să apară"), apoi CĂLDURĂ pe
+`model-caldura`, apoi LINIȘTE pe `model-liniste` (21 oct.) — toate trei pe master. Rămâne
+Apropiere, pe `model-apropiere`, când o cere proprietarul.**
 *Lumină, verificat local (stiva reală, `ana.test` pe Lumină):* fără culori — neschimbat; cu Safir,
 Smarald + „Elegant", Bordeaux + „De revistă" — nimic stricat, nicio eroare. De știut: cu o culoare
 aleasă, tenta lavandă a Luminii devine calcarul cald (ca pe Claritate); fără font ales, Lumină are
@@ -233,14 +234,27 @@ de la sine titluri amestecate (Cormorant la unele, sans gros la „Despre mine",
 Domeniul `model-lumina.vercel.app` e presupus după modelul celui de Claritate — dacă e altul,
 meniul nu apare (fără stricăciuni) și se corectează în `acces.ts`.
 *Lumină pe master* (`d52057e`); proprietarul: „merge". *CĂLDURĂ pe `model-caldura.vercel.app`*
-(„merge, hai la Căldură") — PE BRANCH. Verificat local: fără culori neschimbat; cu Safir, Smarald +
+(„merge, hai la Căldură") — pe master (`27683c2`, apoi `6e219ca` pentru 1,08). Verificat local: fără culori neschimbat; cu Safir, Smarald +
 „Elegant", Bordeaux + „De revistă" — nimic stricat, nicio eroare; meniul și pagina apar. Găsit, NU
 legat de „Aspect" (șablonul de dinainte, pe toate site-urile Căldură): la titlul mare (Manrope 700 +
 partea a doua în Cormorant cursiv, la 0,98), virgula lui „Ș"/„ț" atinge rândul de dedesubt;
 măsurat pe pixeli: „…psihoterapie, / în ritmul tău" se desparte de la 1,00, dar „Ședințe pentru
 tine / îți ascult povestea" (căciulița înaltă a lui „î" în Cormorant) abia la 1,08 — 1,05 nu
 ajunge. Proprietarul: „1, pune 1,08 și fă pe master" → `caldura.ts`, `interlinieMinimaTitlu: 1.08`,
-pe TOATE site-urile Căldură; verificat pe pixeli (ambele titluri despărțite: 11px, 4px). Întâi a fost doar discutat (proprietarul: „momentan nu facem
+pe TOATE site-urile Căldură; verificat pe pixeli (ambele titluri despărțite: 11px, 4px).
+*LINIȘTE pe `model-liniste.vercel.app`* („merge, hai la Liniște"; domeniul e cel din lista
+demo-urilor din 7 oct.). Verificat local: fără culori neschimbat; cu culori și fonturi — nimic
+stricat. Două lucruri găsite și hotărâte de proprietar („B și 1,05, apoi fă pe master", 21 oct.):
+(1) banda „Ce spun clienții" avea verdele-salvie scris direct în componentă, deci rămânea verde
+și pe un site cu Safir sau Bordeaux; acum, DOAR cu culori alese, e același ton stins în nuanța
+accentului (rolul `fundalPareri`, `REGULI_PREMIUM.pareri`: salvia cu lumina și croma ei, cu 0,02
+mai închisă — fără coborâre, aurul-șampanie al etichetei ieșea 4,2:1 pe partea luminoasă; acum
+cel mai slab caz e 4,6:1, probat pe toate nuanțele, și în modul manual). Fără culori alese,
+verdele exact de până acum. (2) Titlul mare (Cormorant, 0,98) lăsa virgula lui „Ș" să atingă
+căciulița lui „î" de dedesubt, și pe Liniște, și pe Lumină (același font); se atinge și la 1,00 →
+`interlinieMinimaTitlu: 1.05` în `liniste.ts` ȘI `lumina.ts`, pe TOATE site-urile lor (nu doar
+cele cu „Aspect"). Pe pixeli: pe laptop ~4px între rânduri; pe telefon (48px) doar 1–2px — nu se
+ating, dar sunt aproape; dacă proprietarul vrea mai mult aer, 1,08 (ca la Căldură). Întâi a fost doar discutat (proprietarul: „momentan nu facem
 nimic, doar discutăm"); apoi a cerut „hai sa facem partea cu culorile si fonturile… Mai intai
 culorile". Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
 *Hotărâri confirmate:*

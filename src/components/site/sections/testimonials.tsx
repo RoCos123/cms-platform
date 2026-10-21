@@ -259,6 +259,10 @@ export function Testimonials({
  * proprietar (3 oct. 2026): baza rgb(65,84,71); spre stânga-sus urcă la
  * rgb(71,90,77), în dreapta coboară la rgb(60,80,66). Un gradient liniar pe
  * orizontală pentru bază, plus o lumină largă și slabă sus.
+ *
+ * Pe un site cu culori alese în „Aspect", aceeași bandă în tonul stins al
+ * accentului (`--t-fundal-pareri`, varianta B aleasă de proprietar pe 21 oct.
+ * 2026); fără culori alese, verdele de mai jos, neschimbat.
  */
 function FundalVerde() {
   return (
@@ -268,7 +272,7 @@ function FundalVerde() {
         position: "absolute",
         inset: 0,
         background:
-          "radial-gradient(ellipse 55% 70% at 33% 0%, rgba(80, 100, 86, 0.55), transparent 70%), linear-gradient(90deg, #415447 0%, #415548 50%, #3c5042 100%)",
+          "var(--t-fundal-pareri, radial-gradient(ellipse 55% 70% at 33% 0%, rgba(80, 100, 86, 0.55), transparent 70%), linear-gradient(90deg, #415447 0%, #415548 50%, #3c5042 100%))",
       }}
     />
   );

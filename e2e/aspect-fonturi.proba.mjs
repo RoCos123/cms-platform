@@ -143,9 +143,9 @@ test("`getTemplate` fără fonturi întoarce EXACT șablonul — site-urile exis
     assert.equal(stil["--t-greutate-titlu-ales"], undefined, sablon.nume);
     assert.equal(stil["--t-cursiv-secundar"], undefined, sablon.nume);
     assert.equal(stil["--t-stil-accent-titlu"], undefined, sablon.nume);
-    // Excepțiile: Claritate (1,05) și Căldură (1,08) au de la sine o distanță minimă la titluri, pentru
-    // căciulița lui „î" și virgula lui „Ș".
-    assert.equal(stil["--t-interlinie-minima-titlu"], { claritate: "1.05", caldura: "1.08" }[sablon.id], sablon.nume);
+    // Excepțiile: Claritate, Liniște, Lumină (1,05) și Căldură (1,08) au de la sine o distanță minimă
+    // la titluri, pentru căciulița lui „î" și virgula lui „Ș".
+    assert.equal(stil["--t-interlinie-minima-titlu"], { claritate: "1.05", caldura: "1.08", liniste: "1.05", lumina: "1.05" }[sablon.id], sablon.nume);
     assert.equal(sablon.tipografie.fontTitlu, undefined, `${sablon.nume}: niciun șablon nu are fontTitlu`);
   }
 });
@@ -372,11 +372,17 @@ test("griul se citește: 60% din culoarea titlului rămâne peste 3:1 (titlu mar
   assert.ok(min < 3.6, `cel mai slab caz (${min.toFixed(2)}) — dacă urcă mult, griul s-a întunecat și nu se mai deosebește`);
 });
 
-test("Claritate (1,05) și Căldură (1,08), și fără font ales: titlul mare nu mai lasă diacriticele să se atingă", () => {
+test("Claritate, Liniște, Lumină (1,05) și Căldură (1,08), și fără font ales: titlul mare nu mai lasă diacriticele să se atingă", () => {
   // Măsurat pe pixeli: la 0,98, un „î" sub un „Ș" sau un „p" se atinge. Claritate (Inter): la 1,05
   // rămân ~6px. Căldură (Manrope + partea a doua în Cormorant, cu căciulița înaltă): abia la 1,08.
+  // Liniște și Lumină (titlul întreg în Cormorant): se ating și la 1,00; la 1,05 rămân ~4px.
+  // Apropiere nu e încă (n-a fost măsurată).
   for (const sablon of listTemplates()) {
-    assert.equal(sablon.tipografie.interlinieMinimaTitlu, { claritate: 1.05, caldura: 1.08 }[sablon.id], sablon.nume);
+    assert.equal(sablon.tipografie.interlinieMinimaTitlu, { claritate: 1.05, caldura: 1.08, liniste: 1.05, lumina: 1.05 }[sablon.id], sablon.nume);
+  }
+  // Pe Liniște și Lumină, la fel: doar un font de TEXT ales nu schimbă distanța titlurilor.
+  for (const id of ["liniste", "lumina"]) {
+    assert.equal(getTemplate(id, undefined, { text: "Lora" }).tipografie.interlinieMinimaTitlu, 1.05, id);
   }
   // Pe Căldură, un font de TEXT ales nu schimbă titlurile, deci nici distanța lor.
   assert.equal(getTemplate("caldura", undefined, { text: "Lora" }).tipografie.interlinieMinimaTitlu, 1.08);

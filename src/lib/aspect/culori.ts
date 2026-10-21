@@ -1,6 +1,6 @@
 import type { TemplatePalette } from "@/lib/templates/types";
 import { normalizeazaHex, oklchDinHex, hexDinOklch } from "./culoare";
-import { bazaManuala, matase } from "./paleta";
+import { bazaManuala, fundalPareri, matase } from "./paleta";
 
 /**
  * Culorile alese de un client pentru site-ul lui (meniul „Aspect").
@@ -158,9 +158,11 @@ export function paletaEfectiva(sablon: TemplatePalette, aspect: AspectCulori): T
     if (paleta.fundalBanda) paleta.fundalBanda = paleta.fundalRelief;
   }
 
-  // Mătasea se reface din culorile FINALE: omul poate schimba banda sau butonul de mână.
+  // Mătasea și banda „Ce spun clienții” se refac din culorile FINALE: omul poate schimba banda
+  // sau butonul de mână.
   paleta.fundalInchisMatase = matase(paleta.fundalInchis).css;
   paleta.accentMatase = matase(paleta.accent).css;
+  paleta.fundalPareri = fundalPareri(paleta.accent).css;
 
   return paleta;
 }

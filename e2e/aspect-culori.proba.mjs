@@ -84,6 +84,28 @@ function umbraMatase(hex) {
   return hexDinOklch({ l: Math.max(0, o.l - 0.05), c: o.c, h: o.h });
 }
 
+/**
+ * Banda „Ce spun clienții" de la Liniște (varianta B, 21 oct.), scrisă din nou aici: salvia benzii
+ * (#415447 baza, #3C5042 umbra, #506456 lumina, cea din urmă la 55%), cu 0,02 mai închisă, în
+ * nuanța accentului; un accent gri o face gri. `varf` = lumina la 55% peste bază (cel mai luminos punct).
+ */
+function pareriIndependent(accent) {
+  const n = oklchDinHex(accent);
+  const ton = (hex) => {
+    const o = oklchDinHex(hex);
+    return hexDinOklch({ l: o.l - 0.02, c: n.c < 0.01 ? 0 : o.c, h: n.h });
+  };
+  const baza = ton("#415447");
+  const umbra = ton("#3C5042");
+  const lumina = ton("#506456");
+  const canal = (hex, i) => parseInt(hex.slice(1 + 2 * i, 3 + 2 * i), 16);
+  const varf = `#${[0, 1, 2].map((i) => hex2(Math.round(canal(lumina, i) * 0.55 + canal(baza, i) * 0.45))).join("")}`.toUpperCase();
+  return {
+    baza, umbra, lumina, varf,
+    css: `radial-gradient(ellipse 55% 70% at 33% 0%, ${lumina}8C, transparent 70%), linear-gradient(90deg, ${baza} 0%, ${baza} 50%, ${umbra} 100%)`,
+  };
+}
+
 /** Perechile care apar pe ecran — copiate din proba șabloanelor, nu importate din cod. */
 function perechiIndependente(p) {
   const lista = [];
@@ -101,6 +123,13 @@ function perechiIndependente(p) {
     }
   }
   if (p.accentMatase) lista.push(["accentText pe lumina butonului", p.accentText, luminaMatase(p.accent)]);
+  // Banda „Ce spun clienții" (Liniște): titlul, eticheta și accentul ei se citesc pe toată banda.
+  if (p.fundalPareri) {
+    const banda = pareriIndependent(p.accent);
+    for (const rol of ["textPeInchis", "textSecundarPeInchis", "accentPeInchis"]) {
+      for (const loc of ["baza", "umbra", "varf"]) lista.push([`${rol} pe banda cu păreri (${loc})`, p[rol], banda[loc]]);
+    }
+  }
   // Paleta premium (19 oct.): linkurile pe fundalurile deschise și textul butonului la hover.
   if (p.accentInteractiv) {
     for (const [numeFundal, fundal] of [["fundal", p.fundal], ["fundalNuantat", p.fundalNuantat], ["fundalRelief", p.fundalRelief]]) {
@@ -170,6 +199,8 @@ for (const sablon of listTemplates()) {
       for (const [rol, valoare] of Object.entries(paleta)) {
         if (rol.endsWith("Matase")) {
           assert.match(valoare, /^linear-gradient\(135deg, #[0-9A-F]{6} 20%, #[0-9A-F]{6} 50%, #[0-9A-F]{6} 90%\)$/, `${culoare}: ${rol}`);
+        } else if (rol === "fundalPareri") {
+          assert.match(valoare, /^radial-gradient\(ellipse 55% 70% at 33% 0%, #[0-9A-F]{6}8C, transparent 70%\), linear-gradient\(90deg, (#[0-9A-F]{6}) 0%, \1 50%, #[0-9A-F]{6} 100%\)$/, `${culoare}: ${rol}`);
         } else {
           assert.ok(esteHexValid(valoare), `${culoare}: ${rol} = ${valoare}`);
         }
@@ -697,6 +728,8 @@ for (const sablon of listTemplates()) {
       // Mătasea benzii și a butonului: lumina 20%, baza 50%, umbra 90%, la 135°.
       asteptat("fundalInchisMatase", `linear-gradient(135deg, ${luminaMatase(p.fundalInchis)} 20%, ${p.fundalInchis} 50%, ${umbraMatase(p.fundalInchis)} 90%)`);
       asteptat("accentMatase", `linear-gradient(135deg, ${luminaMatase(p.accent)} 20%, ${p.accent} 50%, ${umbraMatase(p.accent)} 90%)`);
+      // Banda „Ce spun clienții": salvia, cu 0,02 mai închisă, în nuanța accentului.
+      asteptat("fundalPareri", pareriIndependent(p.accent).css);
       // Calcarul cald, exact valorile proprietarului.
       asteptat("fundal", "#F2EFE9");
       asteptat("fundalNuantat", "#FAF8F5");
@@ -952,4 +985,53 @@ test("mătasea („Silk & Velvet”): pe benzi, subsol, cartonașele închise ș
   const nume = perechiDeContrast(manual).map((x) => x.nume);
   assert.ok(nume.includes("Textul de pe fundalul închis, pe partea luminoasă a benzii"), nume.join(" | "));
   assert.ok(nume.includes("Textul de pe butoane, pe partea luminoasă a butonului"));
+});
+
+test("banda „Ce spun clienții” de la Liniște: tonul stins al accentului cu culori alese, verdele de până acum fără", () => {
+  // Niciun șablon n-are banda nouă: fără culori alese, Liniște rămâne pe verdele ei.
+  for (const sablon of listTemplates()) {
+    assert.equal("fundalPareri" in sablon.paleta, false, sablon.nume);
+    assert.equal(templateStyle(sablon)["--t-fundal-pareri"], undefined, sablon.nume);
+  }
+  const ales = getTemplate("liniste", { mod: "auto", principala: "#1D3A5F" });
+  assert.equal(templateStyle(ales)["--t-fundal-pareri"], ales.paleta.fundalPareri);
+  assert.equal(ales.paleta.fundalPareri, pareriIndependent(ales.paleta.accent).css);
+  // Un ton STINS, nu culoarea plină: croma salviei (~0,03), nu a culorii alese.
+  const baza = pareriIndependent(ales.paleta.accent).baza;
+  assert.ok(oklchDinHex(baza).c < 0.04, `${baza}: prea saturată`);
+  assert.ok(Math.abs(oklchDinHex(baza).h - oklchDinHex(ales.paleta.accent).h) < 4, `${baza}: altă nuanță decât accentul`);
+  // Un accent gri dă o bandă gri.
+  assert.ok(oklchDinHex(pareriIndependent("#777777").baza).c < 0.005);
+
+  // Componenta: rolul nou, CU rezervă pe verdele exact de până acum.
+  assert.ok(citeste("src/components/site/sections/testimonials.tsx").includes(
+    '"var(--t-fundal-pareri, radial-gradient(ellipse 55% 70% at 33% 0%, rgba(80, 100, 86, 0.55), transparent 70%), linear-gradient(90deg, #415447 0%, #415548 50%, #3c5042 100%))"',
+  ));
+
+  // Pe ORICE nuanță (lumina și croma benzii sunt fixe, doar nuanța se mișcă), textele de pe bandă
+  // trec 4,5:1 pe bază, pe umbră și pe cel mai luminos punct — cu paleta calculată…
+  const slabe = [];
+  for (let h = 0; h < 360; h += 1) {
+    for (const culoare of [hexDinOklch({ l: 0.35, c: 0.12, h }), hexDinOklch({ l: 0.8, c: 0.08, h })]) {
+      const { paleta } = paletaDinCuloare(getTemplate("liniste").paleta, culoare);
+      const banda = pareriIndependent(paleta.accent);
+      for (const rol of ["textPeInchis", "textSecundarPeInchis", "accentPeInchis"]) {
+        for (const loc of ["baza", "umbra", "varf"]) {
+          const r = contrast(paleta[rol], banda[loc]);
+          if (r < 4.5) slabe.push(`${culoare} ${rol} pe ${loc}: ${r.toFixed(2)}`);
+        }
+      }
+      // …și în modul manual fără culoare principală, cu textele deschise ale șablonului.
+      const manual = paletaEfectiva(getTemplate("liniste").paleta, citesteAspectCulori({ mod: "manual", manual: { accent: culoare } }));
+      const bandaManual = pareriIndependent(manual.accent);
+      assert.equal(manual.fundalPareri, bandaManual.css, "modul manual: banda se reface din accentul FINAL");
+      for (const rol of ["textPeInchis", "textSecundarPeInchis", "accentPeInchis"]) {
+        for (const loc of ["baza", "umbra", "varf"]) {
+          const r = contrast(manual[rol], bandaManual[loc]);
+          if (r < 4.5) slabe.push(`manual ${culoare} ${rol} pe ${loc}: ${r.toFixed(2)}`);
+        }
+      }
+    }
+  }
+  assert.deepEqual(slabe.slice(0, 10), [], `${slabe.length} slabe`);
 });

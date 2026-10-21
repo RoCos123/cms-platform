@@ -72,6 +72,12 @@ export type TemplatePalette = {
    */
   fundalInchisMatase?: string;
   accentMatase?: string;
+  /**
+   * Fundalul benzii „Ce spun clienții" de la Liniște, pe un site cu culori alese: tot un gradient
+   * (doar ca `background`), tonul stins al accentului în locul salviei (21 oct. 2026). Niciun
+   * șablon nu-l are; banda rămâne atunci verde, ca până acum.
+   */
+  fundalPareri?: string;
   /** Culoarea erorilor de formular, pe fundal deschis și pe fundal închis. */
   eroare: string;
   eroarePeInchis: string;

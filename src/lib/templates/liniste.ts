@@ -47,6 +47,10 @@ export const liniste: Template = {
     titluriInSecundar: true,
     accentInItalic: true,
     greutateTitlu: 400,
+    // Titlul mare stătea la 0,98, iar în Cormorant virgula lui „Ș"/„ț" atingea rândul de dedesubt
+    // (măsurat pe pixeli: se atinge și la 1,00; la 1,05 rămân ~4px între ele). Cerut de
+    // proprietar, 21 oct. 2026: „B și 1,05". Titlurile secțiunilor (1,08) rămân.
+    interlinieMinimaTitlu: 1.05,
   },
 
   forme: {

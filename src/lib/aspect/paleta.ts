@@ -83,6 +83,14 @@ export const REGULI_PREMIUM = {
   accentPeInchis: "#DFC59B",
   /** Textele pe deschis: gri-cărbune cald (OKLCH, nuanța calcarului). */
   text: { croma: 0.006, h: 80 },
+  /**
+   * Banda „Ce spun clienții" de la Liniște (varianta B, aleasă de proprietar pe 21 oct. 2026):
+   * salvia ei — măsurată pe captura proprietarului, vezi `FundalVerde` — cu lumina și croma
+   * păstrate, dar în nuanța accentului și cu 0,02 mai închisă (OKLCH). Atât trebuie ca toate
+   * trei textele de pe bandă să treacă 4,5:1 pe orice nuanță: fără coborâre, aurul-șampanie
+   * rămânea la 4,2:1 pe partea luminoasă.
+   */
+  pareri: { baza: "#415447", umbra: "#3C5042", lumina: "#506456", alfaLumina: 0.55, intunecare: 0.02 },
 } as const;
 
 /** Cele trei faze ale mătăsii pentru o culoare, plus gradientul CSS gata de pus ca `background`. */
@@ -98,6 +106,44 @@ export function matase(hex: string): Matase {
   const lumina = hexDinOklch({ l: Math.min(1, o.l + r.lumina.l), c: o.c < 0.01 ? o.c : o.c + r.lumina.c, h: o.h });
   const umbra = hexDinOklch({ l: Math.max(0, o.l + r.umbra.l), c: o.c, h: o.h });
   return { lumina, baza: hex, umbra, css: `linear-gradient(135deg, ${lumina} 20%, ${hex} 50%, ${umbra} 90%)` };
+}
+
+/**
+ * Fundalul benzii „Ce spun clienții": baza, umbra (dreapta), lumina largă de sus și `varf` — cel
+ * mai luminos punct (lumina, la opacitatea ei, peste bază), unde se măsoară contrastul — plus
+ * gradientul CSS gata de pus ca `background`.
+ */
+export type FundalPareri = { baza: string; umbra: string; lumina: string; varf: string; css: string };
+
+/** Două culori `#RRGGBB` amestecate cum le amestecă ecranul: `sus` la opacitatea `alfa`, peste `jos`. */
+function suprapune(sus: string, alfa: number, jos: string): string {
+  const canal = (hex: string, i: number) => parseInt(hex.slice(1 + 2 * i, 3 + 2 * i), 16);
+  const canale = [0, 1, 2].map((i) => Math.round(canal(sus, i) * alfa + canal(jos, i) * (1 - alfa)));
+  return `#${canale.map((v) => v.toString(16).padStart(2, "0")).join("")}`.toUpperCase();
+}
+
+/**
+ * Banda „Ce spun clienții" în nuanța unui accent: un ton stins, nu culoarea plină (salvia, cu
+ * nuanța schimbată). Un accent gri o dă gri — croma nu urcă unde nuanța n-are sens, ca la mătase.
+ */
+export function fundalPareri(accent: string): FundalPareri {
+  const r = REGULI_PREMIUM.pareri;
+  const nuanta = oklchDinHex(accent);
+  const ton = (hex: string) => {
+    const o = oklchDinHex(hex);
+    return hexDinOklch({ l: o.l - r.intunecare, c: nuanta.c < 0.01 ? 0 : o.c, h: nuanta.h });
+  };
+  const baza = ton(r.baza);
+  const umbra = ton(r.umbra);
+  const lumina = ton(r.lumina);
+  const alfa = Math.round(r.alfaLumina * 255).toString(16).padStart(2, "0").toUpperCase();
+  return {
+    baza,
+    umbra,
+    lumina,
+    varf: suprapune(lumina, r.alfaLumina, baza),
+    css: `radial-gradient(ellipse 55% 70% at 33% 0%, ${lumina}${alfa}, transparent 70%), linear-gradient(90deg, ${baza} 0%, ${baza} 50%, ${umbra} 100%)`,
+  };
 }
 
 export type RezultatPaleta = {
@@ -248,6 +294,9 @@ export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): Rezu
     // Mătasea: gradientele, folosite DOAR ca `background` (banda și butoanele pline).
     fundalInchisMatase: banda.css,
     accentMatase: butonMatase.css,
+    // Banda „Ce spun clienții" (doar Liniște o desenează): tonul stins al accentului. Textele de pe
+    // ea, așa cum ies mai sus, trec 4,5:1 pe orice nuanță (probat în `aspect-culori.proba.mjs`).
+    fundalPareri: fundalPareri(accent).css,
     eroare,
     eroarePeInchis,
     chenar,
