@@ -199,7 +199,9 @@ apare, serverul refuză pornirea, iar o bifă rămasă în bază nu pune bulina 
 toate cinci). Ca să se deschidă și altora, se adaugă cheile lor în listă. Repararea navigării pe pagina
 tradusă NU ține de listă (e invizibilă și ajută orice site citit prin Google).
 *Ce e construit:*
-- **Bulina** (`src/components/site/comutator-limba.tsx`, steagurile în `steaguri.tsx`): rotundă, în antet
+- **Bulina** (`src/components/site/comutator-limba.tsx`, steagurile în `steaguri.tsx`): rotundă, steag de
+  13px (micșorată la jumătate, din 26px, la cererea proprietarului după proba pe Google adevărat — „funcționează",
+  21 oct.; pe branch, nepublicată), zona de apăsat 28px (minimul pentru o țintă de deget e 24px), în antet
   după linkuri, pe telefon lângă ☰; arată steagul limbii în care e citită pagina (britanic pentru engleză —
   propunerea mea, acceptată cu „așa"). Apăsată, deschide lista Română · English · Deutsch, fiecare cu steag
   și nume în limba ei, limba curentă bifată; se închide la clic în afară sau cu Esc. Steagurile sunt

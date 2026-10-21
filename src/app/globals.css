@@ -325,11 +325,16 @@ body {
   flex-shrink: 0;
 }
 
+/*
+ * Zona de apăsat (28px) e mai mare decât steagul (13px — micșorat la jumătate la cererea
+ * proprietarului, 21 oct. 2026): un steag de 13px n-ar putea fi nimerit cu degetul, iar
+ * minimul cerut pentru o țintă de apăsat e 24px. Zona în plus e transparentă, nu se vede.
+ */
 .antet-limba-buton {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: 0;
   border-radius: 999px;
@@ -339,8 +344,8 @@ body {
 
 /* Steagul umple bulina; inelul subțire îl desparte de orice fundal de antet. */
 .antet-limba-buton .steag {
-  width: 26px;
-  height: 26px;
+  width: 13px;
+  height: 13px;
   border-radius: 999px;
   box-shadow: 0 0 0 1px color-mix(in oklab, var(--t-text) 22%, transparent);
   transition: transform 0.15s ease;
@@ -348,7 +353,7 @@ body {
 
 .antet-limba-buton:hover .steag,
 .antet-limba-buton[aria-expanded="true"] .steag {
-  transform: scale(1.08);
+  transform: scale(1.15);
 }
 
 .antet-limba-buton:focus-visible {
