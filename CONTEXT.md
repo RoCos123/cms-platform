@@ -226,7 +226,9 @@ MASTER (`fc6e863`, CI verde, rularea 221), în aceeași probă. DESCHIDERE TREPT
 `model-lumina.vercel.app` („pe model-lumina frate, pe asta să apară"), apoi CĂLDURĂ pe
 `model-caldura`, apoi LINIȘTE pe `model-liniste` (21 oct.) — toate trei pe master. APROPIERE pe
 `model-apropiere` („merge, hai la Apropiere", 21 oct.): poarta și cele trei hotărâri (mai jos, la
-„Apropiere") sunt PE BRANCH, așteaptă „fă pe master".**
+„Apropiere") sunt pe master (`92fd7a3`, CI verde, rularea 229). Cu asta, toate cinci șabloanele au
+„Aspect", fiecare doar pe site-ul lui model. Pasul următor, când îl cere proprietarul: deschiderea
+pentru clienți (`aspectPermis` → `true`, vezi `acces.ts`).**
 *Lumină, verificat local (stiva reală, `ana.test` pe Lumină):* fără culori — neschimbat; cu Safir,
 Smarald + „Elegant", Bordeaux + „De revistă" — nimic stricat, nicio eroare. De știut: cu o culoare
 aleasă, tenta lavandă a Luminii devine calcarul cald (ca pe Claritate); fără font ales, Lumină are
@@ -273,7 +275,8 @@ culorii alese, C pală stinsă (L ~0,90, C 0,03) — B și C calculate ca textul
 pe cartonașele colorate, textul mic și linkul în culoarea textului principal (≥ 6,3:1). (3) Titlul
 mare pe telefon (Nunito 800, 0,98): virgula lui „Ș" atinge „t"-ul de dedesubt („Ședințe pentru /
 tine"), și la 1,05; la 1,08 se despart. Pe laptop nu se ating. Propunerea: 1,08, ca la Căldură.
-*Hotărât* (proprietarul: „facem cum crezi tu că e mai bine" → recomandările sesiunii), PE BRANCH:
+*Hotărât* (proprietarul: „facem cum crezi tu că e mai bine" → recomandările sesiunii; pe master
+`92fd7a3`):
 (1) varianta C — rolul `fundalSalvie` (`REGULI_PREMIUM.salvie`: nuanța accentului, C 0,03, de la
 L 0,80 deschisă doar cât trec 4,6:1 textul, textul secundar, linkurile și accentul → în practică
 L ~0,90), doar cu culori alese; cele cinci locuri folosesc `var(--t-fundal-salvie,
