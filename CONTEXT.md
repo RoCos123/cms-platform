@@ -201,7 +201,8 @@ cererea proprietarului cu bulina — ocupă mai puțin și se vede pe telefon f�
   (`https://<domeniu-cu-liniuțe>.translate.goog/<cale>?_x_tr_sl=ro&_x_tr_tl=en&_x_tr_hl=en`), Română duce
   înapoi la pagina noastră. Până la clic nu se încarcă nimic de la Google. `translate="no"`; lista stă mereu
   în pagină și doar se ascunde (`hidden`), ca deschiderea să nu mute noduri pe sub traducere.
-- **Bifa** din Setări („Site-ul în engleză și germană” → „Arată alegerea limbii pe site”), salvată pe loc
+- **Bifa** din Setări („Traducere site (EN/DE)” — titlul ales de proprietar, fără alt rând sub el — →
+  „Arată alegerea limbii pe site”), salvată pe loc
   în `site_settings.pagini.limbi`. **Oprită din oficiu** (lipsa valorii = oprit, pe dos față de pagini);
   proprietarul a cerut-o explicit opțională, din panou (21 oct.). O pornește clientul; pe site-urile model,
   proprietarul, intrând în panoul lor din `/proprietar`. Fără migrare, fără SQL.
@@ -213,7 +214,7 @@ cererea proprietarului cu bulina — ocupă mai puțin și se vede pe telefon f�
   (fără navigarea rapidă din Next). Plus peticul pentru React când Google rescrie textul (react#11538).
   Pe domeniul site-ului nu face nimic.
 - **Antetul** se strânge în ☰ mai devreme când bulina e pornită (`greutateMeniu` în `header.tsx`: bulina
-  cântărește cât un link, pe Apropiere — lângă „Programează" — cât două): cu un nume real, rândul se rupea
+  cântărește cât un link, pe Apropiere — lângă „Programează" — cât trei): cu un nume real, rândul se rupea
   pe două. Meniul, bulina și ☰ stau într-un grup (`.antet-grup`) care nu se strânge sub bulină + ☰ (la 360px,
   strâns, ☰ ieșea din ecran). Fără bulină, antetul e exact cum era (nici grupul nu există).
 - **Politica de confidențialitate**: paragraf nou `[TRADUCERE]` în `sabloane/` (inclusiv că ce se trimite

@@ -46,10 +46,8 @@ export function ComutatorLimbi({ pornitInitial }: { pornitInitial: boolean }) {
 
   return (
     <Card>
-      <CardHeader
-        title="Site-ul în engleză și germană"
-        description="Sus, în antet, o bulină cu steagul limbii. Cine o apasă alege English sau Deutsch și citește site-ul tradus automat de Google."
-      />
+      {/* Titlul ales de proprietar (21 oct. 2026): „Traducere site (EN/DE)", atât. */}
+      <CardHeader title="Traducere site (EN/DE)" />
       <CardBody>
         <label className="flex cursor-pointer items-start gap-3">
           <input

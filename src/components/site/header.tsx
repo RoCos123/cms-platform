@@ -73,7 +73,7 @@ export function SiteHeader({ data, friendly }: { data: SiteHeaderData; friendly?
   const linkuri = cta ? linkuriToate.filter((l) => l !== cta) : linkuriToate;
   /*
     Bulina limbii ocupă în rând cam cât un link, iar pe „Apropiere", lângă butonul
-    „Programează", cam cât două. Fără socoteala asta, cu un nume real de cabinet, meniul și
+    „Programează", cam cât trei. Fără socoteala asta, cu un nume real de cabinet, meniul și
     numele se rupeau pe câte două rânduri (Apropiere: 901–960px cu trei-patru linkuri,
     1101px cu șase) — măsurat pe toate cinci șabloanele, 360–1440px, 21 oct. 2026. Socotită
     așa, meniul se strânge în buton de la un prag mai mare; la meniurile cele mai lungi
@@ -81,7 +81,7 @@ export function SiteHeader({ data, friendly }: { data: SiteHeaderData; friendly?
     pornită; fără ea, greutatea e numărul de linkuri și antetul rămâne exact cum era.
   */
   const cuLimbi = Boolean(data.domeniuLimbi);
-  const greutateMeniu = linkuri.length + (cuLimbi ? 1 + (cta ? 1 : 0) : 0);
+  const greutateMeniu = linkuri.length + (cuLimbi ? 1 + (cta ? 2 : 0) : 0);
   const claseAntet = [
     "antet",
     greutateMeniu > 5 && "antet--multe-linkuri",
