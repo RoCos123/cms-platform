@@ -14,8 +14,9 @@ import { fonturiDinBrand } from "./fonturi";
  * Apoi, câte un șablon pe rând (proprietarul, 20 oct. 2026: „hai să aplicăm treptat, pe fiecare
  * șablon în parte"), fiecare pe site-ul lui model: Lumină pe `model-lumina` („pe model-lumina
  * frate, pe asta să apară"), apoi Căldură pe `model-caldura` („merge, hai la Căldură"), apoi
- * Liniște pe `model-liniste` („merge, hai la Liniște"). Ordinea propusă: Lumină, Căldură, Liniște,
- * Apropiere.
+ * Liniște pe `model-liniste` („merge, hai la Liniște"), apoi Apropiere pe `model-apropiere`
+ * („merge, hai la Apropiere"). Cu asta, toate cinci șabloanele au „Aspect" — dar tot doar pe
+ * site-ul lor model.
  *
  * Poarta nu e o nevoie tehnică (paleta calculată e probată pe toate cinci șabloanele), ci o
  * măsură de prudență. O ține un SINGUR loc, aici. Ce hotărăște:
@@ -30,7 +31,7 @@ import { fonturiDinBrand } from "./fonturi";
  */
 
 /** Șabloanele pe care e pornit „Aspect". */
-export const SABLOANE_CU_ASPECT: readonly string[] = ["claritate", "lumina", "caldura", "liniste"];
+export const SABLOANE_CU_ASPECT: readonly string[] = ["claritate", "lumina", "caldura", "liniste", "apropiere"];
 
 /**
  * Domeniile (`sites.domain`) pe care e pornit „Aspect". Potrivire EXACTĂ, nu „conține".
@@ -45,6 +46,7 @@ export const DOMENII_CU_ASPECT: readonly string[] = [
   "model-lumina.vercel.app",
   "model-caldura.vercel.app",
   "model-liniste.vercel.app",
+  "model-apropiere.vercel.app",
 ];
 
 export type SiteAspect = {

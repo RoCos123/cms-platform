@@ -224,8 +224,9 @@ DOAR PE `model-claritate.vercel.app` (Claritate); FONTURILE FĂCUTE PE 20 OCT. 2
 MASTER (`fc6e863`, CI verde, rularea 221), în aceeași probă. DESCHIDERE TREPTATĂ, CÂTE UN ȘABLON
 (proprietarul, 20 oct.: „hai să aplicăm treptat, pe fiecare șablon în parte"): LUMINĂ pe
 `model-lumina.vercel.app` („pe model-lumina frate, pe asta să apară"), apoi CĂLDURĂ pe
-`model-caldura`, apoi LINIȘTE pe `model-liniste` (21 oct.) — toate trei pe master. Rămâne
-Apropiere, pe `model-apropiere`, când o cere proprietarul.**
+`model-caldura`, apoi LINIȘTE pe `model-liniste` (21 oct.) — toate trei pe master. APROPIERE pe
+`model-apropiere` („merge, hai la Apropiere", 21 oct.): poarta PE BRANCH, așteaptă trei hotărâri
+(mai jos, la „Apropiere") și „fă pe master".**
 *Lumină, verificat local (stiva reală, `ana.test` pe Lumină):* fără culori — neschimbat; cu Safir,
 Smarald + „Elegant", Bordeaux + „De revistă" — nimic stricat, nicio eroare. De știut: cu o culoare
 aleasă, tenta lavandă a Luminii devine calcarul cald (ca pe Claritate); fără font ales, Lumină are
@@ -254,7 +255,25 @@ verdele exact de până acum. (2) Titlul mare (Cormorant, 0,98) lăsa virgula lu
 căciulița lui „î" de dedesubt, și pe Liniște, și pe Lumină (același font); se atinge și la 1,00 →
 `interlinieMinimaTitlu: 1.05` în `liniste.ts` ȘI `lumina.ts`, pe TOATE site-urile lor (nu doar
 cele cu „Aspect"). Pe pixeli: pe laptop ~4px între rânduri; pe telefon (48px) doar 1–2px — nu se
-ating, dar sunt aproape; dacă proprietarul vrea mai mult aer, 1,08 (ca la Căldură). Întâi a fost doar discutat (proprietarul: „momentan nu facem
+ating, dar sunt aproape; dacă proprietarul vrea mai mult aer, 1,08 (ca la Căldură). Pe master
+(`0b28605`, CI verde, rularea 228).
+*APROPIERE pe `model-apropiere.vercel.app`* („merge, hai la Apropiere"; domeniul e cel din lista
+demo-urilor din 7 oct.) — poarta e PE BRANCH; cu ea, toate cinci șabloanele au „Aspect", iar poarta
+mai ține doar prin domenii. Verificat local: fără culori neschimbat; cu Safir, Smarald +
+„Prietenos", Bordeaux + „Elegant", „Personal" fără culori — nimic stricat, nicio eroare, meniul și
+pagina apar. Găsite, de hotărât de proprietar (cu imagini):
+(1) Cartonașele „salvie" ale Apropierii (al doilea serviciu din patru, cardul din mijloc la
+„Păreri", cardul de lângă datele de contact, cel din spatele pozei din „Despre", pata din hero) au
+ca fundal `--t-accent-pe-inchis`; cu o culoare aleasă, acela e aurul-șampanie → cartonașele ies
+aurii, nu în culoarea aleasă. Variante arătate: A aur-șampanie (cum iese acum), B nuanță pală vie a
+culorii alese, C pală stinsă (L ~0,90, C 0,03) — B și C calculate ca textul de pe ele să treacă
+4,5:1. (2) Lizibilitatea pe cartonașele colorate NU intra în garanția paletei: textul mic gri și
+„Citește mai mult" ies sub 4,5:1 — pe aur 3,7:1 (linkul 3,6:1 la culorile verzi), pe piersică
+4,1:1 (cu orice culoare aleasă), iar pe șablonul însuși, fără culori, 3,4:1 pe salvie. Propunerea:
+pe cartonașele colorate, textul mic și linkul în culoarea textului principal (≥ 6,3:1). (3) Titlul
+mare pe telefon (Nunito 800, 0,98): virgula lui „Ș" atinge „t"-ul de dedesubt („Ședințe pentru /
+tine"), și la 1,05; la 1,08 se despart. Pe laptop nu se ating. Propunerea: 1,08, ca la Căldură.
+Întâi a fost doar discutat (proprietarul: „momentan nu facem
 nimic, doar discutăm"); apoi a cerut „hai sa facem partea cu culorile si fonturile… Mai intai
 culorile". Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.
 *Hotărâri confirmate:*
