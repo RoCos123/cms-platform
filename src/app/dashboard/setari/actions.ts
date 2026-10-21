@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
 import { CAMPURI_CABINET, CAMPURI_FIRMA, CAMPURI_SEO, CAMPURI_SOCIAL } from "@/lib/setari";
 import { tipulSiteului } from "@/lib/pagina-vanzare-date";
+import { traducerePermisa } from "@/lib/traducere";
 import { catreEditor, catreStocare, valideaza, type ValoareEditor } from "@/lib/sectiuni-editare";
 
 export type RezultatSetari =
@@ -184,6 +185,15 @@ export async function schimbaPublicarea(publica: boolean): Promise<RezultatSetar
 export async function comutaLimbile(pornite: boolean): Promise<RezultatSetari> {
   const session = await verifySession();
   const supabase = await createClient();
+
+  // Pornirea, doar pe șabloanele care o au (azi, Claritate). Oprirea merge oricând: o bifă
+  // rămasă pornită de pe alt șablon trebuie să se poată stinge.
+  if (pornite) {
+    const { data: site } = await supabase.from("sites").select("template").eq("id", session.siteId).single();
+    if (!traducerePermisa(site?.template as string | null)) {
+      return { ok: false, mesaj: "Traducerea nu e disponibilă pentru șablonul acestui site." };
+    }
+  }
 
   const { data: existent } = await supabase
     .from("site_settings")

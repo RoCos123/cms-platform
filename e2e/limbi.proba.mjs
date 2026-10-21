@@ -3,13 +3,16 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   LIMBI_SITE,
+  SABLOANE_CU_TRADUCERE,
   adresaInLimba,
   adresaPeTradusa,
   esteGazdaTradusa,
   gazdaOriginala,
   gazdaTradusa,
   limbaPaginii,
+  traducerePermisa,
 } from "@/lib/traducere";
+import { listTemplates } from "@/lib/templates";
 import { limbileSuntPornite, paginaEsteActiva } from "@/lib/setari";
 
 /**
@@ -145,7 +148,7 @@ test("bifa limbilor e oprită din oficiu și nu atinge comutatoarele paginilor",
 
 test("legăturile din cod: comutatorul doar cu bifa, repararea doar pe gazda tradusă", () => {
   const cadru = citeste("src/components/site/cadru-site.tsx");
-  assert.match(cadru, /domeniuLimbi: limbileSuntPornite\(pagini\) \? domain : undefined/);
+  assert.match(cadru, /domeniuLimbi:\s*limbileSuntPornite\(pagini\) && traducerePermisa\(site\?\.template\) \? domain : undefined/);
   assert.match(cadru, /<NavigareTradusa \/>/);
 
   const navigare = citeste("src/components/site/navigare-tradusa.tsx");
@@ -192,4 +195,24 @@ test("politica de confidențialitate are paragraful despre traducere", () => {
   assert.match(paragraf, /translate\.goog/);
   assert.match(paragraf, /nu se încarcă nimic de la Google/);
   assert.match(paragraf, /formular/);
+});
+
+test("alegerea limbii, doar pe Claritate (cerut de proprietar, 21 oct. 2026)", () => {
+  assert.deepEqual([...SABLOANE_CU_TRADUCERE], ["claritate"]);
+  const sabloane = listTemplates().map((sablon) => sablon.id);
+  assert.ok(sabloane.includes("claritate"), "șablonul există");
+  for (const sablon of sabloane) assert.equal(traducerePermisa(sablon), sablon === "claritate", sablon);
+  assert.equal(traducerePermisa(null), false);
+  assert.equal(traducerePermisa(undefined), false);
+  assert.equal(traducerePermisa("Claritate"), false, "potrivire exactă, ca în coloana `sites.template`");
+
+  // Bifa din Setări apare doar pe Claritate; serverul refuză pornirea pe alt șablon.
+  const pagina = citeste("src/app/dashboard/setari/page.tsx");
+  assert.match(pagina, /traducerePermisa\(site\?\.template as string \| null\) && \(\s*<ComutatorLimbi/);
+  const actiuni = citeste("src/app/dashboard/setari/actions.ts");
+  const comuta = actiuni.slice(actiuni.indexOf("export async function comutaLimbile"));
+  assert.ok(
+    comuta.indexOf("traducerePermisa") > -1 && comuta.indexOf("traducerePermisa") < comuta.indexOf(".upsert("),
+    "verificarea șablonului vine înainte de scriere",
+  );
 });

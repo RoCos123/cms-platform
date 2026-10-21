@@ -22,6 +22,7 @@ import { NumaratorVizite } from "@/components/site/numarator-vizite";
 import { TranzitieLogo } from "@/components/site/tranzitie-logo";
 import { RevealLaScroll } from "@/components/site/reveal-la-scroll";
 import { NavigareTradusa } from "@/components/site/navigare-tradusa";
+import { traducerePermisa } from "@/lib/traducere";
 
 /**
  * Cadrul oricărei pagini publice: fonturile șablonului, antetul, subsolul și,
@@ -165,7 +166,9 @@ export async function CadruSite({
             paginaServicii: paginaEsteActiva(pagini, "servicii"),
             blog: areBlog ? "pagina" : null,
             paginiProprii: inAntet,
-            domeniuLimbi: limbileSuntPornite(pagini) ? domain : undefined,
+            // Bulina limbii: bifată de client ȘI pe un șablon care o are (azi, doar Claritate).
+            domeniuLimbi:
+              limbileSuntPornite(pagini) && traducerePermisa(site?.template) ? domain : undefined,
           }}
         />
 

@@ -191,6 +191,11 @@ Pe branch-ul `claude/sleepy-tesla-aanhq7`; ajunge pe master doar la „fă pe ma
 panoul rămâne în română. **Nu reproune variantele respinse** (traducere pe server, ecrane pe limbi).
 Prima variantă, un rând „RO · EN · DE" la capătul meniului (jos în ☰ pe telefon), a fost înlocuită la
 cererea proprietarului cu bulina — ocupă mai puțin și se vede pe telefon fără să deschizi meniul.
+**Doar pe șablonul Claritate** (cerut de proprietar, 21 oct.: „hai să aplicăm doar pe claritate"):
+`SABLOANE_CU_TRADUCERE = ["claritate"]` în `src/lib/traducere.ts`. Pe celelalte șabloane cardul din Setări nu
+apare, serverul refuză pornirea, iar o bifă rămasă în bază nu pune bulina pe site (verificat în browser pe
+toate cinci). Ca să se deschidă și altora, se adaugă cheile lor în listă. Repararea navigării pe pagina
+tradusă NU ține de listă (e invizibilă și ajută orice site citit prin Google).
 *Ce e construit:*
 - **Bulina** (`src/components/site/comutator-limba.tsx`, steagurile în `steaguri.tsx`): rotundă, în antet
   după linkuri, pe telefon lângă ☰; arată steagul limbii în care e citită pagina (britanic pentru engleză —
@@ -220,6 +225,9 @@ cererea proprietarului cu bulina — ocupă mai puțin și se vede pe telefon f�
 - **Politica de confidențialitate**: paragraf nou `[TRADUCERE]` în `sabloane/` (inclusiv că ce se trimite
   dintr-un formular de pe pagina tradusă trece prin Google). Paginile deja scrise ale clienților nu se schimbă
   singure — vezi tabelul din §„Politica de confidențialitate se schimbă odată cu platforma”.
+*Antetul, pe Claritate, după poartă:* 360–1440px, 4–7 linkuri, nume lung: nimic rupt și nimic ieșit din ecran;
+singura diferență, la 430px numele lung trece de pe un rând pe două (întreg, netăiat — încape în cele două
+rânduri permise).
 *Cum s-a verificat:* `e2e/limbi.proba.mjs` (adresele, coada, bifa, legăturile din cod); în browser, pe stiva
 locală, cu o **imitație** a traducerii Google (Google e blocat din mediul de lucru): fără coadă → „Can't
 translate”, cu coadă → textul rescris în `<font>`. Imitația reproduce eroarea văzută de proprietar fără

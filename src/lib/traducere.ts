@@ -23,6 +23,23 @@
  * probate în Node — vezi `e2e/limbi.proba.mjs`.
  */
 
+/**
+ * Șabloanele pe care se poate porni alegerea limbii. Deocamdată doar „Claritate" — cerut de
+ * proprietar pe 21 oct. 2026 („hai să aplicăm doar pe claritate"), cum a pornit și „Aspect",
+ * de la un singur șablon. Pe celelalte, bifa din Setări nu apare, serverul refuză s-o
+ * pornească, iar o valoare rămasă în bază (de pildă după o schimbare de șablon) nu pune
+ * bulina pe site. Ca să se deschidă și altora, se adaugă aici cheile lor.
+ *
+ * Repararea navigării pe pagina tradusă (`navigare-tradusa.tsx`) nu ține de listă: nu se
+ * vede, iar la traducerea Google se ajunge pe orice site, și din rezultatele căutării.
+ */
+export const SABLOANE_CU_TRADUCERE: readonly string[] = ["claritate"];
+
+/** Se poate porni alegerea limbii pe un site cu șablonul ăsta? Fără șablon: nu. */
+export function traducerePermisa(sablon: string | null | undefined): boolean {
+  return typeof sablon === "string" && SABLOANE_CU_TRADUCERE.includes(sablon);
+}
+
 /** Limba în care e scris site-ul. Pagina în limba asta e chiar pagina noastră, nu o traducere. */
 export const LIMBA_ORIGINALA = "ro";
 

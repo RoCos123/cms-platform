@@ -21,6 +21,7 @@ import Link from "next/link";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
 import { tipulSiteului } from "@/lib/pagina-vanzare-date";
+import { traducerePermisa } from "@/lib/traducere";
 
 export const metadata = { title: "Setări" };
 
@@ -74,7 +75,10 @@ export default async function SetariPage() {
         politicaEsteCiorna={politica?.status !== "published"}
       />
 
-      <ComutatorLimbi pornitInitial={limbileSuntPornite(setari?.pagini as Pagini | null)} />
+      {/* Doar pe șabloanele care au alegerea limbii (azi, Claritate) — vezi `SABLOANE_CU_TRADUCERE`. */}
+      {traducerePermisa(site?.template as string | null) && (
+        <ComutatorLimbi pornitInitial={limbileSuntPornite(setari?.pagini as Pagini | null)} />
+      )}
 
       <Card>
         <CardHeader
