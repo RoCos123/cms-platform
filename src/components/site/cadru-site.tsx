@@ -220,7 +220,7 @@ export async function CadruSite({
 
         {/* Pe pagina citită prin traducerea Google, linkurile păstrează limba — vezi
             `navigare-tradusa.tsx`. Pe domeniul site-ului nu face nimic. Pusă pe toate
-            site-urile, nu doar pe cele cu comutatorul pornit: la traducerea Google ajunge
+            site-urile, nu doar pe cele cu bulina limbii pornită: la traducerea Google ajunge
             oricine și din rezultatele căutării („Tradu această pagină"). */}
         <NavigareTradusa />
       </div>

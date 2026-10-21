@@ -318,7 +318,7 @@ export type PaginaOptionala = "servicii" | "blog";
  */
 export type Pagini = Partial<Record<PaginaOptionala, boolean>> & {
   /**
-   * Alegerea limbii din antet (RO · EN · DE, traducerea Google — vezi `@/lib/traducere`).
+   * Alegerea limbii din antet (bulina cu steag, traducerea Google — vezi `@/lib/traducere`).
    * Stă tot aici, lângă comutatoarele paginilor, fiindcă se scrie la fel: o bifă care se
    * salvează pe loc și nu atinge restul setărilor. Dar pe dos față de pagini: lipsa
    * valorii înseamnă OPRIT. Un site care n-a cerut-o nu primește peste noapte un rând nou

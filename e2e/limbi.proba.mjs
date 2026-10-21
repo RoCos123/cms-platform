@@ -159,9 +159,29 @@ test("legăturile din cod: comutatorul doar cu bifa, repararea doar pe gazda tra
   assert.match(comutator, /data-adresa=\{adresa\}/);
   // Nimic încărcat de la Google: doar linkuri, niciun script.
   assert.doesNotMatch(comutator, /<script|translate_a|translate\.google\.com/);
+  // Lista stă mereu în pagină și doar se ascunde: deschiderea nu mută noduri pe sub traducere.
+  assert.match(comutator, /hidden=\{!deschis\}/);
 
+  // O singură bulină, în afara rândului de linkuri: se vede și pe telefon, lângă ☰.
   const nav = citeste("src/components/site/header-nav.tsx");
-  assert.equal(nav.match(/domeniuLimbi && <ComutatorLimba/g)?.length, 2, "în rând și în meniul de pe telefon");
+  assert.equal(nav.match(/<ComutatorLimba/g)?.length, 1);
+  assert.ok(nav.indexOf("<ComutatorLimba") > nav.indexOf("</nav>"), "bulina e după rândul de linkuri, nu în el");
+});
+
+test("steagurile sunt desenate, nu emoji (pe Windows emoji-urile de steag ies ca litere)", () => {
+  const steaguri = citeste("src/components/site/steaguri.tsx");
+  // Literele-indicator regionale (🇷🇴 = U+1F1F7 U+1F1F4 etc.) din care se fac steagurile emoji.
+  assert.doesNotMatch(steaguri, /[\u{1F1E6}-\u{1F1FF}]/u);
+  for (const cod of ["ro", "de"]) assert.match(steaguri, new RegExp(`cod === "${cod}"`));
+  // Culorile oficiale, ca un steag greșit să nu treacă neobservat.
+  for (const culoare of ["#002B7F", "#FCD116", "#CE1126", "#DD0000", "#FFCE00", "#012169", "#C8102E"]) {
+    assert.ok(steaguri.includes(culoare), culoare);
+  }
+  assert.deepEqual(
+    LIMBI_SITE.map((limba) => limba.nume),
+    ["Română", "English", "Deutsch"],
+    "numele limbii, scris în limba ei, stă lângă steag",
+  );
 });
 
 test("politica de confidențialitate are paragraful despre traducere", () => {

@@ -174,7 +174,7 @@ export async function schimbaPublicarea(publica: boolean): Promise<RezultatSetar
 }
 
 /**
- * Pornește sau oprește alegerea limbii din antet (RO · EN · DE, traducerea Google — vezi
+ * Pornește sau oprește alegerea limbii din antet (bulina cu steag, traducerea Google — vezi
  * `@/lib/traducere`).
  *
  * Scrie doar `pagini.limbi`, peste ce era: ca la comutatorul paginii de servicii, o
@@ -210,7 +210,7 @@ export async function comutaLimbile(pornite: boolean): Promise<RezultatSetari> {
     entitate: "SiteSettings",
     diff: {
       rezumat: pornite
-        ? "Alegerea limbii (RO · EN · DE) a fost pusă pe site."
+        ? "Alegerea limbii (bulina cu steag) a fost pusă pe site."
         : "Alegerea limbii a fost scoasă de pe site.",
     },
   });

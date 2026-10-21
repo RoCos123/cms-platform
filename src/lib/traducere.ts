@@ -2,7 +2,7 @@
  * Site-ul public citit în altă limbă, prin traducerea Google a paginilor (21 oct. 2026).
  *
  * Hotărât de proprietar (18 oct.): cât mai simplu, fără DeepL sau alt serviciu plătit,
- * fără traduceri scrise de client. Deci nu traducem noi nimic: comutatorul din antet e
+ * fără traduceri scrise de client. Deci nu traducem noi nimic: alegerea limbii din antet e
  * un set de LINKURI către adresa de traducere a Google, de forma
  *
  *   https://model--apropiere-vercel-app.translate.goog/servicii?_x_tr_sl=ro&_x_tr_tl=en&_x_tr_hl=en
@@ -27,14 +27,13 @@
 export const LIMBA_ORIGINALA = "ro";
 
 /**
- * Limbile din comutator, în ordinea în care apar. `titlu` e scris în limba ținută, fiindcă
- * pe el îl citește (la trecerea cu mouse-ul, sau cu cititorul de ecran) tocmai omul care nu
- * știe română.
+ * Limbile din alegerea limbii, în ordinea în care apar. `nume` și `nota` sunt scrise în
+ * limba ținută, fiindcă le citește tocmai omul care nu știe română.
  */
 export const LIMBI_SITE = [
-  { cod: "ro", eticheta: "RO", titlu: "Română — pagina originală" },
-  { cod: "en", eticheta: "EN", titlu: "English — automatic translation by Google" },
-  { cod: "de", eticheta: "DE", titlu: "Deutsch — automatische Übersetzung von Google" },
+  { cod: "ro", nume: "Română", nota: "pagina originală" },
+  { cod: "en", nume: "English", nota: "automatic translation by Google" },
+  { cod: "de", nume: "Deutsch", nota: "automatische Übersetzung von Google" },
 ] as const;
 
 export type CodLimba = (typeof LIMBI_SITE)[number]["cod"];
@@ -109,8 +108,8 @@ export function adresaInLimba(domeniu: string, cale: string, limba: CodLimba): s
 
 /**
  * În ce limbă e citită acum pagina: română pe domeniul nostru, limba din `_x_tr_tl` pe
- * gazda tradusă. Poate fi și o limbă care nu e în comutator (bara Google lasă vizitatorul
- * să aleagă oricare) — atunci comutatorul nu are nicio limbă marcată.
+ * gazda tradusă. Poate fi și o limbă care nu e în listă (bara Google lasă vizitatorul
+ * să aleagă oricare) — atunci în listă nu e bifată nicio limbă.
  */
 export function limbaPaginii(gazda: string, cautare: string): string {
   if (!esteGazdaTradusa(gazda)) return LIMBA_ORIGINALA;

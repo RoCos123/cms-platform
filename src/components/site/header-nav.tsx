@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { Fragment, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { ComutatorLimba } from "./comutator-limba";
 
 export type LinkAntet = { text: string; href: string };
@@ -24,7 +24,7 @@ export function HeaderNav({
   linkuri: LinkAntet[];
   /**
    * Domeniul site-ului, când e pornită alegerea limbii (`pagini.limbi`); altfel lipsește și
-   * comutatorul nu apare. Stă la capătul rândului de linkuri, iar pe telefon, jos în meniu.
+   * bulina nu apare. Stă după rândul de linkuri, iar pe telefon, lângă butonul ☰.
    */
   domeniuLimbi?: string;
 }) {
@@ -47,16 +47,23 @@ export function HeaderNav({
     return () => document.removeEventListener("keydown", laTasta);
   }, [deschis]);
 
+  // Cu bulina limbii, meniul, bulina și ☰ stau împreună într-un grup: pe calculator bulina
+  // vine imediat după linkuri, pe telefon imediat lângă ☰ — nu plutind în golul dintre nume
+  // și restul antetului. Fără bulină, nimic în plus: antetul rămâne exact cum era.
+  const Invelis = domeniuLimbi ? GrupCuLimba : Fragment;
+
   return (
-    <>
+    <Invelis>
       <nav aria-label="Navigare principală" className="antet-nav">
         {linkuri.map((link) => (
           <a key={link.href} href={link.href} className="antet-link">
             {link.text}
           </a>
         ))}
-        {domeniuLimbi && <ComutatorLimba domeniu={domeniuLimbi} varianta="rand" />}
       </nav>
+
+      {/* Bulina limbii stă în afara rândului de linkuri, deci se vede pe orice ecran. */}
+      {domeniuLimbi && <ComutatorLimba domeniu={domeniuLimbi} />}
 
       <button
         ref={butonRef}
@@ -95,9 +102,12 @@ export function HeaderNav({
               {link.text}
             </a>
           ))}
-          {domeniuLimbi && <ComutatorLimba domeniu={domeniuLimbi} varianta="panou" />}
         </div>
       )}
-    </>
+    </Invelis>
   );
+}
+
+function GrupCuLimba({ children }: { children: ReactNode }) {
+  return <div className="antet-grup">{children}</div>;
 }

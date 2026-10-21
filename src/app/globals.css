@@ -301,65 +301,109 @@ body {
 }
 
 /*
- * Alegerea limbii (RO · EN · DE), la capătul rândului de linkuri — vezi
- * `comutator-limba.tsx`. Mai mică și despărțită de meniu printr-o linie subțire: nu e o
- * pagină a site-ului, ci un fel de a-l citi. Culoarea textului e a meniului (`--t-text`),
- * nu una mai stinsă, ca să nu coboare sub 4,5:1 pe niciun fundal de antet; limba curentă
- * se vede prin grosime și subliniere.
+ * Alegerea limbii: bulina cu steag și lista care se deschide sub ea — vezi
+ * `comutator-limba.tsx`. Grupul ține împreună meniul, bulina și ☰ (doar pe site-urile cu
+ * bulina pornită), ca bulina să stea lângă ele, nu în golul din mijlocul antetului.
  */
-.antet-limbi {
+/*
+ * Fără `min-width: 0`: grupul nu are voie să se strângă sub bulină + ☰ (la 360px, strâns,
+ * ☰ ieșea cu 8px din ecran). Rândul de linkuri din el se rupe în continuare singur.
+ */
+.antet-grup {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding-left: 20px;
-  border-left: 1px solid color-mix(in oklab, var(--t-chenar) 80%, transparent);
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  white-space: nowrap;
+  gap: 10px;
+}
+
+/* Aer între linkuri și bulină — doar cât se văd linkurile (ascunse, n-au cutie, deci nici margine). */
+.antet-grup .antet-nav {
+  margin-right: 14px;
 }
 
 .antet-limba {
-  color: var(--t-text);
-  text-decoration: none;
-  font-weight: 500;
+  position: relative;
+  flex-shrink: 0;
 }
 
-.antet-limba--activa {
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  text-decoration-thickness: 1.5px;
+.antet-limba-buton {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
 }
 
-.antet-limbi-punct {
-  color: var(--t-text);
-  opacity: 0.6;
+/* Steagul umple bulina; inelul subțire îl desparte de orice fundal de antet. */
+.antet-limba-buton .steag {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--t-text) 22%, transparent);
+  transition: transform 0.15s ease;
 }
 
-/*
- * În meniul de pe telefon: un rând al lui, jos, cu țintă de deget (44px). Eticheta stă în
- * mijlocul cutiei de 44px, deci prima cutie se trage puțin spre stânga, ca „RO" să cadă sub
- * linkurile de deasupra, nu cu jumătate de deget mai înăuntru (linia de deasupra rămâne pe loc).
- */
-.antet-limbi--panou {
-  gap: 4px;
-  padding-left: 0;
-  padding-top: 6px;
-  border-left: 0;
-  border-top: 1px solid color-mix(in oklab, var(--t-chenar) 50%, transparent);
-  font-size: 16px;
+.antet-limba-buton:hover .steag,
+.antet-limba-buton[aria-expanded="true"] .steag {
+  transform: scale(1.08);
 }
 
-.antet-limbi--panou .antet-limba {
-  display: inline-flex;
+.antet-limba-buton:focus-visible {
+  outline: 2px solid var(--t-text);
+  outline-offset: 1px;
+}
+
+.antet-limba-lista {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 30;
+  min-width: 190px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  background: var(--t-fundal);
+  border: 1px solid color-mix(in oklab, var(--t-chenar) 80%, transparent);
+  border-radius: 12px;
+  box-shadow: 0 16px 36px -18px rgba(0, 0, 0, 0.35);
+}
+
+.antet-limba-lista[hidden] {
+  display: none;
+}
+
+.antet-limba-optiune {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  min-width: 44px;
+  gap: 12px;
   min-height: 44px;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--t-text);
+  font-size: 15px;
+  text-decoration: none;
 }
 
-.antet-limbi--panou .antet-limba:first-child {
-  margin-left: -11px;
+.antet-limba-optiune:hover,
+.antet-limba-optiune:focus-visible {
+  background: color-mix(in oklab, var(--t-text) 7%, transparent);
+}
+
+.antet-limba-optiune[aria-current="true"] {
+  font-weight: 600;
+}
+
+.antet-limba-optiune .steag {
+  flex-shrink: 0;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--t-text) 15%, transparent);
+}
+
+.antet-limba-bifa {
+  margin-left: auto;
 }
 
 /*
@@ -401,8 +445,8 @@ body {
 
 /*
  * Și mai devreme când, pe lângă un meniu lung, antetul are și alegerea limbii: la 1101–1140px,
- * un nume real, șase linkuri și RO · EN · DE nu mai încăpeau pe un rând. Clasa vine doar cu
- * comutatorul pornit (vezi `greutateMeniu` în `header.tsx`), deci antetele fără el nu se schimbă.
+ * un nume real, șase linkuri și bulina limbii nu mai încăpeau pe un rând. Clasa vine doar cu
+ * bulina pornită (vezi `greutateMeniu` în `header.tsx`), deci antetele fără ea nu se schimbă.
  */
 @media (max-width: 1200px) {
   .antet--foarte-multe-linkuri .antet-nav {
@@ -414,7 +458,7 @@ body {
   }
 }
 
-/* Șapte linkuri, nume real și RO · EN · DE nu încap pe rând la nicio lățime: meniul rămâne în buton. */
+/* Cel mai lung meniu, nume real și bulina limbii nu încap pe rând la nicio lățime: meniul rămâne în buton. */
 .antet--meniu-mereu-strans .antet-nav {
   display: none;
 }

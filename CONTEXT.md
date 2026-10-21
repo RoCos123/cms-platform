@@ -182,20 +182,29 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
-**Limbile site-ului: comutator RO · EN · DE prin traducerea Google — FĂCUT PE BRANCH, NEPUBLICAT
-(21 oct. 2026; cerut de proprietar: „hai să facem modificarea limbii din RO în EN dar și în DE").**
+**Limbile site-ului: bulina cu steag (română · engleză · germană) prin traducerea Google — FĂCUT PE
+BRANCH, NEPUBLICAT (21 oct. 2026; cerut de proprietar: „hai să facem modificarea limbii din RO în EN dar și
+în DE", apoi „o bulină… steagul RO când e în română, steagul Angliei când e în engleză" și „să fie
+opțională, din panou").**
 Pe branch-ul `claude/sleepy-tesla-aanhq7`; ajunge pe master doar la „fă pe master". *Hotărârile din
 18 oct. rămân:* cât mai simplu, fără DeepL sau alt serviciu cu cheie, fără traduceri scrise de client,
 panoul rămâne în română. **Nu reproune variantele respinse** (traducere pe server, ecrane pe limbi).
+Prima variantă, un rând „RO · EN · DE" la capătul meniului (jos în ☰ pe telefon), a fost înlocuită la
+cererea proprietarului cu bulina — ocupă mai puțin și se vede pe telefon fără să deschizi meniul.
 *Ce e construit:*
-- **Comutatorul** (`src/components/site/comutator-limba.tsx`): RO · EN · DE la capătul rândului de
-  linkuri din antet, iar pe telefon, jos în meniul ☰. EN/DE sunt LINKURI către traducerea Google a
-  aceleiași pagini (`https://<domeniu-cu-liniuțe>.translate.goog/<cale>?_x_tr_sl=ro&_x_tr_tl=en&_x_tr_hl=en`),
-  RO duce înapoi la pagina noastră. Până la clic nu se încarcă nimic de la Google. `translate="no"`.
+- **Bulina** (`src/components/site/comutator-limba.tsx`, steagurile în `steaguri.tsx`): rotundă, în antet
+  după linkuri, pe telefon lângă ☰; arată steagul limbii în care e citită pagina (britanic pentru engleză —
+  propunerea mea, acceptată cu „așa"). Apăsată, deschide lista Română · English · Deutsch, fiecare cu steag
+  și nume în limba ei, limba curentă bifată; se închide la clic în afară sau cu Esc. Steagurile sunt
+  DESENATE (SVG), nu emoji: Windows arată steagurile emoji ca două litere. English/Deutsch sunt LINKURI
+  către traducerea Google a aceleiași pagini
+  (`https://<domeniu-cu-liniuțe>.translate.goog/<cale>?_x_tr_sl=ro&_x_tr_tl=en&_x_tr_hl=en`), Română duce
+  înapoi la pagina noastră. Până la clic nu se încarcă nimic de la Google. `translate="no"`; lista stă mereu
+  în pagină și doar se ascunde (`hidden`), ca deschiderea să nu mute noduri pe sub traducere.
 - **Bifa** din Setări („Site-ul în engleză și germană” → „Arată alegerea limbii pe site”), salvată pe loc
-  în `site_settings.pagini.limbi`. **Oprită din oficiu** (lipsa valorii = oprit, pe dos față de pagini) —
-  propunerea mea, neconfirmată explicit de proprietar. O pornește clientul; pe site-urile model, proprietarul,
-  intrând în panoul lor din `/proprietar`. Fără migrare, fără SQL.
+  în `site_settings.pagini.limbi`. **Oprită din oficiu** (lipsa valorii = oprit, pe dos față de pagini);
+  proprietarul a cerut-o explicit opțională, din panou (21 oct.). O pornește clientul; pe site-urile model,
+  proprietarul, intrând în panoul lor din `/proprietar`. Fără migrare, fără SQL.
 - **Navigarea pe pagina tradusă** (`src/components/site/navigare-tradusa.tsx`, pe TOATE site-urile, fiindcă
   la traducerea Google se ajunge și din rezultatele căutării). Proba proprietarului pe `model-apropiere`
   (21 oct.): prima pagină și o pagină interioară deschisă direct cu coada se traduc, dar un clic în meniu
@@ -203,18 +212,18 @@ panoul rămâne în română. **Nu reproune variantele respinse** (traducere pe 
   `*.translate.goog`, clicul pe un link al site-ului primește coada paginii curente și încarcă pagina întreagă
   (fără navigarea rapidă din Next). Plus peticul pentru React când Google rescrie textul (react#11538).
   Pe domeniul site-ului nu face nimic.
-- **Antetul** se strânge în ☰ mai devreme când comutatorul e pornit (`greutateMeniu` în `header.tsx`):
-  cu un nume real și 5–7 linkuri, rândul se rupea pe două. Măsurat pe toate cinci șabloanele, 901–1440px,
-  3–7 linkuri: nimic rupt în plus. De la 7 linkuri + comutator, meniul rămâne mereu în ☰. Fără comutator,
-  antetul e exact cum era.
+- **Antetul** se strânge în ☰ mai devreme când bulina e pornită (`greutateMeniu` în `header.tsx`: bulina
+  cântărește cât un link, pe Apropiere — lângă „Programează" — cât două): cu un nume real, rândul se rupea
+  pe două. Meniul, bulina și ☰ stau într-un grup (`.antet-grup`) care nu se strânge sub bulină + ☰ (la 360px,
+  strâns, ☰ ieșea din ecran). Fără bulină, antetul e exact cum era (nici grupul nu există).
 - **Politica de confidențialitate**: paragraf nou `[TRADUCERE]` în `sabloane/` (inclusiv că ce se trimite
   dintr-un formular de pe pagina tradusă trece prin Google). Paginile deja scrise ale clienților nu se schimbă
   singure — vezi tabelul din §„Politica de confidențialitate se schimbă odată cu platforma”.
 *Cum s-a verificat:* `e2e/limbi.proba.mjs` (adresele, coada, bifa, legăturile din cod); în browser, pe stiva
 locală, cu o **imitație** a traducerii Google (Google e blocat din mediul de lucru): fără coadă → „Can't
 translate”, cu coadă → textul rescris în `<font>`. Imitația reproduce eroarea văzută de proprietar fără
-reparație; cu reparație, pe toate cinci șabloanele: meniul, logoul, ancorele, EN → DE → RO și meniul de pe
-telefon (deschis/închis după rescriere) merg, fără erori. **Nu e Google adevărat.**
+reparație; cu reparație, pe toate cinci șabloanele: meniul, logoul, ancorele, English → Deutsch → Română,
+bulina și meniul de pe telefon (deschise/închise după rescriere) merg, fără erori. **Nu e Google adevărat.**
 *De verificat de proprietar după „fă pe master”* (pornind bifa pe un site model): clic în meniu pe pagina
 tradusă; trimiterea unui formular de pe pagina tradusă — **necunoscut** dacă Google lasă să treacă
 trimiterea (dacă nu, varianta propusă: un rând „Pentru contact/programare, treci la română”; de hotărât,
@@ -3101,7 +3110,7 @@ el, din ziua în care și-a făcut site-ul. Un client care și-a publicat politi
 | 1 sept. 2026 | Fonturile se servesc de pe domeniul clientului | Paragraful despre Google Fonts SE SCOATE de tot |
 | 16 sept. 2026 | Contactul cere nume + email (obligatoriu); telefonul scos | Rândul despre ce salvează formularul: „numele și numărul tău de telefon, iar adresa de email doar dacă vrei” nu mai e adevărat |
 | 14–15 oct. 2026 | Contactul (14 oct.) ȘI programările (15 oct.) cer nume + email (obligatoriu) + telefon (OPȚIONAL) | Același rând (formularul de contact; programările adaugă numele, emailul, telefonul opțional și ora cerută): „se salvează numele și adresa ta de email, iar numărul de telefon doar dacă vrei să-l lași”. **Făcut în șablon pe 15 oct.** (rescris; paginile clienților rămân de corectat de mână) |
-| 21 oct. 2026 | Alegerea limbii RO · EN · DE (traducerea Google), pornită din Setări | Paragraful `[TRADUCERE]`, păstrat doar dacă bifa e pornită: la EN/DE, vizitatorul ajunge la Google. **Făcut în șablon** (branch, 21 oct.) |
+| 21 oct. 2026 | Alegerea limbii — bulina cu steag (traducerea Google), pornită din Setări | Paragraful `[TRADUCERE]`, păstrat doar dacă bifa e pornită: la English/Deutsch, vizitatorul ajunge la Google. **Făcut în șablon** (branch, 21 oct.) |
 
 Toate sunt făcute în șablon (ultimele două — 16 sept. și 14–15 oct. — prin rescrierea din 15 oct.). **Niciuna nu e făcută în paginile deja
 scrise de clienți** — deocamdată nu există niciun client care să-și fi publicat

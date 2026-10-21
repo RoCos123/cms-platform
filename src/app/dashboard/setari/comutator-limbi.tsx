@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/toast";
 import { comutaLimbile } from "./actions";
 
 /**
- * Bifa care pune pe site alegerea limbii (RO · EN · DE).
+ * Bifa care pune pe site alegerea limbii (bulina cu steag: română, engleză, germană).
  *
  * Se salvează pe loc, ca bifa paginii de servicii: o singură hotărâre, cu efect pe tot
  * site-ul, care n-are de ce să aștepte bara de salvare a formularului de mai jos.
@@ -37,8 +37,8 @@ export function ComutatorLimbi({ pornitInitial }: { pornitInitial: boolean }) {
       }
       show(
         urmatoarea
-          ? "Alegerea limbii apare acum sus, în antetul site-ului."
-          : "Alegerea limbii a fost scoasă de pe site.",
+          ? "Bulina cu steag apare acum sus, în antetul site-ului."
+          : "Bulina cu steag a fost scoasă de pe site.",
         "success",
       );
     });
@@ -48,7 +48,7 @@ export function ComutatorLimbi({ pornitInitial }: { pornitInitial: boolean }) {
     <Card>
       <CardHeader
         title="Site-ul în engleză și germană"
-        description="Sus, în antet, un rând mic: RO · EN · DE. Cine apasă EN sau DE citește site-ul tradus automat de Google."
+        description="Sus, în antet, o bulină cu steagul limbii. Cine o apasă alege English sau Deutsch și citește site-ul tradus automat de Google."
       />
       <CardBody>
         <label className="flex cursor-pointer items-start gap-3">
@@ -63,8 +63,8 @@ export function ComutatorLimbi({ pornitInitial }: { pornitInitial: boolean }) {
             <span className="font-medium text-foreground">Arată alegerea limbii pe site</span>
             <span className="mt-1 block text-muted-foreground">
               Traducerea o face Google, pe loc: nu scrii nimic în plus, dar nici nu poți corecta
-              ce iese, iar la texte despre psihologie poate suna stângaci. Până nu apasă cineva
-              EN sau DE, site-ul nu încarcă nimic de la Google. Pagina tradusă nu te aduce mai sus
+              ce iese, iar la texte despre psihologie poate suna stângaci. Până nu alege cineva
+              altă limbă, site-ul nu încarcă nimic de la Google. Pagina tradusă nu te aduce mai sus
               în căutările în engleză sau germană — ajută doar omul ajuns deja pe site.
             </span>
             <span className="mt-1 block text-muted-foreground">
