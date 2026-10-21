@@ -183,7 +183,7 @@ rând, schimbată din inițiativa mea — amândouă respinse). Verificarea ceru
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
 **Limbile site-ului: bulina cu steag (română · engleză · germană) prin traducerea Google — PE MASTER
-(`0d6760c`, 21 oct. 2026), DOAR PE CLARITATE, OPRITĂ DIN OFICIU (21 oct. 2026; cerut de proprietar: „hai să facem modificarea limbii din RO în EN dar și
+(`0d6760c`, CI verde, rularea 230, 21 oct. 2026), DOAR PE CLARITATE, OPRITĂ DIN OFICIU (21 oct. 2026; cerut de proprietar: „hai să facem modificarea limbii din RO în EN dar și
 în DE", apoi „o bulină… steagul RO când e în română, steagul Angliei când e în engleză" și „să fie
 opțională, din panou").**
 Dusă pe master la „fă pe master" (21 oct.). **Următorul pas e al proprietarului:** intră din `/proprietar` în
