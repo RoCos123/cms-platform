@@ -217,7 +217,7 @@ tradusă NU ține de listă (e invizibilă și ajută orice site citit prin Goog
   proprietarul, intrând în panoul lor din `/proprietar`. Fără migrare, fără SQL.
 - **Banda albă de pe pagina tradusă** (captura proprietarului, 21 oct.): la derulare, deasupra antetului rămânea
   o bandă albă goală — locul barei Google de traducere, care se ascunde —, iar antetul nostru stătea lipit sub
-  ea. Reparat pe branch: pe `*.translate.goog`, `navigare-tradusa.tsx` pune `data-tradus` pe `<html>`, iar
+  ea. Reparat (pe master `41d1fbc`, CI verde, rularea 232): pe `*.translate.goog`, `navigare-tradusa.tsx` pune `data-tradus` pe `<html>`, iar
   `html[data-tradus] .antet` nu mai e lipit (`position: relative`, `top: 0`), deci urcă odată cu pagina.
   **Mecanismul exact al Google nu l-am văzut** (Google e blocat din mediul de lucru; imitația locală nu
   reproduce banda), deci e o reparație probabilă, nu dovedită: dacă banda rămâne, e chiar bara Google și
