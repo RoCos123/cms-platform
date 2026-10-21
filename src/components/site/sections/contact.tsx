@@ -338,7 +338,8 @@ export function Contact({
                 // Verdele deschis de salvie, același cu cardul din spatele pozei
                 // din „Despre mine" și cu petele din hero — semnătura caldă a
                 // sursei. Un chenar verde ceva mai apăsat, subțiat până rămâne blând.
-                background: "var(--t-accent-pe-inchis)",
+                // Cu culori alese în „Aspect", nuanța pală a accentului (`--t-fundal-salvie`).
+                background: "var(--t-fundal-salvie, var(--t-accent-pe-inchis))",
                 border: "1px solid color-mix(in oklab, var(--t-accent) 35%, transparent)",
                 color: "var(--t-text)",
               }}

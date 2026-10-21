@@ -151,7 +151,8 @@ export function Testimonials({
                 style={{
                   padding: "28px",
                   borderRadius: "var(--t-raza)",
-                  background: featured ? "var(--t-accent-pe-inchis)" : "var(--t-suprafata, var(--t-fundal-nuantat))",
+                  // Cardul din mijloc: salvia; cu culori alese în „Aspect", nuanța pală a accentului.
+                  background: featured ? "var(--t-fundal-salvie, var(--t-accent-pe-inchis))" : "var(--t-suprafata, var(--t-fundal-nuantat))",
                   border: `1px solid ${featured ? "var(--t-accent)" : "var(--t-chenar)"}`,
                   color: "var(--t-text)",
                   display: "flex",
@@ -186,7 +187,15 @@ export function Testimonials({
                   <span style={{ minWidth: 0 }}>
                     <span style={{ display: "block", fontWeight: 700, fontSize: "14px" }}>{marturie.autor}</span>
                     {marturie.context && (
-                      <span style={{ display: "block", fontSize: "13px", color: "var(--t-text-secundar)" }}>
+                      <span
+                        style={{
+                          display: "block",
+                          fontSize: "13px",
+                          // Pe cardul colorat, griul secundar nu trece 4,5:1 (3,4:1 pe salvie) —
+                          // deci culoarea textului; pe cele albe, griul de până acum.
+                          color: featured ? "var(--t-text)" : "var(--t-text-secundar)",
+                        }}
+                      >
                         {marturie.context}
                       </span>
                     )}

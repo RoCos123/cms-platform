@@ -130,6 +130,12 @@ function perechiIndependente(p) {
       for (const loc of ["baza", "umbra", "varf"]) lista.push([`${rol} pe banda cu păreri (${loc})`, p[rol], banda[loc]]);
     }
   }
+  // Cartonașele „salvie" (Apropiere): tot textul care ar putea sta pe ele se citește.
+  if (p.fundalSalvie) {
+    for (const rol of ["text", "textSecundar", "accentInteractiv", "accent"]) {
+      lista.push([`${rol} pe cartonașul salvie`, p[rol] ?? p.accent, p.fundalSalvie]);
+    }
+  }
   // Paleta premium (19 oct.): linkurile pe fundalurile deschise și textul butonului la hover.
   if (p.accentInteractiv) {
     for (const [numeFundal, fundal] of [["fundal", p.fundal], ["fundalNuantat", p.fundalNuantat], ["fundalRelief", p.fundalRelief]]) {
@@ -765,6 +771,20 @@ for (const sablon of listTemplates()) {
         if (ht.c > 0.04 && dif > 8) gresite.push(`${culoare} linkuri: nuanța a fugit (${ht.h.toFixed(0)} → ${hl.h.toFixed(0)})`);
       }
 
+      // Cartonașele „salvie" (Apropiere, varianta C): nuanța accentului, C 0,03, pornind de la L 0,80;
+      // dacă textele se citesc pe ea, EXACT ea; altfel mai deschisă, doar cât trebuie.
+      const ac = oklchDinHex(p.accent);
+      const pe = (l) => hexDinOklch({ l, c: ac.c < 0.01 ? 0 : 0.03, h: ac.h });
+      const texteSalvie = [p.text, p.textSecundar, p.accentInteractiv, p.accent];
+      if (trece(pe(0.8), texteSalvie)) {
+        asteptat("fundalSalvie", pe(0.8));
+      } else {
+        const ls = oklchDinHex(p.fundalSalvie).l;
+        if (!(ls > 0.8)) gresite.push(`${culoare} salvie: nu s-a deschis (${p.fundalSalvie})`);
+        if (trece(pe(ls - 0.01), texteSalvie)) gresite.push(`${culoare} salvie: deschisă mai mult decât trebuia (L ${ls.toFixed(3)})`);
+        if (oklchDinHex(p.fundalSalvie).c > 0.032) gresite.push(`${culoare} salvie: prea colorată (${p.fundalSalvie})`);
+      }
+
       // Butonul: o culoare foarte deschisă (L > 50) coboară la L ≤ 28; iar textul de pe buton
       // se citește MEREU (se verifică direct, nu doar prin pragul L > 50).
       if (hsl.l > 50 && hslDinHex(p.accent).l > 28.6) gresite.push(`${culoare} buton: L ${hslDinHex(p.accent).l.toFixed(1)} > 28`);
@@ -875,9 +895,12 @@ test("linkurile din text și hover-ul pe butoane: legate de rolul nou, cu rezerv
   ]) {
     assert.ok(citeste(cale).includes('color: "var(--s-link, var(--s-accent))"'), cale);
   }
-  for (const cale of ["src/components/site/card-articol.tsx", "src/components/site/sections/features.tsx"]) {
-    assert.ok(citeste(cale).includes('color: "var(--t-accent-interactiv, var(--t-accent))"'), cale);
-  }
+  assert.ok(citeste("src/components/site/card-articol.tsx").includes('color: "var(--t-accent-interactiv, var(--t-accent))"'));
+  // Cartonașele de servicii ale Apropierii: culoarea linkurilor pe cele deschise; pe cele colorate
+  // (salvie, piersică), culoarea textului — acolo linkul n-ar trece 4,5:1.
+  assert.ok(citeste("src/components/site/sections/features.tsx").includes(
+    'color: accent === "deschis" ? "var(--t-accent-interactiv, var(--t-accent))" : "var(--t-text)",',
+  ));
 });
 
 test("mostrele culorilor gata alese: trei fâșii (50% banda închisă, 30% butoane, 20% linkuri), calculate ca pe site", () => {
@@ -1034,6 +1057,68 @@ test("banda „Ce spun clienții” de la Liniște: tonul stins al accentului cu
           if (r < 4.5) slabe.push(`manual ${culoare} ${rol} pe ${loc}: ${r.toFixed(2)}`);
         }
       }
+    }
+  }
+  assert.deepEqual(slabe.slice(0, 10), [], `${slabe.length} slabe`);
+});
+
+test("cartonașele „salvie” de la Apropiere: nuanța pală, stinsă, a accentului cu culori alese; salvia fără — și textul de pe ele se citește", () => {
+  // Niciun șablon n-are rolul nou: fără culori alese, cartonașele rămân pe salvia de până acum.
+  for (const sablon of listTemplates()) {
+    assert.equal("fundalSalvie" in sablon.paleta, false, sablon.nume);
+    assert.equal(templateStyle(sablon)["--t-fundal-salvie"], undefined, sablon.nume);
+  }
+  for (const [nume, hex] of [["Safir", "#0A3463"], ["Bordeaux", "#4F0D1A"], ["Smarald", "#083D27"]]) {
+    const ales = getTemplate("apropiere", { mod: "auto", principala: hex });
+    const s = oklchDinHex(ales.paleta.fundalSalvie);
+    assert.equal(templateStyle(ales)["--t-fundal-salvie"], ales.paleta.fundalSalvie, nume);
+    // Pal (cât imaginea aleasă de proprietar, L ~0,90), stins (C ≤ 0,03), în nuanța accentului — nu aurul.
+    assert.ok(s.l > 0.85 && s.l < 0.95, `${nume}: L ${s.l.toFixed(3)}`);
+    assert.ok(s.c < 0.032, `${nume}: C ${s.c.toFixed(3)}`);
+    const dif = Math.abs(((s.h - oklchDinHex(ales.paleta.accent).h + 540) % 360) - 180);
+    assert.ok(dif < 6, `${nume}: altă nuanță decât accentul (${dif.toFixed(1)}°)`);
+    assert.notEqual(ales.paleta.fundalSalvie, ales.paleta.accentPeInchis);
+  }
+  // Un accent gri dă un cartonaș gri.
+  assert.ok(oklchDinHex(getTemplate("apropiere", { mod: "auto", principala: "#777777" }).paleta.fundalSalvie).c < 0.005);
+
+  // Modul manual: se reface din culorile FINALE.
+  const manual = paletaEfectiva(getTemplate("apropiere").paleta, citesteAspectCulori({ mod: "manual", principala: "#0A3463", manual: { accent: "#4F0D1A" } }));
+  const hManual = oklchDinHex(manual.fundalSalvie).h;
+  assert.ok(Math.abs(((hManual - oklchDinHex("#4F0D1A").h + 540) % 360) - 180) < 6, "manual: nuanța accentului ales de mână");
+  for (const rol of ["text", "textSecundar", "accent"]) assert.ok(contrast(manual[rol], manual.fundalSalvie) >= 4.5, `manual: ${rol}`);
+
+  // Componentele: rolul nou CU rezervă pe salvia de până acum, în toate cele cinci locuri.
+  const SALVIE = '"var(--t-fundal-salvie, var(--t-accent-pe-inchis))"';
+  for (const [cale, cate] of [
+    ["src/components/site/sections/hero.tsx", 1],
+    ["src/components/site/sections/about-teaser.tsx", 1],
+    ["src/components/site/sections/contact.tsx", 1],
+    ["src/components/site/sections/testimonials.tsx", 1],
+    ["src/components/site/sections/features.tsx", 1],
+  ]) {
+    const text = citeste(cale);
+    assert.equal(text.split(SALVIE).length - 1, cate, cale);
+    assert.ok(!/background: (featured \? )?"var\(--t-accent-pe-inchis\)"/.test(text), `${cale}: a rămas un fundal salvie fără rolul nou`);
+  }
+  assert.ok(!/\? "var\(--t-accent-pe-inchis\)"\s*:\s*accent === "piersica"/.test(citeste("src/components/site/sections/features.tsx")));
+});
+
+test("Apropiere: pe cartonașele colorate (salvie, piersică) textul mic și linkul au culoarea textului — se citesc, cu sau fără culori alese", () => {
+  const servicii = citeste("src/components/site/sections/features.tsx");
+  assert.ok(servicii.includes('style={{ fontSize: "15px", color: accent === "deschis" ? "var(--t-text-secundar)" : "var(--t-text)" }}'));
+  assert.ok(servicii.includes('color: accent === "deschis" ? "var(--t-accent-interactiv, var(--t-accent))" : "var(--t-text)",'));
+  const pareri = citeste("src/components/site/sections/testimonials.tsx");
+  assert.ok(pareri.includes('color: featured ? "var(--t-text)" : "var(--t-text-secundar)",'));
+  // Textul pe toate fundalurile colorate: salvia și piersica șablonului, iar cu culori alese,
+  // cartonașul pal și piersica (rămasă a șablonului).
+  const sablon = getTemplate("apropiere").paleta;
+  for (const fundal of [sablon.accentPeInchis, sablon.accentCald]) assert.ok(contrast(sablon.text, fundal) >= 4.5, fundal);
+  const slabe = [];
+  for (const culoare of CULORI) {
+    const p = getTemplate("apropiere", { mod: "auto", principala: culoare }).paleta;
+    for (const fundal of [p.fundalSalvie, p.accentCald]) {
+      if (contrast(p.text, fundal) < 4.5) slabe.push(`${culoare}: ${p.text} pe ${fundal}`);
     }
   }
   assert.deepEqual(slabe.slice(0, 10), [], `${slabe.length} slabe`);

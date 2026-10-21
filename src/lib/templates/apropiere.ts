@@ -60,6 +60,11 @@ export const apropiere: Template = {
     // bucata scrisă de mână e dreaptă.
     accentInItalic: false,
     greutateTitlu: 800,
+    // Titlul mare stătea la 0,98, iar pe telefon virgula lui „Ș" atingea „t"-ul de pe rândul de
+    // dedesubt („Ședințe pentru / tine"; măsurat pe pixeli: se atinge și la 1,05, se desparte la
+    // 1,08). Pe laptop nu se atingea. Hotărât 21 oct. 2026 („facem cum crezi tu că e mai bine"),
+    // ca la Căldură. Titlurile secțiunilor (1,08) rămân.
+    interlinieMinimaTitlu: 1.08,
   },
 
   forme: {

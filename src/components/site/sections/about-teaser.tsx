@@ -199,7 +199,8 @@ export function AboutTeaser({
                   inset: 0,
                   transform: "translate(-16px, 18px) rotate(-2.5deg)",
                   borderRadius: "var(--t-raza)",
-                  background: "var(--t-accent-pe-inchis)",
+                  // Cu culori alese în „Aspect", nuanța pală a accentului; fără, salvia.
+                  background: "var(--t-fundal-salvie, var(--t-accent-pe-inchis))",
                 }}
               />
             )}

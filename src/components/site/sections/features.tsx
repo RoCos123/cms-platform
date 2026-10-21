@@ -328,9 +328,10 @@ function ServiciiFriendly({
         // Tipar fix de accente, ca la sursă: al doilea card verde, al patrulea
         // piersică, restul deschise; se repetă la fiecare patru.
         const accent = i % 4 === 1 ? "salvie" : i % 4 === 3 ? "piersica" : "deschis";
+        // Cu culori alese în „Aspect", cartonașul „salvie" e nuanța pală a accentului.
         const fundal =
           accent === "salvie"
-            ? "var(--t-accent-pe-inchis)"
+            ? "var(--t-fundal-salvie, var(--t-accent-pe-inchis))"
             : accent === "piersica"
               ? "var(--t-accent-cald)"
               : "var(--t-suprafata, var(--t-fundal-nuantat))";
@@ -359,10 +360,18 @@ function ServiciiFriendly({
               serviciu={serviciu}
               taiat={paginaDetaliata}
               inaltimeRand={1.6}
-              style={{ fontSize: "15px", color: "var(--t-text-secundar)" }}
+              // Pe cartonașele colorate (salvie, piersică), griul secundar și linkul nu treceau
+              // 4,5:1 (3,4–4,1:1) — deci culoarea textului; pe cele deschise, ca până acum.
+              style={{ fontSize: "15px", color: accent === "deschis" ? "var(--t-text-secundar)" : "var(--t-text)" }}
             />
             {paginaDetaliata && (
-              <span style={{ fontSize: "15px", fontWeight: 700, color: "var(--t-accent-interactiv, var(--t-accent))" }}>
+              <span
+                style={{
+                  fontSize: "15px",
+                  fontWeight: 700,
+                  color: accent === "deschis" ? "var(--t-accent-interactiv, var(--t-accent))" : "var(--t-text)",
+                }}
+              >
                 Citește mai mult
               </span>
             )}

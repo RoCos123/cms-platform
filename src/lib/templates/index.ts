@@ -90,6 +90,8 @@ export function templateStyle(template: Template): CSSProperties {
     "--t-accent-matase": p.accentMatase,
     // Banda „Ce spun clienții" de la Liniște, în tonul stins al accentului (vezi `testimonials.tsx`).
     "--t-fundal-pareri": p.fundalPareri,
+    // Cartonașele „salvie" de la Apropiere, în nuanța pală a accentului.
+    "--t-fundal-salvie": p.fundalSalvie,
     // Doar „Apropiere" le pune; la restul rămân nedefinite, iar componentele
     // care le folosesc cad pe forma dinainte prin `var(--…, implicit)`.
     "--t-accent-cald": p.accentCald,

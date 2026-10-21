@@ -91,6 +91,12 @@ export const REGULI_PREMIUM = {
    * rămânea la 4,2:1 pe partea luminoasă.
    */
   pareri: { baza: "#415447", umbra: "#3C5042", lumina: "#506456", alfaLumina: 0.55, intunecare: 0.02 },
+  /**
+   * Cartonașele „salvie" de la Apropiere (varianta C, „pală, stinsă", 21 oct. 2026): nuanța
+   * accentului cu croma 0,03 (OKLCH), pornind de la lumina salviei șablonului (L 0,80) și
+   * deschisă doar cât trebuie ca textul, textul secundar, linkurile și accentul să treacă pe ea.
+   */
+  salvie: { l: 0.8, c: 0.03 },
 } as const;
 
 /** Cele trei faze ale mătăsii pentru o culoare, plus gradientul CSS gata de pus ca `background`. */
@@ -144,6 +150,16 @@ export function fundalPareri(accent: string): FundalPareri {
     varf: suprapune(lumina, r.alfaLumina, baza),
     css: `radial-gradient(ellipse 55% 70% at 33% 0%, ${lumina}${alfa}, transparent 70%), linear-gradient(90deg, ${baza} 0%, ${baza} 50%, ${umbra} 100%)`,
   };
+}
+
+/**
+ * Fundalul cartonașelor „salvie" de la Apropiere în nuanța unui accent: pal și stins, cât să se
+ * citească pe el toate `texte`. Un accent gri dă un cartonaș gri.
+ */
+export function fundalSalvie(accent: string, texte: string[]): string {
+  const r = REGULI_PREMIUM.salvie;
+  const nuanta = oklchDinHex(accent);
+  return ajusteaza({ l: r.l, c: nuanta.c < 0.01 ? 0 : r.c, h: nuanta.h }, texte, "deschide");
 }
 
 export type RezultatPaleta = {
@@ -297,6 +313,9 @@ export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): Rezu
     // Banda „Ce spun clienții" (doar Liniște o desenează): tonul stins al accentului. Textele de pe
     // ea, așa cum ies mai sus, trec 4,5:1 pe orice nuanță (probat în `aspect-culori.proba.mjs`).
     fundalPareri: fundalPareri(accent).css,
+    // Cartonașele „salvie" (doar Apropiere le desenează): pal, în nuanța accentului, nu aurul de pe
+    // bandă — cu tot textul care ar putea sta pe ele lizibil.
+    fundalSalvie: fundalSalvie(accent, [text, textSecundar, accentInteractiv, accent]),
     eroare,
     eroarePeInchis,
     chenar,

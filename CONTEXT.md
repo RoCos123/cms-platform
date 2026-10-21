@@ -225,8 +225,8 @@ MASTER (`fc6e863`, CI verde, rularea 221), în aceeași probă. DESCHIDERE TREPT
 (proprietarul, 20 oct.: „hai să aplicăm treptat, pe fiecare șablon în parte"): LUMINĂ pe
 `model-lumina.vercel.app` („pe model-lumina frate, pe asta să apară"), apoi CĂLDURĂ pe
 `model-caldura`, apoi LINIȘTE pe `model-liniste` (21 oct.) — toate trei pe master. APROPIERE pe
-`model-apropiere` („merge, hai la Apropiere", 21 oct.): poarta PE BRANCH, așteaptă trei hotărâri
-(mai jos, la „Apropiere") și „fă pe master".**
+`model-apropiere` („merge, hai la Apropiere", 21 oct.): poarta și cele trei hotărâri (mai jos, la
+„Apropiere") sunt PE BRANCH, așteaptă „fă pe master".**
 *Lumină, verificat local (stiva reală, `ana.test` pe Lumină):* fără culori — neschimbat; cu Safir,
 Smarald + „Elegant", Bordeaux + „De revistă" — nimic stricat, nicio eroare. De știut: cu o culoare
 aleasă, tenta lavandă a Luminii devine calcarul cald (ca pe Claritate); fără font ales, Lumină are
@@ -273,6 +273,18 @@ culorii alese, C pală stinsă (L ~0,90, C 0,03) — B și C calculate ca textul
 pe cartonașele colorate, textul mic și linkul în culoarea textului principal (≥ 6,3:1). (3) Titlul
 mare pe telefon (Nunito 800, 0,98): virgula lui „Ș" atinge „t"-ul de dedesubt („Ședințe pentru /
 tine"), și la 1,05; la 1,08 se despart. Pe laptop nu se ating. Propunerea: 1,08, ca la Căldură.
+*Hotărât* (proprietarul: „facem cum crezi tu că e mai bine" → recomandările sesiunii), PE BRANCH:
+(1) varianta C — rolul `fundalSalvie` (`REGULI_PREMIUM.salvie`: nuanța accentului, C 0,03, de la
+L 0,80 deschisă doar cât trec 4,6:1 textul, textul secundar, linkurile și accentul → în practică
+L ~0,90), doar cu culori alese; cele cinci locuri folosesc `var(--t-fundal-salvie,
+var(--t-accent-pe-inchis))`, deci fără culori salvia rămâne. Piersica rămâne a șablonului.
+(2) Pe TOATE site-urile Apropiere: pe cartonașele colorate de la servicii (salvie, piersică),
+descrierea și „Citește mai mult" sunt în culoarea textului; la „Păreri", pe cardul din mijloc,
+rândul mic de sub nume la fel. Măsurat în browser: cel mai slab text pe un cartonaș colorat e
+6,6:1 fără culori, 8,0:1 cu culori (înainte: 3,4–4,1:1). Cartonașele albe neschimbate.
+(3) `apropiere.ts`, `interlinieMinimaTitlu: 1.08`, pe TOATE site-urile Apropiere; pe pixeli: telefon
+2–4px între rânduri, laptop 12–16px. Probe: 2 teste noi + reguli în cele existente, 16 stricări
+prinse; tot: 528.
 Întâi a fost doar discutat (proprietarul: „momentan nu facem
 nimic, doar discutăm"); apoi a cerut „hai sa facem partea cu culorile si fonturile… Mai intai
 culorile". Cerere: fiecare client să-și poată schimba culorile și fonturile din panou.

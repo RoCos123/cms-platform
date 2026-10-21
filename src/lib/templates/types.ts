@@ -78,6 +78,13 @@ export type TemplatePalette = {
    * șablon nu-l are; banda rămâne atunci verde, ca până acum.
    */
   fundalPareri?: string;
+  /**
+   * Fundalul cartonașelor „salvie" de la Apropiere (al doilea serviciu din patru, cardul din mijloc
+   * la „Păreri", cardul cu datele de contact, cel din spatele pozei, pata din hero), pe un site cu
+   * culori alese: o nuanță pală, stinsă, a accentului (21 oct. 2026). Niciun șablon nu-l are;
+   * cartonașele cad atunci pe `accentPeInchis`, salvia de până acum.
+   */
+  fundalSalvie?: string;
   /** Culoarea erorilor de formular, pe fundal deschis și pe fundal închis. */
   eroare: string;
   eroarePeInchis: string;

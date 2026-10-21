@@ -115,7 +115,8 @@ export function Hero({
           width: "460px",
           height: "460px",
           borderRadius: "50%",
-          background: "var(--t-accent-pe-inchis)",
+          // Cu culori alese în „Aspect", nuanța pală a accentului (`--t-fundal-salvie`); fără, salvia.
+          background: "var(--t-fundal-salvie, var(--t-accent-pe-inchis))",
           filter: "blur(72px)",
           opacity: 0.5,
           pointerEvents: "none",
