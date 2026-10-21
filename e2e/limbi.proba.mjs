@@ -154,6 +154,9 @@ test("legăturile din cod: comutatorul doar cu bifa, repararea doar pe gazda tra
   const navigare = citeste("src/components/site/navigare-tradusa.tsx");
   // Prima instrucțiune din efect: pe domeniul site-ului, ieșire imediată.
   assert.match(navigare, /useEffect\(\(\) => \{\s*if \(!esteGazdaTradusa\(window\.location\.hostname\)\) return;/);
+  // Pe pagina tradusă, antetul nu mai stă lipit sus (banda albă a barei Google, 21 oct.).
+  assert.match(navigare, /document\.documentElement\.setAttribute\("data-tradus", ""\)/);
+  assert.match(citeste("src/app/globals.css"), /html\[data-tradus\] \.antet \{\s*position: relative !important;/);
   // Captură pe `window`, ca să ajungă înaintea navigării rapide din Next.
   assert.match(navigare, /window\.addEventListener\("click", laClic, true\)/);
 

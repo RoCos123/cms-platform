@@ -28,6 +28,8 @@ export function NavigareTradusa() {
     if (!esteGazdaTradusa(window.location.hostname)) return;
 
     tolereazaTextulRescris();
+    // Antetul nu mai stă lipit sus pe pagina tradusă — vezi `html[data-tradus]` în globals.css.
+    document.documentElement.setAttribute("data-tradus", "");
 
     function repara(eveniment: MouseEvent, oprestePropagarea: boolean) {
       const tinta = eveniment.target;

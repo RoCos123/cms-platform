@@ -215,6 +215,17 @@ tradusă NU ține de listă (e invizibilă și ajută orice site citit prin Goog
   în `site_settings.pagini.limbi`. **Oprită din oficiu** (lipsa valorii = oprit, pe dos față de pagini);
   proprietarul a cerut-o explicit opțională, din panou (21 oct.). O pornește clientul; pe site-urile model,
   proprietarul, intrând în panoul lor din `/proprietar`. Fără migrare, fără SQL.
+- **Banda albă de pe pagina tradusă** (captura proprietarului, 21 oct.): la derulare, deasupra antetului rămânea
+  o bandă albă goală — locul barei Google de traducere, care se ascunde —, iar antetul nostru stătea lipit sub
+  ea. Reparat pe branch: pe `*.translate.goog`, `navigare-tradusa.tsx` pune `data-tradus` pe `<html>`, iar
+  `html[data-tradus] .antet` nu mai e lipit (`position: relative`, `top: 0`), deci urcă odată cu pagina.
+  **Mecanismul exact al Google nu l-am văzut** (Google e blocat din mediul de lucru; imitația locală nu
+  reproduce banda), deci e o reparație probabilă, nu dovedită: dacă banda rămâne, e chiar bara Google și
+  nu se scoate din site. Pe domeniul site-ului antetul rămâne lipit, ca înainte.
+- **Steagul mare pe site-ul publicat** după `25d275a` (proprietarul, 21 oct., și după Ctrl+F5): în cod și în
+  build-ul local steagul are 13px; nu s-a putut vedea de aici ce a publicat Vercel. Acum mărimea e scrisă și
+  în atributele steagului (`steaguri.tsx`), nu doar în CSS. Dacă și după următoarea publicare apare mare:
+  de verificat în Vercel → Deployments că ultima publicare e a commit-ului cel nou și e „Ready".
 - **Navigarea pe pagina tradusă** (`src/components/site/navigare-tradusa.tsx`, pe TOATE site-urile, fiindcă
   la traducerea Google se ajunge și din rezultatele căutării). Proba proprietarului pe `model-apropiere`
   (21 oct.): prima pagină și o pagină interioară deschisă direct cu coada se traduc, dar un clic în meniu

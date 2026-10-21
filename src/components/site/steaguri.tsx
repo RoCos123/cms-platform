@@ -19,7 +19,9 @@ export function Steag({ cod, forma }: { cod: CodSteag; forma: "rotund" | "drept"
   const id = `steag${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const marime =
     forma === "rotund"
-      ? { width: 24, height: 24, preserveAspectRatio: "xMidYMid slice" }
+      ? // 13px și în atributele steagului, nu doar în CSS (`.antet-limba-buton .steag`): pagina
+        // poartă singură mărimea, chiar dacă foaia de stil ajunge mai târziu sau e una veche.
+        { width: 13, height: 13, preserveAspectRatio: "xMidYMid slice" }
       : { width: 21, height: 14, preserveAspectRatio: "none" };
 
   if (cod === "ro") {

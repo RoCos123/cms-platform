@@ -301,6 +301,20 @@ body {
 }
 
 /*
+ * Pe pagina citită prin traducerea Google, antetul nu mai stă lipit sus: urcă odată cu pagina.
+ * Google împinge toată pagina în jos ca să facă loc barei lui de traducere; când bara se ascunde
+ * la derulare, locul ei rămânea o bandă albă goală, iar antetul nostru stătea lipit sub ea
+ * (captura proprietarului, 21 oct. 2026). Fără lipire, banda urcă și ea odată cu pagina.
+ * `!important`, fiindcă lipirea e scrisă direct pe element (`header.tsx`). Atributul îl pune
+ * `navigare-tradusa.tsx`, doar pe `*.translate.goog`; pe site-ul nostru antetul rămâne lipit.
+ */
+html[data-tradus] .antet {
+  position: relative !important;
+  /* Și fără vreo deplasare pusă de altcineva peste antet, ca să urce întreg odată cu pagina. */
+  top: 0 !important;
+}
+
+/*
  * Alegerea limbii: bulina cu steag și lista care se deschide sub ea — vezi
  * `comutator-limba.tsx`. Grupul ține împreună meniul, bulina și ☰ (doar pe site-urile cu
  * bulina pornită), ca bulina să stea lângă ele, nu în golul din mijlocul antetului.
