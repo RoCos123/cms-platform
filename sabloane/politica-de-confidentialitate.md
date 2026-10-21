@@ -40,6 +40,7 @@ tot paragraful. **Nicio paranteză dreaptă nu rămâne în pagina publicată.**
 | `[PROGRAMĂRI]` (trei paragrafe) | cabinetul are modulul Programări pornit |
 | `[YOUTUBE]` | pe site sunt videoclipuri YouTube la „Apariții” |
 | `[WHATSAPP]` | în Setări e pus un număr de WhatsApp (butonul plutitor) |
+| `[TRADUCERE]` | în Setări e bifată „Arată alegerea limbii pe site” (RO · EN · DE din antet) |
 
 ## De verificat înainte de publicare
 
@@ -103,6 +104,8 @@ Fonturile cu care e scris site-ul și pozele se încarcă de pe același server 
 [YOUTUBE] Singura excepție sunt videoclipurile de pe YouTube: dacă un videoclip nu are o imagine de copertă a lui, imaginea poate fi adusă de la YouTube (Google) chiar când deschizi pagina, iar atunci YouTube vede adresa ta IP. Filmul în sine se încarcă abia când apeși pe el.
 
 [WHATSAPP] Butonul de WhatsApp e un simplu link: nu se încarcă nimic de la WhatsApp până nu apeși pe el. Dacă îl apeși, ajungi în aplicația lor, unde se aplică regulile lor, nu ale acestui site.
+
+[TRADUCERE] Sus, în antet, poți alege să citești site-ul în engleză sau germană (EN, DE). Traducerea o face Google Translate, iar alegerea e tot un simplu link: până nu apeși EN sau DE, nu se încarcă nimic de la Google. Dacă apeși, pagina se deschide prin serviciul lor de traducere, la o adresă a lor (care se termină în „translate.goog”), iar Google vede adresa ta IP și paginile pe care le citești; acolo se aplică regulile Google, nu ale acestui site. Ce trimiți printr-un formular de pe pagina tradusă trece și prin serverele Google înainte să ajungă la mine. Ca să te întorci la pagina mea, apeși RO.
 
 ## Ce nu se întâmplă
 

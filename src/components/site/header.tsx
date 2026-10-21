@@ -36,6 +36,11 @@ export type SiteHeaderData = {
    * implicite, nu le înlocuiesc (pentru asta există `linkuri`).
    */
   paginiProprii?: LinkAntet[];
+  /**
+   * Domeniul site-ului, dacă clientul a pornit alegerea limbii (RO · EN · DE) din Setări.
+   * Lipsa = fără comutator, ca până acum.
+   */
+  domeniuLimbi?: string;
 };
 
 /**
@@ -66,13 +71,33 @@ export function SiteHeader({ data, friendly }: { data: SiteHeaderData; friendly?
   // îndemână chiar dacă restul linkurilor s-au strâns în meniul-buton.
   const cta = friendly ? linkuriToate.find((l) => l.href === "/programare") : undefined;
   const linkuri = cta ? linkuriToate.filter((l) => l !== cta) : linkuriToate;
+  /*
+    Alegerea limbii (RO · EN · DE) ocupă în rând cam cât două linkuri, iar pe „Apropiere"
+    butonul „Programează" încă unul. Fără socoteala asta, cu un nume real de cabinet,
+    meniul și numele se rupeau pe câte două rânduri între 900 și 1040px (cinci linkuri)
+    și între 1100 și 1140px (șase) — măsurat pe toate cinci șabloanele, 21 oct. 2026.
+    Socotită așa, meniul se strânge în buton de la un prag mai mare; de la șapte linkuri
+    plus comutator nu mai încape la nicio lățime (rândul are cel mult 1180px), deci rămâne
+    strâns mereu. Pragurile noi țin doar cu comutatorul pornit; fără el, greutatea e
+    numărul de linkuri și antetul rămâne exact cum era.
+  */
+  const cuLimbi = Boolean(data.domeniuLimbi);
+  const greutateMeniu = linkuri.length + (cuLimbi ? 2 + (cta ? 1 : 0) : 0);
+  const claseAntet = [
+    "antet",
+    greutateMeniu > 5 && "antet--multe-linkuri",
+    cuLimbi && greutateMeniu > 7 && "antet--foarte-multe-linkuri",
+    cuLimbi && greutateMeniu > 8 && "antet--meniu-mereu-strans",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <header
       // Peste cinci linkuri, meniul se strânge în buton mai devreme (vezi
       // globals.css): un nume real de cabinet plus șase linkuri nu mai încap pe
       // un rând la 950px, oricât de bine s-ar purta fiecare în parte.
-      className={linkuri.length > 5 ? "antet antet--multe-linkuri" : "antet"}
+      className={claseAntet}
       style={
         friendly
           ? // Pastila plutitoare: antetul e transparent, iar rândul de dedesubt e
@@ -176,7 +201,7 @@ export function SiteHeader({ data, friendly }: { data: SiteHeaderData; friendly?
           </span>
         </Link>
 
-        <HeaderNav linkuri={linkuri} />
+        <HeaderNav linkuri={linkuri} domeniuLimbi={data.domeniuLimbi} />
 
         {cta ? (
           // Butonul-CTA prietenos: pastilă închisă cu scris crem, ca la sursă

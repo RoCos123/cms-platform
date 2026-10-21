@@ -172,3 +172,52 @@ export async function schimbaPublicarea(publica: boolean): Promise<RezultatSetar
 
   return { ok: true };
 }
+
+/**
+ * Pornește sau oprește alegerea limbii din antet (RO · EN · DE, traducerea Google — vezi
+ * `@/lib/traducere`).
+ *
+ * Scrie doar `pagini.limbi`, peste ce era: ca la comutatorul paginii de servicii, o
+ * bifă care se salvează pe loc nu are voie să atingă celelalte comutatoare din același
+ * grup.
+ */
+export async function comutaLimbile(pornite: boolean): Promise<RezultatSetari> {
+  const session = await verifySession();
+  const supabase = await createClient();
+
+  const { data: existent } = await supabase
+    .from("site_settings")
+    .select("pagini")
+    .eq("site_id", session.siteId)
+    .maybeSingle();
+
+  const pagini = { ...((existent?.pagini ?? {}) as Record<string, unknown>), limbi: pornite };
+
+  // `upsert`: rândul de setări poate lipsi, iar un `update` ar fi trecut în tăcere.
+  const { error } = await supabase
+    .from("site_settings")
+    .upsert({ site_id: session.siteId, pagini }, { onConflict: "site_id" });
+
+  if (error) {
+    console.error("Comutarea limbilor a eșuat:", error);
+    return { ok: false, mesaj: "Nu am putut salva. Încearcă din nou." };
+  }
+
+  await scrieInJurnal({
+    siteId: session.siteId,
+    actorId: session.userId,
+    actiune: "update",
+    entitate: "SiteSettings",
+    diff: {
+      rezumat: pornite
+        ? "Alegerea limbii (RO · EN · DE) a fost pusă pe site."
+        : "Alegerea limbii a fost scoasă de pe site.",
+    },
+  });
+
+  revalidatePath("/dashboard", "layout");
+  // Antetul e pe fiecare pagină a site-ului, nu doar pe prima.
+  revalidatePath("/", "layout");
+
+  return { ok: true };
+}

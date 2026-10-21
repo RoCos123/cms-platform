@@ -182,42 +182,46 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
-**Limbile site-ului: comutator RO / EN / … cu traducere AUTOMATĂ, pe site-ul public — PLANIFICAT, NEÎNCEPUT
-(18 oct. 2026; proprietarul: „nu facem nimic acum, doar adaugă în context ce planuim").**
-*Ce vrea:* un comutator de limbă pe SITE-UL PUBLIC (RO/EN, eventual germană, franceză etc.), cu
-traducere automată. **Panoul rămâne în română** — nu se traduce. Clientul nu scrie nicio traducere.
-*Hotărâri confirmate:* (1) **cât mai simplu**; (2) **fără DeepL sau orice alt serviciu de
-traducere plătit/cu cheie — „poate Google da, altfel nu"**; (3) deci s-au RESPINS: traducerea pe server
-cu un API extern (DeepL, un model de limbaj etc.), cu traduceri salvate în bază, și varianta „clientul
-scrie traducerile" (ecrane de editare pe limbi, adrese `/en/…`, `hreflang`, hartă de site pe limbi, `lang`
-pe pagină — vreo 4–6 sesiuni, deci mult mai mult). **Nu reproune alea.**
-*Ce rămâne de ales, cu observații (nu s-au hotărât):*
-- **Varianta cea mai simplă, propunerea sesiunii: comutatorul e un set de LINKURI către traducerea
-  Google a paginii** (adresa de tip `https://<domeniul-cu-liniuțe>.translate.goog/…?_x_tr_sl=ro&_x_tr_tl=en`),
-  nu un script pe site: până apasă vizitatorul, pagina NU încarcă nimic de la Google — la fel ca butonul
-  WhatsApp, care e un simplu link `wa.me` — deci „zero cereri către Google" rămâne adevărat; la clic,
-  Google vede pagina și IP-ul vizitatorului, alegerea lui. **De verificat înainte de a promite** (n-am
-  încercat, nu am acces la Google din mediul de lucru): dacă formularele, calendarul de programări și
-  caseta hCaptcha funcționează în pagina tradusă (un proxy poate strica trimiterea — probabil nu merg
-  și atunci arătăm un rând „pentru programări/contact, treci la versiunea în română"); dacă formatul
-  adresei cu `translate.goog` merge cu domeniile proprii ale clienților; dacă mecanismul mai e oferit de
-  Google (un widget de tip „Website Translator" are un istoric de schimbări — de verificat la momentul
-  construirii, nu de presupus).
-- **Varianta cu scriptul/widgetul Google pe site** (butonul apare în pagină): mai comodă pentru
-  vizitator, dar încarcă scripturi de la Google la fiecare vizită și poate pune cookie-uri — contrazice
-  „zero cereri către Google" și politica de confidențialitate. Doar dacă proprietarul o vrea, și atunci
-  cu politica rescrisă și, probabil, cu un banner.
-- **Nimic de construit:** browserele (Chrome, Edge) oferă oricum „Tradu pagina" pentru că `lang="ro"` e
-  corect — de spus clientului dacă întreabă.
-*Consecințe de ținut minte la construire:* (a) politica de confidențialitate (șablonul din
-`sabloane/`) trebuie să spună că, la apăsarea comutatorului, vizitatorul ajunge la Google (un paragraf cu
-etichetă, ca `[WHATSAPP]`); (b) pagina tradusă NU e indexată de Google ca pagina noastră (nu e pe
-domeniul clientului) — nu aduce poziționare, doar ajutor pentru vizitator; (c) calitatea traducerii e a
-Google, nu a noastră — pentru texte de psihologie poate ieși stângace; de aceea comutatorul n-ar trebui
-să pară „versiunea oficială în engleză"; (d) comutatorul ar fi opțional per site, OPRIT din oficiu
-(propunere, neconfirmată). *Efort (estimare cu rezerve):* mic — o sesiune sau mai puțin, dacă verificarea
-de mai sus iese bine; programările/formularele într-o limbă străină sunt partea necunoscută.
-*Limbi:* nehotărât; propunerea sesiunii: engleza întâi.
+**Limbile site-ului: comutator RO · EN · DE prin traducerea Google — FĂCUT PE BRANCH, NEPUBLICAT
+(21 oct. 2026; cerut de proprietar: „hai să facem modificarea limbii din RO în EN dar și în DE").**
+Pe branch-ul `claude/sleepy-tesla-aanhq7`; ajunge pe master doar la „fă pe master". *Hotărârile din
+18 oct. rămân:* cât mai simplu, fără DeepL sau alt serviciu cu cheie, fără traduceri scrise de client,
+panoul rămâne în română. **Nu reproune variantele respinse** (traducere pe server, ecrane pe limbi).
+*Ce e construit:*
+- **Comutatorul** (`src/components/site/comutator-limba.tsx`): RO · EN · DE la capătul rândului de
+  linkuri din antet, iar pe telefon, jos în meniul ☰. EN/DE sunt LINKURI către traducerea Google a
+  aceleiași pagini (`https://<domeniu-cu-liniuțe>.translate.goog/<cale>?_x_tr_sl=ro&_x_tr_tl=en&_x_tr_hl=en`),
+  RO duce înapoi la pagina noastră. Până la clic nu se încarcă nimic de la Google. `translate="no"`.
+- **Bifa** din Setări („Site-ul în engleză și germană” → „Arată alegerea limbii pe site”), salvată pe loc
+  în `site_settings.pagini.limbi`. **Oprită din oficiu** (lipsa valorii = oprit, pe dos față de pagini) —
+  propunerea mea, neconfirmată explicit de proprietar. O pornește clientul; pe site-urile model, proprietarul,
+  intrând în panoul lor din `/proprietar`. Fără migrare, fără SQL.
+- **Navigarea pe pagina tradusă** (`src/components/site/navigare-tradusa.tsx`, pe TOATE site-urile, fiindcă
+  la traducerea Google se ajunge și din rezultatele căutării). Proba proprietarului pe `model-apropiere`
+  (21 oct.): prima pagină și o pagină interioară deschisă direct cu coada se traduc, dar un clic în meniu
+  dădea „Can't translate this page” — linkurile relative duceau la adresa fără coada `_x_tr_*`. Acum, doar pe
+  `*.translate.goog`, clicul pe un link al site-ului primește coada paginii curente și încarcă pagina întreagă
+  (fără navigarea rapidă din Next). Plus peticul pentru React când Google rescrie textul (react#11538).
+  Pe domeniul site-ului nu face nimic.
+- **Antetul** se strânge în ☰ mai devreme când comutatorul e pornit (`greutateMeniu` în `header.tsx`):
+  cu un nume real și 5–7 linkuri, rândul se rupea pe două. Măsurat pe toate cinci șabloanele, 901–1440px,
+  3–7 linkuri: nimic rupt în plus. De la 7 linkuri + comutator, meniul rămâne mereu în ☰. Fără comutator,
+  antetul e exact cum era.
+- **Politica de confidențialitate**: paragraf nou `[TRADUCERE]` în `sabloane/` (inclusiv că ce se trimite
+  dintr-un formular de pe pagina tradusă trece prin Google). Paginile deja scrise ale clienților nu se schimbă
+  singure — vezi tabelul din §„Politica de confidențialitate se schimbă odată cu platforma”.
+*Cum s-a verificat:* `e2e/limbi.proba.mjs` (adresele, coada, bifa, legăturile din cod); în browser, pe stiva
+locală, cu o **imitație** a traducerii Google (Google e blocat din mediul de lucru): fără coadă → „Can't
+translate”, cu coadă → textul rescris în `<font>`. Imitația reproduce eroarea văzută de proprietar fără
+reparație; cu reparație, pe toate cinci șabloanele: meniul, logoul, ancorele, EN → DE → RO și meniul de pe
+telefon (deschis/închis după rescriere) merg, fără erori. **Nu e Google adevărat.**
+*De verificat de proprietar după „fă pe master”* (pornind bifa pe un site model): clic în meniu pe pagina
+tradusă; trimiterea unui formular de pe pagina tradusă — **necunoscut** dacă Google lasă să treacă
+trimiterea (dacă nu, varianta propusă: un rând „Pentru contact/programare, treci la română”; de hotărât,
+ținând cont și că datele trec prin Google); programarea online pe pagina tradusă.
+*Rămâne de știut:* paginile traduse nu se indexează ca ale clientului (nu aduc poziționare); calitatea
+traducerii e a Google; cererile de preîncărcare ale Next (`?_rsc=`) ajung și ele la Google pe pagina
+tradusă și primesc eroare — fără efect vizibil.
 
 **Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE ȘI PE MASTER, ÎN PROBĂ
 DOAR PE `model-claritate.vercel.app` (Claritate); FONTURILE FĂCUTE PE 20 OCT. 2026, ȘI ELE PE
@@ -3097,6 +3101,7 @@ el, din ziua în care și-a făcut site-ul. Un client care și-a publicat politi
 | 1 sept. 2026 | Fonturile se servesc de pe domeniul clientului | Paragraful despre Google Fonts SE SCOATE de tot |
 | 16 sept. 2026 | Contactul cere nume + email (obligatoriu); telefonul scos | Rândul despre ce salvează formularul: „numele și numărul tău de telefon, iar adresa de email doar dacă vrei” nu mai e adevărat |
 | 14–15 oct. 2026 | Contactul (14 oct.) ȘI programările (15 oct.) cer nume + email (obligatoriu) + telefon (OPȚIONAL) | Același rând (formularul de contact; programările adaugă numele, emailul, telefonul opțional și ora cerută): „se salvează numele și adresa ta de email, iar numărul de telefon doar dacă vrei să-l lași”. **Făcut în șablon pe 15 oct.** (rescris; paginile clienților rămân de corectat de mână) |
+| 21 oct. 2026 | Alegerea limbii RO · EN · DE (traducerea Google), pornită din Setări | Paragraful `[TRADUCERE]`, păstrat doar dacă bifa e pornită: la EN/DE, vizitatorul ajunge la Google. **Făcut în șablon** (branch, 21 oct.) |
 
 Toate sunt făcute în șablon (ultimele două — 16 sept. și 14–15 oct. — prin rescrierea din 15 oct.). **Niciuna nu e făcută în paginile deja
 scrise de clienți** — deocamdată nu există niciun client care să-și fi publicat

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { ComutatorLimba } from "./comutator-limba";
 
 export type LinkAntet = { text: string; href: string };
 
@@ -16,7 +17,17 @@ export type LinkAntet = { text: string; href: string };
  * Ce e vizibil când se decide din CSS, nu din JavaScript: un meniu care apare
  * abia după ce se încarcă scriptul clipește la fiecare încărcare de pagină.
  */
-export function HeaderNav({ linkuri }: { linkuri: LinkAntet[] }) {
+export function HeaderNav({
+  linkuri,
+  domeniuLimbi,
+}: {
+  linkuri: LinkAntet[];
+  /**
+   * Domeniul site-ului, când e pornită alegerea limbii (`pagini.limbi`); altfel lipsește și
+   * comutatorul nu apare. Stă la capătul rândului de linkuri, iar pe telefon, jos în meniu.
+   */
+  domeniuLimbi?: string;
+}) {
   const [deschis, setDeschis] = useState(false);
   const butonRef = useRef<HTMLButtonElement>(null);
   const idPanou = useId();
@@ -44,6 +55,7 @@ export function HeaderNav({ linkuri }: { linkuri: LinkAntet[] }) {
             {link.text}
           </a>
         ))}
+        {domeniuLimbi && <ComutatorLimba domeniu={domeniuLimbi} varianta="rand" />}
       </nav>
 
       <button
@@ -83,6 +95,7 @@ export function HeaderNav({ linkuri }: { linkuri: LinkAntet[] }) {
               {link.text}
             </a>
           ))}
+          {domeniuLimbi && <ComutatorLimba domeniu={domeniuLimbi} varianta="panou" />}
         </div>
       )}
     </>

@@ -5,7 +5,9 @@ import {
   CAMPURI_FIRMA,
   CAMPURI_SEO,
   CAMPURI_SOCIAL,
+  limbileSuntPornite,
   type Brand,
+  type Pagini,
   type Seo,
   type Social,
 } from "@/lib/setari";
@@ -14,6 +16,7 @@ import { culoriPermise, fonturiPermise } from "@/lib/aspect/acces";
 import { getTemplate } from "@/lib/templates";
 import { FormularSetari } from "./formular";
 import { ComutatorPublicare } from "./comutator-publicare";
+import { ComutatorLimbi } from "./comutator-limbi";
 import Link from "next/link";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { LinkVeziPeSite } from "@/components/dashboard/link-vezi-pe-site";
@@ -28,7 +31,7 @@ export default async function SetariPage() {
 
   const [{ data: site }, { data: setari }, { data: politica }, tip] = await Promise.all([
     supabase.from("sites").select("name, domain, template, published_at").eq("id", session.siteId).single(),
-    supabase.from("site_settings").select("brand, seo, social").eq("site_id", session.siteId).maybeSingle(),
+    supabase.from("site_settings").select("brand, seo, social, pagini").eq("site_id", session.siteId).maybeSingle(),
     // Doar starea, nu textul: cardul de publicare vrea să știe dacă politica de
     // confidențialitate mai e ciornă, ca să spună asta înainte de lansare.
     supabase
@@ -70,6 +73,8 @@ export default async function SetariPage() {
         // confidențialitate e în aceeași situație ca unul cu ea nepublicată.
         politicaEsteCiorna={politica?.status !== "published"}
       />
+
+      <ComutatorLimbi pornitInitial={limbileSuntPornite(setari?.pagini as Pagini | null)} />
 
       <Card>
         <CardHeader

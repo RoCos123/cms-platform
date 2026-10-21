@@ -316,11 +316,25 @@ export type PaginaOptionala = "servicii" | "blog";
  * cum i l-am construit. O valoare implicită „oprit" ar fi făcut ca o pagină
  * scrisă de client să dispară în tăcere la prima citire a setărilor.
  */
-export type Pagini = Partial<Record<PaginaOptionala, boolean>>;
+export type Pagini = Partial<Record<PaginaOptionala, boolean>> & {
+  /**
+   * Alegerea limbii din antet (RO · EN · DE, traducerea Google — vezi `@/lib/traducere`).
+   * Stă tot aici, lângă comutatoarele paginilor, fiindcă se scrie la fel: o bifă care se
+   * salvează pe loc și nu atinge restul setărilor. Dar pe dos față de pagini: lipsa
+   * valorii înseamnă OPRIT. Un site care n-a cerut-o nu primește peste noapte un rând nou
+   * în antet și o pagină tradusă de altcineva.
+   */
+  limbi?: boolean;
+};
 
 export function paginaEsteActiva(
   pagini: Pagini | null | undefined,
   care: PaginaOptionala,
 ): boolean {
   return pagini?.[care] !== false;
+}
+
+/** E pornită alegerea limbii în antet? Doar dacă clientul a bifat-o (vezi `Pagini.limbi`). */
+export function limbileSuntPornite(pagini: Pagini | null | undefined): boolean {
+  return pagini?.limbi === true;
 }

@@ -4,7 +4,7 @@ import { identitateaSiteului } from "@/lib/site-public";
 import { culoriPermise, fonturiPermise } from "@/lib/aspect/acces";
 import { articolePublicate } from "@/lib/blog-public";
 import { linkurilePaginilor } from "@/lib/pagini-publice";
-import { linkurileSociale, paginaEsteActiva } from "@/lib/setari";
+import { limbileSuntPornite, linkurileSociale, paginaEsteActiva } from "@/lib/setari";
 import { moduleleSiteului } from "@/lib/module";
 import { seePotFaceProgramari } from "@/lib/programari-publice";
 import { getTemplate, templateStyle } from "@/lib/templates";
@@ -21,6 +21,7 @@ import { BaraAdmin } from "@/components/site/bara-admin";
 import { NumaratorVizite } from "@/components/site/numarator-vizite";
 import { TranzitieLogo } from "@/components/site/tranzitie-logo";
 import { RevealLaScroll } from "@/components/site/reveal-la-scroll";
+import { NavigareTradusa } from "@/components/site/navigare-tradusa";
 
 /**
  * Cadrul oricărei pagini publice: fonturile șablonului, antetul, subsolul și,
@@ -164,6 +165,7 @@ export async function CadruSite({
             paginaServicii: paginaEsteActiva(pagini, "servicii"),
             blog: areBlog ? "pagina" : null,
             paginiProprii: inAntet,
+            domeniuLimbi: limbileSuntPornite(pagini) ? domain : undefined,
           }}
         />
 
@@ -215,6 +217,12 @@ export async function CadruSite({
             vizibilă, deci fără JavaScript totul se vede oricum — nu mai e nevoie
             de plasa `<noscript>` de dinainte. */}
         <RevealLaScroll />
+
+        {/* Pe pagina citită prin traducerea Google, linkurile păstrează limba — vezi
+            `navigare-tradusa.tsx`. Pe domeniul site-ului nu face nimic. Pusă pe toate
+            site-urile, nu doar pe cele cu comutatorul pornit: la traducerea Google ajunge
+            oricine și din rezultatele căutării („Tradu această pagină"). */}
+        <NavigareTradusa />
       </div>
     </>
   );
