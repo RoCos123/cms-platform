@@ -182,11 +182,13 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
-**Limbile site-ului: bulina cu steag (română · engleză · germană) prin traducerea Google — FĂCUT PE
-BRANCH, NEPUBLICAT (21 oct. 2026; cerut de proprietar: „hai să facem modificarea limbii din RO în EN dar și
+**Limbile site-ului: bulina cu steag (română · engleză · germană) prin traducerea Google — PE MASTER
+(`0d6760c`, 21 oct. 2026), DOAR PE CLARITATE, OPRITĂ DIN OFICIU (21 oct. 2026; cerut de proprietar: „hai să facem modificarea limbii din RO în EN dar și
 în DE", apoi „o bulină… steagul RO când e în română, steagul Angliei când e în engleză" și „să fie
 opțională, din panou").**
-Pe branch-ul `claude/sleepy-tesla-aanhq7`; ajunge pe master doar la „fă pe master". *Hotărârile din
+Dusă pe master la „fă pe master" (21 oct.). **Următorul pas e al proprietarului:** intră din `/proprietar` în
+panoul lui `model-claritate`, bifează Setări → „Traducere site (EN/DE)” și încearcă pe Google adevărat
+(lista de mai jos, „De verificat de proprietar"). *Hotărârile din
 18 oct. rămân:* cât mai simplu, fără DeepL sau alt serviciu cu cheie, fără traduceri scrise de client,
 panoul rămâne în română. **Nu reproune variantele respinse** (traducere pe server, ecrane pe limbi).
 Prima variantă, un rând „RO · EN · DE" la capătul meniului (jos în ☰ pe telefon), a fost înlocuită la
