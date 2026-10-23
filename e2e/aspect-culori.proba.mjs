@@ -1311,9 +1311,9 @@ test("ecranul „Aspect”: cele două colecții deasupra mostrelor; butonul col
   assert.ok(ecran.includes('setStare({ mod: "auto", principala: null, manual: {}, finisaj: "matasos" });'));
 });
 
-test("colecția „Mat & Mineral”, doar pe Claritate (proprietarul, 23 oct. 2026): ecran, salvare și site", () => {
-  assert.deepEqual([...SABLOANE_CU_MAT], ["claritate"]);
-  for (const sablon of listTemplates()) assert.equal(matPermis(sablon.id), sablon.id === "claritate", sablon.id);
+test("colecția „Mat & Mineral”, doar pe Claritate și Lumină (proprietarul, 23 oct. 2026): ecran, salvare și site", () => {
+  assert.deepEqual([...SABLOANE_CU_MAT], ["claritate", "lumina"]);
+  for (const sablon of listTemplates()) assert.equal(matPermis(sablon.id), ["claritate", "lumina"].includes(sablon.id), sablon.id);
   assert.equal(matPermis(null), false);
   assert.equal(matPermis(undefined), false);
 
@@ -1322,14 +1322,17 @@ test("colecția „Mat & Mineral”, doar pe Claritate (proprietarul, 23 oct. 20
   const peClaritate = culoriPermise(brand, { domain: "model-claritate.vercel.app", template: "claritate" });
   assert.equal(peClaritate.finisaj, "mat");
   const peLumina = culoriPermise(brand, { domain: "model-lumina.vercel.app", template: "lumina" });
-  assert.equal("finisaj" in peLumina, false);
-  assert.equal(peLumina.principala, "#54282C", "culoarea rămâne, doar finisajul cade");
-  assert.ok(getTemplate("lumina", peLumina).paleta.fundalInchisMatase?.startsWith("linear-gradient"), "pe Lumină: mătăsos");
+  assert.equal(peLumina.finisaj, "mat");
+  assert.equal("fundalInchisMatase" in getTemplate("lumina", peLumina).paleta, false, "pe Lumină: mat");
+  const peCaldura = culoriPermise(brand, { domain: "model-caldura.vercel.app", template: "caldura" });
+  assert.equal("finisaj" in peCaldura, false);
+  assert.equal(peCaldura.principala, "#54282C", "culoarea rămâne, doar finisajul cade");
+  assert.ok(getTemplate("caldura", peCaldura).paleta.fundalInchisMatase?.startsWith("linear-gradient"), "pe Căldură: mătăsos");
   assert.equal("fundalInchisMatase" in getTemplate("claritate", peClaritate).paleta, false, "pe Claritate: mat");
   // Ce nu e obiect, sau n-are finisaj, trece neatins.
-  assert.equal(faraFinisajNepermis(undefined, "lumina"), undefined);
+  assert.equal(faraFinisajNepermis(undefined, "caldura"), undefined);
   const faraFinisaj = { mod: "auto", principala: "#0A3463" };
-  assert.equal(faraFinisajNepermis(faraFinisaj, "lumina"), faraFinisaj);
+  assert.equal(faraFinisajNepermis(faraFinisaj, "caldura"), faraFinisaj);
 
   // Ecranul: comutatorul și culorile inițiale trec prin aceeași regulă; salvarea refuză „mat” pe alt șablon.
   const pagina = citeste("src/app/dashboard/aspect/page.tsx");
