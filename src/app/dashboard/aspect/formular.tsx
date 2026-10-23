@@ -150,6 +150,7 @@ export function FormularAspect({
   numeSablon,
   numeSite,
   initiale,
+  colectiaMata,
   initialeFonturi,
   previzualizare,
 }: {
@@ -157,6 +158,8 @@ export function FormularAspect({
   numeSablon: string;
   numeSite: string;
   initiale: AspectCulori | null;
+  /** Are șablonul colecția „Mat & Mineral" (`matPermis`)? Fără ea, doar culorile mătăsoase, fără comutator. */
+  colectiaMata: boolean;
   initialeFonturi: AspectFonturi | null;
   /** Site-ul adevărat al clientului. `null` = nicio secțiune vizibilă: se arată pagina de exemplu. */
   previzualizare: PrevizualizareSite | null;
@@ -198,7 +201,8 @@ export function FormularAspect({
   // Mostrele colecției alese: paleta fiecăreia, calculată pe șablonul ACESTUI site și cu finisajul
   // colecției, ca fâșiile să arate exact ce iese (banda închisă, butoanele, linkurile) — cu luciu la
   // „Mătăsos & Radiant", plate la „Mat & Mineral".
-  const colectie = COLECTII_CULOARE.find((c) => c.finisaj === stare.finisaj) ?? COLECTII_CULOARE[0];
+  const colectii = colectiaMata ? COLECTII_CULOARE : COLECTII_CULOARE.filter((c) => c.finisaj === "matasos");
+  const colectie = colectii.find((c) => c.finisaj === stare.finisaj) ?? colectii[0];
   const mostre = colectie.preseturi.map((preset) => ({
     ...preset,
     paleta: paletaDinCuloare(sablon.paleta, preset.hex, colectie.finisaj).paleta,
@@ -327,7 +331,8 @@ export function FormularAspect({
               />
               <CardBody className="space-y-5">
                 {/* Colecția = finisajul. Deasupra a tot, fiindcă se aplică și culorii scrise mai jos,
-                    nu doar mostrelor. */}
+                    nu doar mostrelor. Doar unde șablonul are și colecția mată. */}
+                {colectii.length > 1 && (
                 <div className="space-y-2">
                   <p className="text-xs font-medium text-muted-foreground">Colecția</p>
                   <div
@@ -335,7 +340,7 @@ export function FormularAspect({
                     role="group"
                     aria-label="Colecția de culori"
                   >
-                    {COLECTII_CULOARE.map((c) => (
+                    {colectii.map((c) => (
                       <button
                         key={c.finisaj}
                         type="button"
@@ -355,6 +360,7 @@ export function FormularAspect({
                   </div>
                   <p className="text-xs text-muted-foreground">{colectie.descriere}</p>
                 </div>
+                )}
 
                 <CampCuloare
                   id="culoare-principala"
@@ -365,7 +371,7 @@ export function FormularAspect({
 
                 <div>
                   <p className="mb-1 text-xs font-medium text-muted-foreground">
-                    Sau pornește de la una gata aleasă din „{colectie.nume}”
+                    Sau pornește de la una gata aleasă{colectii.length > 1 && <> din „{colectie.nume}”</>}
                   </p>
                   <p className="mb-2 text-xs text-muted-foreground">
                     Fiecare mostră arată, de la stânga: banda închisă, butoanele și linkurile.
@@ -441,8 +447,9 @@ export function FormularAspect({
                 description={
                   stare.principala ? (
                     <>
-                      Pornești de la culorile calculate din {stare.principala}, în colecția „{colectie.nume}”. Ca să
-                      schimbi punctul de pornire, treci pe Automat, alege altă culoare sau altă colecție și revino aici.
+                      Pornești de la culorile calculate din {stare.principala}
+                      {colectii.length > 1 && <>, în colecția „{colectie.nume}”</>}. Ca să schimbi punctul de pornire,
+                      treci pe Automat, alege altă culoare{colectii.length > 1 && " sau altă colecție"} și revino aici.
                     </>
                   ) : (
                     <>Pornești de la culorile șablonului „{numeSablon}”.</>

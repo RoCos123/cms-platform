@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
-import { aspectPermis } from "@/lib/aspect/acces";
+import { aspectPermis, matPermis } from "@/lib/aspect/acces";
 import { brandCuCulori, brandCuFonturi, valideazaCulori, valideazaFonturi } from "@/lib/aspect/salvare";
 
 export type RezultatAspect = { ok: true } | { ok: false; mesaj: string };
@@ -42,6 +42,10 @@ export async function salveazaAspect(brut: unknown, brutFonturi: unknown): Promi
     const verificat = valideazaCulori(brut);
     if (!verificat.ok) return { ok: false, mesaj: verificat.mesaj };
     culori = verificat.culori;
+    // Colecția „Mat & Mineral", doar pe șabloanele care o au (`SABLOANE_CU_MAT`, azi Claritate).
+    if (culori.finisaj === "mat" && !matPermis(site?.template)) {
+      return { ok: false, mesaj: "Colecția „Mat & Mineral” nu e pornită pentru șablonul site-ului tău." };
+    }
   }
 
   const verificateFonturi = valideazaFonturi(brutFonturi);

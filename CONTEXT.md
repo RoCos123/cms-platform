@@ -266,7 +266,13 @@ MASTER (`fc6e863`, CI verde, rularea 221), în aceeași probă. DESCHIDERE TREPT
 „Apropiere") sunt pe master (`92fd7a3`, CI verde, rularea 229). Cu asta, toate cinci șabloanele au
 „Aspect", fiecare doar pe site-ul lui model. Pasul următor, când îl cere proprietarul: deschiderea
 pentru clienți (`aspectPermis` → `true`, vezi `acces.ts`).**
-*A doua colecție de culori, „Mat & Mineral” (23 oct. 2026, cerută de proprietar; PE BRANCH, nepublicată):*
+*A doua colecție de culori, „Mat & Mineral” (23 oct. 2026, cerută de proprietar; PE MASTER, DOAR PE CLARITATE —
+„fă pe master, dar doar pe un model/șablon, hai pe claritate”):* `SABLOANE_CU_MAT = ["claritate"]` în
+`src/lib/aspect/acces.ts`. Pe celelalte șabloane comutatorul „Colecția” nu apare (doar culorile mătăsoase, ca
+înainte), salvarea unui „mat” se refuză, iar un „mat” rămas în bază e citit ca mătăsos (`faraFinisajNepermis`,
+în `culoriPermise` și în pagina „Aspect”). Verificat în browser: Claritate — comutator, culoarea mată plată pe
+site; Lumină — fără comutator, aceeași culoare mătăsoasă. Ca să se deschidă și altora: cheile lor în listă.
+
 lângă „Mătăsos & Radiant” (cele 12 de până acum, `PRESETURI_MATASOASE`), 12 culori mate (`PRESETURI_MATE`,
 numele și codurile exact ale lui: Rosewood Mat `#54282C` … Espresso Mat `#30231C`). Aceleași culori de statut,
 plate: fără mătase (gradient) pe benzi, subsol și butoane, cu o cromă mai calmă.

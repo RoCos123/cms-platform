@@ -30,7 +30,15 @@ import {
   brandCuCulori,
   valideazaCulori,
 } from "@/lib/aspect/salvare";
-import { DOMENII_CU_ASPECT, SABLOANE_CU_ASPECT, aspectPermis, culoriPermise } from "@/lib/aspect/acces";
+import {
+  DOMENII_CU_ASPECT,
+  SABLOANE_CU_ASPECT,
+  SABLOANE_CU_MAT,
+  aspectPermis,
+  culoriPermise,
+  faraFinisajNepermis,
+  matPermis,
+} from "@/lib/aspect/acces";
 
 /**
  * Culorile alese de client (meniul „Aspect”). `pnpm test:logica`.
@@ -569,7 +577,7 @@ test("ecranul „Aspect” e în meniu, înaintea Setărilor, și are o pagină"
   assert.ok(aranjament.includes('select("name, domain, template")'), "layout-ul trebuie să citească și șablonul");
   const pagina = citeste("src/app/dashboard/aspect/page.tsx");
   assert.ok(pagina.includes("verifySession()"));
-  assert.ok(pagina.includes("citesteAspectCulori(culoriDinBrand(setari?.brand))"));
+  assert.ok(pagina.includes("citesteAspectCulori(faraFinisajNepermis(culoriDinBrand(setari?.brand), site?.template as string | null))"));
   assert.ok(pagina.includes("if (!aspectPermis({ domain: site?.domain as string | null, template: site?.template as string | null })) notFound();"), "fără poartă, pagina e 404");
   assert.ok(pagina.indexOf("notFound();") < pagina.indexOf("<FormularAspect"));
 });
@@ -1288,7 +1296,10 @@ test("modul manual cu finisajul mat: culorile alese de mână, tot fără mătas
 
 test("ecranul „Aspect”: cele două colecții deasupra mostrelor; butonul colecției e finisajul și se salvează", () => {
   const ecran = citeste("src/app/dashboard/aspect/formular.tsx");
-  assert.ok(ecran.includes("{COLECTII_CULOARE.map((c) => ("));
+  assert.ok(ecran.includes("{colectii.map((c) => ("));
+  // Comutatorul apare doar unde șablonul are și colecția mată.
+  assert.ok(ecran.includes('const colectii = colectiaMata ? COLECTII_CULOARE : COLECTII_CULOARE.filter((c) => c.finisaj === "matasos");'));
+  assert.ok(ecran.includes("{colectii.length > 1 && ("));
   assert.ok(ecran.includes("aria-pressed={stare.finisaj === c.finisaj}"));
   assert.ok(ecran.includes("onClick={() => setStare((s) => ({ ...s, finisaj: c.finisaj }))}"));
   // Mostrele sunt ale colecției alese; finisajul intră în ce se salvează și în „modificat”.
@@ -1298,4 +1309,34 @@ test("ecranul „Aspect”: cele două colecții deasupra mostrelor; butonul col
   assert.ok(ecran.includes("finisaj: finisajul(initiale),"));
   assert.ok(ecran.includes("finisaj: finisajul(referinta),"), "renunțarea revine și la finisaj");
   assert.ok(ecran.includes('setStare({ mod: "auto", principala: null, manual: {}, finisaj: "matasos" });'));
+});
+
+test("colecția „Mat & Mineral”, doar pe Claritate (proprietarul, 23 oct. 2026): ecran, salvare și site", () => {
+  assert.deepEqual([...SABLOANE_CU_MAT], ["claritate"]);
+  for (const sablon of listTemplates()) assert.equal(matPermis(sablon.id), sablon.id === "claritate", sablon.id);
+  assert.equal(matPermis(null), false);
+  assert.equal(matPermis(undefined), false);
+
+  // Pe site: pe Claritate finisajul mat rămâne; pe alt șablon (tot site model, cu „Aspect”) se citește mătăsos.
+  const brand = { aspect: { culori: { mod: "auto", principala: "#54282C", manual: {}, asumat: false, finisaj: "mat" } } };
+  const peClaritate = culoriPermise(brand, { domain: "model-claritate.vercel.app", template: "claritate" });
+  assert.equal(peClaritate.finisaj, "mat");
+  const peLumina = culoriPermise(brand, { domain: "model-lumina.vercel.app", template: "lumina" });
+  assert.equal("finisaj" in peLumina, false);
+  assert.equal(peLumina.principala, "#54282C", "culoarea rămâne, doar finisajul cade");
+  assert.ok(getTemplate("lumina", peLumina).paleta.fundalInchisMatase?.startsWith("linear-gradient"), "pe Lumină: mătăsos");
+  assert.equal("fundalInchisMatase" in getTemplate("claritate", peClaritate).paleta, false, "pe Claritate: mat");
+  // Ce nu e obiect, sau n-are finisaj, trece neatins.
+  assert.equal(faraFinisajNepermis(undefined, "lumina"), undefined);
+  const faraFinisaj = { mod: "auto", principala: "#0A3463" };
+  assert.equal(faraFinisajNepermis(faraFinisaj, "lumina"), faraFinisaj);
+
+  // Ecranul: comutatorul și culorile inițiale trec prin aceeași regulă; salvarea refuză „mat” pe alt șablon.
+  const pagina = citeste("src/app/dashboard/aspect/page.tsx");
+  assert.ok(pagina.includes("const colectiaMata = matPermis(site?.template as string | null);"));
+  assert.ok(pagina.includes("citesteAspectCulori(faraFinisajNepermis(culoriDinBrand(setari?.brand), site?.template as string | null))"));
+  assert.ok(pagina.includes("colectiaMata={colectiaMata}"));
+  const actiune = citeste("src/app/dashboard/aspect/actions.ts");
+  const verificare = actiune.indexOf('culori.finisaj === "mat" && !matPermis(site?.template)');
+  assert.ok(verificare > -1 && verificare < actiune.indexOf(".upsert("), "verificarea vine înainte de scriere");
 });

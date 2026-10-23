@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { verifySession } from "@/lib/dal";
-import { aspectPermis } from "@/lib/aspect/acces";
+import { aspectPermis, faraFinisajNepermis, matPermis } from "@/lib/aspect/acces";
 import { createClient } from "@/lib/supabase/server";
 import { citesteAspectCulori, culoriDinBrand } from "@/lib/aspect/culori";
 import { citesteAspectFonturi, fonturiDinBrand } from "@/lib/aspect/fonturi";
@@ -24,7 +24,9 @@ export default async function AspectPage() {
   if (!aspectPermis({ domain: site?.domain as string | null, template: site?.template as string | null })) notFound();
 
   const sablon = getTemplate(site?.template as string | null);
-  const initiale = citesteAspectCulori(culoriDinBrand(setari?.brand));
+  // Finisajul mat, doar pe șabloanele care au colecția „Mat & Mineral" (azi, Claritate).
+  const colectiaMata = matPermis(site?.template as string | null);
+  const initiale = citesteAspectCulori(faraFinisajNepermis(culoriDinBrand(setari?.brand), site?.template as string | null));
   const initialeFonturi = citesteAspectFonturi(fonturiDinBrand(setari?.brand));
 
   // Site-ul adevărat al clientului, ca să vadă culorile pe pozele și textele lui; `null` pentru
@@ -54,6 +56,7 @@ export default async function AspectPage() {
         numeSablon={sablon.nume}
         numeSite={String(site?.name ?? "")}
         initiale={initiale}
+        colectiaMata={colectiaMata}
         initialeFonturi={initialeFonturi}
         previzualizare={previzualizare}
       />
