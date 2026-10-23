@@ -45,9 +45,21 @@ import { contrast, hexDinHsl, hexDinOklch, hslDinHex, oklchDinHex, type Hsl, typ
  * trebuie. Întunecarea se face în OKLCH, nu în HSL: acolo nuanța percepută rămâne aceeași (un
  * albastru întunecat în HSL „trage" spre violet). Butonul se verifică direct cu textul de pe el.
  *
+ * FINISAJUL MAT („Mat & Mineral", a doua colecție, 23 oct. 2026, cerută de proprietar): aceleași
+ * culori de statut, dar plate — fără mătase pe bandă și pe butoane — și cu o cromă mai calmă. Fundalurile
+ * deschise, textele și garda de contrast rămân aceleași; se schimbă banda, linkurile și aurul de pe
+ * bandă (vezi `REGULI_MATE`). Finisajul se alege separat de culoare (`Finisaj`); lipsa lui = mătăsos.
+ *
  * Funcție pură, fără „use client" și fără `server-only`: o rulează și site-ul, și
  * previzualizarea din panou, și probele din Node (sute de culori la întâmplare).
  */
+
+/**
+ * Finisajul paletei: `matasos` — banda și butoanele cu patina de mătase (gradientul); `mat` —
+ * culoare plină, plată. Pe site, „mat" înseamnă doar că rolurile de mătase lipsesc: componentele
+ * cad singure pe culoarea plină (`var(--t-fundal-inchis-matase, var(--t-fundal-inchis))`).
+ */
+export type Finisaj = "matasos" | "mat";
 
 /** Pragul WCAG 2.1 AA pentru text normal. Același ca în proba șabloanelor. */
 export const PRAG_CONTRAST = 4.5;
@@ -99,6 +111,21 @@ export const REGULI_PREMIUM = {
   salvie: { l: 0.8, c: 0.03 },
 } as const;
 
+/**
+ * Regulile colecției „Mat & Mineral", în HSL, ca ale proprietarului. Potrivite pe cele 12 ținte date
+ * de el (banda și linkurile fiecărei culori mate): banda iese la cel mult 0,014, linkurile la cel mult
+ * 0,019 distanță OKLab de ținta lui — sub pragul de la care ochiul deosebește două culori (~0,02).
+ * Proba `aspect-culori` le compară pe toate douăsprezece.
+ */
+export const REGULI_MATE = {
+  /** Banda închisă: nuanța și saturația culorii, luminozitatea × 0,57 (ex. Rosewood Mat → `#2B1518`). */
+  fundalInchis: { factorLuminozitate: 0.57 },
+  /** Linkurile și hover-ul: nuanța și saturația culorii, luminozitatea + 7,5 (ex. Safir Mat → `#204E80`). */
+  accentInteractiv: { luminozitateInPlus: 7.5 },
+  /** Pe bandă: șampanie-nisipiu, mai temperat și mai mineral decât aurul mătăsos. */
+  accentPeInchis: "#D5C2A3",
+} as const;
+
 /** Cele trei faze ale mătăsii pentru o culoare, plus gradientul CSS gata de pus ca `background`. */
 export type Matase = { lumina: string; baza: string; umbra: string; css: string };
 
@@ -131,8 +158,9 @@ function suprapune(sus: string, alfa: number, jos: string): string {
 /**
  * Banda „Ce spun clienții" în nuanța unui accent: un ton stins, nu culoarea plină (salvia, cu
  * nuanța schimbată). Un accent gri o dă gri — croma nu urcă unde nuanța n-are sens, ca la mătase.
+ * Cu finisajul mat, banda e plată: doar baza, fără lumina de sus și fără umbră.
  */
-export function fundalPareri(accent: string): FundalPareri {
+export function fundalPareri(accent: string, finisaj: Finisaj = "matasos"): FundalPareri {
   const r = REGULI_PREMIUM.pareri;
   const nuanta = oklchDinHex(accent);
   const ton = (hex: string) => {
@@ -142,6 +170,7 @@ export function fundalPareri(accent: string): FundalPareri {
   const baza = ton(r.baza);
   const umbra = ton(r.umbra);
   const lumina = ton(r.lumina);
+  if (finisaj === "mat") return { baza, umbra: baza, lumina: baza, varf: baza, css: baza };
   const alfa = Math.round(r.alfaLumina * 255).toString(16).padStart(2, "0").toUpperCase();
   return {
     baza,
@@ -229,27 +258,57 @@ export function accentInteractivDin(culoare: string, deschise: string[], textBut
 }
 
 /**
+ * Linkurile și hover-ul în finisajul mat: regula din `REGULI_MATE` (nuanța și saturația culorii,
+ * luminozitatea + 7,5), apoi aceeași gardă ca la cele mătăsoase.
+ */
+function accentInteractivMat(culoare: string, deschise: string[], textButon: string): string {
+  const aleasa = hslDinHex(culoare);
+  const tinta = hexDinHsl({ ...aleasa, l: Math.min(100, aleasa.l + REGULI_MATE.accentInteractiv.luminozitateInPlus) });
+  return ajusteaza(oklchDinHex(tinta), [...deschise, textButon], "inchide");
+}
+
+/**
  * Paleta șablonului, refăcută în jurul unei culori. `culoare` e `#RRGGBB` (se verifică
  * înainte, la salvare); orice altceva ar da o paletă fără sens, deci apelantul o validează.
+ * `finisaj` — mătăsos (implicit, cum a fost mereu) sau mat (vezi `Finisaj`).
  */
-export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): RezultatPaleta {
+export function paletaDinCuloare(
+  sablon: TemplatePalette,
+  culoare: string,
+  finisaj: Finisaj = "matasos",
+): RezultatPaleta {
   const aleasa = oklchDinHex(culoare);
   const hsl = hslDinHex(culoare);
   const r = REGULI_PREMIUM;
+  const mat = finisaj === "mat";
+  const ra = r.accent;
+  // O culoare foarte deschisă coboară întâi la L 28% (regula proprietarului pentru butoane).
+  const pornire = hsl.l > ra.pragLuminos ? hexDinHsl({ ...hsl, l: ra.luminozitate }) : culoare;
 
-  // 1. Fundalurile deschise: calcarul cald, același pentru orice culoare.
+  // 1. Fundalurile deschise: calcarul cald, același pentru orice culoare și orice finisaj.
   const { fundal, fundalNuantat, fundalRelief, chenar } = r;
-  //    Banda închisă: culoarea aleasă, bogată. O culoare cromatică păstrează cel puțin 0,065 din
-  //    cromă (fără să depășească croma ei); una temperată rămâne temperată.
+  //    Banda închisă. Mătăsos: culoarea aleasă, bogată — o culoare cromatică păstrează cel puțin
+  //    0,065 din cromă (fără să depășească croma ei); una temperată rămâne temperată.
+  //    Mat: nuanța și saturația culorii, mai închisă (`REGULI_MATE`), pornind de la culoarea
+  //    butoanelor — deci o culoare foarte deschisă, scrisă de mână, tot bandă închisă dă; apoi
+  //    întunecată cât trebuie ca textele de pe bandă să se citească pe ea.
   const ri = r.fundalInchis;
   const cromaBanda = aleasa.c < ri.pragCromatic
     ? aleasa.c * ri.procentCroma
     : Math.max(aleasa.c * ri.procentCroma, Math.min(ri.cromaMinima, aleasa.c));
-  const fundalInchis = hexDinOklch({ l: ri.l, c: cromaBanda, h: aleasa.h });
-  const banda = matase(fundalInchis);
+  const hslPornire = hslDinHex(pornire);
+  const fundalInchis = mat
+    ? ajusteaza(
+        oklchDinHex(hexDinHsl({ ...hslPornire, l: hslPornire.l * REGULI_MATE.fundalInchis.factorLuminozitate })),
+        [r.textPeInchis, r.textSecundarPeInchis, REGULI_MATE.accentPeInchis],
+        "inchide",
+      )
+    : hexDinOklch({ l: ri.l, c: cromaBanda, h: aleasa.h });
+  const banda = mat ? null : matase(fundalInchis);
   const deschise = [fundal, fundalNuantat, fundalRelief];
   //    Ce stă pe bandă trebuie să se citească peste TOATĂ mătasea: și pe baza ei, și pe lumină.
-  const peBanda = [fundalInchis, banda.lumina];
+  //    Pe banda mată, doar pe culoarea ei plină.
+  const peBanda = banda ? [fundalInchis, banda.lumina] : [fundalInchis];
 
   // 2. Textele: gri-cărbune cald pe deschis (luminozitatea șablonului); fildeș și mătase crudă pe
   //    bandă — apoi garda, doar cât trebuie ca să treacă pragul pe cel mai greu fundal.
@@ -259,31 +318,33 @@ export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): Rezu
   const textPeInchis = ajusteaza(oklchDinHex(r.textPeInchis), peBanda, "deschide");
   const textSecundarPeInchis = ajusteaza(oklchDinHex(r.textSecundarPeInchis), peBanda, "deschide");
 
-  // 3. Accentul (butoane, accente mari). O culoare foarte deschisă coboară întâi la L 28%
-  //    (regula proprietarului); apoi garda: textul ALB de pe buton se citește pe el ȘI pe lumina
-  //    mătăsii lui, iar accentul scris ca text (cuvintele colorate din titluri) pe fundalurile deschise.
-  const ra = r.accent;
-  const pornire = hsl.l > ra.pragLuminos ? hexDinHsl({ ...hsl, l: ra.luminozitate }) : culoare;
+  // 3. Accentul (butoane, accente mari), pornind de la culoarea de mai sus; apoi garda: textul ALB
+  //    de pe buton se citește pe el (și, la mătăsos, pe lumina mătăsii lui), iar accentul scris ca
+  //    text (cuvintele colorate din titluri) pe fundalurile deschise.
   const accent = ajusteaza(
     oklchDinHex(pornire),
     [...deschise, "#FFFFFF"],
     "inchide",
     TINTA,
-    (hex) => contrast("#FFFFFF", matase(hex).lumina) >= TINTA,
+    mat ? undefined : (hex) => contrast("#FFFFFF", matase(hex).lumina) >= TINTA,
   );
-  const butonMatase = matase(accent);
+  const butonMatase = mat ? null : matase(accent);
 
   // Textul de pe butonul plin: alb (garda de mai sus îl asigură); dacă șablonul are alt text
   // deschis care trece și el, peste toată mătasea, îl păstrează pe al șablonului.
   const accentText = [sablon.accentText, "#FFFFFF"].find(
-    (candidat) => contrast(candidat, accent) >= TINTA && contrast(candidat, butonMatase.lumina) >= TINTA,
+    (candidat) =>
+      contrast(candidat, accent) >= TINTA && (!butonMatase || contrast(candidat, butonMatase.lumina) >= TINTA),
   ) ?? "#FFFFFF";
 
   // 4. Linkurile și hover-ul pe butoane.
-  const accentInteractiv = accentInteractivDin(culoare, deschise, accentText);
+  const accentInteractiv = mat
+    ? accentInteractivMat(culoare, deschise, accentText)
+    : accentInteractivDin(culoare, deschise, accentText);
 
-  // Pe bandă: aur-șampanie — nu o variantă pastelată a culorii („mentolat" pe Smarald).
-  const accentPeInchis = ajusteaza(oklchDinHex(r.accentPeInchis), peBanda, "deschide");
+  // Pe bandă: aur-șampanie (la mat, șampanie-nisipiu) — nu o variantă pastelată a culorii
+  // („mentolat" pe Smarald).
+  const accentPeInchis = ajusteaza(oklchDinHex(mat ? REGULI_MATE.accentPeInchis : r.accentPeInchis), peBanda, "deschide");
 
   // Roșul erorilor nu urmează culoarea aleasă (o eroare verde ar fi o minciună), dar trebuie
   // să rămână lizibil pe fundalurile noi.
@@ -307,12 +368,12 @@ export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): Rezu
     // (pe Smarald, amestecul de 8% ieșea tot gri-verzui). Textul și steaua ei sunt deja verificate
     // pe relief, prin garda de mai sus.
     fundalBanda: fundalRelief,
-    // Mătasea: gradientele, folosite DOAR ca `background` (banda și butoanele pline).
-    fundalInchisMatase: banda.css,
-    accentMatase: butonMatase.css,
-    // Banda „Ce spun clienții" (doar Liniște o desenează): tonul stins al accentului. Textele de pe
-    // ea, așa cum ies mai sus, trec 4,5:1 pe orice nuanță (probat în `aspect-culori.proba.mjs`).
-    fundalPareri: fundalPareri(accent).css,
+    // Mătasea: gradientele, folosite DOAR ca `background` (banda și butoanele pline). La mat lipsesc
+    // cu totul, iar banda și butoanele cad pe culoarea plină.
+    ...(banda && butonMatase && { fundalInchisMatase: banda.css, accentMatase: butonMatase.css }),
+    // Banda „Ce spun clienții" (doar Liniște o desenează): tonul stins al accentului (plat, la mat).
+    // Textele de pe ea, așa cum ies mai sus, trec 4,5:1 pe orice nuanță (probat în `aspect-culori.proba.mjs`).
+    fundalPareri: fundalPareri(accent, finisaj).css,
     // Cartonașele „salvie" (doar Apropiere le desenează): pal, în nuanța accentului, nu aurul de pe
     // bandă — cu tot textul care ar putea sta pe ele lizibil.
     fundalSalvie: fundalSalvie(accent, [text, textSecundar, accentInteractiv, accent]),
@@ -342,8 +403,12 @@ export function paletaDinCuloare(sablon: TemplatePalette, culoare: string): Rezu
  * ales una — paleta șablonului, căreia i se adaugă doar culoarea linkurilor (șabloanele n-o au),
  * calculată din accentul șablonului. Un singur loc, ca ecranul și site-ul să pornească identic.
  */
-export function bazaManuala(sablon: TemplatePalette, principala: string | null): TemplatePalette {
-  if (principala) return paletaDinCuloare(sablon, principala).paleta;
+export function bazaManuala(
+  sablon: TemplatePalette,
+  principala: string | null,
+  finisaj: Finisaj = "matasos",
+): TemplatePalette {
+  if (principala) return paletaDinCuloare(sablon, principala, finisaj).paleta;
   return {
     ...sablon,
     accentInteractiv: accentInteractivDin(

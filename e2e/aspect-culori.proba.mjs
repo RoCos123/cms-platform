@@ -14,14 +14,22 @@ import {
   normalizeazaHex,
   oklchDinHex,
 } from "@/lib/aspect/culoare";
-import { PRAG_CONTRAST, bazaManuala, paletaDinCuloare, perechiDeContrast, verificaPerechi } from "@/lib/aspect/paleta";
+import { PRAG_CONTRAST, REGULI_MATE, bazaManuala, paletaDinCuloare, perechiDeContrast, verificaPerechi } from "@/lib/aspect/paleta";
 import {
   ROLURI_MANUALE,
   citesteAspectCulori,
   culoriDinBrand,
+  finisajul,
   paletaEfectiva,
 } from "@/lib/aspect/culori";
-import { CULOARE_PROPUSA, PRESETURI_CULOARE, brandCuCulori, valideazaCulori } from "@/lib/aspect/salvare";
+import {
+  COLECTII_CULOARE,
+  CULOARE_PROPUSA,
+  PRESETURI_MATASOASE,
+  PRESETURI_MATE,
+  brandCuCulori,
+  valideazaCulori,
+} from "@/lib/aspect/salvare";
 import { DOMENII_CU_ASPECT, SABLOANE_CU_ASPECT, aspectPermis, culoriPermise } from "@/lib/aspect/acces";
 
 /**
@@ -124,10 +132,12 @@ function perechiIndependente(p) {
   }
   if (p.accentMatase) lista.push(["accentText pe lumina butonului", p.accentText, luminaMatase(p.accent)]);
   // Banda „Ce spun clienții" (Liniște): titlul, eticheta și accentul ei se citesc pe toată banda.
+  // Plată (finisajul mat) e doar baza; cu lumină și umbră, pe toate trei.
   if (p.fundalPareri) {
     const banda = pareriIndependent(p.accent);
+    const locuri = p.fundalPareri.includes("gradient") ? ["baza", "umbra", "varf"] : ["baza"];
     for (const rol of ["textPeInchis", "textSecundarPeInchis", "accentPeInchis"]) {
-      for (const loc of ["baza", "umbra", "varf"]) lista.push([`${rol} pe banda cu păreri (${loc})`, p[rol], banda[loc]]);
+      for (const loc of locuri) lista.push([`${rol} pe banda cu păreri (${loc})`, p[rol], banda[loc]]);
     }
   }
   // Cartonașele „salvie" (Apropiere): tot textul care ar putea sta pe ele se citește.
@@ -438,12 +448,14 @@ test("salvarea Setărilor PĂSTREAZĂ aspectul ales — altfel fiecare salvare a
 // ───────────────────────── salvarea din meniul „Aspect” ─────────────────────────
 
 test("culorile gata alese nu sunt întunecate vizibil pe niciun șablon (cel mult o treaptă imperceptibilă)", () => {
-  assert.ok(PRESETURI_CULOARE.length >= 8);
-  assert.equal(new Set(PRESETURI_CULOARE.map((p) => p.hex)).size, PRESETURI_CULOARE.length, "fără duplicate");
-  for (const preset of PRESETURI_CULOARE) {
+  for (const colectie of COLECTII_CULOARE) {
+    assert.equal(colectie.preseturi.length, 12, colectie.nume);
+    assert.equal(new Set(colectie.preseturi.map((p) => p.hex)).size, 12, `${colectie.nume}: fără duplicate`);
+  }
+  for (const [preset, finisaj] of COLECTII_CULOARE.flatMap((c) => c.preseturi.map((p) => [p, c.finisaj]))) {
     assert.ok(esteHexValid(preset.hex) && preset.hex === normalizeazaHex(preset.hex), preset.nume);
     for (const sablon of listTemplates()) {
-      const rezultat = paletaDinCuloare(sablon.paleta, preset.hex);
+      const rezultat = paletaDinCuloare(sablon.paleta, preset.hex, finisaj);
       assert.equal(rezultat.accentAjustat, false, `${preset.nume} (${preset.hex}) ajunge întunecată pe „${sablon.nume}”: ${rezultat.accentObtinut}`);
       // Aceeași nuanță, aproape aceeași luminozitate: diferența, dacă există, nu se vede.
       const dorit = oklchDinHex(preset.hex);
@@ -814,7 +826,7 @@ test("Petrol și Smarald: linkurile pe 32–38% nu s-ar citi — se întunecă e
 
 test("cele 12 culori „Silk & Velvet”: exact numele și codurile proprietarului, în ordinea lui; Safir e cea propusă", () => {
   assert.deepEqual(
-    PRESETURI_CULOARE.map((p) => `${p.nume} ${p.hex}`),
+    PRESETURI_MATASOASE.map((p) => `${p.nume} ${p.hex}`),
     [
       "Rosewood #5C1D24", "Bordeaux #4F0D1A", "Aubergine #3A0A26", "Plum #42163B",
       "Indigo #1F1646", "Bleumarin #0D1B38", "Safir #0A3463", "Teal #0A3D44",
@@ -822,11 +834,11 @@ test("cele 12 culori „Silk & Velvet”: exact numele și codurile proprietarul
     ],
   );
   assert.equal(CULOARE_PROPUSA, "#0A3463");
-  assert.equal(PRESETURI_CULOARE.find((p) => p.hex === CULOARE_PROPUSA)?.nume, "Safir");
+  assert.equal(PRESETURI_MATASOASE.find((p) => p.hex === CULOARE_PROPUSA)?.nume, "Safir");
   // Șablonul Claritate își păstrează culoarea: site-urile fără culori alese nu se schimbă.
   assert.equal(getTemplate("claritate").paleta.accent, "#1B5C99");
   // Toate 12 apar pe butoane EXACT cum sunt (sunt destul de închise pe orice șablon).
-  for (const preset of PRESETURI_CULOARE) {
+  for (const preset of PRESETURI_MATASOASE) {
     for (const sablon of listTemplates()) assert.equal(paletaDinCuloare(sablon.paleta, preset.hex).paleta.accent, preset.hex, `${preset.nume} pe ${sablon.nume}`);
   }
 });
@@ -905,7 +917,7 @@ test("linkurile din text și hover-ul pe butoane: legate de rolul nou, cu rezerv
 
 test("mostrele culorilor gata alese: trei fâșii (50% banda închisă, 30% butoane, 20% linkuri), calculate ca pe site", () => {
   const ecran = citeste("src/app/dashboard/aspect/formular.tsx");
-  assert.ok(ecran.includes("paleta: paletaDinCuloare(sablon.paleta, preset.hex).paleta"), "aceeași funcție ca pe site");
+  assert.ok(ecran.includes("paleta: paletaDinCuloare(sablon.paleta, preset.hex, colectie.finisaj).paleta"), "aceeași funcție ca pe site, cu finisajul colecției");
   // Banda și butonul arătate cu mătasea lor, ca pe site.
   assert.ok(ecran.includes('style={{ flex: "50 1 0", background: preset.paleta.fundalInchisMatase ?? preset.paleta.fundalInchis }}'));
   assert.ok(ecran.includes('style={{ flex: "30 1 0", background: preset.paleta.accentMatase ?? preset.paleta.accent }}'));
@@ -915,7 +927,7 @@ test("mostrele culorilor gata alese: trei fâșii (50% banda închisă, 30% buto
   assert.ok(ecran.includes("de la stânga: banda închisă, butoanele și linkurile"));
   // Safir doar propus în câmp: nu se salvează până nu alege omul.
   assert.ok(ecran.includes("valoare={stare.principala ?? CULOARE_PROPUSA}"));
-  assert.ok(ecran.includes("const baza = bazaManuala(sablon.paleta, stare.principala);"));
+  assert.ok(ecran.includes("const baza = bazaManuala(sablon.paleta, stare.principala, stare.finisaj);"));
 });
 
 test("hover-ul se vede și în previzualizarea din „Aspect”, fără ca previzualizarea să devină folosibilă", () => {
@@ -1122,4 +1134,168 @@ test("Apropiere: pe cartonașele colorate (salvie, piersică) textul mic și lin
     }
   }
   assert.deepEqual(slabe.slice(0, 10), [], `${slabe.length} slabe`);
+});
+
+// ───────────────────────── colecția „Mat & Mineral” (23 oct. 2026) ─────────────────────────
+
+/** Țintele proprietarului pentru cele 12 culori mate: principala, banda închisă, linkurile. */
+const TINTE_MATE = [
+  ["Rosewood Mat", "#54282C", "#2B1518", "#6E343A"],
+  ["Bordeaux Mat", "#4A1822", "#260D12", "#66212F"],
+  ["Aubergine Mat", "#361529", "#1F0C18", "#52203E"],
+  ["Plum Mat", "#3D2038", "#231220", "#592E52"],
+  ["Indigo Mat", "#252040", "#151224", "#383061"],
+  ["Bleumarin Mat", "#162238", "#0E1524", "#223659"],
+  ["Safir Mat", "#163659", "#0E2036", "#204E80"],
+  ["Teal Mat", "#1B3B3E", "#102326", "#265459"],
+  ["Smarald Mat", "#163628", "#0D2118", "#21523D"],
+  ["Eucalipt Mat", "#3A4637", "#1F261D", "#4A5946"],
+  ["Oliv Mat", "#3B3C26", "#222416", "#505233"],
+  ["Espresso Mat", "#30231C", "#1C1410", "#4A362B"],
+];
+
+/** Distanța OKLab între două culori; sub ~0,02 ochiul nu le deosebește. */
+function distanta(a, b) {
+  const lab = (hex) => {
+    const o = oklchDinHex(hex);
+    const r = (o.h * Math.PI) / 180;
+    return [o.l, o.c * Math.cos(r), o.c * Math.sin(r)];
+  };
+  const [x, y] = [lab(a), lab(b)];
+  return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]);
+}
+
+test("„Mat & Mineral”: exact cele 12 nume și coduri ale proprietarului, în ordinea lui; două colecții în ecran", () => {
+  assert.deepEqual(PRESETURI_MATE.map((p) => `${p.nume} ${p.hex}`), TINTE_MATE.map(([nume, hex]) => `${nume} ${hex}`));
+  assert.ok(PRESETURI_MATE.every((p) => p.matasos === false));
+  assert.ok(PRESETURI_MATASOASE.every((p) => p.matasos === true));
+  assert.deepEqual(COLECTII_CULOARE.map((c) => [c.nume, c.finisaj]), [["Mătăsos & Radiant", "matasos"], ["Mat & Mineral", "mat"]]);
+  // Butoanele apar EXACT în culoarea aleasă (toate sunt destul de închise).
+  for (const preset of PRESETURI_MATE) {
+    for (const sablon of listTemplates()) {
+      assert.equal(paletaDinCuloare(sablon.paleta, preset.hex, "mat").paleta.accent, preset.hex, `${preset.nume} pe ${sablon.nume}`);
+    }
+  }
+});
+
+test("„Mat & Mineral”: banda și linkurile ies la cel mult 0,02 (OKLab) de țintele proprietarului", () => {
+  const abateri = [];
+  for (const [nume, hex, banda, linkuri] of TINTE_MATE) {
+    for (const sablon of listTemplates()) {
+      const { paleta } = paletaDinCuloare(sablon.paleta, hex, "mat");
+      const db = distanta(paleta.fundalInchis, banda);
+      const dl = distanta(paleta.accentInteractiv, linkuri);
+      if (db > 0.02 || dl > 0.02) abateri.push(`${nume} pe ${sablon.nume}: banda ${paleta.fundalInchis} (${db.toFixed(3)}), linkuri ${paleta.accentInteractiv} (${dl.toFixed(3)})`);
+    }
+  }
+  assert.deepEqual(abateri, []);
+  // Regulile, scrise din nou aici: HSL, aceeași nuanță și saturație; banda × 0,57, linkurile + 7,5.
+  assert.equal(REGULI_MATE.fundalInchis.factorLuminozitate, 0.57);
+  assert.equal(REGULI_MATE.accentInteractiv.luminozitateInPlus, 7.5);
+  const h = hslDinHex("#163659");
+  assert.equal(paletaDinCuloare(getTemplate("claritate").paleta, "#163659", "mat").paleta.fundalInchis, hexDinHsl({ ...h, l: h.l * 0.57 }));
+  assert.equal(paletaDinCuloare(getTemplate("claritate").paleta, "#163659", "mat").paleta.accentInteractiv, hexDinHsl({ ...h, l: h.l + 7.5 }));
+});
+
+test("„Mat & Mineral”: fără mătase pe bandă și butoane; calcarul și textele de pe bandă comune; șampanie-nisipiu pe bandă", () => {
+  for (const sablon of listTemplates()) {
+    for (const preset of PRESETURI_MATE) {
+      const { paleta } = paletaDinCuloare(sablon.paleta, preset.hex, "mat");
+      for (const rol of ["fundalInchisMatase", "accentMatase"]) assert.equal(rol in paleta, false, `${preset.nume}: ${rol}`);
+      assert.equal(paleta.fundal, "#F2EFE9");
+      assert.equal(paleta.fundalNuantat, "#FAF8F5");
+      assert.equal(paleta.fundalRelief, "#E8E2D5");
+      assert.equal(paleta.chenar, "#E2DDD3");
+      assert.equal(paleta.textPeInchis, "#FAF6F0");
+      assert.equal(paleta.textSecundarPeInchis, "#D6CFC4");
+      assert.equal(paleta.accentPeInchis, "#D5C2A3", `${preset.nume}: cifrele de pe bandă`);
+      // Banda „Ce spun clienții" e și ea plată: o singură culoare, fără lumină și umbră.
+      assert.ok(esteHexValid(paleta.fundalPareri), `${preset.nume}: ${paleta.fundalPareri}`);
+      assert.equal(paleta.fundalPareri, pareriIndependent(paleta.accent).baza);
+    }
+    // Aceeași culoare, mătăsoasă: mătasea e la locul ei.
+    const matasoasa = paletaDinCuloare(sablon.paleta, "#54282C").paleta;
+    assert.ok(matasoasa.fundalInchisMatase?.startsWith("linear-gradient(135deg"));
+    assert.ok(matasoasa.accentMatase?.startsWith("linear-gradient(135deg"));
+  }
+  // Pe site: la mat variabilele de mătase lipsesc, deci benzile și butoanele cad pe culoarea plină.
+  const mat = templateStyle(getTemplate("claritate", { mod: "auto", principala: "#54282C", manual: {}, asumat: false, finisaj: "mat" }));
+  assert.equal(mat["--t-fundal-inchis-matase"], undefined);
+  assert.equal(mat["--t-accent-matase"], undefined);
+  assert.equal(mat["--t-fundal-inchis"], paletaDinCuloare(getTemplate("claritate").paleta, "#54282C", "mat").paleta.fundalInchis);
+  const matasos = templateStyle(getTemplate("claritate", { mod: "auto", principala: "#54282C", manual: {}, asumat: false }));
+  assert.ok(matasos["--t-fundal-inchis-matase"].startsWith("linear-gradient"));
+});
+
+for (const sablon of listTemplates()) {
+  test(`„${sablon.nume}”, finisaj mat: pe ${CULORI.length} de culori, TOATE perechile trec ${PRAG_CONTRAST}:1, banda rămâne închisă`, () => {
+    const slabe = [];
+    for (const culoare of [...CULORI, ...PRESETURI_MATE.map((p) => p.hex)]) {
+      const { paleta } = paletaDinCuloare(sablon.paleta, culoare, "mat");
+      assert.ok(luminanta(paleta.fundalInchis) < 0.15, `${culoare}: banda mată nu mai e închisă (${paleta.fundalInchis})`);
+      for (const [nume, text, fundal] of perechiIndependente(paleta)) {
+        const raport = contrast(text, fundal);
+        if (raport < PRAG_CONTRAST) slabe.push(`${culoare} → ${nume}: ${raport.toFixed(2)}:1 (${text} pe ${fundal})`);
+      }
+      // Lista din cod (avertismentele din panou) spune același lucru.
+      assert.ok(verificaPerechi(paleta).every((x) => x.trece), `${culoare}: ${verificaPerechi(paleta).filter((x) => !x.trece).map((x) => x.nume).join(", ")}`);
+    }
+    assert.deepEqual(slabe.slice(0, 12), [], `${slabe.length} perechi slabe:\n  ${slabe.slice(0, 12).join("\n  ")}`);
+  });
+}
+
+test("finisajul se salvează doar ca „mat” (mătăsosul e implicit), se citește din bază și se spune când e stricat", () => {
+  assert.deepEqual(valideazaCulori({ mod: "auto", principala: "#54282C", finisaj: "mat" }), {
+    ok: true,
+    culori: { mod: "auto", principala: "#54282C", manual: {}, asumat: false, finisaj: "mat" },
+  });
+  // Mătăsos sau nimic: aceeași formă ca înainte de colecția mată, deci culorile salvate rămân identice.
+  for (const finisaj of ["matasos", undefined, null, ""]) {
+    assert.deepEqual(valideazaCulori({ mod: "auto", principala: "#0A3463", finisaj }), {
+      ok: true,
+      culori: { mod: "auto", principala: "#0A3463", manual: {}, asumat: false },
+    }, String(finisaj));
+  }
+  assert.equal(valideazaCulori({ mod: "manual", principala: "#54282C", manual: { text: "#111111" }, finisaj: "mat" }).culori.finisaj, "mat");
+  for (const rau of ["lucios", "MAT", 1, true, {}]) {
+    assert.equal(valideazaCulori({ mod: "auto", principala: "#54282C", finisaj: rau }).ok, false, String(rau));
+  }
+  // Din bază: „mat" rămâne; orice altceva înseamnă mătăsos, fără să strice nimic.
+  assert.equal(citesteAspectCulori({ mod: "auto", principala: "#54282C", finisaj: "mat" }).finisaj, "mat");
+  for (const rau of ["lucios", 1, null, undefined, "matasos"]) {
+    const citit = citesteAspectCulori({ mod: "auto", principala: "#54282C", finisaj: rau });
+    assert.equal("finisaj" in citit, false, String(rau));
+    assert.equal(finisajul(citit), "matasos");
+  }
+  assert.equal(finisajul(null), "matasos");
+});
+
+test("modul manual cu finisajul mat: culorile alese de mână, tot fără mătase", () => {
+  const sablon = getTemplate("claritate").paleta;
+  const mat = paletaEfectiva(sablon, citesteAspectCulori({ mod: "manual", principala: "#54282C", manual: { fundalInchis: "#102030", accent: "#5C1D24" }, finisaj: "mat" }));
+  assert.equal(mat.fundalInchis, "#102030");
+  assert.equal(mat.accent, "#5C1D24");
+  assert.equal("fundalInchisMatase" in mat, false);
+  assert.equal("accentMatase" in mat, false);
+  assert.ok(esteHexValid(mat.fundalPareri), "banda cu păreri, plată");
+  // Fără culoare principală (pornind de la șablon), tot fără mătase.
+  const faraPrincipala = paletaEfectiva(sablon, citesteAspectCulori({ mod: "manual", principala: null, manual: { accent: "#5C1D24" }, finisaj: "mat" }));
+  assert.equal("fundalInchisMatase" in faraPrincipala, false);
+  assert.equal("accentMatase" in faraPrincipala, false);
+  // Avertismentele din panou nu mai cer partea luminoasă a benzii: nu există.
+  assert.ok(!perechiDeContrast(mat).some((x) => x.nume.includes("partea luminoasă")));
+});
+
+test("ecranul „Aspect”: cele două colecții deasupra mostrelor; butonul colecției e finisajul și se salvează", () => {
+  const ecran = citeste("src/app/dashboard/aspect/formular.tsx");
+  assert.ok(ecran.includes("{COLECTII_CULOARE.map((c) => ("));
+  assert.ok(ecran.includes("aria-pressed={stare.finisaj === c.finisaj}"));
+  assert.ok(ecran.includes("onClick={() => setStare((s) => ({ ...s, finisaj: c.finisaj }))}"));
+  // Mostrele sunt ale colecției alese; finisajul intră în ce se salvează și în „modificat”.
+  assert.ok(ecran.includes("const mostre = colectie.preseturi.map((preset) => ({"));
+  assert.ok(ecran.includes('const finisaj = stare.finisaj === "mat" ? { finisaj: "mat" as const } : {};'));
+  assert.ok(ecran.includes("finisajul(culori),"), "semnătura");
+  assert.ok(ecran.includes("finisaj: finisajul(initiale),"));
+  assert.ok(ecran.includes("finisaj: finisajul(referinta),"), "renunțarea revine și la finisaj");
+  assert.ok(ecran.includes('setStare({ mod: "auto", principala: null, manual: {}, finisaj: "matasos" });'));
 });

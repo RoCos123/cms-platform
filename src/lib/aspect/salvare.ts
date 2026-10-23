@@ -9,24 +9,64 @@ import { fontText, fontTitlu, type AspectFonturi } from "./fonturi";
  */
 
 /**
- * Culorile gata alese — „Silk & Velvet" (a treia rundă, 19 oct. 2026): pigment pur, saturat și
- * adânc, după referințele vizuale ale proprietarului. Numele și codurile sunt exact cele date de el.
- * Fiind toate închise, apar pe butoane exact așa (proba `aspect-culori` o verifică pe toate cinci
- * șabloanele); linkurile, banda și mătasea lor se calculează din ele.
+ * Culorile gata alese, colecția „Mătăsos & Radiant" — „Silk & Velvet" (a treia rundă, 19 oct.
+ * 2026): pigment pur, saturat și adânc, după referințele vizuale ale proprietarului. Numele și
+ * codurile sunt exact cele date de el. Fiind toate închise, apar pe butoane exact așa (proba
+ * `aspect-culori` o verifică pe toate cinci șabloanele); linkurile, banda și mătasea lor se
+ * calculează din ele.
  */
-export const PRESETURI_CULOARE = [
-  { nume: "Rosewood", hex: "#5C1D24" },
-  { nume: "Bordeaux", hex: "#4F0D1A" },
-  { nume: "Aubergine", hex: "#3A0A26" },
-  { nume: "Plum", hex: "#42163B" },
-  { nume: "Indigo", hex: "#1F1646" },
-  { nume: "Bleumarin", hex: "#0D1B38" },
-  { nume: "Safir", hex: "#0A3463" },
-  { nume: "Teal", hex: "#0A3D44" },
-  { nume: "Smarald", hex: "#083D27" },
-  { nume: "Eucalipt", hex: "#3A4637" },
-  { nume: "Oliv", hex: "#3B3E19" },
-  { nume: "Espresso", hex: "#2E1D14" },
+export const PRESETURI_MATASOASE = [
+  { nume: "Rosewood", hex: "#5C1D24", matasos: true },
+  { nume: "Bordeaux", hex: "#4F0D1A", matasos: true },
+  { nume: "Aubergine", hex: "#3A0A26", matasos: true },
+  { nume: "Plum", hex: "#42163B", matasos: true },
+  { nume: "Indigo", hex: "#1F1646", matasos: true },
+  { nume: "Bleumarin", hex: "#0D1B38", matasos: true },
+  { nume: "Safir", hex: "#0A3463", matasos: true },
+  { nume: "Teal", hex: "#0A3D44", matasos: true },
+  { nume: "Smarald", hex: "#083D27", matasos: true },
+  { nume: "Eucalipt", hex: "#3A4637", matasos: true },
+  { nume: "Oliv", hex: "#3B3E19", matasos: true },
+  { nume: "Espresso", hex: "#2E1D14", matasos: true },
+] as const;
+
+/**
+ * Colecția „Mat & Mineral" (23 oct. 2026, cerută de proprietar): aceleași culori de statut, cu o
+ * cromă mai calmă, pentru un aspect plat, mat, mineral — fără luciu pe benzi și butoane. Numele și
+ * codurile sunt exact cele date de el; banda și linkurile lor ies din `REGULI_MATE`.
+ */
+export const PRESETURI_MATE = [
+  { nume: "Rosewood Mat", hex: "#54282C", matasos: false },
+  { nume: "Bordeaux Mat", hex: "#4A1822", matasos: false },
+  { nume: "Aubergine Mat", hex: "#361529", matasos: false },
+  { nume: "Plum Mat", hex: "#3D2038", matasos: false },
+  { nume: "Indigo Mat", hex: "#252040", matasos: false },
+  { nume: "Bleumarin Mat", hex: "#162238", matasos: false },
+  { nume: "Safir Mat", hex: "#163659", matasos: false },
+  { nume: "Teal Mat", hex: "#1B3B3E", matasos: false },
+  { nume: "Smarald Mat", hex: "#163628", matasos: false },
+  { nume: "Eucalipt Mat", hex: "#3A4637", matasos: false },
+  { nume: "Oliv Mat", hex: "#3B3C26", matasos: false },
+  { nume: "Espresso Mat", hex: "#30231C", matasos: false },
+] as const;
+
+/**
+ * Cele două colecții, cum le arată ecranul „Aspect": fiecare cu finisajul ei. Butonul colecției ESTE
+ * alegerea finisajului — se aplică și unei culori alese cu pipeta, nu doar mostrelor.
+ */
+export const COLECTII_CULOARE = [
+  {
+    finisaj: "matasos",
+    nume: "Mătăsos & Radiant",
+    descriere: "Banda închisă și butoanele au o patină de mătase: o lumină fină care trece peste culoare.",
+    preseturi: PRESETURI_MATASOASE,
+  },
+  {
+    finisaj: "mat",
+    nume: "Mat & Mineral",
+    descriere: "Aceleași culori de statut, mai calme: banda și butoanele sunt culoare plină, plată, fără luciu.",
+    preseturi: PRESETURI_MATE,
+  },
 ] as const;
 
 /**
@@ -48,7 +88,8 @@ const lipseste = (valoare: unknown) => valoare === undefined || valoare === null
  * (care citește din bază și ignoră în tăcere ce nu e valid), aici o greșeală se SPUNE:
  * omul a scris ceva, iar ce n-am înțeles nu dispare pe nesimțite.
  *
- * Se păstrează doar cele opt culori ale modului manual; orice altă cheie se aruncă.
+ * Se păstrează doar culorile modului manual și finisajul (doar „mat"; mătăsosul nu se scrie, e
+ * implicit); orice altă cheie se aruncă.
  */
 export function valideazaCulori(brut: unknown): RezultatValidare {
   if (typeof brut !== "object" || brut === null || Array.isArray(brut)) {
@@ -58,6 +99,12 @@ export function valideazaCulori(brut: unknown): RezultatValidare {
   const sursa = brut as Record<string, unknown>;
   if (sursa.mod !== "auto" && sursa.mod !== "manual") return { ok: false, mesaj: MESAJ_STRICAT };
 
+  // Finisajul: „mat" sau nimic (= mătăsos). Altceva nu vine dintr-un ecran al nostru.
+  if (!lipseste(sursa.finisaj) && sursa.finisaj !== "mat" && sursa.finisaj !== "matasos") {
+    return { ok: false, mesaj: MESAJ_STRICAT };
+  }
+  const finisaj = sursa.finisaj === "mat" ? { finisaj: "mat" as const } : {};
+
   let principala: string | null = null;
   if (!lipseste(sursa.principala)) {
     principala = normalizeazaHex(sursa.principala);
@@ -66,7 +113,7 @@ export function valideazaCulori(brut: unknown): RezultatValidare {
 
   if (sursa.mod === "auto") {
     if (!principala) return { ok: false, mesaj: "Alege o culoare principală." };
-    return { ok: true, culori: { mod: "auto", principala, manual: {}, asumat: false } };
+    return { ok: true, culori: { mod: "auto", principala, manual: {}, asumat: false, ...finisaj } };
   }
 
   const manual: Partial<Record<RolManual, string>> = {};
@@ -88,7 +135,7 @@ export function valideazaCulori(brut: unknown): RezultatValidare {
     return { ok: false, mesaj: "Nu ai schimbat nicio culoare." };
   }
 
-  return { ok: true, culori: { mod: "manual", principala, manual, asumat: sursa.asumat === true } };
+  return { ok: true, culori: { mod: "manual", principala, manual, asumat: sursa.asumat === true, ...finisaj } };
 }
 
 const esteObiect = (valoare: unknown): valoare is Record<string, unknown> =>

@@ -16,7 +16,7 @@ import { brandCuCulori, brandCuFonturi, valideazaFonturi } from "@/lib/aspect/sa
 import { fonturiPermise } from "@/lib/aspect/acces";
 import { contrast } from "@/lib/aspect/culoare";
 import { matase } from "@/lib/aspect/paleta";
-import { PRESETURI_CULOARE } from "@/lib/aspect/salvare";
+import { COLECTII_CULOARE } from "@/lib/aspect/salvare";
 
 /**
  * Fonturile alese de client (meniul „Aspect"). `pnpm test:logica`.
@@ -358,7 +358,7 @@ test("griul se citește: 60% din culoarea titlului rămâne peste 3:1 (titlu mar
   const gri = (text, fundal) => "#" + rgb(text).map((v, i) => Math.round(v * 0.6 + rgb(fundal)[i] * 0.4).toString(16).padStart(2, "0")).join("").toUpperCase();
   let min = 99;
   for (const sablon of listTemplates()) {
-    for (const culori of [undefined, ...PRESETURI_CULOARE.map((p) => ({ mod: "auto", principala: p.hex }))]) {
+    for (const culori of [undefined, ...COLECTII_CULOARE.flatMap((c) => c.preseturi.map((p) => ({ mod: "auto", principala: p.hex, ...(c.finisaj === "mat" && { finisaj: "mat" }) })))]) {
       const p = getTemplate(sablon.id, culori, { titluri: "Tenor Sans" }).paleta;
       const perechi = [[p.text, p.fundal], [p.text, p.fundalNuantat], [p.text, p.fundalRelief], [p.textPeInchis, p.fundalInchis]];
       if (p.fundalInchisMatase) perechi.push([p.textPeInchis, matase(p.fundalInchis).lumina]);

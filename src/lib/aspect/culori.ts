@@ -1,6 +1,6 @@
 import type { TemplatePalette } from "@/lib/templates/types";
 import { normalizeazaHex, oklchDinHex, hexDinOklch } from "./culoare";
-import { bazaManuala, fundalPareri, fundalSalvie, matase } from "./paleta";
+import { bazaManuala, fundalPareri, fundalSalvie, matase, type Finisaj } from "./paleta";
 
 /**
  * Culorile alese de un client pentru site-ul lui (meniul „Aspect").
@@ -83,7 +83,17 @@ export type AspectCulori = {
   manual: Partial<Record<RolManual, string>>;
   /** A bifat „înțeleg că poate fi greu de citit". Nu schimbă nimic pe site. */
   asumat: boolean;
+  /**
+   * Colecția „Mat & Mineral" (23 oct. 2026): banda și butoanele plate, fără mătase. Se scrie DOAR
+   * când e mat; lipsa = mătăsos, deci culorile salvate înainte rămân exact cum erau, fără migrare.
+   */
+  finisaj?: "mat";
 };
+
+/** Finisajul unor culori alese: „mat" doar dacă e scris așa; orice altceva (sau nimic) = mătăsos. */
+export function finisajul(culori: Pick<AspectCulori, "finisaj"> | null | undefined): Finisaj {
+  return culori?.finisaj === "mat" ? "mat" : "matasos";
+}
 
 /**
  * Culorile din bază, curățate. `null` = nicio culoare proprie valabilă, deci site-ul arată
@@ -110,7 +120,13 @@ export function citesteAspectCulori(brut: unknown): AspectCulori | null {
   if (mod === "auto" && !principala) return null;
   if (mod === "manual" && !principala && Object.keys(manual).length === 0) return null;
 
-  return { mod, principala, manual, asumat: sursa.asumat === true };
+  return {
+    mod,
+    principala,
+    manual,
+    asumat: sursa.asumat === true,
+    ...(sursa.finisaj === "mat" && { finisaj: "mat" as const }),
+  };
 }
 
 /** Culorile din `brand` (un JSONB venit din bază), ca să le citească și cadrul, și panoul. */
@@ -142,7 +158,8 @@ function dinFundalNou(baza: TemplatePalette, fundalNou: string, rolDeBaza: strin
 export function paletaEfectiva(sablon: TemplatePalette, aspect: AspectCulori): TemplatePalette {
   // În modul automat `principala` există mereu (`citesteAspectCulori` o cere), deci baza e
   // paleta calculată; în cel manual poate lipsi, iar baza e a șablonului (plus linkurile).
-  const baza = bazaManuala(sablon, aspect.principala);
+  const finisaj = finisajul(aspect);
+  const baza = bazaManuala(sablon, aspect.principala, finisaj);
   if (aspect.mod === "auto") return baza;
 
   const paleta: TemplatePalette = { ...baza };
@@ -159,10 +176,16 @@ export function paletaEfectiva(sablon: TemplatePalette, aspect: AspectCulori): T
   }
 
   // Mătasea, banda „Ce spun clienții” și cartonașele „salvie” se refac din culorile FINALE: omul
-  // poate schimba banda, butonul sau textele de mână.
-  paleta.fundalInchisMatase = matase(paleta.fundalInchis).css;
-  paleta.accentMatase = matase(paleta.accent).css;
-  paleta.fundalPareri = fundalPareri(paleta.accent).css;
+  // poate schimba banda, butonul sau textele de mână. La mat nu există mătase: banda și butoanele
+  // rămân culoarea plină aleasă.
+  if (finisaj === "mat") {
+    delete paleta.fundalInchisMatase;
+    delete paleta.accentMatase;
+  } else {
+    paleta.fundalInchisMatase = matase(paleta.fundalInchis).css;
+    paleta.accentMatase = matase(paleta.accent).css;
+  }
+  paleta.fundalPareri = fundalPareri(paleta.accent, finisaj).css;
   paleta.fundalSalvie = fundalSalvie(paleta.accent, [
     paleta.text,
     paleta.textSecundar,

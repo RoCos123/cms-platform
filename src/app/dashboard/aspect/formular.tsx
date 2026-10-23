@@ -13,9 +13,9 @@ import { cn } from "@/lib/cn";
 import { getTemplate } from "@/lib/templates";
 import type { Serviciu } from "@/lib/servicii";
 import { normalizeazaHex } from "@/lib/aspect/culoare";
-import { bazaManuala, paletaDinCuloare, verificaPerechi, PRAG_CONTRAST } from "@/lib/aspect/paleta";
-import { ROLURI_MANUALE, type AspectCulori, type ModCulori, type RolManual } from "@/lib/aspect/culori";
-import { CULOARE_PROPUSA, PRESETURI_CULOARE } from "@/lib/aspect/salvare";
+import { bazaManuala, paletaDinCuloare, verificaPerechi, PRAG_CONTRAST, type Finisaj } from "@/lib/aspect/paleta";
+import { ROLURI_MANUALE, finisajul, type AspectCulori, type ModCulori, type RolManual } from "@/lib/aspect/culori";
+import { COLECTII_CULOARE, CULOARE_PROPUSA } from "@/lib/aspect/salvare";
 import type { AspectFonturi } from "@/lib/aspect/fonturi";
 import type { PrevizualizareSite } from "@/lib/aspect/previzualizare";
 import { salveazaAspect } from "./actions";
@@ -25,12 +25,16 @@ type Stare = {
   mod: ModCulori;
   principala: string | null;
   manual: Partial<Record<RolManual, string>>;
+  /** Colecția aleasă deasupra mostrelor: mătăsos sau mat. Se aplică și culorii alese cu pipeta. */
+  finisaj: Finisaj;
 };
 
 /** Ce s-ar salva pentru starea de pe ecran; `null` = nicio culoare proprie (culorile șablonului). */
 function catreSalvare(stare: Stare, asumat: boolean): AspectCulori | null {
+  // „mat" se scrie; mătăsosul e implicit, deci nu se scrie (culorile salvate înainte rămân identice).
+  const finisaj = stare.finisaj === "mat" ? { finisaj: "mat" as const } : {};
   if (stare.mod === "auto") {
-    return stare.principala ? { mod: "auto", principala: stare.principala, manual: {}, asumat: false } : null;
+    return stare.principala ? { mod: "auto", principala: stare.principala, manual: {}, asumat: false, ...finisaj } : null;
   }
 
   const manual: Partial<Record<RolManual, string>> = {};
@@ -40,7 +44,7 @@ function catreSalvare(stare: Stare, asumat: boolean): AspectCulori | null {
   }
 
   if (!stare.principala && Object.keys(manual).length === 0) return null;
-  return { mod: "manual", principala: stare.principala, manual, asumat };
+  return { mod: "manual", principala: stare.principala, manual, asumat, ...finisaj };
 }
 
 /**
@@ -54,6 +58,7 @@ function semnatura(culori: AspectCulori | null): string {
     culori.principala,
     ROLURI_MANUALE.map((rol) => culori.manual[rol.cheie] ?? null),
     culori.asumat,
+    finisajul(culori),
   ]);
 }
 
@@ -160,6 +165,7 @@ export function FormularAspect({
     mod: initiale?.mod ?? "auto",
     principala: initiale?.principala ?? null,
     manual: initiale?.manual ?? {},
+    finisaj: finisajul(initiale),
   });
   const [referinta, setReferinta] = useState<AspectCulori | null>(initiale);
   const [fonturi, setFonturi] = useState<AspectFonturi>(initialeFonturi ?? { titluri: null, text: null });
@@ -186,14 +192,16 @@ export function FormularAspect({
 
   // Paleta calculată din culoarea principală (sau a șablonului, dacă n-a ales una): de la ea
   // pornește modul manual și cu ea se compară ce a schimbat omul. Aceeași funcție ca pe site.
-  const calculat = stare.principala ? paletaDinCuloare(sablon.paleta, stare.principala) : null;
-  const baza = bazaManuala(sablon.paleta, stare.principala);
+  const calculat = stare.principala ? paletaDinCuloare(sablon.paleta, stare.principala, stare.finisaj) : null;
+  const baza = bazaManuala(sablon.paleta, stare.principala, stare.finisaj);
 
-  // Mostrele culorilor gata alese: paleta fiecăreia, calculată pe șablonul ACESTUI site, ca
-  // fâșiile să arate exact ce iese (banda închisă, butoanele, linkurile).
-  const mostre = PRESETURI_CULOARE.map((preset) => ({
+  // Mostrele colecției alese: paleta fiecăreia, calculată pe șablonul ACESTUI site și cu finisajul
+  // colecției, ca fâșiile să arate exact ce iese (banda închisă, butoanele, linkurile) — cu luciu la
+  // „Mătăsos & Radiant", plate la „Mat & Mineral".
+  const colectie = COLECTII_CULOARE.find((c) => c.finisaj === stare.finisaj) ?? COLECTII_CULOARE[0];
+  const mostre = colectie.preseturi.map((preset) => ({
     ...preset,
-    paleta: paletaDinCuloare(sablon.paleta, preset.hex).paleta,
+    paleta: paletaDinCuloare(sablon.paleta, preset.hex, colectie.finisaj).paleta,
   }));
 
   // Site-ul adevărat, dacă are secțiuni vizibile; altfel pagina de exemplu (de jos).
@@ -238,7 +246,7 @@ export function FormularAspect({
   }
 
   function reiaDeLaSablon() {
-    setStare({ mod: "auto", principala: null, manual: {} });
+    setStare({ mod: "auto", principala: null, manual: {}, finisaj: "matasos" });
   }
 
   return (
@@ -318,6 +326,36 @@ export function FormularAspect({
                 description="Din ea se calculează butoanele, linkurile, fundalurile și benzile închise."
               />
               <CardBody className="space-y-5">
+                {/* Colecția = finisajul. Deasupra a tot, fiindcă se aplică și culorii scrise mai jos,
+                    nu doar mostrelor. */}
+                <div className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">Colecția</p>
+                  <div
+                    className="inline-flex flex-wrap rounded-base border border-border bg-surface p-1"
+                    role="group"
+                    aria-label="Colecția de culori"
+                  >
+                    {COLECTII_CULOARE.map((c) => (
+                      <button
+                        key={c.finisaj}
+                        type="button"
+                        aria-pressed={stare.finisaj === c.finisaj}
+                        onClick={() => setStare((s) => ({ ...s, finisaj: c.finisaj }))}
+                        className={cn(
+                          "rounded-sm px-3 py-1.5 text-sm font-medium",
+                          "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                          stare.finisaj === c.finisaj
+                            ? "bg-foreground text-background"
+                            : "text-muted-foreground hover:text-foreground",
+                        )}
+                      >
+                        {c.nume}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{colectie.descriere}</p>
+                </div>
+
                 <CampCuloare
                   id="culoare-principala"
                   eticheta="Culoarea principală"
@@ -326,7 +364,9 @@ export function FormularAspect({
                 />
 
                 <div>
-                  <p className="mb-1 text-xs font-medium text-muted-foreground">Sau pornește de la una gata aleasă</p>
+                  <p className="mb-1 text-xs font-medium text-muted-foreground">
+                    Sau pornește de la una gata aleasă din „{colectie.nume}”
+                  </p>
                   <p className="mb-2 text-xs text-muted-foreground">
                     Fiecare mostră arată, de la stânga: banda închisă, butoanele și linkurile.
                   </p>
@@ -340,14 +380,17 @@ export function FormularAspect({
                             aria-pressed={activ}
                             onClick={() => setStare((s) => ({ ...s, principala: preset.hex }))}
                             className={cn(
-                              "flex w-full flex-col items-center gap-1.5 rounded-base border p-2 text-xs text-foreground",
+                              // `h-full`: un nume pe două rânduri („Rosewood Mat") nu face cartonașul mai
+                              // înalt decât vecinii lui de pe rând.
+                              "flex h-full w-full flex-col items-center gap-1.5 rounded-base border p-2 text-xs text-foreground",
                               "hover:bg-surface-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                               activ ? "border-foreground" : "border-border",
                             )}
                           >
                             {/* Trei fâșii, nu o pată: banda închisă (50%), butoanele (30%) și
-                                linkurile (20%), exact cum ies pe site. Fundalul cardurilor nu e aici:
-                                e același alabastru la toate culorile. */}
+                                linkurile (20%), exact cum ies pe site — cu mătasea lor la colecția
+                                mătăsoasă, plate la cea mată (paleta mată n-are roluri de mătase).
+                                Fundalul cardurilor nu e aici: e același alabastru la toate culorile. */}
                             <span aria-hidden className="flex h-8 w-full gap-0.5">
                               <span
                                 className="rounded-sm"
@@ -398,8 +441,8 @@ export function FormularAspect({
                 description={
                   stare.principala ? (
                     <>
-                      Pornești de la culorile calculate din {stare.principala}. Ca să schimbi punctul de pornire, treci pe
-                      Automat, alege altă culoare și revino aici.
+                      Pornești de la culorile calculate din {stare.principala}, în colecția „{colectie.nume}”. Ca să
+                      schimbi punctul de pornire, treci pe Automat, alege altă culoare sau altă colecție și revino aici.
                     </>
                   ) : (
                     <>Pornești de la culorile șablonului „{numeSablon}”.</>
@@ -509,6 +552,7 @@ export function FormularAspect({
             mod: referinta?.mod ?? "auto",
             principala: referinta?.principala ?? null,
             manual: referinta?.manual ?? {},
+            finisaj: finisajul(referinta),
           });
           setFonturi(referintaFonturi ?? { titluri: null, text: null });
           setEroare(undefined);

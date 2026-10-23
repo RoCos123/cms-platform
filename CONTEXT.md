@@ -266,6 +266,28 @@ MASTER (`fc6e863`, CI verde, rularea 221), în aceeași probă. DESCHIDERE TREPT
 „Apropiere") sunt pe master (`92fd7a3`, CI verde, rularea 229). Cu asta, toate cinci șabloanele au
 „Aspect", fiecare doar pe site-ul lui model. Pasul următor, când îl cere proprietarul: deschiderea
 pentru clienți (`aspectPermis` → `true`, vezi `acces.ts`).**
+*A doua colecție de culori, „Mat & Mineral” (23 oct. 2026, cerută de proprietar; PE BRANCH, nepublicată):*
+lângă „Mătăsos & Radiant” (cele 12 de până acum, `PRESETURI_MATASOASE`), 12 culori mate (`PRESETURI_MATE`,
+numele și codurile exact ale lui: Rosewood Mat `#54282C` … Espresso Mat `#30231C`). Aceleași culori de statut,
+plate: fără mătase (gradient) pe benzi, subsol și butoane, cu o cromă mai calmă.
+- **Cum se leagă:** finisajul e un câmp separat, `brand.aspect.culori.finisaj = "mat"`; lipsa lui = mătăsos.
+  Fără migrare (JSONB), iar culorile salvate înainte rămân identice (mătăsosul nu se scrie). Am ales câmpul,
+  nu „HEX-ul e în lista mătăsoasă” (varianta propusă și de proprietar): o culoare aleasă cu pipeta n-ar fi avut
+  finisaj sigur. `paletaDinCuloare(sablon, culoare, finisaj)`: la „mat” lipsesc `fundalInchisMatase` și
+  `accentMatase`, iar componentele cad singure pe culoarea plină (`var(--t-fundal-inchis-matase,
+  var(--t-fundal-inchis))`) — nicio componentă atinsă. Banda „Ce spun clienții” (Liniște) e și ea plată la mat.
+- **Regulile mate** (`REGULI_MATE`, HSL, ca ale proprietarului): banda = nuanța și saturația culorii,
+  luminozitatea × 0,57; linkurile = luminozitatea + 7,5; pe bandă șampanie-nisipiu `#D5C2A3`; textele de pe
+  bandă și calcarul — comune. Potrivite pe cele 12 ținte date de el (banda și linkurile fiecărei culori): cel
+  mult 0,014 / 0,019 distanță OKLab, sub pragul de ~0,02 de la care ochiul deosebește două culori; proba le
+  compară pe toate. Apoi aceeași gardă de contrast 4,5:1 (banda se întunecă, la nevoie, ca textele de pe ea să
+  treacă; o culoare foarte deschisă, scrisă de mână, tot bandă închisă dă).
+- **În „Aspect”:** „Colecția” — două butoane deasupra culorii și a mostrelor; butonul ESTE finisajul (se aplică
+  și culorii scrise cu pipeta, și modului manual). Mostrele colecției mate sunt plate, cele mătăsoase cu luciu.
+- **Verificat:** probele (12 mate pe toate cinci șabloanele, sute de culori la întâmplare și cu finisaj mat,
+  țintele, validarea, modul manual); în browser, pe `ana.test` (poarta deschisă temporar): la mat subsolul,
+  banda și butoanele n-au gradient (butonul e exact `#54282C`), pe toate cinci șabloanele; înapoi la mătăsos,
+  gradientul revine; în bază se scrie `"finisaj": "mat"`, iar la mătăsos cheia dispare.
 *Lumină, verificat local (stiva reală, `ana.test` pe Lumină):* fără culori — neschimbat; cu Safir,
 Smarald + „Elegant", Bordeaux + „De revistă" — nimic stricat, nicio eroare. De știut: cu o culoare
 aleasă, tenta lavandă a Luminii devine calcarul cald (ca pe Claritate); fără font ales, Lumină are
