@@ -273,7 +273,7 @@ rularea 233, DOAR PE CLARITATE —
 înainte), salvarea unui „mat” se refuză, iar un „mat” rămas în bază e citit ca mătăsos (`faraFinisajNepermis`,
 în `culoriPermise` și în pagina „Aspect”). Verificat în browser: Claritate — comutator, culoarea mată plată pe
 site; Lumină — fără comutator, aceeași culoare mătăsoasă. Ca să se deschidă și altora: cheile lor în listă.
-**Apoi Lumină** („merge, hai și pe lumina”, 23 oct.; PE BRANCH, nepublicat): `SABLOANE_CU_MAT = ["claritate",
+**Apoi Lumină** („merge, hai și pe lumina”, 23 oct.; PE MASTER `bc6be23`, CI verde, rularea 234): `SABLOANE_CU_MAT = ["claritate",
 "lumina"]`. Verificat în browser pe Lumină: comutatorul apare, cu Safir Mat și Rosewood Mat subsolul, banda și
 butoanele sunt plate, cu Safir mătăsos luciul revine; Căldură rămâne fără comutator (culoarea mată se citește
 mătăsoasă); nicio eroare.
