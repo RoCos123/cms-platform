@@ -53,12 +53,13 @@ export const DOMENII_CU_ASPECT: readonly string[] = [
  * Șabloanele pe care se poate alege colecția „Mat & Mineral" (finisajul mat), deschise câte unul, ca
  * „Aspect": întâi Claritate (proprietarul, 23 oct. 2026: „fă pe master, dar doar pe un model/șablon,
  * hai pe claritate"), apoi Lumină („merge, hai și pe lumina"), apoi Căldură („merge, hai și pe căldură"),
- * apoi Liniște („merge, hai și pe liniște").
+ * apoi Liniște („merge, hai și pe liniște"), apoi Apropiere („merge, hai și pe apropiere") — cu asta, toate
+ * cinci șabloanele.
  * Pe celelalte: comutatorul „Colecția" nu apare în „Aspect", salvarea unui finisaj mat se refuză, iar
  * un „mat" rămas în bază (de pildă după o schimbare de șablon) e citit ca mătăsos — vezi `culoriPermise`.
  * Ca să se deschidă și altora, se adaugă cheile lor aici.
  */
-export const SABLOANE_CU_MAT: readonly string[] = ["claritate", "lumina", "caldura", "liniste"];
+export const SABLOANE_CU_MAT: readonly string[] = ["claritate", "lumina", "caldura", "liniste", "apropiere"];
 
 /** Se poate alege finisajul mat pe un site cu șablonul ăsta? */
 export function matPermis(template: string | null | undefined): boolean {

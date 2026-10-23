@@ -1311,9 +1311,12 @@ test("ecranul „Aspect”: cele două colecții deasupra mostrelor; butonul col
   assert.ok(ecran.includes('setStare({ mod: "auto", principala: null, manual: {}, finisaj: "matasos" });'));
 });
 
-test("colecția „Mat & Mineral”, pe Claritate, Lumină, Căldură și Liniște (proprietarul, 23 oct. 2026): ecran, salvare și site", () => {
-  assert.deepEqual([...SABLOANE_CU_MAT], ["claritate", "lumina", "caldura", "liniste"]);
-  for (const sablon of listTemplates()) assert.equal(matPermis(sablon.id), sablon.id !== "apropiere", sablon.id);
+test("colecția „Mat & Mineral”, pe toate cinci șabloanele (deschise câte unul, 23 oct. 2026): ecran, salvare și site", () => {
+  assert.deepEqual([...SABLOANE_CU_MAT], ["claritate", "lumina", "caldura", "liniste", "apropiere"]);
+  // Aceeași listă ca a șabloanelor: un șablon nou adăugat doar în cod n-ar avea colecția mată.
+  assert.deepEqual([...SABLOANE_CU_MAT].sort(), listTemplates().map((sablon) => sablon.id).sort());
+  for (const sablon of listTemplates()) assert.equal(matPermis(sablon.id), true, sablon.id);
+  assert.equal(matPermis("necunoscut"), false);
   assert.equal(matPermis(null), false);
   assert.equal(matPermis(undefined), false);
 
@@ -1332,14 +1335,17 @@ test("colecția „Mat & Mineral”, pe Claritate, Lumină, Căldură și Liniș
   assert.equal("fundalInchisMatase" in getTemplate("liniste", peLiniste).paleta, false, "pe Liniște: mat");
   assert.ok(esteHexValid(getTemplate("liniste", peLiniste).paleta.fundalPareri), "pe Liniște: banda cu păreri, plată");
   const peApropiere = culoriPermise(brand, { domain: "model-apropiere.vercel.app", template: "apropiere" });
-  assert.equal("finisaj" in peApropiere, false);
-  assert.equal(peApropiere.principala, "#54282C", "culoarea rămâne, doar finisajul cade");
-  assert.ok(getTemplate("apropiere", peApropiere).paleta.fundalInchisMatase?.startsWith("linear-gradient"), "pe Apropiere: mătăsos");
+  assert.equal(peApropiere.finisaj, "mat");
+  assert.equal("fundalInchisMatase" in getTemplate("apropiere", peApropiere).paleta, false, "pe Apropiere: mat");
+  // Un șablon din afara listei: culoarea rămâne, finisajul cade (mătăsos).
+  const peAltul = faraFinisajNepermis(brand.aspect.culori, "necunoscut");
+  assert.equal("finisaj" in peAltul, false);
+  assert.equal(peAltul.principala, "#54282C", "culoarea rămâne, doar finisajul cade");
   assert.equal("fundalInchisMatase" in getTemplate("claritate", peClaritate).paleta, false, "pe Claritate: mat");
   // Ce nu e obiect, sau n-are finisaj, trece neatins.
-  assert.equal(faraFinisajNepermis(undefined, "apropiere"), undefined);
+  assert.equal(faraFinisajNepermis(undefined, "necunoscut"), undefined);
   const faraFinisaj = { mod: "auto", principala: "#0A3463" };
-  assert.equal(faraFinisajNepermis(faraFinisaj, "apropiere"), faraFinisaj);
+  assert.equal(faraFinisajNepermis(faraFinisaj, "necunoscut"), faraFinisaj);
 
   // Ecranul: comutatorul și culorile inițiale trec prin aceeași regulă; salvarea refuză „mat” pe alt șablon.
   const pagina = citeste("src/app/dashboard/aspect/page.tsx");
