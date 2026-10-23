@@ -277,7 +277,8 @@ rularea 238).**
   sub 640px lista se aliniază acum cu marginea antetului. Reverificat pe toate cinci, la 360/390/430px, cu și fără
   butonul de telefon: încape peste tot.
 
-**„Aspect” e DESCHIS PENTRU TOȚI CLIENȚII din 23 oct. 2026** („hai să deschidem Aspect pentru toți clienții”):
+**„Aspect” e DESCHIS PENTRU TOȚI CLIENȚII din 23 oct. 2026** („hai să deschidem Aspect pentru toți clienții”;
+PE MASTER `b7b08ed`, împreună cu alegerea limbii pentru toți, CI verde, rularea 239):
 `aspectPermis` = șablonul în `SABLOANE_CU_ASPECT` (toate cinci) ȘI domeniul în afara `DOMENII_FARA_ASPECT`
 (sitepsihologi — pagina de vânzare a platformei, nu un client; hotărârea din 18 oct. „NU sitepsihologi” rămâne;
 ca să-l aibă și el, se scoate din listă). Lista de domenii permise (`DOMENII_CU_ASPECT`) a dispărut. Deschiderea
