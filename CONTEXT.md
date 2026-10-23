@@ -277,6 +277,10 @@ site; Lumină — fără comutator, aceeași culoare mătăsoasă. Ca să se des
 "lumina"]`. Verificat în browser pe Lumină: comutatorul apare, cu Safir Mat și Rosewood Mat subsolul, banda și
 butoanele sunt plate, cu Safir mătăsos luciul revine; Căldură rămâne fără comutator (culoarea mată se citește
 mătăsoasă); nicio eroare.
+**Apoi Căldură** („merge, hai și pe căldură”, 23 oct.; PE BRANCH, nepublicat): `SABLOANE_CU_MAT = ["claritate",
+"lumina", "caldura"]`. Verificat în browser pe Căldură: comutatorul apare, cu Safir Mat și Rosewood Mat subsolul,
+banda și butoanele sunt plate, cu Safir mătăsos luciul revine; Liniște rămâne fără comutator (culoarea mată se
+citește mătăsoasă); nicio eroare.
 
 lângă „Mătăsos & Radiant” (cele 12 de până acum, `PRESETURI_MATASOASE`), 12 culori mate (`PRESETURI_MATE`,
 numele și codurile exact ale lui: Rosewood Mat `#54282C` … Espresso Mat `#30231C`). Aceleași culori de statut,
