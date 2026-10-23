@@ -276,6 +276,14 @@ rularea 238).**
   sub 640px lista se aliniază acum cu marginea antetului. Reverificat pe toate cinci, la 360/390/430px, cu și fără
   butonul de telefon: încape peste tot.
 
+**„Aspect” e DESCHIS PENTRU TOȚI CLIENȚII din 23 oct. 2026** („hai să deschidem Aspect pentru toți clienții”):
+`aspectPermis` = șablonul în `SABLOANE_CU_ASPECT` (toate cinci) ȘI domeniul în afara `DOMENII_FARA_ASPECT`
+(sitepsihologi — pagina de vânzare a platformei, nu un client; hotărârea din 18 oct. „NU sitepsihologi” rămâne;
+ca să-l aibă și el, se scoate din listă). Lista de domenii permise (`DOMENII_CU_ASPECT`) a dispărut. Deschiderea
+nu schimbă niciun site: fără culori sau fonturi alese, fiecare arată exact ca șablonul lui. Alegerea limbii NU
+s-a deschis odată cu el: rămâne pe Claritate și pe coterodica (`src/lib/traducere.ts`).
+Istoria de mai jos (proba, deschiderea câte un șablon) rămâne pentru context.
+
 **Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE ȘI PE MASTER, ÎN PROBĂ
 DOAR PE `model-claritate.vercel.app` (Claritate); FONTURILE FĂCUTE PE 20 OCT. 2026, ȘI ELE PE
 MASTER (`fc6e863`, CI verde, rularea 221), în aceeași probă. DESCHIDERE TREPTATĂ, CÂTE UN ȘABLON
@@ -1041,7 +1049,10 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
    punct; se începe primul și curge în paralel cu restul. Din clipa în care
    platforma ține numele și telefoanele pacienților altcuiva, actele nu sunt opționale.
 2. **Planurile plătite la Vercel și Supabase, cu backup** — minute, proprietar.
-   Nu se știe pe ce planuri e proiectul. Din documentația lor (citită 7 oct.):
+   **Starea, spusă de proprietar pe 23 oct. 2026: Vercel pe abonamentul profesional (Pro, „25 de euro"),
+   Supabase pe planul GRATUIT.** Deci Vercel e rezolvat (uz comercial permis, fără plafonul de domenii),
+   iar la Supabase rămâne de trecut pe Pro înainte de primul client plătitor: pe gratuit NU există nicio
+   copie de siguranță automată a bazei (texte, programări, mesaje ale clienților). Din documentația lor (citită 7 oct.):
    **Vercel Hobby (gratuit) e doar pentru uz necomercial** — a fi plătit ca să faci
    sau să găzduiești un site e uz comercial și cere Pro; Hobby are și plafon de
    50 de domenii pe proiect, Pro practic nu. **Supabase gratuit n-are niciun
@@ -1117,9 +1128,10 @@ acte), scrie „nu știu" — nu se presupune că e făcut sau nefăcut. **Ține
    Lista exactă: `RAPORT-BRIEF-SITEPSIHOLOGI.md`, secțiunea 7.
 
 **C. Verificări înainte de lansare**
-- `DEV_TENANT_DOMAIN` să NU fie setat pe Production (pinuiește orice `*.vercel.app`
-  la un singur site). Cele cinci `model-…` arată fiecare alt șablon, ceea ce
-  sugerează că nu e setat — **deducție, neverificată** direct în Vercel.
+- ~~`DEV_TENANT_DOMAIN` să NU fie setat pe Production~~ (pinuiește orice `*.vercel.app`
+  la un singur site) — **spus de proprietar pe 23 oct. 2026: nu mai e pe Production; crede că l-a și
+  șters.** Nu l-am putut verifica de aici (fără acces la Vercel); se potrivește cu ce se vede: cele cinci
+  `model-…` arată fiecare alt șablon.
 - Testul de izolare pe domenii distincte și rutate (vezi §„Izolarea între
   clienți: cum o testezi înainte de lansare").
 - Tragerea articolelor pe un telefon real (vezi „Unde am rămas").
@@ -1148,7 +1160,7 @@ proba pentru lanțul „site-model completat → capturi → site de vânzări c
 | 1 | **Contract + acord de prelucrare (GDPR)** | proprietar + avocat | **săptămâni** |
 | 2 | **Email tranzacțional** | proprietar (hotărârea), apoi cod | zile |
 | 3 | ~~Resetarea parolei~~ — **făcută** (cod, 10 sept.), pe punte | proprietar: 3 setări Supabase | minute |
-| 4 | **Backup / PITR verificat în Supabase** | proprietar | minute |
+| 4 | **Backup / PITR verificat în Supabase** — Supabase e pe planul gratuit (23 oct.), deci **nu există backup**: trebuie Pro | proprietar | minute |
 | 5 | ~~Cele două chei hCaptcha~~ — **făcut** (17 sept.) | proprietar | ✓ |
 | 6 | **Videoclipul de instructaj** | proprietar, ULTIMUL | ore |
 

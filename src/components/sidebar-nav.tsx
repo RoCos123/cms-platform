@@ -68,7 +68,7 @@ export function SidebarNav({
 }: {
   mesajeNecitite?: number;
   programariDeRaspuns?: number;
-  /** „Aspect" e în probă (vezi `src/lib/aspect/acces.ts`): fără asta, intrarea nu apare. */
+  /** „Aspect" are o poartă (vezi `src/lib/aspect/acces.ts`): fără asta, intrarea nu apare. */
   aspectActiv?: boolean;
 }) {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});

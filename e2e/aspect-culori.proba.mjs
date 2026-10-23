@@ -31,7 +31,7 @@ import {
   valideazaCulori,
 } from "@/lib/aspect/salvare";
 import {
-  DOMENII_CU_ASPECT,
+  DOMENII_FARA_ASPECT,
   SABLOANE_CU_ASPECT,
   SABLOANE_CU_MAT,
   aspectPermis,
@@ -601,78 +601,71 @@ test("previzualizarea din „Aspect” arată toate cele patru fundaluri — inc
   assert.ok(!/key: "quote",\s+variant: null,\s+tone: "inchis"/.test(randuri), "fundalul închis nu poate sta pe citat");
 });
 
-// ───────────────────────── poarta „în probă” ─────────────────────────
+// ───────────────────────── poarta ─────────────────────────
 
-// Proprietarul a cerut „Aspect" pe „model claritate" (site-ul lui), NU pe sitepsihologi (18 oct.);
-// apoi, câte un șablon pe rând: Lumină pe „model-lumina", Căldură pe „model-caldura" (20 oct.),
-// Liniște pe „model-liniste" și Apropiere pe „model-apropiere" (21 oct.).
-const DOMENIU_PERMIS = "model-claritate.vercel.app";
-const DOMENIU_LUMINA = "model-lumina.vercel.app";
-const DOMENIU_CALDURA = "model-caldura.vercel.app";
-const DOMENIU_LINISTE = "model-liniste.vercel.app";
-const DOMENIU_APROPIERE = "model-apropiere.vercel.app";
-/** Primul site din afara modelelor (proprietarul, 23 oct. 2026): „Aspect" pe orice șablon. */
-const DOMENIU_COTERODICA = "coterodica.vercel.app";
+// Proprietarul a cerut „Aspect" întâi pe „model claritate" (18 oct.), NU pe sitepsihologi; apoi pe
+// fiecare site model (20–21 oct.), pe coterodica și, pe 23 oct., pentru toți clienții. Sitepsihologi
+// (pagina de vânzare a platformei, nu un client) rămâne fără.
+const SITE_URI_MODEL = [
+  ["model-claritate.vercel.app", "claritate"],
+  ["model-lumina.vercel.app", "lumina"],
+  ["model-caldura.vercel.app", "caldura"],
+  ["model-liniste.vercel.app", "liniste"],
+  ["model-apropiere.vercel.app", "apropiere"],
+];
 // Un domeniu de probă și listele cu care se încearcă REGULA (listele reale se verifică separat).
 const DOMENIU_PROBA = "cabinet-proba.test";
-const LISTE_PROBA = { sabloane: ["claritate"], domenii: [DOMENIU_PROBA] };
+const LISTE_PROBA = { sabloane: ["claritate"], exceptii: [DOMENIU_PROBA] };
 
-test("listele reale: toate cinci șabloanele, fiecare pe site-ul lui model, plus coterodica — și NICIODATĂ sitepsihologi", () => {
+test("listele reale: „Aspect” la toți clienții, pe toate cinci șabloanele — și NICIODATĂ pe sitepsihologi", () => {
   assert.deepEqual([...SABLOANE_CU_ASPECT], ["claritate", "lumina", "caldura", "liniste", "apropiere"]);
-  assert.deepEqual([...DOMENII_CU_ASPECT], [DOMENIU_PERMIS, DOMENIU_LUMINA, DOMENIU_CALDURA, DOMENIU_LINISTE, DOMENIU_APROPIERE, DOMENIU_COTERODICA]);
-  // Toate șabloanele care există sunt deschise; poarta mai ține doar prin domenii.
+  // Toate șabloanele care există sunt deschise.
   assert.deepEqual([...SABLOANE_CU_ASPECT].sort(), listTemplates().map((t) => t.id).sort());
-  for (const domeniu of DOMENII_CU_ASPECT) {
-    assert.ok(!/sitepsihologi/i.test(domeniu), "proprietarul a cerut „Aspect” NU pe sitepsihologi");
+  assert.deepEqual([...DOMENII_FARA_ASPECT], ["sitepsihologi.vercel.app", "sitepsihologi.ro", "www.sitepsihologi.ro"]);
+  for (const domeniu of DOMENII_FARA_ASPECT) {
     assert.equal(domeniu, domeniu.toLowerCase().trim(), "domeniile se scriu cu litere mici, fără spații");
     assert.ok(!/^https?:|\/|\s/.test(domeniu), "doar domeniul, fără https:// sau cale");
+    for (const sablon of SABLOANE_CU_ASPECT) assert.equal(aspectPermis({ domain: domeniu, template: sablon }), false, `${domeniu} (${sablon})`);
   }
-  // Cu listele reale: fiecare site model, pe șablonul lui, are poarta deschisă.
-  assert.equal(aspectPermis({ domain: DOMENIU_PERMIS, template: "claritate" }), true);
-  assert.equal(aspectPermis({ domain: DOMENIU_LUMINA, template: "lumina" }), true);
-  assert.equal(aspectPermis({ domain: DOMENIU_CALDURA, template: "caldura" }), true);
-  assert.equal(aspectPermis({ domain: DOMENIU_LINISTE, template: "liniste" }), true);
-  assert.equal(aspectPermis({ domain: DOMENIU_APROPIERE, template: "apropiere" }), true);
-  // coterodica: oricare i-ar fi șablonul.
-  for (const sablon of SABLOANE_CU_ASPECT) assert.equal(aspectPermis({ domain: DOMENIU_COTERODICA, template: sablon }), true, sablon);
-  // Orice alt domeniu — sitepsihologi, un client adevărat — rămâne fără „Aspect", pe orice șablon.
-  for (const altul of ["sitepsihologi.vercel.app", "sitepsihologi.ro", "cosmin-claritate.vercel.app", "alt-cabinet.vercel.app", "model-apropiere.vercel.app.evil.test"]) {
-    for (const sablon of SABLOANE_CU_ASPECT) assert.equal(aspectPermis({ domain: altul, template: sablon }), false, `${altul} (${sablon})`);
+  // Site-urile model, coterodica și orice alt client, pe orice șablon: deschis.
+  for (const [domeniu, sablon] of SITE_URI_MODEL) assert.equal(aspectPermis({ domain: domeniu, template: sablon }), true, domeniu);
+  for (const domeniu of ["coterodica.vercel.app", "alt-cabinet.vercel.app", "cabinet-ana-pop.ro"]) {
+    for (const sablon of SABLOANE_CU_ASPECT) assert.equal(aspectPermis({ domain: domeniu, template: sablon }), true, `${domeniu} (${sablon})`);
   }
-  // Un șablon necunoscut rămâne închis, chiar pe un site model.
-  for (const domeniu of DOMENII_CU_ASPECT) {
-    for (const sablon of ["altceva", "", null, undefined]) assert.equal(aspectPermis({ domain: domeniu, template: sablon }), false, `${String(sablon)} pe ${domeniu}`);
+  // Un șablon necunoscut sau lipsă, ori un site fără domeniu, rămâne închis.
+  for (const sablon of ["altceva", "", null, undefined, "Claritate"]) {
+    assert.equal(aspectPermis({ domain: "alt-cabinet.vercel.app", template: sablon }), false, String(sablon));
   }
+  for (const gol of [null, undefined, ""]) assert.equal(aspectPermis({ domain: gol, template: "claritate" }), false);
   assert.equal(culoriPermise({ aspect: { culori: { mod: "auto", principala: "#2E7D5B" } } }, { domain: "sitepsihologi.vercel.app", template: "claritate" }), undefined);
+  assert.equal(citesteAspectCulori(culoriPermise({ aspect: { culori: { mod: "auto", principala: "#2E7D5B" } } }, { domain: "alt-cabinet.vercel.app", template: "lumina" }))?.principala, "#2E7D5B");
 });
 
-test("poarta: ȘI șablonul, ȘI domeniul — ambele deodată (regula, cu liste de probă)", () => {
+test("poarta: șablonul în listă ȘI domeniul în afara excepțiilor (regula, cu liste de probă)", () => {
   const permis = (site) => aspectPermis(site, LISTE_PROBA);
-  assert.equal(permis({ domain: DOMENIU_PROBA, template: "claritate" }), true);
-  // Un site Claritate al altcuiva nu primește nimic.
-  assert.equal(permis({ domain: "alt-cabinet.test", template: "claritate" }), false);
-  // Nici site-ul permis, dacă ar trece pe alt șablon.
-  for (const sablon of ["caldura", "liniste", "lumina", "apropiere", "altceva", "", null, undefined]) {
-    assert.equal(permis({ domain: DOMENIU_PROBA, template: sablon }), false, String(sablon));
+  // Orice alt site, pe un șablon din listă: deschis.
+  assert.equal(permis({ domain: "alt-cabinet.test", template: "claritate" }), true);
+  // Excepția: închisă, pe orice șablon.
+  for (const sablon of ["claritate", "caldura", null]) assert.equal(permis({ domain: DOMENIU_PROBA, template: sablon }), false, String(sablon));
+  // Un șablon din afara listei: închis, pe orice site.
+  for (const sablon of ["caldura", "liniste", "lumina", "apropiere", "altceva", "", null, undefined, "Claritate", "claritate "]) {
+    assert.equal(permis({ domain: "alt-cabinet.test", template: sablon }), false, String(sablon));
   }
   for (const gol of [null, undefined, ""]) assert.equal(permis({ domain: gol, template: "claritate" }), false);
-  // Potrivire EXACTĂ: nu „conține", nu prefix/sufix, nu litere mari, nu subdomeniu al celui permis.
-  for (const aproape of [`www.${DOMENIU_PROBA}`, `${DOMENIU_PROBA}.evil.com`, `x${DOMENIU_PROBA}`, DOMENIU_PROBA.toUpperCase(), ` ${DOMENIU_PROBA}`, "cabinet-proba"]) {
-    assert.equal(permis({ domain: aproape, template: "claritate" }), false, aproape);
+  // Excepțiile se potrivesc EXACT: alt domeniu care doar seamănă nu e excepție.
+  for (const aproape of [`www.${DOMENIU_PROBA}`, `${DOMENIU_PROBA}.evil.com`, `x${DOMENIU_PROBA}`]) {
+    assert.equal(permis({ domain: aproape, template: "claritate" }), true, aproape);
   }
-  assert.equal(permis({ domain: DOMENIU_PROBA, template: "Claritate" }), false);
-  assert.equal(permis({ domain: DOMENIU_PROBA, template: "claritate " }), false);
-  // Liste goale: nimeni.
-  assert.equal(aspectPermis({ domain: DOMENIU_PROBA, template: "claritate" }, { sabloane: [], domenii: [DOMENIU_PROBA] }), false);
-  assert.equal(aspectPermis({ domain: DOMENIU_PROBA, template: "claritate" }, { sabloane: ["claritate"], domenii: [] }), false);
+  // Fără șabloane: nimeni.
+  assert.equal(aspectPermis({ domain: "alt-cabinet.test", template: "claritate" }, { sabloane: [], exceptii: [] }), false);
 });
 
 test("poarta închisă: culorile salvate în bază NU ajung pe site — șablonul rămâne neatins", () => {
   const brand = { aspect: { culori: { mod: "auto", principala: "#2E7D5B", manual: {}, asumat: false } } };
 
   for (const [nume, site] of [
-    ["alt site, Claritate", { domain: "alt-cabinet.test", template: "claritate" }],
-    ["site-ul permis, alt șablon", { domain: DOMENIU_PROBA, template: "caldura" }],
+    ["excepția, Claritate", { domain: DOMENIU_PROBA, template: "claritate" }],
+    ["alt site, alt șablon", { domain: "alt-cabinet.test", template: "caldura" }],
     ["fără site", { domain: null, template: null }],
   ]) {
     assert.equal(culoriPermise(brand, site, LISTE_PROBA), undefined, nume);
@@ -682,7 +675,7 @@ test("poarta închisă: culorile salvate în bază NU ajung pe site — șablonu
   }
 
   // Poarta deschisă: culorile trec, iar șablonul Claritate se colorează.
-  const permis = culoriPermise(brand, { domain: DOMENIU_PROBA, template: "claritate" }, LISTE_PROBA);
+  const permis = culoriPermise(brand, { domain: "alt-cabinet.test", template: "claritate" }, LISTE_PROBA);
   assert.deepEqual(citesteAspectCulori(permis)?.principala, "#2E7D5B");
   assert.notEqual(getTemplate("claritate", permis), getTemplate("claritate"));
   assert.notDeepEqual(getTemplate("claritate", permis).paleta, getTemplate("claritate").paleta);

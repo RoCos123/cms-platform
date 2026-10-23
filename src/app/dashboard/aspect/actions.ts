@@ -29,7 +29,7 @@ export async function salveazaAspect(brut: unknown, brutFonturi: unknown): Promi
   const session = await verifySession();
   const supabase = await createClient();
 
-  // „Aspect" e în probă (`acces.ts`): cererea trimisă de mână de pe un site fără poartă
+  // „Aspect" are o poartă (`acces.ts`): cererea trimisă de mână de pe un site fără poartă
   // deschisă se refuză aici, nu doar se ascunde din meniu. Șablonul se citește din bază,
   // niciodată din ce trimite browserul.
   const { data: site } = await supabase.from("sites").select("domain, template").eq("id", session.siteId).single();

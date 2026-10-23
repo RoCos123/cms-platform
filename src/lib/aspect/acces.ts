@@ -2,54 +2,36 @@ import { culoriDinBrand } from "./culori";
 import { fonturiDinBrand } from "./fonturi";
 
 /**
- * Cine are meniul „Aspect" — deocamdată doar în probă.
+ * Cine are meniul „Aspect": TOȚI CLIENȚII, din 23 oct. 2026 (proprietarul: „hai să deschidem Aspect
+ * pentru toți clienții"), pe oricare dintre cele cinci șabloane — în afară de pagina de vânzare a
+ * platformei (`DOMENII_FARA_ASPECT`).
  *
- * Cerut de proprietar (18 oct. 2026): „limitează pe șablonul Claritate și pe site-ul meu" — iar
- * site-ul lui e „model claritate" (`model-claritate.vercel.app`, numit în panou „Popescu Robert"),
- * NU sitepsihologi — ca să încerce culorile într-un singur loc înainte să le primească toți
- * clienții. Trebuie să se potrivească AMBELE: șablonul E în listă ȘI domeniul E în listă. Un site
- * Claritate al altui client nu primește nimic; nici site-ul proprietarului, dacă ar trece pe alt
- * șablon.
+ * Istoria, pe scurt: a pornit în probă pe „model claritate" (18 oct.: „limitează pe șablonul Claritate
+ * și pe site-ul meu" — NU sitepsihologi), apoi câte un șablon pe rând, fiecare pe site-ul lui model
+ * (20–21 oct.), apoi pe primul site de client, `coterodica.vercel.app` (23 oct.), apoi la toți.
  *
- * Apoi, câte un șablon pe rând (proprietarul, 20 oct. 2026: „hai să aplicăm treptat, pe fiecare
- * șablon în parte"), fiecare pe site-ul lui model: Lumină pe `model-lumina` („pe model-lumina
- * frate, pe asta să apară"), apoi Căldură pe `model-caldura` („merge, hai la Căldură"), apoi
- * Liniște pe `model-liniste` („merge, hai la Liniște"), apoi Apropiere pe `model-apropiere`
- * („merge, hai la Apropiere"). Cu asta, toate cinci șabloanele au „Aspect" — dar tot doar pe
- * site-ul lor model.
- *
- * Poarta nu e o nevoie tehnică (paleta calculată e probată pe toate cinci șabloanele), ci o
- * măsură de prudență. O ține un SINGUR loc, aici. Ce hotărăște:
+ * Poarta nu mai e o măsură de probă, ci regula: o ține un SINGUR loc, aici. Ce hotărăște:
  *
  * • meniul „Aspect" din panou și pagina `/dashboard/aspect` (altfel: „Pagina nu există");
  * • salvarea culorilor și fonturilor (altfel refuzată, chiar dacă cineva trimite cererea de mână);
- * • aplicarea lor pe site-ul public și în toate previzualizările din panou — un site din afara
- *   probei le ignoră, chiar dacă în bază ar sta culori sau fonturi salvate.
+ * • aplicarea lor pe site-ul public și în toate previzualizările din panou — un site fără „Aspect" le
+ *   ignoră, chiar dacă în bază ar sta culori sau fonturi salvate.
  *
- * Ca să deschizi pentru toți clienții: fă `aspectPermis` să întoarcă `true`. Nu mai e nimic de
- * schimbat în restul codului, iar culorile deja salvate rămân.
+ * Deschiderea nu schimbă niciun site: fără culori sau fonturi alese, fiecare arată exact ca șablonul lui.
  */
 
-/** Șabloanele pe care e pornit „Aspect". */
+/** Șabloanele pe care e pornit „Aspect": toate cinci. Un șablon necunoscut rămâne închis. */
 export const SABLOANE_CU_ASPECT: readonly string[] = ["claritate", "lumina", "caldura", "liniste", "apropiere"];
 
 /**
- * Domeniile (`sites.domain`) pe care e pornit „Aspect". Potrivire EXACTĂ, nu „conține".
- *
- * Domeniul, nu `sites.id`: platforma își recunoaște oricum site-urile după domeniu, iar id-ul lui
- * „model claritate" nu e în depozit. Dacă domeniul se schimbă (a mai fost redenumit o dată:
- * `cosmin-claritate` → `model-claritate`), poarta se închide singură — fără stricăciuni; se pune
- * noul domeniu aici. Dacă vreodată e nevoie de ceva mai stabil, se trece pe id.
+ * Site-urile (`sites.domain`, potrivire EXACTĂ) care NU au „Aspect": pagina de vânzare a platformei,
+ * pe adresa de acum și pe cele viitoare. Hotărârea din 18 oct. („NU sitepsihologi") rămâne și după
+ * deschiderea pentru clienți: sitepsihologi nu e un client. Ca să-l aibă și el, se scoate de aici.
  */
-export const DOMENII_CU_ASPECT: readonly string[] = [
-  "model-claritate.vercel.app",
-  "model-lumina.vercel.app",
-  "model-caldura.vercel.app",
-  "model-liniste.vercel.app",
-  "model-apropiere.vercel.app",
-  // Primul site din afara modelelor (proprietarul, 23 oct. 2026: „adaugă aceste schimbări, Aspect —
-  // culori și font… pe coterodica.vercel.app"). Pe orice șablon (toate cinci sunt în lista de mai sus).
-  "coterodica.vercel.app",
+export const DOMENII_FARA_ASPECT: readonly string[] = [
+  "sitepsihologi.vercel.app",
+  "sitepsihologi.ro",
+  "www.sitepsihologi.ro",
 ];
 
 /**
@@ -75,19 +57,19 @@ export type SiteAspect = {
 };
 
 /** Cele două liste, ca probele să poată încerca regula și cu alte valori decât cele reale. */
-export type ListeAspect = { sabloane: readonly string[]; domenii: readonly string[] };
+export type ListeAspect = { sabloane: readonly string[]; exceptii: readonly string[] };
 
-const LISTE_REALE: ListeAspect = { sabloane: SABLOANE_CU_ASPECT, domenii: DOMENII_CU_ASPECT };
+const LISTE_REALE: ListeAspect = { sabloane: SABLOANE_CU_ASPECT, exceptii: DOMENII_FARA_ASPECT };
 
-/** Are acest site meniul „Aspect"? Ambele liste trebuie să-l cuprindă. */
+/** Are acest site meniul „Aspect"? Șablonul e în listă și domeniul NU e printre excepții. */
 export function aspectPermis(site: SiteAspect, liste: ListeAspect = LISTE_REALE): boolean {
   if (!site.domain || !site.template) return false;
-  return liste.sabloane.includes(site.template) && liste.domenii.includes(site.domain);
+  return liste.sabloane.includes(site.template) && !liste.exceptii.includes(site.domain);
 }
 
 /**
  * Culorile alese, DOAR dacă site-ul are „Aspect". Singurul drum prin care culorile din `brand`
- * ajung pe site sau într-o previzualizare: un site din afara probei primește `undefined`, deci
+ * ajung pe site sau într-o previzualizare: un site fără „Aspect" primește `undefined`, deci
  * `getTemplate` îi întoarce șablonul neatins.
  */
 export function culoriPermise(brand: unknown, site: SiteAspect, liste: ListeAspect = LISTE_REALE): unknown {

@@ -20,7 +20,7 @@ export default async function AspectPage() {
     supabase.from("site_settings").select("brand").eq("site_id", session.siteId).maybeSingle(),
   ]);
 
-  // Ecranul e în probă: cine n-are poarta deschisă îl vede ca pe o pagină care nu există.
+  // Cine n-are „Aspect" (`acces.ts`) vede ecranul ca pe o pagină care nu există.
   if (!aspectPermis({ domain: site?.domain as string | null, template: site?.template as string | null })) notFound();
 
   const sablon = getTemplate(site?.template as string | null);

@@ -423,11 +423,11 @@ test("fonturile se pun în `brand` fără să atingă culorile sau datele din Se
   assert.deepEqual(citesteAspectFonturi(fonturiDinBrand(cu)), fonturi, "ce s-a salvat se citește înapoi la fel");
 });
 
-test("poarta: fonturile salvate NU ajung pe un site din afara probei", () => {
+test("poarta: fonturile salvate NU ajung pe un site fără „Aspect” (excepție, alt șablon, fără domeniu)", () => {
   const brand = { aspect: { fonturi: { titluri: "Caveat", text: "Lora" } } };
-  const liste = { sabloane: ["claritate"], domenii: ["proba.ro"] };
+  const liste = { sabloane: ["claritate"], exceptii: ["vanzare.ro"] };
   assert.deepEqual(fonturiPermise(brand, { domain: "proba.ro", template: "claritate" }, liste), brand.aspect.fonturi);
-  for (const site of [{ domain: "alt.ro", template: "claritate" }, { domain: "proba.ro", template: "liniste" }, { domain: null, template: "claritate" }]) {
+  for (const site of [{ domain: "vanzare.ro", template: "claritate" }, { domain: "proba.ro", template: "liniste" }, { domain: null, template: "claritate" }]) {
     assert.equal(fonturiPermise(brand, site, liste), undefined, JSON.stringify(site));
     const sablon = getTemplate(site.template);
     assert.equal(getTemplate(site.template, undefined, fonturiPermise(brand, site, liste)), sablon);
