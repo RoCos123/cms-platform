@@ -257,7 +257,8 @@ traducerii e a Google; cererile de preîncărcare ale Next (`?_rsc=`) ajung și 
 tradusă și primesc eroare — fără efect vizibil.
 
 **Primul site din afara modelelor: `coterodica.vercel.app` (23 oct. 2026; proprietarul: „adaugă aceste schimbări,
-Aspect — culori și font — dar și toggle limbă, pe coterodica.vercel.app"; PE BRANCH, nepublicat).**
+Aspect — culori și font — dar și toggle limbă, pe coterodica.vercel.app"; dus pe master la „repar-o și fă pe
+master").**
 - **„Aspect” (culori, inclusiv „Mat & Mineral”, și fonturi):** domeniul adăugat în `DOMENII_CU_ASPECT`
   (`src/lib/aspect/acces.ts`). Merge pe orice șablon (toate cinci sunt în `SABLOANE_CU_ASPECT`).
 - **Alegerea limbii (bulina cu steag):** poarta era doar pe șablon (Claritate). Șablonul lui coterodica nu se vede
@@ -268,6 +269,12 @@ Aspect — culori și font — dar și toggle limbă, pe coterodica.vercel.app";
 - **De știut:** potrivirea e EXACTĂ pe `sites.domain`. Dacă în Supabase domeniul lui coterodica e scris altfel
   (alt subdomeniu, un domeniu propriu), meniul „Aspect” și bifa nu apar — fără nicio stricăciune — și se
   corectează în cele două liste.
+- **Verificat, fiindcă bulina limbii n-avea încă probe pe toate șabloanele:** pe toate cinci (stiva locală, imitația
+  Google), navigarea pe pagina tradusă, lista, Esc, English → Deutsch → Română — fără erori; antetul, 360–1440px,
+  3–7 linkuri, nume lung — nimic rupt (doar la 430px numele lung trece pe două rânduri, întreg). Găsit și reparat:
+  pe Apropiere, la 390px, lista de limbi ieșea cu 36px din ecran prin stânga (bulina stă lângă „Programează”);
+  sub 640px lista se aliniază acum cu marginea antetului. Reverificat pe toate cinci, la 360/390/430px, cu și fără
+  butonul de telefon: încape peste tot.
 
 **Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE ȘI PE MASTER, ÎN PROBĂ
 DOAR PE `model-claritate.vercel.app` (Claritate); FONTURILE FĂCUTE PE 20 OCT. 2026, ȘI ELE PE
