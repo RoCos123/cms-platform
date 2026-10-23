@@ -35,9 +35,20 @@
  */
 export const SABLOANE_CU_TRADUCERE: readonly string[] = ["claritate"];
 
-/** Se poate porni alegerea limbii pe un site cu șablonul ăsta? Fără șablon: nu. */
-export function traducerePermisa(sablon: string | null | undefined): boolean {
-  return typeof sablon === "string" && SABLOANE_CU_TRADUCERE.includes(sablon);
+/**
+ * Site-urile (`sites.domain`, potrivire exactă) care au alegerea limbii oricare le-ar fi șablonul.
+ * `coterodica.vercel.app` — cerut de proprietar pe 23 oct. 2026, odată cu „Aspect" pe același site
+ * („adaugă aceste schimbări… și toggle limbă, pe coterodica.vercel.app").
+ */
+export const DOMENII_CU_TRADUCERE: readonly string[] = ["coterodica.vercel.app"];
+
+/**
+ * Se poate porni alegerea limbii pe site-ul ăsta? Da, dacă șablonul e în `SABLOANE_CU_TRADUCERE`
+ * SAU domeniul în `DOMENII_CU_TRADUCERE`. Fără niciunul: nu.
+ */
+export function traducerePermisa(sablon: string | null | undefined, domeniu?: string | null): boolean {
+  if (typeof sablon === "string" && SABLOANE_CU_TRADUCERE.includes(sablon)) return true;
+  return typeof domeniu === "string" && DOMENII_CU_TRADUCERE.includes(domeniu);
 }
 
 /** Limba în care e scris site-ul. Pagina în limba asta e chiar pagina noastră, nu o traducere. */

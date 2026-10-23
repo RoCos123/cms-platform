@@ -75,8 +75,8 @@ export default async function SetariPage() {
         politicaEsteCiorna={politica?.status !== "published"}
       />
 
-      {/* Doar pe șabloanele care au alegerea limbii (azi, Claritate) — vezi `SABLOANE_CU_TRADUCERE`. */}
-      {traducerePermisa(site?.template as string | null) && (
+      {/* Doar pe site-urile care au alegerea limbii — vezi `traducerePermisa`. */}
+      {traducerePermisa(site?.template as string | null, site?.domain as string | null) && (
         <ComutatorLimbi pornitInitial={limbileSuntPornite(setari?.pagini as Pagini | null)} />
       )}
 

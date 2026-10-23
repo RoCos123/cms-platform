@@ -186,11 +186,11 @@ export async function comutaLimbile(pornite: boolean): Promise<RezultatSetari> {
   const session = await verifySession();
   const supabase = await createClient();
 
-  // Pornirea, doar pe șabloanele care o au (azi, Claritate). Oprirea merge oricând: o bifă
+  // Pornirea, doar pe site-urile care o au (`traducerePermisa`). Oprirea merge oricând: o bifă
   // rămasă pornită de pe alt șablon trebuie să se poată stinge.
   if (pornite) {
-    const { data: site } = await supabase.from("sites").select("template").eq("id", session.siteId).single();
-    if (!traducerePermisa(site?.template as string | null)) {
+    const { data: site } = await supabase.from("sites").select("template, domain").eq("id", session.siteId).single();
+    if (!traducerePermisa(site?.template as string | null, site?.domain as string | null)) {
       return { ok: false, mesaj: "Traducerea nu e disponibilă pentru șablonul acestui site." };
     }
   }

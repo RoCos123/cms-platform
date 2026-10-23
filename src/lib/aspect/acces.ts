@@ -47,6 +47,9 @@ export const DOMENII_CU_ASPECT: readonly string[] = [
   "model-caldura.vercel.app",
   "model-liniste.vercel.app",
   "model-apropiere.vercel.app",
+  // Primul site din afara modelelor (proprietarul, 23 oct. 2026: „adaugă aceste schimbări, Aspect —
+  // culori și font… pe coterodica.vercel.app"). Pe orice șablon (toate cinci sunt în lista de mai sus).
+  "coterodica.vercel.app",
 ];
 
 /**

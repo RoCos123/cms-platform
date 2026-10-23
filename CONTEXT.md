@@ -256,6 +256,19 @@ trimiterea (dacă nu, varianta propusă: un rând „Pentru contact/programare, 
 traducerii e a Google; cererile de preîncărcare ale Next (`?_rsc=`) ajung și ele la Google pe pagina
 tradusă și primesc eroare — fără efect vizibil.
 
+**Primul site din afara modelelor: `coterodica.vercel.app` (23 oct. 2026; proprietarul: „adaugă aceste schimbări,
+Aspect — culori și font — dar și toggle limbă, pe coterodica.vercel.app"; PE BRANCH, nepublicat).**
+- **„Aspect” (culori, inclusiv „Mat & Mineral”, și fonturi):** domeniul adăugat în `DOMENII_CU_ASPECT`
+  (`src/lib/aspect/acces.ts`). Merge pe orice șablon (toate cinci sunt în `SABLOANE_CU_ASPECT`).
+- **Alegerea limbii (bulina cu steag):** poarta era doar pe șablon (Claritate). Șablonul lui coterodica nu se vede
+  din mediul de lucru (fără acces la Supabase), deci poarta a primit și o listă de domenii:
+  `traducerePermisa(sablon, domeniu)` = șablonul în `SABLOANE_CU_TRADUCERE` SAU domeniul în
+  `DOMENII_CU_TRADUCERE` (`src/lib/traducere.ts`), folosită de antet, de Setări și de acțiunea de salvare.
+  Bulina apare abia după ce cineva bifează Setări → „Traducere site (EN/DE)” pe coterodica (oprită din oficiu).
+- **De știut:** potrivirea e EXACTĂ pe `sites.domain`. Dacă în Supabase domeniul lui coterodica e scris altfel
+  (alt subdomeniu, un domeniu propriu), meniul „Aspect” și bifa nu apar — fără nicio stricăciune — și se
+  corectează în cele două liste.
+
 **Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE ȘI PE MASTER, ÎN PROBĂ
 DOAR PE `model-claritate.vercel.app` (Claritate); FONTURILE FĂCUTE PE 20 OCT. 2026, ȘI ELE PE
 MASTER (`fc6e863`, CI verde, rularea 221), în aceeași probă. DESCHIDERE TREPTATĂ, CÂTE UN ȘABLON

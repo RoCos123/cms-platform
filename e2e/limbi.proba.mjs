@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   LIMBI_SITE,
+  DOMENII_CU_TRADUCERE,
   SABLOANE_CU_TRADUCERE,
   adresaInLimba,
   adresaPeTradusa,
@@ -148,7 +149,7 @@ test("bifa limbilor e oprită din oficiu și nu atinge comutatoarele paginilor",
 
 test("legăturile din cod: comutatorul doar cu bifa, repararea doar pe gazda tradusă", () => {
   const cadru = citeste("src/components/site/cadru-site.tsx");
-  assert.match(cadru, /domeniuLimbi:\s*limbileSuntPornite\(pagini\) && traducerePermisa\(site\?\.template\) \? domain : undefined/);
+  assert.match(cadru, /domeniuLimbi:\s*limbileSuntPornite\(pagini\) && traducerePermisa\(site\?\.template, domain\) \? domain : undefined/);
   assert.match(cadru, /<NavigareTradusa \/>/);
 
   const navigare = citeste("src/components/site/navigare-tradusa.tsx");
@@ -200,22 +201,30 @@ test("politica de confidențialitate are paragraful despre traducere", () => {
   assert.match(paragraf, /formular/);
 });
 
-test("alegerea limbii, doar pe Claritate (cerut de proprietar, 21 oct. 2026)", () => {
+test("alegerea limbii: pe Claritate (21 oct. 2026) și pe coterodica, oricare i-ar fi șablonul (23 oct.)", () => {
   assert.deepEqual([...SABLOANE_CU_TRADUCERE], ["claritate"]);
+  assert.deepEqual([...DOMENII_CU_TRADUCERE], ["coterodica.vercel.app"]);
   const sabloane = listTemplates().map((sablon) => sablon.id);
   assert.ok(sabloane.includes("claritate"), "șablonul există");
   for (const sablon of sabloane) assert.equal(traducerePermisa(sablon), sablon === "claritate", sablon);
   assert.equal(traducerePermisa(null), false);
   assert.equal(traducerePermisa(undefined), false);
   assert.equal(traducerePermisa("Claritate"), false, "potrivire exactă, ca în coloana `sites.template`");
+  // Domeniul deschide alegerea limbii pe orice șablon; alt domeniu, pe alt șablon, nu.
+  for (const sablon of sabloane) {
+    assert.equal(traducerePermisa(sablon, "coterodica.vercel.app"), true, `coterodica pe ${sablon}`);
+    assert.equal(traducerePermisa(sablon, "alt-cabinet.vercel.app"), sablon === "claritate", `alt site pe ${sablon}`);
+  }
+  assert.equal(traducerePermisa(null, "coterodica.vercel.app"), true);
+  assert.equal(traducerePermisa("caldura", "Coterodica.vercel.app"), false, "potrivire exactă, ca în coloana `sites.domain`");
 
-  // Bifa din Setări apare doar pe Claritate; serverul refuză pornirea pe alt șablon.
+  // Bifa din Setări apare doar unde e permisă; serverul refuză pornirea în rest.
   const pagina = citeste("src/app/dashboard/setari/page.tsx");
-  assert.match(pagina, /traducerePermisa\(site\?\.template as string \| null\) && \(\s*<ComutatorLimbi/);
+  assert.match(pagina, /traducerePermisa\(site\?\.template as string \| null, site\?\.domain as string \| null\) && \(\s*<ComutatorLimbi/);
   const actiuni = citeste("src/app/dashboard/setari/actions.ts");
   const comuta = actiuni.slice(actiuni.indexOf("export async function comutaLimbile"));
   assert.ok(
     comuta.indexOf("traducerePermisa") > -1 && comuta.indexOf("traducerePermisa") < comuta.indexOf(".upsert("),
-    "verificarea șablonului vine înainte de scriere",
+    "verificarea șablonului și a domeniului vine înainte de scriere",
   );
 });

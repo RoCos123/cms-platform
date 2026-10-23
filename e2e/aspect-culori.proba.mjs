@@ -611,13 +611,15 @@ const DOMENIU_LUMINA = "model-lumina.vercel.app";
 const DOMENIU_CALDURA = "model-caldura.vercel.app";
 const DOMENIU_LINISTE = "model-liniste.vercel.app";
 const DOMENIU_APROPIERE = "model-apropiere.vercel.app";
+/** Primul site din afara modelelor (proprietarul, 23 oct. 2026): „Aspect" pe orice șablon. */
+const DOMENIU_COTERODICA = "coterodica.vercel.app";
 // Un domeniu de probă și listele cu care se încearcă REGULA (listele reale se verifică separat).
 const DOMENIU_PROBA = "cabinet-proba.test";
 const LISTE_PROBA = { sabloane: ["claritate"], domenii: [DOMENIU_PROBA] };
 
-test("listele reale: toate cinci șabloanele, fiecare pe site-ul lui model, și NICIODATĂ sitepsihologi", () => {
+test("listele reale: toate cinci șabloanele, fiecare pe site-ul lui model, plus coterodica — și NICIODATĂ sitepsihologi", () => {
   assert.deepEqual([...SABLOANE_CU_ASPECT], ["claritate", "lumina", "caldura", "liniste", "apropiere"]);
-  assert.deepEqual([...DOMENII_CU_ASPECT], [DOMENIU_PERMIS, DOMENIU_LUMINA, DOMENIU_CALDURA, DOMENIU_LINISTE, DOMENIU_APROPIERE]);
+  assert.deepEqual([...DOMENII_CU_ASPECT], [DOMENIU_PERMIS, DOMENIU_LUMINA, DOMENIU_CALDURA, DOMENIU_LINISTE, DOMENIU_APROPIERE, DOMENIU_COTERODICA]);
   // Toate șabloanele care există sunt deschise; poarta mai ține doar prin domenii.
   assert.deepEqual([...SABLOANE_CU_ASPECT].sort(), listTemplates().map((t) => t.id).sort());
   for (const domeniu of DOMENII_CU_ASPECT) {
@@ -631,6 +633,8 @@ test("listele reale: toate cinci șabloanele, fiecare pe site-ul lui model, și 
   assert.equal(aspectPermis({ domain: DOMENIU_CALDURA, template: "caldura" }), true);
   assert.equal(aspectPermis({ domain: DOMENIU_LINISTE, template: "liniste" }), true);
   assert.equal(aspectPermis({ domain: DOMENIU_APROPIERE, template: "apropiere" }), true);
+  // coterodica: oricare i-ar fi șablonul.
+  for (const sablon of SABLOANE_CU_ASPECT) assert.equal(aspectPermis({ domain: DOMENIU_COTERODICA, template: sablon }), true, sablon);
   // Orice alt domeniu — sitepsihologi, un client adevărat — rămâne fără „Aspect", pe orice șablon.
   for (const altul of ["sitepsihologi.vercel.app", "sitepsihologi.ro", "cosmin-claritate.vercel.app", "alt-cabinet.vercel.app", "model-apropiere.vercel.app.evil.test"]) {
     for (const sablon of SABLOANE_CU_ASPECT) assert.equal(aspectPermis({ domain: altul, template: sablon }), false, `${altul} (${sablon})`);
