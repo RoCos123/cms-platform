@@ -257,8 +257,8 @@ traducerii e a Google; cererile de preîncărcare ale Next (`?_rsc=`) ajung și 
 tradusă și primesc eroare — fără efect vizibil.
 
 **Primul site din afara modelelor: `coterodica.vercel.app` (23 oct. 2026; proprietarul: „adaugă aceste schimbări,
-Aspect — culori și font — dar și toggle limbă, pe coterodica.vercel.app"; dus pe master la „repar-o și fă pe
-master").**
+Aspect — culori și font — dar și toggle limbă, pe coterodica.vercel.app"; PE MASTER `bc74fbd`, CI verde,
+rularea 238).**
 - **„Aspect” (culori, inclusiv „Mat & Mineral”, și fonturi):** domeniul adăugat în `DOMENII_CU_ASPECT`
   (`src/lib/aspect/acces.ts`). Merge pe orice șablon (toate cinci sunt în `SABLOANE_CU_ASPECT`).
 - **Alegerea limbii (bulina cu steag):** poarta era doar pe șablon (Claritate). Șablonul lui coterodica nu se vede
