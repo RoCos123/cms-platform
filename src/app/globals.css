@@ -394,6 +394,23 @@ html[data-tradus] .antet {
   display: none;
 }
 
+/*
+ * Pe telefon, lista nu se mai aliniază cu bulina, ci cu marginea din dreapta a antetului: pe
+ * „Apropiere” (sau lângă un buton de telefon) bulina stă mai spre stânga, iar lista de 190px,
+ * aliniată la ea, ieșea din ecran prin stânga (36px la 390px — proba din 23 oct. 2026). Fără
+ * poziționare pe bulină, lista se raportează la rândul antetului (`position: relative`).
+ */
+@media (max-width: 640px) {
+  .antet-limba {
+    position: static;
+  }
+
+  .antet-limba-lista {
+    right: 12px;
+    top: calc(100% + 6px);
+  }
+}
+
 .antet-limba-optiune {
   display: flex;
   align-items: center;
