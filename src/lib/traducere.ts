@@ -24,31 +24,24 @@
  */
 
 /**
- * Șabloanele pe care se poate porni alegerea limbii. Deocamdată doar „Claritate" — cerut de
- * proprietar pe 21 oct. 2026 („hai să aplicăm doar pe claritate"), cum a pornit și „Aspect",
- * de la un singur șablon. Pe celelalte, bifa din Setări nu apare, serverul refuză s-o
- * pornească, iar o valoare rămasă în bază (de pildă după o schimbare de șablon) nu pune
- * bulina pe site. Ca să se deschidă și altora, se adaugă aici cheile lor.
+ * Șabloanele pe care se poate porni alegerea limbii: TOATE CINCI, din 23 oct. 2026 (proprietarul:
+ * „bulina de limbă trebuie să fie în Setări, disponibilă pentru toți noii clienți"). Bifa din
+ * Setări („Traducere site (EN/DE)”) apare deci pe orice site și rămâne OPRITĂ din oficiu: bulina
+ * apare doar unde o bifează cineva.
+ *
+ * Istoria: a pornit doar pe Claritate (21 oct.: „hai să aplicăm doar pe claritate"), apoi și pe
+ * `coterodica.vercel.app` (23 oct.), apoi la toți. Bulina e verificată pe toate cinci șabloanele
+ * (antetul 360–1440px, lista pe telefon, pagina tradusă). Un șablon necunoscut rămâne fără: bifa nu
+ * apare, serverul refuză s-o pornească, iar o valoare rămasă în bază nu pune bulina pe site.
  *
  * Repararea navigării pe pagina tradusă (`navigare-tradusa.tsx`) nu ține de listă: nu se
  * vede, iar la traducerea Google se ajunge pe orice site, și din rezultatele căutării.
  */
-export const SABLOANE_CU_TRADUCERE: readonly string[] = ["claritate"];
+export const SABLOANE_CU_TRADUCERE: readonly string[] = ["claritate", "lumina", "caldura", "liniste", "apropiere"];
 
-/**
- * Site-urile (`sites.domain`, potrivire exactă) care au alegerea limbii oricare le-ar fi șablonul.
- * `coterodica.vercel.app` — cerut de proprietar pe 23 oct. 2026, odată cu „Aspect" pe același site
- * („adaugă aceste schimbări… și toggle limbă, pe coterodica.vercel.app").
- */
-export const DOMENII_CU_TRADUCERE: readonly string[] = ["coterodica.vercel.app"];
-
-/**
- * Se poate porni alegerea limbii pe site-ul ăsta? Da, dacă șablonul e în `SABLOANE_CU_TRADUCERE`
- * SAU domeniul în `DOMENII_CU_TRADUCERE`. Fără niciunul: nu.
- */
-export function traducerePermisa(sablon: string | null | undefined, domeniu?: string | null): boolean {
-  if (typeof sablon === "string" && SABLOANE_CU_TRADUCERE.includes(sablon)) return true;
-  return typeof domeniu === "string" && DOMENII_CU_TRADUCERE.includes(domeniu);
+/** Se poate porni alegerea limbii pe un site cu șablonul ăsta? Fără șablon: nu. */
+export function traducerePermisa(sablon: string | null | undefined): boolean {
+  return typeof sablon === "string" && SABLOANE_CU_TRADUCERE.includes(sablon);
 }
 
 /** Limba în care e scris site-ul. Pagina în limba asta e chiar pagina noastră, nu o traducere. */

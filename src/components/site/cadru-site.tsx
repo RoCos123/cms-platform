@@ -166,10 +166,9 @@ export async function CadruSite({
             paginaServicii: paginaEsteActiva(pagini, "servicii"),
             blog: areBlog ? "pagina" : null,
             paginiProprii: inAntet,
-            // Bulina limbii: bifată de client ȘI pe un site care o are (șablonul Claritate, sau
-            // un domeniu din `DOMENII_CU_TRADUCERE`).
+            // Bulina limbii: bifată de client ȘI pe un șablon care o are (toate cinci).
             domeniuLimbi:
-              limbileSuntPornite(pagini) && traducerePermisa(site?.template, domain) ? domain : undefined,
+              limbileSuntPornite(pagini) && traducerePermisa(site?.template) ? domain : undefined,
           }}
         />
 

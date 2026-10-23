@@ -261,8 +261,9 @@ Aspect — culori și font — dar și toggle limbă, pe coterodica.vercel.app";
 rularea 238).**
 - **„Aspect” (culori, inclusiv „Mat & Mineral”, și fonturi):** domeniul adăugat în `DOMENII_CU_ASPECT`
   (`src/lib/aspect/acces.ts`). Merge pe orice șablon (toate cinci sunt în `SABLOANE_CU_ASPECT`).
-- **Alegerea limbii (bulina cu steag):** poarta era doar pe șablon (Claritate). Șablonul lui coterodica nu se vede
-  din mediul de lucru (fără acces la Supabase), deci poarta a primit și o listă de domenii:
+- **Alegerea limbii (bulina cu steag):** *(depășit în aceeași zi: alegerea limbii e acum pe toate șabloanele, fără
+  listă de domenii — vezi deschiderea pentru toți, mai sus.)* Poarta era doar pe șablon (Claritate). Șablonul lui
+  coterodica nu se vede din mediul de lucru (fără acces la Supabase), deci poarta a primit și o listă de domenii:
   `traducerePermisa(sablon, domeniu)` = șablonul în `SABLOANE_CU_TRADUCERE` SAU domeniul în
   `DOMENII_CU_TRADUCERE` (`src/lib/traducere.ts`), folosită de antet, de Setări și de acțiunea de salvare.
   Bulina apare abia după ce cineva bifează Setări → „Traducere site (EN/DE)” pe coterodica (oprită din oficiu).
@@ -280,8 +281,12 @@ rularea 238).**
 `aspectPermis` = șablonul în `SABLOANE_CU_ASPECT` (toate cinci) ȘI domeniul în afara `DOMENII_FARA_ASPECT`
 (sitepsihologi — pagina de vânzare a platformei, nu un client; hotărârea din 18 oct. „NU sitepsihologi” rămâne;
 ca să-l aibă și el, se scoate din listă). Lista de domenii permise (`DOMENII_CU_ASPECT`) a dispărut. Deschiderea
-nu schimbă niciun site: fără culori sau fonturi alese, fiecare arată exact ca șablonul lui. Alegerea limbii NU
-s-a deschis odată cu el: rămâne pe Claritate și pe coterodica (`src/lib/traducere.ts`).
+nu schimbă niciun site: fără culori sau fonturi alese, fiecare arată exact ca șablonul lui.
+**Și alegerea limbii e pentru toți, din aceeași zi** („bulina de limbă trebuie să fie în Setări, disponibilă pentru
+toți noii clienți”): `SABLOANE_CU_TRADUCERE` = toate cinci șabloanele (`src/lib/traducere.ts`), lista de domenii
+(`DOMENII_CU_TRADUCERE`, făcută pentru coterodica) a dispărut. Bifa „Traducere site (EN/DE)” apare în Setări pe
+orice site și rămâne OPRITĂ din oficiu. Verificat în browser pe Apropiere și Căldură: cardul apare, bifa pune și
+scoate bulina. Politica de confidențialitate a unui site care o pornește are nevoie de paragraful `[TRADUCERE]`.
 Istoria de mai jos (proba, deschiderea câte un șablon) rămâne pentru context.
 
 **Meniul „Aspect": culori și fonturi alese de client — CULORILE SUNT FĂCUTE ȘI PE MASTER, ÎN PROBĂ
