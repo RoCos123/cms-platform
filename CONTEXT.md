@@ -186,27 +186,31 @@ face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spun
 MASTER `91d19ff` (30 oct. 2026, la „fă pe master”; CI verde, rularea 240).** Cererea proprietarului: să se vadă clar că
 modelele pot avea alte culori și fonturi, schimbate oricând. I-am arătat trei machete (A — buline pe cartonașe,
 B — captura se schimbă singură, C — bloc separat sub modele); **a ales B** („B cel cu animația”).
-*Ce e construit:*
-- **În panou**, la secțiunea galeriei, fiecare cartonaș are „Alte variante ale modelului” (cel mult 3): o captură
-  + „Culoarea” (cele 24 de culori gata alese din „Aspect”) + „Fonturile” (cele 9 perechi), din casete cu listă,
-  nu text liber. Câmpul apare DOAR pe galeria „vitrina” a unui site de vânzare (`campuriPentruRand` în
+**FĂRĂ ETICHETĂ ȘI FĂRĂ BULINE (30 oct., după ce a văzut prima versiune pe site): „nu vreau să scrie nimic,
+vreau să nu mai fie nicio etichetă, doar să se schimbe automat odată ce am încărcat mai multe variante” — PE
+RAMURĂ, NU PE MASTER.** Prima versiune (pe master, `91d19ff`) avea sus o etichetă („Ca în demo”, „Safir · Modern”,
+„Altă variantă”) cu buline de apăsat, plus „Culoarea” și „Fonturile” în panou pentru ea; toate trei au ieșit. **Nu le
+repune.** Ce se salvase în „culoare”/„fonturi” cade singur la următoarea salvare a secțiunii.
+*Ce e construit (după schimbare):*
+- **În panou**, la secțiunea galeriei, fiecare cartonaș are „Alte variante ale modelului” (cel mult 3), fiecare
+  doar o captură. Câmpul apare DOAR pe galeria „vitrina” a unui site de vânzare (`campuriPentruRand` în
   `src/lib/sectiuni.ts`, folosit și de editor, și de salvare — salvarea aruncă tot ce nu e declarat). Captura e
   decorativă (`alt=""`), deci fără „Text alternativ”. Butoanele variantelor stau deasupra pozei
   (`controaleDeasupra` la `RepeaterList`): ca listă în listă, pe două coloane, poza rămânea de 80px.
 - **Pe site** (`src/components/site/sections/cadre-vitrina.tsx`): poza principală, apoi capturile, câte 3,5 s,
-  trecere de 0,8 s; sus, o etichetă („Ca în demo”, „Safir · Modern”) cu câte o bulină pe poză. Stă pe loc cât
-  cartonașul nu e pe ecran, sub maus, după ce omul apasă o bulină și la „mișcare redusă” (bulinele merg și
-  atunci). Fără variante, cartonașul e exact ca înainte. Merge și în previzualizarea din panou.
-- *Verificat:* `e2e/variante-model.proba.mjs` (7 probe; în total 557, toate trec); în browser, pe stiva locală, cu
-  capturi de probă: schimbarea, oprirea la maus, bulinele, mișcarea redusă, telefonul la 360/390px, butonul
-  „Vreau acest model” și clicul spre demo; în panou: citirea, salvarea, cabinetul fără câmp.
-*Ce are de făcut proprietarul (codul e pe master; până pune capturile, galeria arată ca înainte):* 2 capturi pe model (10 în total), pe demo-uri — în „Aspect”
-alege culoarea și fonturile, salvează, captura părții de sus (ca la poza principală), apoi revine la culorile
-modelului; în panoul sitepsihologi le pune la „Alte variante ale modelului” și alege culoarea și fonturile din
-listă. *Propuse, nefăcute (le schimbă el din panou, dacă vrea):* textul de sub titlu („…Fiecare devine al tău:
-pui textele și pozele tale, alegi culorile și scrisul care ți se potrivesc — și le schimbi oricând, singur, din
-panou.”) și titlul cartonașului „Caldură” → „Căldură”. Variantele nealese (A, C) și ideea „Încearcă alte culori”
-direct pe demo (D) nu se reiau fără el.
+  trecere de 0,8 s, nimic scris peste ele. Stă pe loc cât cartonașul nu e pe ecran, sub maus, și la „mișcare
+  redusă” (ex. „Efecte de animație” oprite în Windows — așa le-a văzut întâi proprietarul, pe loc): omul acela vede
+  doar poza principală. Fără variante, cartonașul e exact ca înainte. Merge și în previzualizarea din panou.
+- *Verificat:* `e2e/variante-model.proba.mjs` (6 probe; în total 556, toate trec); în browser, pe stiva locală, cu
+  capturi de probă: schimbarea, oprirea la maus, mișcarea redusă, telefonul, fără niciun buton pe cartonaș; în
+  panou: doar captura, salvarea păstrează variantele, cabinetul fără câmp. Pe master, proprietarul a pus capturile
+  pe Apropiere și a confirmat că se schimbă automat (cu animațiile Windows pornite).
+*Ce are de făcut proprietarul:* 2 capturi pe model, pe demo-uri (în „Aspect” alege culoarea și fonturile, salvează,
+captura părții de sus în fereastră InPrivate — fără bara „Editează pagina”/„Panou” —, apoi revine la culorile
+modelului) și le pune la „Alte variante ale modelului”. *Propuse, nefăcute (le schimbă el din panou, dacă vrea):*
+textul de sub titlu („…Fiecare devine al tău: pui textele și pozele tale, alegi culorile și scrisul care ți se
+potrivesc — și le schimbi oricând, singur, din panou.”) și titlul cartonașului „Caldură” → „Căldură”. Variantele
+nealese (A, C) și ideea „Încearcă alte culori” direct pe demo (D) nu se reiau fără el.
 
 **Limbile site-ului: bulina cu steag (română · engleză · germană) prin traducerea Google — PE MASTER
 (`0d6760c`, CI verde, rularea 230, 21 oct. 2026), DOAR PE CLARITATE, OPRITĂ DIN OFICIU (21 oct. 2026; cerut de proprietar: „hai să facem modificarea limbii din RO în EN dar și

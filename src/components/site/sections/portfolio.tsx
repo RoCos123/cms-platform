@@ -3,13 +3,7 @@ import type { PunctFocal } from "@/lib/punct-focal";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
-import {
-  ATRIBUT_MODEL,
-  MAX_VARIANTE_MODEL,
-  TEXTE_VANZARE,
-  culoareaVariantei,
-  etichetaVariantei,
-} from "@/lib/pagina-vanzare";
+import { ATRIBUT_MODEL, MAX_VARIANTE_MODEL, TEXTE_VANZARE } from "@/lib/pagina-vanzare";
 import { CadreVitrina, type CadruVitrina } from "./cadre-vitrina";
 
 export type PortfolioData = {
@@ -42,14 +36,9 @@ export type PortfolioData = {
     };
     /**
      * „Alte variante ale modelului" — doar pe cartonașele galeriei de pe pagina de vânzare
-     * (`campuriPentruRand`): capturi ale aceluiași demo în alte culori și fonturi, cu numele
-     * culorii și al perechii de fonturi alese în „Aspect". Vezi `CadreVitrina`.
+     * (`campuriPentruRand`): capturi ale aceluiași demo în alte culori și fonturi. Vezi `CadreVitrina`.
      */
-    variante?: {
-      imagine?: { url: string; pozitie?: PunctFocal };
-      culoare?: string;
-      fonturi?: string;
-    }[];
+    variante?: { imagine?: { url: string; pozitie?: PunctFocal } }[];
   }[];
 };
 
@@ -450,19 +439,11 @@ function CartonasVitrina({
   const cadre: CadruVitrina[] | null =
     element.imagine && variante.length > 0
       ? [
-          {
-            src: element.imagine.url,
-            alt: element.imagine.altText ?? "",
-            pozitie: incadrarePoza,
-            eticheta: TEXTE_VANZARE.variante.demo,
-            culoare: null,
-          },
+          { src: element.imagine.url, alt: element.imagine.altText ?? "", pozitie: incadrarePoza },
           ...variante.map((varianta) => ({
             src: varianta.imagine!.url,
             alt: "",
             pozitie: varianta.imagine!.pozitie ?? { x: 50, y: 0 },
-            eticheta: etichetaVariantei(varianta),
-            culoare: culoareaVariantei(varianta.culoare),
           })),
         ]
       : null;

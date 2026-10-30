@@ -17,13 +17,7 @@
  */
 
 import { MAX_CUVINTE_BANDA, MAX_LUNGIME_CUVANT_BANDA } from "@/lib/banda-servicii";
-import {
-  CULORI_VARIANTA,
-  FONTURI_VARIANTA,
-  MAX_VARIANTE_MODEL,
-  VARIANTA_MODELE,
-  type TipSite,
-} from "@/lib/pagina-vanzare";
+import { MAX_VARIANTE_MODEL, VARIANTA_MODELE, type TipSite } from "@/lib/pagina-vanzare";
 
 type CampComun = {
   /** Cheia din JSON-ul secțiunii. */
@@ -102,17 +96,7 @@ export type CampSchema =
       cuSubtitluri?: boolean;
     })
   | (CampComun & { tip: "numar"; min?: number; maxim?: number })
-  /**
-   * O alegere dintr-o listă închisă (o casetă cu opțiuni). În JSON: textul opțiunii, sau nimic.
-   * Serverul primește doar o opțiune din listă — `valideaza` refuză orice alt text, ca o cerere
-   * făcută de mână să nu poată scrie pe site ce vrea ea.
-   */
-  | (CampComun & {
-      tip: "alegere";
-      optiuni: readonly string[];
-      /** Ce scrie în casetă când nu e ales nimic. */
-      gol: string;
-    })
+
   /** Pereche text + adresă. În JSON: `{ text, href }`. */
   | (CampComun & { tip: "link" })
   /** În JSON: `{ url, altText, uploadId? }` — aceeași formă ca la încărcare. */
@@ -865,7 +849,7 @@ const CAMP_VARIANTE_MODEL: CampSchema = {
   cheie: "variante",
   eticheta: "Alte variante ale modelului",
   etichetaElement: "variantă",
-  rezumatDin: "culoare",
+  rezumatDin: "imagine",
   max: MAX_VARIANTE_MODEL,
   controaleDeasupra: true,
   hint:
@@ -877,22 +861,6 @@ const CAMP_VARIANTE_MODEL: CampSchema = {
       eticheta: "Captura",
       hint: "Partea de sus a paginii demo, ca la poza principală — se vede la fel, tăiată la aceeași formă.",
       decorativa: true,
-    },
-    {
-      tip: "alegere",
-      cheie: "culoare",
-      eticheta: "Culoarea",
-      hint: "Cea aleasă în „Aspect” când ai făcut captura. Se scrie pe poză, lângă o bulină de culoarea ei.",
-      optiuni: CULORI_VARIANTA.map((culoare) => culoare.nume),
-      gol: "Altă culoare (nu se scrie pe poză)",
-    },
-    {
-      tip: "alegere",
-      cheie: "fonturi",
-      eticheta: "Fonturile",
-      hint: "Perechea aleasă în „Aspect” când ai făcut captura.",
-      optiuni: FONTURI_VARIANTA,
-      gol: "Altă combinație (nu se scrie pe poză)",
     },
   ],
 };
