@@ -28,6 +28,12 @@ export type RepeaterListProps<T> = {
   itemLabel: string;
   /** Limită opțională de elemente. Peste ea, butonul de adăugare se blochează. */
   max?: number;
+  /**
+   * Mânerul, numărul și butoanele pe un rând DEASUPRA conținutului, nu în stânga și în dreapta
+   * lui. Pentru o listă pusă în altă listă: acolo, cele două coloane de butoane îi lăsau
+   * conținutului vreo 80 de pixeli, iar o poză cu câmpurile ei nu încăpea (30 oct. 2026).
+   */
+  controaleDeasupra?: boolean;
   className?: string;
 };
 
@@ -61,6 +67,7 @@ export function RepeaterList<T>({
   onAdd,
   itemLabel,
   max,
+  controaleDeasupra = false,
   className,
 }: RepeaterListProps<T>) {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -289,6 +296,77 @@ export function RepeaterList<T>({
               const isDragged = dragIndex === index;
               const isLast = index === items.length - 1;
 
+              // Aceleași trei bucăți, așezate pe rând (implicit) sau cu controalele deasupra.
+              const manere = (
+                <div className="flex shrink-0 items-center gap-1 pt-1">
+                  <button
+                    type="button"
+                    aria-label="Trage pentru reordonare"
+                    /**
+                     * Scos din ordinea de tabulare: tragerea nu se poate face de la
+                     * tastatură, iar calea reală sunt butoanele „Mută mai sus/jos".
+                     */
+                    tabIndex={-1}
+                    onPointerDown={() => grabHandle(index)}
+                    className="cursor-grab rounded-base p-1 text-muted-foreground hover:bg-surface-hover hover:text-foreground active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  >
+                    <GripIcon />
+                  </button>
+                  <span
+                    aria-hidden
+                    className="w-4 text-center text-xs tabular-nums text-muted-foreground"
+                  >
+                    {index + 1}
+                  </span>
+                </div>
+              );
+              const continut = (
+                <div data-repeater-content className="min-w-0 flex-1">
+                  {renderItem(item, index)}
+                </div>
+              );
+              const butoane = (
+                <div className="flex shrink-0 items-center gap-1">
+                  {/*
+                   * Poziția intră în fiecare etichetă: altfel toate rândurile ar avea
+                   * exact același nume accesibil („Mută mai sus"), iar la parcurgerea
+                   * cu cititorul de ecran nimic n-ar spune pe care element ești.
+                   */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={`Mută ${itemLabel} de pe poziția ${index + 1} mai sus`}
+                    data-move="up"
+                    disabled={index === 0}
+                    onClick={() => handleMove(index, "up")}
+                    className="size-8 px-0"
+                  >
+                    <ChevronIcon direction="up" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={`Mută ${itemLabel} de pe poziția ${index + 1} mai jos`}
+                    data-move="down"
+                    disabled={isLast}
+                    onClick={() => handleMove(index, "down")}
+                    className="size-8 px-0"
+                  >
+                    <ChevronIcon direction="down" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    aria-label={`Șterge ${itemLabel} de pe poziția ${index + 1}`}
+                    data-repeater-delete=""
+                    onClick={() => setPendingDelete({ index, key: getKey(item, index) })}
+                    className="size-8 px-0 hover:bg-danger-surface hover:text-danger"
+                  >
+                    <TrashIcon />
+                  </Button>
+                </div>
+              );
+
               return (
                 <li
                   key={getKey(item, index)}
@@ -304,75 +382,26 @@ export function RepeaterList<T>({
 
                   <Card
                     className={cn(
-                      "flex items-start gap-2 p-3 transition-opacity",
+                      controaleDeasupra ? "flex flex-col gap-2 p-3" : "flex items-start gap-2 p-3",
+                      "transition-opacity",
                       isDragged && "opacity-50",
                     )}
                   >
-                    <div className="flex shrink-0 items-center gap-1 pt-1">
-                      <button
-                        type="button"
-                        aria-label="Trage pentru reordonare"
-                        /**
-                         * Scos din ordinea de tabulare: tragerea nu se poate face de la
-                         * tastatură, iar calea reală sunt butoanele „Mută mai sus/jos".
-                         */
-                        tabIndex={-1}
-                        onPointerDown={() => grabHandle(index)}
-                        className="cursor-grab rounded-base p-1 text-muted-foreground hover:bg-surface-hover hover:text-foreground active:cursor-grabbing focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                      >
-                        <GripIcon />
-                      </button>
-                      <span
-                        aria-hidden
-                        className="w-4 text-center text-xs tabular-nums text-muted-foreground"
-                      >
-                        {index + 1}
-                      </span>
-                    </div>
-
-                    <div data-repeater-content className="min-w-0 flex-1">
-                      {renderItem(item, index)}
-                    </div>
-
-                    <div className="flex shrink-0 items-center gap-1">
-                      {/*
-                       * Poziția intră în fiecare etichetă: altfel toate rândurile ar avea
-                       * exact același nume accesibil („Mută mai sus"), iar la parcurgerea
-                       * cu cititorul de ecran nimic n-ar spune pe care element ești.
-                       */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        aria-label={`Mută ${itemLabel} de pe poziția ${index + 1} mai sus`}
-                        data-move="up"
-                        disabled={index === 0}
-                        onClick={() => handleMove(index, "up")}
-                        className="size-8 px-0"
-                      >
-                        <ChevronIcon direction="up" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        aria-label={`Mută ${itemLabel} de pe poziția ${index + 1} mai jos`}
-                        data-move="down"
-                        disabled={isLast}
-                        onClick={() => handleMove(index, "down")}
-                        className="size-8 px-0"
-                      >
-                        <ChevronIcon direction="down" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        aria-label={`Șterge ${itemLabel} de pe poziția ${index + 1}`}
-                        data-repeater-delete=""
-                        onClick={() => setPendingDelete({ index, key: getKey(item, index) })}
-                        className="size-8 px-0 hover:bg-danger-surface hover:text-danger"
-                      >
-                        <TrashIcon />
-                      </Button>
-                    </div>
+                    {controaleDeasupra ? (
+                      <>
+                        <div className="flex items-center justify-between gap-2">
+                          {manere}
+                          {butoane}
+                        </div>
+                        {continut}
+                      </>
+                    ) : (
+                      <>
+                        {manere}
+                        {continut}
+                        {butoane}
+                      </>
+                    )}
                   </Card>
                 </li>
               );

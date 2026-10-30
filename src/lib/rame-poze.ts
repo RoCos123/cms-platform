@@ -49,6 +49,11 @@ export function raportRamei(
     return variant === "vitrina" ? "16 / 9" : "3 / 2";
   }
 
+  // Capturile din „Alte variante ale modelului" stau în aceeași casetă ca poza principală.
+  if (cheieSectiune === "portfolio" && camp === "elemente.variante.imagine" && variant === "vitrina") {
+    return "16 / 9";
+  }
+
   if (cheieSectiune === "logos" && camp === "elemente.imagine") {
     return "16 / 9";
   }

@@ -105,6 +105,8 @@ export function locPozaSectiune(
   if (cheieSectiune === "portfolio" && camp === "elemente.imagine") {
     return variant === "vitrina" ? "vitrina" : "program";
   }
+  // „Alte variante ale modelului": aceeași casetă ca poza principală a cartonașului.
+  if (cheieSectiune === "portfolio" && camp === "elemente.variante.imagine" && variant === "vitrina") return "vitrina";
   if (cheieSectiune === "logos" && camp === "elemente.imagine") return "aparitie";
 
   return undefined;

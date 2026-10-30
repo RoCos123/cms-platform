@@ -17,6 +17,13 @@
  */
 
 import { MAX_CUVINTE_BANDA, MAX_LUNGIME_CUVANT_BANDA } from "@/lib/banda-servicii";
+import {
+  CULORI_VARIANTA,
+  FONTURI_VARIANTA,
+  MAX_VARIANTE_MODEL,
+  VARIANTA_MODELE,
+  type TipSite,
+} from "@/lib/pagina-vanzare";
 
 type CampComun = {
   /** Cheia din JSON-ul secțiunii. */
@@ -95,6 +102,17 @@ export type CampSchema =
       cuSubtitluri?: boolean;
     })
   | (CampComun & { tip: "numar"; min?: number; maxim?: number })
+  /**
+   * O alegere dintr-o listă închisă (o casetă cu opțiuni). În JSON: textul opțiunii, sau nimic.
+   * Serverul primește doar o opțiune din listă — `valideaza` refuză orice alt text, ca o cerere
+   * făcută de mână să nu poată scrie pe site ce vrea ea.
+   */
+  | (CampComun & {
+      tip: "alegere";
+      optiuni: readonly string[];
+      /** Ce scrie în casetă când nu e ales nimic. */
+      gol: string;
+    })
   /** Pereche text + adresă. În JSON: `{ text, href }`. */
   | (CampComun & { tip: "link" })
   /** În JSON: `{ url, altText, uploadId? }` — aceeași formă ca la încărcare. */
@@ -108,6 +126,8 @@ export type CampSchema =
        * n-ar ajuta cu nimic.
        */
       dimensiuni?: string;
+      /** Doar decor pe site (`alt=""`): fără câmpul „Text alternativ". Vezi `ImageField`. */
+      decorativa?: boolean;
     })
   /**
    * Un document de descărcat, ales din bibliotecă. În JSON: `{ fisierId, url }`
@@ -129,6 +149,8 @@ export type CampSchema =
       /** Ce câmp al elementului se afișează ca titlu al rândului în listă. */
       rezumatDin: string;
       max?: number;
+      /** Butoanele rândurilor deasupra conținutului — pentru o listă pusă în altă listă. Vezi `RepeaterList`. */
+      controaleDeasupra?: boolean;
     });
 
 export type MetaSectiune = {
@@ -831,6 +853,72 @@ const LISTA: MetaSectiune[] = [
 ];
 
 const DUPA_CHEIE = new Map(LISTA.map((meta) => [meta.cheie, meta]));
+
+/**
+ * „Alte variante ale modelului" — capturi ale aceluiași demo în alte culori și fonturi, între care
+ * poza cartonașului se schimbă singură (`pagina-vanzare.ts`, `cadre-vitrina.tsx`). Nu stă în
+ * descrierea secțiunii, fiindcă n-are ce căuta pe un cabinet: o adaugă `campuriPentruRand`, doar
+ * pe galeria de modele a paginii de vânzare.
+ */
+const CAMP_VARIANTE_MODEL: CampSchema = {
+  tip: "lista",
+  cheie: "variante",
+  eticheta: "Alte variante ale modelului",
+  etichetaElement: "variantă",
+  rezumatDin: "culoare",
+  max: MAX_VARIANTE_MODEL,
+  controaleDeasupra: true,
+  hint:
+    "Capturi ale aceluiași demo, făcute după ce i-ai schimbat culorile și fonturile din „Aspect”. Pe site, poza cartonașului trece singură de la una la alta, la câteva secunde. Fără nicio variantă, cartonașul rămâne cum e.",
+  campuri: [
+    {
+      tip: "imagine",
+      cheie: "imagine",
+      eticheta: "Captura",
+      hint: "Partea de sus a paginii demo, ca la poza principală — se vede la fel, tăiată la aceeași formă.",
+      decorativa: true,
+    },
+    {
+      tip: "alegere",
+      cheie: "culoare",
+      eticheta: "Culoarea",
+      hint: "Cea aleasă în „Aspect” când ai făcut captura. Se scrie pe poză, lângă o bulină de culoarea ei.",
+      optiuni: CULORI_VARIANTA.map((culoare) => culoare.nume),
+      gol: "Altă culoare (nu se scrie pe poză)",
+    },
+    {
+      tip: "alegere",
+      cheie: "fonturi",
+      eticheta: "Fonturile",
+      hint: "Perechea aleasă în „Aspect” când ai făcut captura.",
+      optiuni: FONTURI_VARIANTA,
+      gol: "Altă combinație (nu se scrie pe poză)",
+    },
+  ],
+};
+
+/**
+ * Câmpurile unui rând anume. De obicei, ale secțiunii; pe galeria de modele a paginii de vânzare
+ * (`portfolio` cu varianta „vitrina", pe un site de vânzare), fiecare cartonaș are în plus
+ * „Alte variante ale modelului".
+ *
+ * Aceeași funcție o folosesc editorul și salvarea: salvarea păstrează DOAR câmpurile declarate,
+ * deci un câmp arătat în editor și necunoscut serverului s-ar pierde la fiecare salvare.
+ */
+export function campuriPentruRand(
+  meta: MetaSectiune,
+  rand: { variant: string | null; tipSite: TipSite },
+): CampSchema[] {
+  if (meta.cheie !== "portfolio" || rand.variant !== VARIANTA_MODELE || rand.tipSite !== "vanzare") {
+    return meta.campuri;
+  }
+
+  return meta.campuri.map((camp) =>
+    camp.tip === "lista" && camp.cheie === "elemente"
+      ? { ...camp, campuri: [...camp.campuri, CAMP_VARIANTE_MODEL] }
+      : camp,
+  );
+}
 
 export function metaSectiune(cheie: string): MetaSectiune | null {
   return DUPA_CHEIE.get(cheie) ?? null;

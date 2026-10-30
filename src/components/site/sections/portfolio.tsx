@@ -3,7 +3,14 @@ import type { PunctFocal } from "@/lib/punct-focal";
 import { Section } from "@/components/site/section";
 import { SectionHeading } from "@/components/site/section-heading";
 import { SectionImage } from "@/components/site/section-image";
-import { ATRIBUT_MODEL, TEXTE_VANZARE } from "@/lib/pagina-vanzare";
+import {
+  ATRIBUT_MODEL,
+  MAX_VARIANTE_MODEL,
+  TEXTE_VANZARE,
+  culoareaVariantei,
+  etichetaVariantei,
+} from "@/lib/pagina-vanzare";
+import { CadreVitrina, type CadruVitrina } from "./cadre-vitrina";
 
 export type PortfolioData = {
   eyebrow?: string;
@@ -33,6 +40,16 @@ export type PortfolioData = {
       latime?: number;
       inaltime?: number;
     };
+    /**
+     * „Alte variante ale modelului" — doar pe cartonașele galeriei de pe pagina de vânzare
+     * (`campuriPentruRand`): capturi ale aceluiași demo în alte culori și fonturi, cu numele
+     * culorii și al perechii de fonturi alese în „Aspect". Vezi `CadreVitrina`.
+     */
+    variante?: {
+      imagine?: { url: string; pozitie?: PunctFocal };
+      culoare?: string;
+      fonturi?: string;
+    }[];
   }[];
 };
 
@@ -383,18 +400,8 @@ function CartonasVitrina({
   */
   const incadrarePoza = element.imagine?.pozitie ?? { x: 50, y: 0 };
 
-  const continut = (
-    <div style={{ position: "relative" }}>
-      {element.imagine && (
-        <SectionImage
-          src={element.imagine.url}
-          alt={element.imagine.altText ?? ""}
-          aspectRatio="16 / 9"
-          sizes="(max-width: 720px) 100vw, 560px"
-          pozitie={incadrarePoza}
-        />
-      )}
-
+  const pestePoza = (
+    <>
       {/* Voalul: fără el, un nume alb scris peste captura unui site deschis
           la culoare ar fi ilizibil — vezi cardul „Servicii" pentru același
           voal, la altă secțiune. Ținut jos și scurt (se stinge pe la 62%):
@@ -415,8 +422,50 @@ function CartonasVitrina({
           {element.titlu}
         </h3>
       )}
+    </>
+  );
+
+  const continut = (
+    <div style={{ position: "relative" }}>
+      {element.imagine && (
+        <SectionImage
+          src={element.imagine.url}
+          alt={element.imagine.altText ?? ""}
+          aspectRatio="16 / 9"
+          sizes="(max-width: 720px) 100vw, 560px"
+          pozitie={incadrarePoza}
+        />
+      )}
+      {pestePoza}
     </div>
   );
+
+  /*
+    „Alte variante ale modelului": poza principală întâi, apoi capturile cu poză. Fără poza
+    principală nu se pornește nimic — variantele arată modelul „și în alte culori", deci au
+    nevoie de el. O captură fără poză (rând început în panou, lăsat gol) se sare. Încadrarea
+    implicită e tot SUS, ca la poza principală.
+  */
+  const variante = (element.variante ?? []).filter((varianta) => varianta.imagine?.url).slice(0, MAX_VARIANTE_MODEL);
+  const cadre: CadruVitrina[] | null =
+    element.imagine && variante.length > 0
+      ? [
+          {
+            src: element.imagine.url,
+            alt: element.imagine.altText ?? "",
+            pozitie: incadrarePoza,
+            eticheta: TEXTE_VANZARE.variante.demo,
+            culoare: null,
+          },
+          ...variante.map((varianta) => ({
+            src: varianta.imagine!.url,
+            alt: "",
+            pozitie: varianta.imagine!.pozitie ?? { x: 50, y: 0 },
+            eticheta: etichetaVariantei(varianta),
+            culoare: culoareaVariantei(varianta.culoare),
+          })),
+        ]
+      : null;
 
   /*
     Pagina de vânzare: butonul „Vreau acest model" (brief 2.2) și numele, pe
@@ -430,6 +479,11 @@ function CartonasVitrina({
     sau pe poză ajunge la linkul demo-ului de dedesubt. Butonul e frate cu acel
     link, nu în el — un link în alt link nu e voie.
   */
+  // Pe pagina de vânzare demo-ul se deschide în filă nouă (brief 2.2): omul
+  // compară modele, iar pagina cu toate modelele trebuie să-i rămână deschisă.
+  // `noopener noreferrer`: demo-ul e alt site și nu primește acces la fereastra asta.
+  const atributeLink = paginaVanzare ? { target: "_blank", rel: "noopener noreferrer" } : {};
+
   const randJos = cuButon && (
     <div
       style={{
@@ -492,15 +546,12 @@ function CartonasVitrina({
         background: "var(--t-suprafata, var(--t-fundal-nuantat))",
       }}
     >
-      {href ? (
-        <a
-          href={href}
-          // Pe pagina de vânzare demo-ul se deschide în filă nouă (brief 2.2): omul
-          // compară modele, iar pagina cu toate modelele trebuie să-i rămână deschisă.
-          // `noopener noreferrer`: demo-ul e alt site și nu primește acces la fereastra asta.
-          {...(paginaVanzare ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-          style={{ display: "block", color: "inherit", textDecoration: "none" }}
-        >
+      {cadre ? (
+        <CadreVitrina cadre={cadre} legatura={href ? { href, ...atributeLink } : null}>
+          {pestePoza}
+        </CadreVitrina>
+      ) : href ? (
+        <a href={href} {...atributeLink} style={{ display: "block", color: "inherit", textDecoration: "none" }}>
           {continut}
         </a>
       ) : (

@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
 import { scrieInJurnal } from "@/lib/audit";
-import { metaSectiune } from "@/lib/sectiuni";
+import { campuriPentruRand, metaSectiune } from "@/lib/sectiuni";
+import { tipulSiteului } from "@/lib/pagina-vanzare-date";
 import { catreEditor, catreStocare, valideaza } from "@/lib/sectiuni-editare";
 import {
   completeazaMasurileImaginilor,
@@ -146,12 +147,15 @@ export async function salveazaSectiune(
     return { ok: false, mesaj: "Conținutul secțiunii e prea mare. Scurtează textele." };
   }
 
-  const { data: rand } = await supabase
-    .from("site_content")
-    .select("id, key, data")
-    .eq("id", id)
-    .eq("site_id", session.siteId)
-    .maybeSingle();
+  const [{ data: rand }, tipSite] = await Promise.all([
+    supabase
+      .from("site_content")
+      .select("id, key, variant, data")
+      .eq("id", id)
+      .eq("site_id", session.siteId)
+      .maybeSingle(),
+    tipulSiteului(session.siteId),
+  ]);
 
   if (!rand) {
     return { ok: false, mesaj: "Secțiunea nu mai există. Reîncarcă pagina." };
@@ -162,8 +166,10 @@ export async function salveazaSectiune(
     return { ok: false, mesaj: "Secțiunea aceasta nu poate fi editată din panou." };
   }
 
-  const curatat = catreStocare(catreEditor(date, meta.campuri), meta.campuri);
-  const erori = valideaza(catreEditor(curatat, meta.campuri), meta.campuri);
+  // Câmpurile rândului, aceleași ca în editor: altfel „Alte variante ale modelului" s-ar pierde aici.
+  const campuri = campuriPentruRand(meta, { variant: rand.variant as string | null, tipSite });
+  const curatat = catreStocare(catreEditor(date, campuri), campuri);
+  const erori = valideaza(catreEditor(curatat, campuri), campuri);
 
   if (Object.keys(erori).length > 0) {
     return { ok: false, mesaj: "Mai lipsește ceva. Verifică marcajele din formular." };

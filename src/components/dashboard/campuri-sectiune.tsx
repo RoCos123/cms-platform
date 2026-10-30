@@ -208,6 +208,7 @@ export function CampuriSectiune({
                 // de varianta rândului — lucruri pe care descrierea câmpului nu
                 // le știe.
                 raport={raportPentru?.(drum)}
+                decorativa={camp.decorativa}
               />
             );
           }
@@ -223,6 +224,30 @@ export function CampuriSectiune({
                 onChange={(nou) => seteaza(camp.cheie, nou)}
               />
             );
+
+          case "alegere": {
+            const ales = String(valoare[camp.cheie] ?? "");
+            return (
+              <SelectField
+                key={camp.cheie}
+                label={camp.eticheta}
+                hint={camp.hint}
+                error={eroare}
+                required={camp.obligatoriu}
+                value={ales}
+                onChange={(event) => seteaza(camp.cheie, event.target.value)}
+              >
+                <option value="">{camp.gol}</option>
+                {/* O valoare ieșită din listă rămâne vizibilă, cu eroarea ei, ca omul să știe ce înlocuiește. */}
+                {ales !== "" && !camp.optiuni.includes(ales) && <option value={ales}>{ales}</option>}
+                {camp.optiuni.map((optiune) => (
+                  <option key={optiune} value={optiune}>
+                    {optiune}
+                  </option>
+                ))}
+              </SelectField>
+            );
+          }
 
           case "slug":
             return (
@@ -275,6 +300,7 @@ export function CampuriSectiune({
                   addLabel={`+ Adaugă ${camp.etichetaElement}`}
                   itemLabel={camp.etichetaElement}
                   max={camp.max}
+                  controaleDeasupra={camp.controaleDeasupra}
                   // Elementul nou se construiește tot din descriere, prin aceeași
                   // funcție care încarcă datele existente: altfel un câmp adăugat
                   // în descriere ar lipsi din elementele noi.

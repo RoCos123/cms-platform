@@ -1,4 +1,6 @@
 import { linkWhatsApp } from "@/lib/whatsapp";
+import { COLECTII_CULOARE } from "@/lib/aspect/salvare";
+import { PERECHI_FONTURI } from "@/lib/aspect/fonturi";
 
 /**
  * Pagina de vânzare — sitepsihologi.ro: textele ei scrise în cod și regulile mici
@@ -67,6 +69,18 @@ export const TEXTE_VANZARE = {
     email: "E-mail",
   },
 
+  /**
+   * Eticheta de pe poza cartonașului, când modelul are „Alte variante" (`etichetaVariantei`).
+   * `demo` e a pozei principale — modelul exact cum e în demo-ul la care duce cartonașul.
+   */
+  variante: {
+    demo: "Ca în demo",
+    /** O variantă fără culoare și fără fonturi alese din listă. */
+    faraNume: "Altă variantă",
+    /** Începutul numelui citit al bulinei: „Arată varianta: Safir · Modern". */
+    arata: "Arată varianta",
+  },
+
   /** Subsolul: o singură listă, aceleași linkuri ca bara de sus (brief 1.3). */
   subsol: {
     /** Nu se vede: e numele listei pentru cititoarele de ecran. */
@@ -90,6 +104,44 @@ export function tipulDinValoare(valoare: unknown): TipSite {
 
 /** Varianta secțiunii „portfolio" care e galeria de modele (cartonașe cu poză și nume). */
 export const VARIANTA_MODELE = "vitrina";
+
+/**
+ * „Alte variante ale modelului" (30 oct. 2026, varianta B aleasă de proprietar din machete): pe
+ * cartonașul unui model, poza se schimbă singură între capturi ale ACELUIAȘI demo în alte culori
+ * și fonturi, ca vizitatorul să vadă că modelul nu vine doar în culorile din demo.
+ *
+ * Câmpul apare în panou doar pe cartonașele galeriei de pe pagina de vânzare (`campuriPentruRand`).
+ * Culoarea și fonturile nu se scriu de mână: se aleg din aceleași liste ca în „Aspect" —
+ * culorile gata alese ale celor două colecții și perechile de fonturi —, ca eticheta de pe poză
+ * să spună exact ce a ales proprietarul acolo când a făcut captura.
+ */
+export const MAX_VARIANTE_MODEL = 3;
+
+/** Toate culorile gata alese din „Aspect", ambele colecții (`Safir`, `Safir Mat`…). */
+export const CULORI_VARIANTA: readonly { nume: string; hex: string; matasos: boolean }[] =
+  COLECTII_CULOARE.flatMap((colectie): readonly { nume: string; hex: string; matasos: boolean }[] => colectie.preseturi);
+
+/** Perechile gata alese din „Aspect" (`Elegant`, `Modern`…). */
+export const FONTURI_VARIANTA: readonly string[] = PERECHI_FONTURI.map((pereche) => pereche.nume);
+
+/** Bulina unei variante: culoarea și dacă e din colecția mătăsoasă. `null` = nicio culoare din listă. */
+export function culoareaVariantei(nume: unknown): { hex: string; matasos: boolean } | null {
+  const gasita = CULORI_VARIANTA.find((culoare) => culoare.nume === nume);
+  return gasita ? { hex: gasita.hex, matasos: gasita.matasos } : null;
+}
+
+/**
+ * Ce scrie pe poză pentru o variantă: „Safir · Modern", doar culoarea, doar fonturile sau, fără
+ * nimic din liste, „Altă variantă". Un nume care nu (mai) e în liste nu se arată: pe poză apare
+ * doar ce se poate alege în „Aspect", nu un text pus de mână în bază.
+ */
+export function etichetaVariantei(varianta: { culoare?: unknown; fonturi?: unknown }): string {
+  const parti = [
+    culoareaVariantei(varianta.culoare) ? (varianta.culoare as string) : null,
+    typeof varianta.fonturi === "string" && FONTURI_VARIANTA.includes(varianta.fonturi) ? varianta.fonturi : null,
+  ].filter((parte): parte is string => parte !== null);
+  return parti.length > 0 ? parti.join(" · ") : TEXTE_VANZARE.variante.faraNume;
+}
 
 /**
  * Atributul pus pe butonul „Vreau acest model". Formularul îl caută la clic și

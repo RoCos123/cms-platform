@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { verifySession } from "@/lib/dal";
 import { createClient } from "@/lib/supabase/server";
-import { metaSectiune } from "@/lib/sectiuni";
+import { campuriPentruRand, metaSectiune } from "@/lib/sectiuni";
 import { catreEditor } from "@/lib/sectiuni-editare";
 import { getTemplate, type SectionTone } from "@/lib/templates";
 import { culoriPermise, fonturiPermise } from "@/lib/aspect/acces";
@@ -141,14 +141,18 @@ export default async function EditorSectiunePage({
   const ancora = ANCORE_SECTIUNI[rand.key as string]?.ancora;
   const hrefPeSite = ancora ? `/#${ancora}` : "/";
 
+  // Câmpurile RÂNDULUI, nu doar ale secțiunii: galeria de modele a paginii de vânzare are în plus
+  // „Alte variante ale modelului". Aceleași ca la salvare (`salveazaSectiune`).
+  const campuri = campuriPentruRand(meta, { variant: rand.variant as string | null, tipSite: tip });
+
   return (
     <EditorSectiune
       id={id}
-      meta={meta}
+      meta={{ ...meta, campuri }}
       hrefPeSite={hrefPeSite}
       tone={(rand.tone as SectionTone) ?? "deschis"}
       variant={rand.variant as string | null}
-      valoareInitiala={catreEditor(continut, meta.campuri)}
+      valoareInitiala={catreEditor(continut, campuri)}
       template={getTemplate(
         site?.template as string | null,
         culoriPermise(setari?.brand, { domain: site?.domain as string | null, template: site?.template as string | null }),

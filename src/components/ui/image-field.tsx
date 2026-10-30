@@ -72,6 +72,12 @@ export type ImageFieldProps = {
    * acolo. Lipsă → pătrat.
    */
   raport?: string;
+  /**
+   * Poză doar decorativă pe site (`alt=""`): fără câmpul „Text alternativ", care n-ar ajunge
+   * nicăieri. Pusă pentru capturile din „Alte variante ale modelului" (30 oct. 2026), care sunt
+   * aceeași pagină în alte culori — cititorul de ecran aude modelul o dată, din poza principală.
+   */
+  decorativa?: boolean;
   className?: string;
 };
 
@@ -121,6 +127,7 @@ export function ImageField({
   cuRepozitionare,
   onReposition,
   raport,
+  decorativa = false,
   className,
 }: ImageFieldProps) {
   const labelId = useId();
@@ -421,28 +428,35 @@ export function ImageField({
               </div>
             )}
 
-            <TextField
-              label="Text alternativ"
-              required
-              // Marcaj pentru mutarea focusului după încărcare: `FieldShell`
-              // își generează singur id-ul, deci nu-l putem ținti altfel.
-              data-image-alt-input=""
-              value={value.altText}
-              onChange={(event) => onChange({ ...value, altText: event.target.value })}
-              placeholder="Ex.: Cabinet luminos, cu două fotolii și o masă joasă"
-              aria-invalid={missingAltText || undefined}
-              hint={
-                <>
-                  Descrie pe scurt ce se vede în imagine. Ajută persoanele care folosesc
-                  cititoare de ecran și apare în Google.
-                  {missingAltText && (
-                    <span className="mt-1 block text-warning">
-                      Deocamdată imaginea e fără descriere.
-                    </span>
-                  )}
-                </>
-              }
-            />
+            {decorativa ? (
+              <p className="text-xs text-muted-foreground">
+                Nu are nevoie de descriere: pe site e doar decor, iar cine folosește un cititor de
+                ecran aude descrierea pozei principale.
+              </p>
+            ) : (
+              <TextField
+                label="Text alternativ"
+                required
+                // Marcaj pentru mutarea focusului după încărcare: `FieldShell`
+                // își generează singur id-ul, deci nu-l putem ținti altfel.
+                data-image-alt-input=""
+                value={value.altText}
+                onChange={(event) => onChange({ ...value, altText: event.target.value })}
+                placeholder="Ex.: Cabinet luminos, cu două fotolii și o masă joasă"
+                aria-invalid={missingAltText || undefined}
+                hint={
+                  <>
+                    Descrie pe scurt ce se vede în imagine. Ajută persoanele care folosesc
+                    cititoare de ecran și apare în Google.
+                    {missingAltText && (
+                      <span className="mt-1 block text-warning">
+                        Deocamdată imaginea e fără descriere.
+                      </span>
+                    )}
+                  </>
+                }
+              />
+            )}
 
             <div className="flex flex-wrap items-center gap-2">
               <Button
@@ -450,6 +464,8 @@ export function ImageField({
                 size="sm"
                 onClick={openFilePicker}
                 disabled={isUploading}
+                // Fără câmpul de descriere, focusul de după încărcare vine aici (vezi `focusAfterChange`).
+                {...(decorativa ? { "data-image-alt-input": "" } : {})}
               >
                 Înlocuiește
               </Button>

@@ -291,6 +291,17 @@ export function valideaza(
 
     if (camp.tip === "imagine" || camp.tip === "document" || camp.tip === "numar") continue;
 
+    if (camp.tip === "alegere") {
+      const ales = String(brut ?? "").trim();
+      if (camp.obligatoriu && ales === "") {
+        erori[drum] = "Alege una dintre variantele din listă.";
+      } else if (ales !== "" && !camp.optiuni.includes(ales)) {
+        // O valoare rămasă în bază după ce opțiunea a ieșit din listă, sau trimisă de mână.
+        erori[drum] = `„${ales}” nu mai e în listă. Alege alta.`;
+      }
+      continue;
+    }
+
     const text = String(brut ?? "").trim();
 
     if (camp.obligatoriu && text === "") {

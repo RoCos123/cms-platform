@@ -182,6 +182,32 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
+**Galeria „Modele” de pe sitepsihologi: „Alte variante ale modelului”, poza care se schimbă singură — PE
+RAMURĂ `claude/sleepy-tesla-aanhq7`, NU PE MASTER (30 oct. 2026).** Cererea proprietarului: să se vadă clar că
+modelele pot avea alte culori și fonturi, schimbate oricând. I-am arătat trei machete (A — buline pe cartonașe,
+B — captura se schimbă singură, C — bloc separat sub modele); **a ales B** („B cel cu animația”).
+*Ce e construit:*
+- **În panou**, la secțiunea galeriei, fiecare cartonaș are „Alte variante ale modelului” (cel mult 3): o captură
+  + „Culoarea” (cele 24 de culori gata alese din „Aspect”) + „Fonturile” (cele 9 perechi), din casete cu listă,
+  nu text liber. Câmpul apare DOAR pe galeria „vitrina” a unui site de vânzare (`campuriPentruRand` în
+  `src/lib/sectiuni.ts`, folosit și de editor, și de salvare — salvarea aruncă tot ce nu e declarat). Captura e
+  decorativă (`alt=""`), deci fără „Text alternativ”. Butoanele variantelor stau deasupra pozei
+  (`controaleDeasupra` la `RepeaterList`): ca listă în listă, pe două coloane, poza rămânea de 80px.
+- **Pe site** (`src/components/site/sections/cadre-vitrina.tsx`): poza principală, apoi capturile, câte 3,5 s,
+  trecere de 0,8 s; sus, o etichetă („Ca în demo”, „Safir · Modern”) cu câte o bulină pe poză. Stă pe loc cât
+  cartonașul nu e pe ecran, sub maus, după ce omul apasă o bulină și la „mișcare redusă” (bulinele merg și
+  atunci). Fără variante, cartonașul e exact ca înainte. Merge și în previzualizarea din panou.
+- *Verificat:* `e2e/variante-model.proba.mjs` (7 probe; în total 557, toate trec); în browser, pe stiva locală, cu
+  capturi de probă: schimbarea, oprirea la maus, bulinele, mișcarea redusă, telefonul la 360/390px, butonul
+  „Vreau acest model” și clicul spre demo; în panou: citirea, salvarea, cabinetul fără câmp.
+*Ce are de făcut proprietarul după „fă pe master”:* 2 capturi pe model (10 în total), pe demo-uri — în „Aspect”
+alege culoarea și fonturile, salvează, captura părții de sus (ca la poza principală), apoi revine la culorile
+modelului; în panoul sitepsihologi le pune la „Alte variante ale modelului” și alege culoarea și fonturile din
+listă. *Propuse, nefăcute (le schimbă el din panou, dacă vrea):* textul de sub titlu („…Fiecare devine al tău:
+pui textele și pozele tale, alegi culorile și scrisul care ți se potrivesc — și le schimbi oricând, singur, din
+panou.”) și titlul cartonașului „Caldură” → „Căldură”. Variantele nealese (A, C) și ideea „Încearcă alte culori”
+direct pe demo (D) nu se reiau fără el.
+
 **Limbile site-ului: bulina cu steag (română · engleză · germană) prin traducerea Google — PE MASTER
 (`0d6760c`, CI verde, rularea 230, 21 oct. 2026), DOAR PE CLARITATE, OPRITĂ DIN OFICIU (21 oct. 2026; cerut de proprietar: „hai să facem modificarea limbii din RO în EN dar și
 în DE", apoi „o bulină… steagul RO când e în română, steagul Angliei când e în engleză" și „să fie
