@@ -205,6 +205,10 @@ repune.** Ce se salvase în „culoare”/„fonturi” cade singur la următoar
   capturi de probă: schimbarea, oprirea la maus, mișcarea redusă, telefonul, fără niciun buton pe cartonaș; în
   panou: doar captura, salvarea păstrează variantele, cabinetul fără câmp. Pe master, proprietarul a pus capturile
   pe Apropiere și a confirmat că se schimbă automat (cu animațiile Windows pornite).
+**Butonul „Vreau acest model” și numele modelelor, mai mici (30 oct.; „cu 20–30% mai mici”) — PE RAMURĂ, NU PE
+MASTER:** butonul ~22% (10,5px, `6px 10px`, 115×25 în loc de 145×32 — spre capătul de jos al cererii, ca textul să
+rămână de citit pe telefon, tot peste 24px înălțime), numele 25% (`clamp(15px, 1.95vw, 21px)`, era
+`clamp(20px, 2.6vw, 28px)`). În `portfolio.tsx`, doar pe cartonașele „vitrina”.
 *Ce are de făcut proprietarul:* 2 capturi pe model, pe demo-uri (în „Aspect” alege culoarea și fonturile, salvează,
 captura părții de sus în fereastră InPrivate — fără bara „Editează pagina”/„Panou” —, apoi revine la culorile
 modelului) și le pune la „Alte variante ale modelului”. *Propuse, nefăcute (le schimbă el din panou, dacă vrea):*

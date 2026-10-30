@@ -488,11 +488,13 @@ function CartonasVitrina({
           whiteSpace: "nowrap",
           display: "inline-flex",
           alignItems: "center",
-          padding: "8px 14px",
+          // Micșorat cu ~22% (30 oct. 2026, proprietarul: „cu 20–30% mai mici"; era 8px 14px și 13px).
+          // Spre capătul de jos al cererii, ca textul să rămână de citit pe telefon; tot 24px+ înălțime.
+          padding: "6px 10px",
           borderRadius: "999px",
           background: "#fff",
           color: "#1a1a1a",
-          fontSize: "13px",
+          fontSize: "10.5px",
           fontWeight: 600,
           lineHeight: 1.2,
           textDecoration: "none",
@@ -545,11 +547,14 @@ function CartonasVitrina({
   );
 }
 
-/** Numele modelului scris peste poză, pe voalul întunecat. */
+/**
+ * Numele modelului scris peste poză, pe voalul întunecat. Micșorat cu 25% pe 30 oct. 2026, odată cu
+ * butonul (proprietarul: „cu 20–30% mai mici"; era `clamp(20px, 2.6vw, 28px)`).
+ */
 const STIL_NUME_MODEL = {
   margin: 0,
   textAlign: "right",
-  fontSize: "clamp(20px, 2.6vw, 28px)",
+  fontSize: "clamp(15px, 1.95vw, 21px)",
   lineHeight: 1.15,
   fontWeight: 700,
   color: "#fff",
