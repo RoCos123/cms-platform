@@ -188,7 +188,7 @@ modelele pot avea alte culori și fonturi, schimbate oricând. I-am arătat trei
 B — captura se schimbă singură, C — bloc separat sub modele); **a ales B** („B cel cu animația”).
 **FĂRĂ ETICHETĂ ȘI FĂRĂ BULINE (30 oct., după ce a văzut prima versiune pe site): „nu vreau să scrie nimic,
 vreau să nu mai fie nicio etichetă, doar să se schimbe automat odată ce am încărcat mai multe variante” — PE
-RAMURĂ, NU PE MASTER.** Prima versiune (pe master, `91d19ff`) avea sus o etichetă („Ca în demo”, „Safir · Modern”,
+MASTER `8fe90d4`, CI verde, rularea 241.** Prima versiune (pe master, `91d19ff`) avea sus o etichetă („Ca în demo”, „Safir · Modern”,
 „Altă variantă”) cu buline de apăsat, plus „Culoarea” și „Fonturile” în panou pentru ea; toate trei au ieșit. **Nu le
 repune.** Ce se salvase în „culoare”/„fonturi” cade singur la următoarea salvare a secțiunii.
 *Ce e construit (după schimbare):*
