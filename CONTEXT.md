@@ -183,7 +183,7 @@ rând, schimbată din inițiativa mea — amândouă respinse). Verificarea ceru
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
 **Galeria „Modele” de pe sitepsihologi: „Alte variante ale modelului”, poza care se schimbă singură — PE
-RAMURĂ `claude/sleepy-tesla-aanhq7`, NU PE MASTER (30 oct. 2026).** Cererea proprietarului: să se vadă clar că
+MASTER `91d19ff` (30 oct. 2026, la „fă pe master”; CI verde, rularea 240).** Cererea proprietarului: să se vadă clar că
 modelele pot avea alte culori și fonturi, schimbate oricând. I-am arătat trei machete (A — buline pe cartonașe,
 B — captura se schimbă singură, C — bloc separat sub modele); **a ales B** („B cel cu animația”).
 *Ce e construit:*
@@ -200,7 +200,7 @@ B — captura se schimbă singură, C — bloc separat sub modele); **a ales B**
 - *Verificat:* `e2e/variante-model.proba.mjs` (7 probe; în total 557, toate trec); în browser, pe stiva locală, cu
   capturi de probă: schimbarea, oprirea la maus, bulinele, mișcarea redusă, telefonul la 360/390px, butonul
   „Vreau acest model” și clicul spre demo; în panou: citirea, salvarea, cabinetul fără câmp.
-*Ce are de făcut proprietarul după „fă pe master”:* 2 capturi pe model (10 în total), pe demo-uri — în „Aspect”
+*Ce are de făcut proprietarul (codul e pe master; până pune capturile, galeria arată ca înainte):* 2 capturi pe model (10 în total), pe demo-uri — în „Aspect”
 alege culoarea și fonturile, salvează, captura părții de sus (ca la poza principală), apoi revine la culorile
 modelului; în panoul sitepsihologi le pune la „Alte variante ale modelului” și alege culoarea și fonturile din
 listă. *Propuse, nefăcute (le schimbă el din panou, dacă vrea):* textul de sub titlu („…Fiecare devine al tău:
