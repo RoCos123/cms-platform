@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTenant } from "@/lib/dal";
 import { identitateaSiteului } from "@/lib/site-public";
-import { linkurilePaginilor } from "@/lib/pagini-publice";
+import { adresaPoliticii } from "@/lib/pagini-publice";
 import { COLOANE_MODULE, moduleleSiteului } from "@/lib/module";
 import { oreDeOferit } from "@/lib/programari-publice";
 import { createServiceClient } from "@/lib/supabase/admin";
@@ -65,9 +65,10 @@ export default async function PaginaProgramare({
 
   if (!zile) notFound();
 
-  const [{ site }, linkuriPagini] = await Promise.all([
+  const [{ site }, linkConfidentialitate] = await Promise.all([
     identitateaSiteului(siteId),
-    linkurilePaginilor(siteId),
+    // Politica publicată, chiar și ascunsă din meniu („Nicăieri"): linkul de lângă bifa de acord.
+    adresaPoliticii(siteId),
   ]);
 
   const deAles: ZiDeAles[] = zile.map((z) => ({
@@ -84,7 +85,6 @@ export default async function PaginaProgramare({
     lunaScrisa,
   );
 
-  const confidentialitate = linkuriPagini.find((p) => p.slug.includes("confident"));
 
   return (
     <CadruSite linkEditare="/dashboard/programari">
@@ -103,7 +103,7 @@ export default async function PaginaProgramare({
               furnizorCaptcha={process.env.NEXT_PUBLIC_CAPTCHA_FURNIZOR || null}
               // Secțiunea are tonul „deschis”, deci caseta merge pe varianta deschisă.
               temaCaptcha="light"
-              linkConfidentialitate={confidentialitate ? `/${confidentialitate.slug}` : undefined}
+              linkConfidentialitate={linkConfidentialitate}
               // Ce a apăsat pe prima pagină. Se verifică în formular față de
               // orele chiar libere — o adresă scrisă de mână nu poate alege o
               // oră care nu se oferă.

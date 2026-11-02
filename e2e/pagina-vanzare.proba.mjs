@@ -227,13 +227,23 @@ test("datele firmei ajung în cele trei locuri cerute, și doar pe pagina de vâ
   assert.ok(cadru.indexOf("...(meniuVanzare && {") < cadru.indexOf("rindLegal:"));
 });
 
-test("bifa de acord: „Politica de confidențialitate” devine link doar când pagina e publicată", () => {
+test("bifa de acord: „Politica de confidențialitate” devine link pe ORICE site, doar cu politica publicată", () => {
+  // 2 nov. 2026: până atunci, implicitul venea doar pe pagina de vânzare; un cabinet avea link doar
+  // dacă scria adresa de mână în secțiune. Acum: aceeași adresă pe orice site, în context, nu în
+  // blocul paginii de vânzare.
   const pagina = citeste("src/app/page.tsx");
-  // Lista vine din `linkurilePaginilor`, care citește doar paginile publicate.
-  assert.ok(pagina.includes("linkurilePaginilor(siteId)"));
-  assert.ok(pagina.includes("linkConfidentialitate: politica ? `/${politica.slug}` : undefined"));
-  assert.ok(citeste("src/lib/pagini-publice.ts").includes('.eq("status", "published")'));
-  // Câmpul scris în secțiune are întâietate; implicitul vine doar de pe pagina de vânzare.
+  assert.ok(pagina.includes("adresaPoliticii(siteId)"));
+  assert.ok(pagina.indexOf("linkConfidentialitate,") < pagina.indexOf("paginaVanzare:"));
+  assert.ok(citeste("src/components/site/render-sections.tsx").includes("linkConfidentialitateImplicit={ctx.linkConfidentialitate}"));
+  // Doar publicată — dar în ORICE loc din meniu, și „Nicăieri” (`linkurilePaginilor` le scoate pe acelea).
+  const pagini = citeste("src/lib/pagini-publice.ts");
+  const inceput = pagini.indexOf("export const adresaPoliticii");
+  const politica = pagini.slice(inceput, pagini.indexOf("\n});\n", inceput));
+  assert.ok(politica.includes('.eq("status", "published")'));
+  assert.ok(!politica.includes("nav_location"));
+  // Programarea folosește aceeași adresă.
+  assert.ok(citeste("src/app/programare/page.tsx").includes("adresaPoliticii(siteId)"));
+  // Câmpul scris în secțiune are întâietate.
   const contact = citeste("src/components/site/sections/contact.tsx");
   assert.ok(contact.includes("linkConfidentialitate={data.linkConfidentialitate || linkConfidentialitateImplicit}"));
 });

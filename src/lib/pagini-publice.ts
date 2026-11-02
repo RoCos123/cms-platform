@@ -37,6 +37,40 @@ export const linkurilePaginilor = cache(async (siteId: string): Promise<LinkPagi
     .filter((pagina) => pagina.loc !== "none");
 });
 
+/** Adresa pe care o primește la provizionare politica fiecărui site (`creeaza_client`). */
+const SLUG_POLITICA = "politica-de-confidentialitate";
+
+/**
+ * Adresa politicii de confidențialitate a site-ului, DOAR dacă e publicată — pentru linkul
+ * „Politica de confidențialitate" de lângă bifa de acord, pe orice site (formularul de contact și
+ * cel de programare). `undefined` cât e ciornă sau lipsește: un link către o pagină inexistentă e
+ * mai rău decât un text care nu se apasă.
+ *
+ * Nu din `linkurilePaginilor`: acolo nu ajung paginile puse în meniu la „Nicăieri", iar politica
+ * trebuie să se poată citi de lângă bifă și când clientul n-o vrea în subsol (2 nov. 2026).
+ * „confident" în adresă, nu adresa exactă: o pagină redenumită de client (`/confidentialitate`)
+ * rămâne politica lui; dacă sunt mai multe, cea cu adresa de la provizionare are întâietate.
+ */
+export const adresaPoliticii = cache(async (siteId: string): Promise<string | undefined> => {
+  const { data, error } = await createServiceClient()
+    .from("pages")
+    .select("slug")
+    .eq("site_id", siteId)
+    .eq("status", "published")
+    .ilike("slug", "%confident%")
+    .order("position", { ascending: true });
+
+  if (error) {
+    // Fără link e mai bine decât un formular căzut: textul rămâne, doar nu se apasă.
+    console.error("Citirea politicii de confidențialitate a eșuat:", error);
+    return undefined;
+  }
+
+  const sluguri = (data ?? []).map((rand) => rand.slug as string);
+  const slug = sluguri.includes(SLUG_POLITICA) ? SLUG_POLITICA : sluguri[0];
+  return slug ? `/${slug}` : undefined;
+});
+
 /**
  * O pagină după adresa ei. `null` dacă nu există sau nu e publicată — atunci
  * ruta răspunde ca la orice adresă inexistentă.

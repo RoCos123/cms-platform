@@ -99,8 +99,8 @@ export function Contact({
    */
   detaliiFirma?: { eticheta: string; valoare: string; href?: string }[];
   /**
-   * Doar pe pagina de vânzare: adresa politicii de confidențialitate PUBLICATE,
-   * folosită când câmpul din secțiune e gol. Cât pagina e ciornă, lipsește.
+   * Adresa politicii de confidențialitate PUBLICATE (`adresaPoliticii`), folosită când câmpul
+   * din secțiune e gol — pe orice site. Cât pagina e ciornă, lipsește.
    */
   linkConfidentialitateImplicit?: string;
 }) {
@@ -131,9 +131,8 @@ export function Contact({
       temaCaptcha={tone === "inchis" ? "dark" : "light"}
       nota={data.notaFormular}
       textAcord={data.textAcord ?? ACORD_IMPLICIT}
-      // Fără valoare implicită: `/confidentialitate` nu există încă, iar un
-      // link către o pagină inexistentă e mai rău decât lipsa lui. Excepția e
-      // pagina de vânzare, unde vine adresa paginii DOAR dacă e publicată.
+      // Adresa scrisă în secțiune, altfel cea a politicii PUBLICATE a site-ului. Nicio adresă
+      // ghicită: un link către o pagină inexistentă e mai rău decât lipsa lui.
       linkConfidentialitate={data.linkConfidentialitate || linkConfidentialitateImplicit}
       mesajSucces={data.mesajSucces}
       // „Trimite", nu „Sună-mă": telefonul e opțional, iar emailul obligatoriu —

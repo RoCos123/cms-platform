@@ -18,6 +18,7 @@ import { adresaImaginii, adresaFisierului } from "@/lib/imagini-adrese";
 import { construiesteDestinatii, ANCORE_SECTIUNI } from "@/lib/destinatii";
 import { documenteleBibliotecii } from "@/lib/imagini-panou";
 import { modeleleDePePagina, tipulSiteului } from "@/lib/pagina-vanzare-date";
+import { adresaPoliticii } from "@/lib/pagini-publice";
 import { dateleFirmei } from "@/lib/pagina-vanzare";
 
 export default async function EditorSectiunePage({
@@ -100,6 +101,7 @@ export default async function EditorSectiunePage({
     oreProgramare,
     tip,
     modele,
+    linkConfidentialitate,
   ] = await Promise.all([
     // Previzualizarea „Articolelor recente” arată articole adevărate, nu
     // exemple: altfel clientul n-ar avea cum să vadă că secțiunea dispare
@@ -128,6 +130,8 @@ export default async function EditorSectiunePage({
     // previzualizarea trebuie să-l arate pe acela, nu pe al unui cabinet.
     tipulSiteului(session.siteId),
     modeleleDePePagina(session.siteId),
+    // Ca pe site: „Politica de confidențialitate” de lângă bifă e link doar cu politica publicată.
+    adresaPoliticii(session.siteId),
   ]);
 
   const destinatii = construiesteDestinatii(
@@ -166,6 +170,7 @@ export default async function EditorSectiunePage({
       oreProgramare={oreProgramare}
       destinatii={destinatii}
       documente={documente}
+      linkConfidentialitate={linkConfidentialitate}
       paginaVanzare={tip === "vanzare" ? { modele, firma: dateleFirmei(setari?.brand) } : null}
     />
   );

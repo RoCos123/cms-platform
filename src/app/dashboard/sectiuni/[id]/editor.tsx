@@ -34,6 +34,7 @@ export function EditorSectiune({
   oreProgramare,
   destinatii,
   documente,
+  linkConfidentialitate,
   paginaVanzare,
 }: {
   id: string;
@@ -58,6 +59,8 @@ export function EditorSectiune({
   destinatii: Destinatie[];
   /** Documentele din bibliotecă, pentru materialele de sub un program. */
   documente: OptiuneDocument[];
+  /** Adresa politicii publicate: în previzualizare, linkul de lângă bifa de acord, ca pe site. */
+  linkConfidentialitate?: string;
   /** Doar pe pagina de vânzare — ca previzualizarea să arate ce are site-ul ăla, nu un cabinet. */
   paginaVanzare: PaginaVanzare | null;
 }) {
@@ -162,7 +165,15 @@ export function EditorSectiune({
         >
           <RenderSections
             rows={[randPreviz]}
-            context={{ articole, servicii, paginaServiciiActiva, oreProgramare, asezari: template.asezari, paginaVanzare }}
+            context={{
+              articole,
+              servicii,
+              paginaServiciiActiva,
+              oreProgramare,
+              asezari: template.asezari,
+              linkConfidentialitate,
+              paginaVanzare,
+            }}
           />
         </PanouPrevizualizare>
       </div>

@@ -78,6 +78,12 @@ export type SectionContext = {
    */
   asezari: TemplateAsezari;
   /**
+   * Adresa politicii de confidențialitate, DOAR dacă e publicată (`adresaPoliticii`). Atunci
+   * „Politica de confidențialitate" de lângă bifa de acord devine link singură, pe orice site
+   * (2 nov. 2026; până atunci doar pe pagina de vânzare); cât e ciornă, rămâne text.
+   */
+  linkConfidentialitate?: string;
+  /**
    * DOAR pe pagina de vânzare (`sites.tip = 'vanzare'`, 9 oct. 2026). Lipsă pe
    * orice site de cabinet — iar lipsa înseamnă: totul ca până acum.
    */
@@ -90,12 +96,6 @@ export type PaginaVanzare = {
   modele: string[];
   /** Datele firmei din Setări, doar cele completate (vezi `dateleFirmei`). */
   firma: DateFirma;
-  /**
-   * Adresa politicii de confidențialitate, DOAR dacă pagina e publicată. Atunci
-   * „Politica de confidențialitate" de lângă bifă devine link singură (brief,
-   * punctul 4); cât e ciornă, rămâne text.
-   */
-  linkConfidentialitate?: string;
 };
 
 /**
@@ -223,7 +223,7 @@ const REGISTRU: Record<string, (row: SectionRow, ctx: SectionContext) => ReactNo
       card={ctx.asezari.contactCard}
       modele={ctx.paginaVanzare?.modele}
       detaliiFirma={ctx.paginaVanzare ? randurileDeContact(ctx.paginaVanzare.firma) : undefined}
-      linkConfidentialitateImplicit={ctx.paginaVanzare?.linkConfidentialitate}
+      linkConfidentialitateImplicit={ctx.linkConfidentialitate}
     />
   ),
   programare: (row, ctx) => (

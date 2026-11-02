@@ -823,7 +823,7 @@ const LISTA: MetaSectiune[] = [
         tip: "adresa",
         cheie: "linkConfidentialitate",
         eticheta: "Adresa politicii de confidențialitate",
-        hint: "Cât timp e gol, textul apare fără link. Se completează când pagina există.",
+        hint: "Lasă gol: linkul duce singur la pagina ta „Politica de confidențialitate”, cât timp e publicată (ca ciornă, textul rămâne fără link). Scrie o adresă doar dacă politica stă în altă parte.",
         max: 200,
       },
       {

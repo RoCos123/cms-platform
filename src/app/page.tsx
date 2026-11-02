@@ -23,7 +23,7 @@ import { CadruSite } from "@/components/site/cadru-site";
 import { DateStructurate } from "@/components/site/date-structurate";
 import { TEXTE_VANZARE, dateleFirmei, numeleModelelor } from "@/lib/pagina-vanzare";
 import { tipulSiteului } from "@/lib/pagina-vanzare-date";
-import { linkurilePaginilor } from "@/lib/pagini-publice";
+import { adresaPoliticii } from "@/lib/pagini-publice";
 import { MARIMEA_CARTONASULUI } from "@/lib/cartonas-masuri";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -83,7 +83,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PublicHomePage() {
   const { siteId, domain } = await getTenant();
 
-  const [{ site, pagini, brand, seo, social }, { data: rows }, articole, servicii, tip, paginiPublicate] =
+  const [{ site, pagini, brand, seo, social }, { data: rows }, articole, servicii, tip, linkConfidentialitate] =
     await Promise.all([
     identitateaSiteului(siteId),
     (await tenantTable("site_content"))
@@ -101,13 +101,9 @@ export default async function PublicHomePage() {
     articolePublicate(siteId),
     serviciiPublicate(siteId),
     tipulSiteului(siteId),
-    // Memorată pe cerere: cadrul o citește oricum pentru meniu, deci nu costă.
-    linkurilePaginilor(siteId),
+    // Politica de confidențialitate, dacă e publicată: linkul de lângă bifa de acord, pe orice site.
+    adresaPoliticii(siteId),
   ]);
-
-  // Pagina de vânzare: politica de confidențialitate, dacă e publicată (aceeași
-  // regulă ca pe pagina de programare). Ciornele nu ajung în listă.
-  const politica = paginiPublicate.find((pagina) => pagina.slug.includes("confident"));
 
   // Dublul cast e necesar cât timp nu generăm tipurile bazei de date: `tenantTable`
   // primește numele tabelului ca `string`, deci supabase-js nu poate deduce forma
@@ -184,6 +180,7 @@ export default async function PublicHomePage() {
             // Așezările vin din șablon. Necunoscut sau lipsă → cel implicit,
             // ca peste tot: o pagină publică trebuie să se randeze mereu.
             asezari: getTemplate(site?.template as string | null).asezari,
+            linkConfidentialitate,
             // Doar pe pagina de vânzare. Modelele se iau din galeria de pe
             // pagină — aceleași rânduri, deci nicio interogare în plus.
             paginaVanzare:
@@ -191,7 +188,6 @@ export default async function PublicHomePage() {
                 ? {
                     modele: numeleModelelor(sections),
                     firma: dateleFirmei(brand),
-                    linkConfidentialitate: politica ? `/${politica.slug}` : undefined,
                   }
                 : null,
           }}

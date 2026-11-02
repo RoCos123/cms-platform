@@ -182,6 +182,21 @@ text: propune și așteaptă (7 oct.: textele lui rescrise de mine; 8 oct.: etic
 rând, schimbată din inițiativa mea — amândouă respinse). Verificarea cerută de el se
 face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spune.
 
+**„Politica de confidențialitate” de lângă bifa de acord e link pe TOATE site-urile (2 nov. 2026; proprietarul:
+„să fie clickuibilă acolo unde scrie «Sunt de acord cu prelucrarea datelor personale. Am citit Politica de
+confidențialitate»” — „pe toate templateurile și site-urile făcute”) — PE RAMURĂ, NU PE MASTER.** Înainte, la
+formularul de contact, linkul venea singur DOAR pe pagina de vânzare; un cabinet îl avea doar dacă scria adresa de
+mână în secțiune. Acum `adresaPoliticii` (`src/lib/pagini-publice.ts`) dă adresa politicii PUBLICATE a oricărui site,
+folosită de formularul de contact (prin contextul secțiunilor) și de programare; tot ea în previzualizările din
+panou. Merge și când pagina e pusă în meniu la „Nicăieri” (lista de linkuri a meniului le scoate pe acelea — de-asta
+nici pagina de vânzare, nici programarea n-aveau link cu politica ascunsă din meniu). Adresa scrisă în secțiune are
+încă întâietate; hint-ul câmpului spune acum că gol = linkul vine singur. **Ciorna rămâne fără link**, dinadins:
+fiecare site primește politica la creare ca ciornă (`creeaza_client`), iar un link către o pagină cu „Aceasta e o
+ciornă…” ar fi mai rău. Verificat în browser pe toate cinci șabloanele (ciornă → text; publicată și ascunsă din
+meniu → link; pagina se deschide; programarea la fel). *Pentru proprietar:* `supabase/verifica-politica-confidentialitate.sql`
+(doar citire) arată pe ce site-uri e publicată politica; unde e „ciornă”, se publică din panoul site-ului
+(Pagini → Politica de confidențialitate → Publică), după ce textul e al clientului.
+
 **Galeria „Modele” de pe sitepsihologi: „Alte variante ale modelului”, poza care se schimbă singură — PE
 MASTER `91d19ff` (30 oct. 2026, la „fă pe master”; CI verde, rularea 240).** Cererea proprietarului: să se vadă clar că
 modelele pot avea alte culori și fonturi, schimbate oricând. I-am arătat trei machete (A — buline pe cartonașe,

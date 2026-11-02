@@ -11,7 +11,7 @@ import { adresaFisierului, adresaImaginii } from "@/lib/imagini-adrese";
 import { moduleleSiteului } from "@/lib/module";
 import { dateleFirmei, numeleModelelor } from "@/lib/pagina-vanzare";
 import { tipulSiteului } from "@/lib/pagina-vanzare-date";
-import { linkurilePaginilor } from "@/lib/pagini-publice";
+import { adresaPoliticii, linkurilePaginilor } from "@/lib/pagini-publice";
 import { oreDeAratatPePrimaPagina, seePotFaceProgramari } from "@/lib/programari-publice";
 import { serviciiPublicate } from "@/lib/servicii-publice";
 import { cheileSectiunilorVizibile, dateleSectiuniiPachete } from "@/lib/sectiuni-vizibile";
@@ -50,7 +50,17 @@ export async function previzualizareaSiteului(
   siteId: string,
   domeniu: string,
 ): Promise<PrevizualizareSite | null> {
-  const [{ data: rows }, { site, brand, pagini, social }, articole, servicii, linkuriPagini, cheiVizibile, datePachete, tip] =
+  const [
+    { data: rows },
+    { site, brand, pagini, social },
+    articole,
+    servicii,
+    linkuriPagini,
+    cheiVizibile,
+    datePachete,
+    tip,
+    linkConfidentialitate,
+  ] =
     await Promise.all([
       // Cu clientul din panou (RLS), ca la editorul de secțiuni; `site_id` explicit peste RLS.
       supabase
@@ -66,6 +76,7 @@ export async function previzualizareaSiteului(
       cheileSectiunilorVizibile(siteId),
       dateleSectiuniiPachete(siteId),
       tipulSiteului(siteId),
+      adresaPoliticii(siteId),
     ]);
 
   if (!rows || rows.length === 0) return null;
@@ -130,6 +141,7 @@ export async function previzualizareaSiteului(
       servicii,
       paginaServiciiActiva,
       oreProgramare: await oreDeAratatPePrimaPagina(siteId, moduleleSiteului(site).programari),
+      linkConfidentialitate,
       paginaVanzare:
         tip === "vanzare" ? { modele: numeleModelelor(randuri), firma: dateleFirmei(brand) } : null,
     },
