@@ -184,7 +184,7 @@ face ÎNAINTE de înlocuire, iar ce iese neconform se ține pe loc și i se spun
 
 **„Politica de confidențialitate” de lângă bifa de acord e link pe TOATE site-urile (2 nov. 2026; proprietarul:
 „să fie clickuibilă acolo unde scrie «Sunt de acord cu prelucrarea datelor personale. Am citit Politica de
-confidențialitate»” — „pe toate templateurile și site-urile făcute”) — PE RAMURĂ, NU PE MASTER.** Înainte, la
+confidențialitate»” — „pe toate templateurile și site-urile făcute”) — PE MASTER `7eae893`, CI verde, rularea 243.** Înainte, la
 formularul de contact, linkul venea singur DOAR pe pagina de vânzare; un cabinet îl avea doar dacă scria adresa de
 mână în secțiune. Acum `adresaPoliticii` (`src/lib/pagini-publice.ts`) dă adresa politicii PUBLICATE a oricărui site,
 folosită de formularul de contact (prin contextul secțiunilor) și de programare; tot ea în previzualizările din
